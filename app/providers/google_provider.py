@@ -8,7 +8,7 @@ from ..models.responses import LLMResponse, TokenUsage
 
 
 class GoogleProvider(BaseAIProvider):
-    def __init__(self, api_key: str, model: str = "gemini2.5-flash-lite", **kwargs):
+    def __init__(self, api_key: str, model: str = "gemini-2.5-flash-lite", **kwargs):
         super().__init__(api_key, model, **kwargs)
         if api_key:
             genai.configure(api_key=api_key)

@@ -1,6 +1,6 @@
 from typing import List, Dict, Any, Optional
 import time
-from anthropic import AsyncAnthropic
+import anthropic
 
 from ..core.base_provider import BaseAIProvider
 from ..models.requests import ChatMessage
@@ -8,9 +8,9 @@ from ..models.responses import LLMResponse, TokenUsage
 
 
 class AnthropicProvider(BaseAIProvider):
-    def __init__(self, api_key: str, model: str = "claude-3-haiku-latest", **kwargs):
+    def __init__(self, api_key: str, model: str = "claude-3-haiku-20240307", **kwargs):
         super().__init__(api_key, model, **kwargs)
-        self.client = AsyncAnthropic(api_key=api_key)
+        self.client = anthropic.AsyncAnthropic(api_key=api_key)
     
     async def _make_api_call(self, messages: List[ChatMessage], temperature: float = 0.7, 
                            max_tokens: int = 1000, **kwargs) -> Any:

@@ -70,13 +70,24 @@ class BaseAIProvider(ABC):
             response_time = time.time() - start_time
             
             # Convert raw_response to dict if it's not already
-            raw_response_dict = raw_response
-            if hasattr(raw_response, 'model_dump'):
-                raw_response_dict = raw_response.model_dump()
+            raw_response_dict = None
+            if isinstance(raw_response, dict):
+                raw_response_dict = raw_response
+            elif hasattr(raw_response, 'model_dump'):
+                try:
+                    raw_response_dict = raw_response.model_dump()
+                except:
+                    raw_response_dict = None
             elif hasattr(raw_response, 'dict'):
-                raw_response_dict = raw_response.dict()
-            elif not isinstance(raw_response, dict):
-                raw_response_dict = str(raw_response)
+                try:
+                    raw_response_dict = raw_response.dict()
+                except:
+                    raw_response_dict = None
+            elif hasattr(raw_response, '__dict__'):
+                try:
+                    raw_response_dict = {k: str(v) for k, v in raw_response.__dict__.items()}
+                except:
+                    raw_response_dict = None
             
             return LLMResponse(
                 provider=self.provider_name,
@@ -107,6 +118,8 @@ class BaseAIProvider(ABC):
                 messages=test_messages,
                 max_tokens=10
             )
+            print(f"Health check for {self.provider_name}: success={response.success}, content='{response.content[:50]}...', error={response.error_message}")
             return response.success
-        except:
+        except Exception as e:
+            print(f"Health check exception for {self.provider_name}: {str(e)}")
             return False
