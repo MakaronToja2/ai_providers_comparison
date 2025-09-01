@@ -29,14 +29,13 @@ class SWEBenchLoader:
             raise ValueError("Split must be 'dev' or 'test'")
         
         try:
-            # Use huggingface datasets path format
-            splits_mapping = {
-                'dev': 'data/dev-00000-of-00001.parquet',
-                'test': 'data/test-00000-of-00001.parquet'
-            }
-            
             logger.info(f"Loading SWE-bench {split} dataset...")
-            df = pd.read_parquet(f"hf://datasets/SWE-bench/SWE-bench_Lite/{splits_mapping[split]}")
+            
+            # Use datasets library instead of direct parquet reading
+            from datasets import load_dataset
+            
+            dataset = load_dataset("SWE-bench/SWE-bench_Lite", split=split)
+            df = dataset.to_pandas()
             
             # Cache the dataset
             self._dataset_cache[split] = df
@@ -86,6 +85,23 @@ class SWEBenchLoader:
         row = instance_rows.iloc[0]
         
         try:
+            # Parse test lists that might come as strings
+            import json
+            
+            fail_to_pass = row.get('FAIL_TO_PASS')
+            if isinstance(fail_to_pass, str):
+                try:
+                    fail_to_pass = json.loads(fail_to_pass)
+                except:
+                    fail_to_pass = None
+            
+            pass_to_pass = row.get('PASS_TO_PASS') 
+            if isinstance(pass_to_pass, str):
+                try:
+                    pass_to_pass = json.loads(pass_to_pass)
+                except:
+                    pass_to_pass = None
+            
             instance = SWEBenchInstance(
                 instance_id=row.get('instance_id', ''),
                 repo=row.get('repo', ''),
@@ -96,8 +112,8 @@ class SWEBenchLoader:
                 hints_text=row.get('hints_text'),
                 created_at=row.get('created_at'),
                 version=row.get('version'),
-                FAIL_TO_PASS=row.get('FAIL_TO_PASS'),
-                PASS_TO_PASS=row.get('PASS_TO_PASS'),
+                FAIL_TO_PASS=fail_to_pass,
+                PASS_TO_PASS=pass_to_pass,
                 environment_setup_commit=row.get('environment_setup_commit')
             )
             

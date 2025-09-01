@@ -9,6 +9,6 @@ anthropic==0.60.0
 google-generativeai==0.3.2
 tenacity==8.2.3
 python-multipart==0.0.6
-pandas==2.1.4
-datasets==2.15.0
-huggingface-hub==0.19.4
+pandas
+datasets
+huggingface-hub
