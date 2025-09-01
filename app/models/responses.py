@@ -27,7 +27,7 @@ class ComparisonResponse(BaseModel):
     summary: Dict[str, Any] = Field(..., description="Summary statistics")
     timestamp: datetime = Field(default_factory=datetime.now)
 
-
+T
 class ProviderHealth(BaseModel):
     healthy: bool = Field(..., description="Whether the provider is healthy")
     error: Optional[str] = Field(None, description="Error message if unhealthy")
