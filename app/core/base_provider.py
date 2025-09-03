@@ -2,10 +2,13 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Any
 import time
 import asyncio
+import json
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from ..models.requests import ChatMessage, LLMRequest
-from ..models.responses import LLMResponse, TokenUsage
+from ..models.responses import LLMResponse, TokenUsage, ToolCall
+from .tools import tool_registry
+from ..config.settings import get_settings
 
 
 class BaseAIProvider(ABC):
@@ -34,15 +37,55 @@ class BaseAIProvider(ABC):
         messages: List[ChatMessage], 
         temperature: float = 0.7,
         max_tokens: int = 1000,
+        tools: Optional[List[Dict[str, Any]]] = None,
         **kwargs
     ) -> Dict[str, Any]:
         """Make the actual API call to the provider"""
         pass
     
     @abstractmethod
-    def _parse_response(self, raw_response: Dict[str, Any]) -> tuple[str, Optional[TokenUsage]]:
+    def _parse_response(self, raw_response: Dict[str, Any]) -> tuple[str, Optional[TokenUsage], Optional[List[Dict[str, Any]]]]:
         """Parse the provider's response into standardized format"""
         pass
+    
+    async def _execute_tool_call(self, tool_name: str, parameters: Dict[str, Any]) -> ToolCall:
+        """Execute a tool call and return the result"""
+        settings = get_settings()
+        
+        # Get the tool from registry
+        tool = tool_registry.get_tool(tool_name)
+        if not tool:
+            return ToolCall(
+                name=tool_name,
+                parameters=parameters,
+                success=False,
+                error=f"Tool '{tool_name}' not found or not enabled"
+            )
+        
+        try:
+            # Execute the tool
+            result = await tool.execute(**parameters)
+            
+            # Log tool call if debugging is enabled
+            if settings.tool_debug:
+                print(f"Tool call: {tool_name} with {parameters}")
+                print(f"Tool result: {result.model_dump()}")
+            
+            return ToolCall(
+                name=tool_name,
+                parameters=parameters,
+                result=result.model_dump(),
+                success=result.success,
+                error=result.error
+            )
+            
+        except Exception as e:
+            return ToolCall(
+                name=tool_name,
+                parameters=parameters,
+                success=False,
+                error=f"Tool execution failed: {str(e)}"
+            )
     
     @retry(
         stop=stop_after_attempt(3),
@@ -53,20 +96,40 @@ class BaseAIProvider(ABC):
         messages: List[ChatMessage],
         temperature: float = 0.7,
         max_tokens: int = 1000,
+        use_tools: bool = True,
         **kwargs
     ) -> LLMResponse:
         """Generate response with retry logic and standardized output"""
         start_time = time.time()
         
         try:
+            # Get available tools if enabled
+            tools_spec = None
+            if use_tools:
+                tool_definitions = tool_registry.get_tool_definitions()
+                if tool_definitions:
+                    tools_spec = [tool.model_dump() for tool in tool_definitions]
+            
             raw_response = await self._make_api_call(
                 messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens,
+                tools=tools_spec,
                 **kwargs
             )
             
-            content, usage = self._parse_response(raw_response)
+            content, usage, tool_calls_data = self._parse_response(raw_response)
+            
+            # Execute any tool calls
+            executed_tool_calls = []
+            if tool_calls_data:
+                for tool_call_data in tool_calls_data:
+                    tool_name = tool_call_data.get("name")
+                    parameters = tool_call_data.get("parameters", {})
+                    
+                    executed_call = await self._execute_tool_call(tool_name, parameters)
+                    executed_tool_calls.append(executed_call)
+            
             response_time = time.time() - start_time
             
             # Convert raw_response to dict if it's not already
@@ -96,7 +159,8 @@ class BaseAIProvider(ABC):
                 usage=usage,
                 response_time=response_time,
                 success=True,
-                raw_response=raw_response_dict
+                raw_response=raw_response_dict,
+                tool_calls=executed_tool_calls if executed_tool_calls else None
             )
             
         except Exception as e:

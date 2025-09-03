@@ -5,6 +5,7 @@ from ..models.requests import AIProvider, ChatMessage
 from ..models.swe_bench import SWEBenchAnalysisRequest, SWEBenchAnalysisResponse, SWEBenchDatasetInfo
 from ..core.provider_factory import ProviderFactory
 from ..utils.swe_bench_loader import swe_bench_loader
+from ..utils.repo_context import repo_context
 
 router = APIRouter()
 
@@ -77,16 +78,19 @@ async def analyze_instance(request: SWEBenchAnalysisRequest):
             model=model
         )
         
-        # Build analysis prompt
-        prompt = _build_analysis_prompt(instance, request)
-        
-        # Generate analysis
-        messages = [ChatMessage(role="user", content=prompt)]
-        llm_response = await provider.generate_response(
-            messages=messages,
-            max_tokens=2000,
-            temperature=0.3
-        )
+        # Clone repository for analysis
+        async with repo_context(instance.repo, instance.base_commit) as repo_ctx:
+            # Build analysis prompt with repo context
+            prompt = _build_analysis_prompt(instance, request, repo_ctx.working_directory)
+            
+            # Generate analysis with tools enabled
+            messages = [ChatMessage(role="user", content=prompt)]
+            llm_response = await provider.generate_response(
+                messages=messages,
+                max_tokens=2000,
+                temperature=0.3,
+                use_tools=True  # Enable tool calling
+            )
         
         # Create structured analysis summary
         analysis_summary = _create_analysis_summary(instance, request, llm_response)
@@ -104,7 +108,7 @@ async def analyze_instance(request: SWEBenchAnalysisRequest):
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
 
 
-def _build_analysis_prompt(instance, request: SWEBenchAnalysisRequest) -> str:
+def _build_analysis_prompt(instance, request: SWEBenchAnalysisRequest, repo_path: str = None) -> str:
     """Build analysis prompt based on request type and instance data"""
     
     if request.custom_prompt:
@@ -132,14 +136,21 @@ Problem Statement: {instance.problem_statement}
 
 {base_info}
 
-Provide a detailed analysis including:
+The repository has been cloned at commit {instance.base_commit} for your analysis.
+
+You have access to tools to explore the codebase:
+- search_code: Search for patterns using regex (e.g., "def function_name", "class ClassName")
+- read_file: Read specific files with optional line ranges
+- list_directory: Browse directory structure
+
+Use these tools to understand the codebase context and provide a detailed analysis including:
 1. What is the bug or issue?
 2. What are the root causes?
 3. What components/files are affected?
 4. How severe is the issue?
 5. What would be the approach to fix it?
 
-Keep your analysis technical and specific."""
+Start by exploring the affected files mentioned in the patch to understand the full context."""
         
     elif request.analysis_type == "solution_generation":
         prompt = f"""Generate a solution for this software issue:

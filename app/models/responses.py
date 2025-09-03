@@ -9,6 +9,14 @@ class TokenUsage(BaseModel):
     total_tokens: int = Field(..., description="Total tokens used")
 
 
+class ToolCall(BaseModel):
+    name: str = Field(..., description="Tool name")
+    parameters: Dict[str, Any] = Field(..., description="Tool parameters")
+    result: Optional[Dict[str, Any]] = Field(None, description="Tool execution result")
+    success: bool = Field(..., description="Whether tool call succeeded")
+    error: Optional[str] = Field(None, description="Error message if failed")
+
+
 class LLMResponse(BaseModel):
     provider: str = Field(..., description="AI provider used")
     model: str = Field(..., description="Model used")
@@ -19,6 +27,7 @@ class LLMResponse(BaseModel):
     success: bool = Field(True, description="Whether the request was successful")
     error_message: Optional[str] = Field(None, description="Error message if failed")
     raw_response: Optional[Dict[str, Any]] = Field(None, description="Raw provider response")
+    tool_calls: Optional[List[ToolCall]] = Field(None, description="Tool calls made during generation")
 
 
 class ComparisonResponse(BaseModel):
@@ -27,7 +36,7 @@ class ComparisonResponse(BaseModel):
     summary: Dict[str, Any] = Field(..., description="Summary statistics")
     timestamp: datetime = Field(default_factory=datetime.now)
 
-T
+
 class ProviderHealth(BaseModel):
     healthy: bool = Field(..., description="Whether the provider is healthy")
     error: Optional[str] = Field(None, description="Error message if unhealthy")

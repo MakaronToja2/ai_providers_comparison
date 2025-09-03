@@ -13,7 +13,7 @@ class AnthropicProvider(BaseAIProvider):
         self.client = anthropic.AsyncAnthropic(api_key=api_key)
     
     async def _make_api_call(self, messages: List[ChatMessage], temperature: float = 0.7, 
-                           max_tokens: int = 1000, **kwargs) -> Any:
+                           max_tokens: int = 1000, tools: Optional[List[Dict[str, Any]]] = None, **kwargs) -> Any:
         # Claude expects system message separate from conversation
         system_message = None
         conversation_messages = []
@@ -37,21 +37,46 @@ class AnthropicProvider(BaseAIProvider):
         
         if system_message:
             params["system"] = system_message
+            
+        # Add tools if provided
+        if tools:
+            # Convert our tool format to Anthropic's format
+            anthropic_tools = []
+            for tool in tools:
+                anthropic_tools.append({
+                    "name": tool["name"],
+                    "description": tool["description"],
+                    "input_schema": tool["parameters"]
+                })
+            params["tools"] = anthropic_tools
         
         response = await self.client.messages.create(**params)
         return response
     
-    def _parse_response(self, raw_response: Any) -> tuple[str, Optional[TokenUsage]]:
-        content = raw_response.content[0].text if raw_response.content else ""
-        usage = raw_response.usage
+    def _parse_response(self, raw_response: Any) -> tuple[str, Optional[TokenUsage], Optional[List[Dict[str, Any]]]]:
+        # Extract text content and tool calls
+        text_content = ""
+        tool_calls = []
         
+        if raw_response.content:
+            for block in raw_response.content:
+                if hasattr(block, 'text') and block.text:
+                    text_content += block.text
+                elif hasattr(block, 'type') and block.type == 'tool_use':
+                    # Anthropic tool call format
+                    tool_calls.append({
+                        "name": block.name,
+                        "parameters": block.input
+                    })
+        
+        usage = raw_response.usage
         usage_obj = TokenUsage(
             prompt_tokens=usage.input_tokens,
             completion_tokens=usage.output_tokens,
             total_tokens=usage.input_tokens + usage.output_tokens
         ) if usage else None
         
-        return content, usage_obj
+        return text_content, usage_obj, tool_calls if tool_calls else None
     
     @property
     def provider_name(self) -> str:

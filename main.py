@@ -1,12 +1,16 @@
 from fastapi import FastAPI
 from app.config.settings import get_settings
 from app.core.routes import router
+from app.core.tool_manager import initialize_tools
 
 app = FastAPI(
     title="LLM Comparison API",
     description="API for comparing different AI providers for pull request analysis",
     version="1.0.0"
 )
+
+# Initialize tools on startup
+initialize_tools()
 
 app.include_router(router, prefix="/api/v1")
 

@@ -1,6 +1,6 @@
 from functools import lru_cache
 from pydantic_settings import BaseSettings
-from typing import Optional
+from typing import Optional, List
 
 
 class Settings(BaseSettings):
@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     # App settings
     app_name: str = "LLM Comparison API"
     debug: bool = False
+    
+    # Tool configuration
+    enabled_tools: List[str] = ["read_file", "list_directory", "search_code"]
+    tool_debug: bool = True  # Log tool calls and results for testing
     
     class Config:
         env_file = ".env"
