@@ -4,6 +4,9 @@ What we achieved:
 - We can load the splits of the SWE bench lite (might wanna configure to load other DS)
 - We can debug the issues of each providers
 
-Next steps:
-- Introduce tools for providers, for sure access to the repo, crawling the repo
 - Introduce test calling
+
+03/09/2025
+- Introduce tools for providers, for sure access to the repo, crawling the repo - BASE AI PROVIDERS DONE, Claude can now see tools.
+
+Tool conversion failed: 'string' - TODO
