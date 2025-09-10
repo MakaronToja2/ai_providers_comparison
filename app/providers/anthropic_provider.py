@@ -27,12 +27,15 @@ class AnthropicProvider(BaseAIProvider):
                     "content": msg.content
                 })
         
+        # Remove any tools from kwargs to avoid conflicts
+        filtered_kwargs = {k: v for k, v in kwargs.items() if k != 'tools'}
+        
         params = {
             "model": self.model,
             "messages": conversation_messages,
             "temperature": temperature,
             "max_tokens": max_tokens,
-            **kwargs
+            **filtered_kwargs
         }
         
         if system_message:
