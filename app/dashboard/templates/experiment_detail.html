@@ -155,14 +155,15 @@
 <script>
 {% if metrics and metrics.success_rate_by_provider %}
 // Provider success rate chart
+const successRates = {{ metrics.success_rate_by_provider | tojson }};
 const providerCtx = document.getElementById('providerChart').getContext('2d');
 new Chart(providerCtx, {
     type: 'bar',
     data: {
-        labels: {{ metrics.success_rate_by_provider.keys() | list | tojson }},
+        labels: Object.keys(successRates),
         datasets: [{
             label: 'Success Rate (%)',
-            data: {{ metrics.success_rate_by_provider.values() | list | map('multiply', 100) | list | tojson }},
+            data: Object.values(successRates).map(v => v * 100),
             backgroundColor: ['#3b82f6', '#10b981', '#f59e0b']
         }]
     },

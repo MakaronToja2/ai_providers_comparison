@@ -1,10 +1,12 @@
 """
 API endpoints for benchmark experiments.
 """
+import io
 import json
 from typing import Optional
 from fastapi import APIRouter, HTTPException, BackgroundTasks
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.responses import StreamingResponse, JSONResponse, Response
+import pandas as pd
 
 from ..benchmark.storage import Storage
 from ..benchmark.runner import ExperimentRunner, get_runner
@@ -22,7 +24,7 @@ from ..models.benchmark import (
 )
 
 
-router = APIRouter(prefix="/api/v1/benchmark", tags=["benchmark"])
+router = APIRouter(prefix="/benchmark", tags=["benchmark"])
 
 # Global instances
 _storage: Optional[Storage] = None
@@ -336,14 +338,69 @@ async def get_context_analysis(experiment_id: str):
 
 @router.get("/experiments/{experiment_id}/export")
 async def export_experiment(experiment_id: str, format: str = "json"):
-    """Export experiment data."""
+    """Export experiment data. Supports 'json' and 'csv' formats."""
     storage = get_storage()
-    data = await storage.export_results_to_dict(experiment_id)
 
-    if not data:
+    experiment = await storage.get_experiment(experiment_id)
+    if not experiment:
         raise HTTPException(status_code=404, detail="Experiment not found")
 
     if format == "json":
+        data = await storage.export_results_to_dict(experiment_id)
         return JSONResponse(content=data)
+
+    elif format == "csv":
+        # Get all results for CSV export
+        results = await storage.get_results_for_experiment(experiment_id, limit=10000)
+        test_results = await storage.get_test_results_for_experiment(experiment_id)
+
+        # Build test result lookup
+        test_by_result_id = {tr.result_id: tr for tr in test_results}
+
+        # Build rows for CSV
+        rows = []
+        for r in results:
+            tr = test_by_result_id.get(r.id)
+            row = {
+                "instance_id": r.instance_id,
+                "provider": r.provider,
+                "model": r.model,
+                "tool_set": r.tool_set,
+                "success": r.success,
+                "error_message": r.error_message or "",
+                "prompt_tokens": r.prompt_tokens or 0,
+                "completion_tokens": r.completion_tokens or 0,
+                "total_tokens": r.total_tokens or 0,
+                "context_size_tokens": r.context_size_tokens or 0,
+                "response_time_seconds": r.response_time_seconds or 0,
+                "tool_call_count": r.tool_call_count,
+                "successful_tool_calls": r.successful_tool_calls,
+                "has_patch": bool(r.generated_patch),
+                "patch_applied": tr.patch_applied if tr else None,
+                "resolved": tr.resolved if tr else None,
+                "fail_to_pass_total": tr.fail_to_pass_total if tr else None,
+                "fail_to_pass_passed": tr.fail_to_pass_passed if tr else None,
+                "pass_to_pass_total": tr.pass_to_pass_total if tr else None,
+                "pass_to_pass_passed": tr.pass_to_pass_passed if tr else None,
+            }
+            rows.append(row)
+
+        # Create DataFrame and export to CSV
+        df = pd.DataFrame(rows)
+
+        # Write to buffer
+        buffer = io.StringIO()
+        df.to_csv(buffer, index=False)
+        csv_content = buffer.getvalue()
+
+        # Return as downloadable file
+        return Response(
+            content=csv_content,
+            media_type="text/csv",
+            headers={
+                "Content-Disposition": f"attachment; filename=experiment_{experiment_id}.csv"
+            }
+        )
+
     else:
-        raise HTTPException(status_code=400, detail=f"Unsupported format: {format}")
+        raise HTTPException(status_code=400, detail=f"Unsupported format: {format}. Use 'json' or 'csv'.")

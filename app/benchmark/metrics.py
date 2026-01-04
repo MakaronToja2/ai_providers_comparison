@@ -61,26 +61,27 @@ class MetricsCalculator:
 
         # Calculate tool usage patterns
         metrics.tool_usage_by_provider = self._tool_usage_by_provider(by_provider)
-        metrics.avg_tool_calls_per_instance = {
-            p: mean([r.tool_call_count for r in rs]) if rs else 0
-            for p, rs in by_provider.items()
-        }
+        metrics.avg_tool_calls_per_instance = {}
+        for p, rs in by_provider.items():
+            tool_calls = [r.tool_call_count for r in rs]
+            metrics.avg_tool_calls_per_instance[p] = mean(tool_calls) if tool_calls else 0
 
         # Calculate token metrics
-        metrics.avg_tokens_by_provider = {
-            p: mean([r.total_tokens for r in rs if r.total_tokens]) if rs else 0
-            for p, rs in by_provider.items()
-        }
-        metrics.avg_context_size_by_provider = {
-            p: mean([r.context_size_tokens for r in rs if r.context_size_tokens]) if rs else 0
-            for p, rs in by_provider.items()
-        }
+        metrics.avg_tokens_by_provider = {}
+        for p, rs in by_provider.items():
+            tokens = [r.total_tokens for r in rs if r.total_tokens]
+            metrics.avg_tokens_by_provider[p] = mean(tokens) if tokens else 0
+
+        metrics.avg_context_size_by_provider = {}
+        for p, rs in by_provider.items():
+            context_sizes = [r.context_size_tokens for r in rs if r.context_size_tokens]
+            metrics.avg_context_size_by_provider[p] = mean(context_sizes) if context_sizes else 0
 
         # Calculate timing metrics
-        metrics.avg_response_time_by_provider = {
-            p: mean([r.response_time_seconds for r in rs if r.response_time_seconds]) if rs else 0
-            for p, rs in by_provider.items()
-        }
+        metrics.avg_response_time_by_provider = {}
+        for p, rs in by_provider.items():
+            times = [r.response_time_seconds for r in rs if r.response_time_seconds]
+            metrics.avg_response_time_by_provider[p] = mean(times) if times else 0
 
         # Calculate total runtime
         all_times = [r.response_time_seconds for r in results if r.response_time_seconds]
@@ -283,9 +284,10 @@ class MetricsCalculator:
 
             resolved = sum(1 for tr in tool_set_test_results if tr.resolved)
 
+            tool_calls = [r.tool_call_count for r in tool_set_results]
             tool_set_analysis[tool_set] = {
                 "total_instances": len(tool_set_results),
-                "avg_tool_calls": mean([r.tool_call_count for r in tool_set_results]),
+                "avg_tool_calls": mean(tool_calls) if tool_calls else 0,
                 "success_rate": self._success_rate(tool_set_results),
                 "resolve_rate": resolved / len(tool_set_test_results) if tool_set_test_results else 0,
             }
@@ -329,11 +331,12 @@ class MetricsCalculator:
 
             resolved = sum(1 for tr in bucket_test_results if tr.resolved)
 
+            tokens = [r.total_tokens for r in bucket_results if r.total_tokens]
             analysis[f"{bucket}-{bucket + bucket_size}"] = {
                 "count": len(bucket_results),
                 "success_rate": self._success_rate(bucket_results),
                 "resolve_rate": resolved / len(bucket_test_results) if bucket_test_results else 0,
-                "avg_tokens": mean([r.total_tokens for r in bucket_results if r.total_tokens]),
+                "avg_tokens": mean(tokens) if tokens else 0,
             }
 
         return analysis

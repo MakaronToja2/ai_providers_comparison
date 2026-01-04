@@ -153,13 +153,14 @@
 const colors = ['#3b82f6', '#10b981', '#f59e0b'];
 
 // Success rate chart
+const successRates = {{ comparison_data.success_rate | tojson }};
 new Chart(document.getElementById('successChart').getContext('2d'), {
     type: 'bar',
     data: {
-        labels: {{ comparison_data.success_rate.keys() | list | tojson }},
+        labels: Object.keys(successRates),
         datasets: [{
             label: 'Success Rate (%)',
-            data: {{ comparison_data.success_rate.values() | list | map('multiply', 100) | list | tojson }},
+            data: Object.values(successRates).map(v => v * 100),
             backgroundColor: colors
         }]
     },
@@ -172,13 +173,14 @@ new Chart(document.getElementById('successChart').getContext('2d'), {
 });
 
 // Response time chart
+const responseTimes = {{ comparison_data.avg_response_time | tojson }};
 new Chart(document.getElementById('timeChart').getContext('2d'), {
     type: 'bar',
     data: {
-        labels: {{ comparison_data.avg_response_time.keys() | list | tojson }},
+        labels: Object.keys(responseTimes),
         datasets: [{
             label: 'Avg Response Time (s)',
-            data: {{ comparison_data.avg_response_time.values() | list | tojson }},
+            data: Object.values(responseTimes),
             backgroundColor: colors
         }]
     },
@@ -191,13 +193,14 @@ new Chart(document.getElementById('timeChart').getContext('2d'), {
 });
 
 // Token usage chart
+const avgTokens = {{ comparison_data.avg_tokens | tojson }};
 new Chart(document.getElementById('tokenChart').getContext('2d'), {
     type: 'bar',
     data: {
-        labels: {{ comparison_data.avg_tokens.keys() | list | tojson }},
+        labels: Object.keys(avgTokens),
         datasets: [{
             label: 'Avg Tokens',
-            data: {{ comparison_data.avg_tokens.values() | list | tojson }},
+            data: Object.values(avgTokens),
             backgroundColor: colors
         }]
     },
@@ -210,13 +213,14 @@ new Chart(document.getElementById('tokenChart').getContext('2d'), {
 });
 
 // Tool calls chart
+const avgToolCalls = {{ comparison_data.avg_tool_calls | tojson }};
 new Chart(document.getElementById('toolCallChart').getContext('2d'), {
     type: 'bar',
     data: {
-        labels: {{ comparison_data.avg_tool_calls.keys() | list | tojson }},
+        labels: Object.keys(avgToolCalls),
         datasets: [{
             label: 'Avg Tool Calls',
-            data: {{ comparison_data.avg_tool_calls.values() | list | tojson }},
+            data: Object.values(avgToolCalls),
             backgroundColor: colors
         }]
     },

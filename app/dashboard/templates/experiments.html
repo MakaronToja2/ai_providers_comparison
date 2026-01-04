@@ -5,6 +5,67 @@
 {% block content %}
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <h2>All Experiments</h2>
+    <button onclick="openCreateModal()" class="btn btn-primary">+ New Experiment</button>
+</div>
+
+<!-- Create Experiment Modal -->
+<div id="createModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; padding: 30px; border-radius: 12px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
+        <h2 style="margin-bottom: 20px;">Create New Experiment</h2>
+        <form id="createForm" onsubmit="createExperiment(event)">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Name *</label>
+                <input type="text" name="name" required style="width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px;" placeholder="My Experiment">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Description</label>
+                <textarea name="description" style="width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px; min-height: 60px;" placeholder="Optional description"></textarea>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Providers *</label>
+                <div style="display: flex; gap: 15px;">
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" name="providers" value="openai" checked> OpenAI
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" name="providers" value="anthropic" checked> Anthropic
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" name="providers" value="google" checked> Google
+                    </label>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Instance Limit</label>
+                <input type="number" name="limit" value="10" min="1" max="300" style="width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px;">
+                <small style="color: var(--gray-600);">Number of SWE-bench instances (max 300)</small>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Tool Set</label>
+                <select name="tool_set" style="width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px;">
+                    <option value="all_tools">All Tools (read_file, search_code, list_directory)</option>
+                    <option value="no_search">No Search (read_file, list_directory)</option>
+                    <option value="file_only">File Only (read_file)</option>
+                    <option value="no_tools">No Tools</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Max Concurrent</label>
+                <input type="number" name="max_concurrent" value="3" min="1" max="10" style="width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px;">
+                <small style="color: var(--gray-600);">Parallel requests per provider</small>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" onclick="closeCreateModal()" class="btn" style="background: var(--gray-100);">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create Experiment</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <div class="card">
@@ -62,6 +123,9 @@
                         {% elif exp.status.value == 'running' %}
                         <button onclick="stopExperiment('{{ exp.id }}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.875rem;">Stop</button>
                         {% endif %}
+                        {% if exp.status.value != 'running' %}
+                        <button onclick="deleteExperiment('{{ exp.id }}', '{{ exp.name }}')" class="btn" style="padding: 6px 12px; font-size: 0.875rem; background: var(--gray-100); color: var(--danger);">Delete</button>
+                        {% endif %}
                     </div>
                 </td>
             </tr>
@@ -86,6 +150,81 @@ POST /api/v1/benchmark/experiments
 
 {% block scripts %}
 <script>
+// Modal functions
+function openCreateModal() {
+    document.getElementById('createModal').style.display = 'flex';
+}
+
+function closeCreateModal() {
+    document.getElementById('createModal').style.display = 'none';
+    document.getElementById('createForm').reset();
+}
+
+// Close modal when clicking outside
+document.getElementById('createModal').addEventListener('click', function(e) {
+    if (e.target === this) closeCreateModal();
+});
+
+// Tool set configurations
+const toolSets = {
+    'all_tools': ['read_file', 'search_code', 'list_directory'],
+    'no_search': ['read_file', 'list_directory'],
+    'file_only': ['read_file'],
+    'no_tools': []
+};
+
+async function createExperiment(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+
+    // Get selected providers
+    const providers = [];
+    form.querySelectorAll('input[name="providers"]:checked').forEach(cb => {
+        providers.push(cb.value);
+    });
+
+    if (providers.length === 0) {
+        alert('Please select at least one provider');
+        return;
+    }
+
+    // Build tool sets based on selection
+    const toolSetName = formData.get('tool_set');
+    const toolSetConfig = {
+        name: toolSetName,
+        enabled_tools: toolSets[toolSetName]
+    };
+
+    const payload = {
+        name: formData.get('name'),
+        description: formData.get('description') || null,
+        providers: providers,
+        limit: parseInt(formData.get('limit')),
+        max_concurrent: parseInt(formData.get('max_concurrent')),
+        tool_sets: [toolSetConfig]
+    };
+
+    try {
+        const response = await fetch('/api/v1/benchmark/experiments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            closeCreateModal();
+            location.reload();
+        } else {
+            const error = await response.json();
+            alert('Failed to create experiment: ' + (error.detail || 'Unknown error'));
+        }
+    } catch (e) {
+        alert('Error: ' + e.message);
+    }
+}
+
 async function startExperiment(id) {
     try {
         const response = await fetch(`/api/v1/benchmark/experiments/${id}/start`, {
@@ -110,6 +249,26 @@ async function stopExperiment(id) {
             location.reload();
         } else {
             alert('Failed to stop experiment');
+        }
+    } catch (e) {
+        alert('Error: ' + e.message);
+    }
+}
+
+async function deleteExperiment(id, name) {
+    if (!confirm(`Are you sure you want to delete "${name}"?\n\nThis will permanently delete all results and test data.`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/v1/benchmark/experiments/${id}`, {
+            method: 'DELETE'
+        });
+        if (response.ok) {
+            location.reload();
+        } else {
+            const error = await response.json();
+            alert('Failed to delete: ' + (error.detail || 'Unknown error'));
         }
     } catch (e) {
         alert('Error: ' + e.message);

@@ -8,7 +8,8 @@ from datetime import datetime
 from typing import AsyncGenerator, List, Optional, Set, Tuple
 from dataclasses import dataclass
 
-from ..core.provider_factory import provider_factory
+from ..core.provider_factory import ProviderFactory
+from ..models.requests import AIProvider
 from ..core.tools import tool_registry
 from ..models.requests import ChatMessage
 from ..models.benchmark import (
@@ -192,22 +193,22 @@ class ExperimentRunner:
                 model = config.models.get(provider, self._get_default_model(provider))
 
                 for tool_set in config.tool_sets:
-                    key = (instance["instance_id"], provider, model, tool_set.name)
+                    key = (instance.instance_id, provider, model, tool_set.name)
 
                     if key not in completed_keys:
                         work_items.append(WorkItem(
-                            instance_id=instance["instance_id"],
+                            instance_id=instance.instance_id,
                             provider=provider,
                             model=model,
                             tool_set_name=tool_set.name,
                             enabled_tools=tool_set.enabled_tools,
-                            repo=instance["repo"],
-                            base_commit=instance["base_commit"],
-                            problem_statement=instance["problem_statement"],
-                            hints_text=instance.get("hints_text"),
-                            patch=instance.get("patch"),
-                            fail_to_pass=instance.get("FAIL_TO_PASS", []),
-                            pass_to_pass=instance.get("PASS_TO_PASS", []),
+                            repo=instance.repo,
+                            base_commit=instance.base_commit,
+                            problem_statement=instance.problem_statement,
+                            hints_text=instance.hints_text,
+                            patch=instance.patch,
+                            fail_to_pass=instance.FAIL_TO_PASS or [],
+                            pass_to_pass=instance.PASS_TO_PASS or [],
                         ))
 
         return work_items
@@ -233,7 +234,7 @@ class ExperimentRunner:
                 # Apply filters
                 if config.instance_ids and instance_id not in config.instance_ids:
                     continue
-                if config.repos and instance["repo"] not in config.repos:
+                if config.repos and instance.repo not in config.repos:
                     continue
 
                 instances.append(instance)
@@ -260,7 +261,7 @@ class ExperimentRunner:
 
         try:
             # Get provider
-            provider = provider_factory.get_provider(work.provider, work.model)
+            provider = ProviderFactory.create_provider(AIProvider(work.provider), work.model)
 
             # Configure tools
             original_tool_states = {}
@@ -269,47 +270,49 @@ class ExperimentRunner:
                 tool_registry._enabled_tools[tool_name] = tool_name in work.enabled_tools
 
             try:
-                # Build prompt
-                messages = self._build_analysis_messages(work)
-                result.context_size_chars = sum(len(m.content) for m in messages)
+                # Clone repository and work in its context
+                async with RepoContext(work.repo, work.base_commit) as repo_ctx:
+                    # Build prompt
+                    messages = self._build_analysis_messages(work)
+                    result.context_size_chars = sum(len(m.content) for m in messages)
 
-                # Generate response
-                start_time = time.time()
-                response = await provider.generate_response(
-                    messages=messages,
-                    temperature=0.3,
-                    max_tokens=4000,
-                )
-                result.response_time_seconds = time.time() - start_time
+                    # Generate response
+                    start_time = time.time()
+                    response = await provider.generate_response(
+                        messages=messages,
+                        temperature=0.3,
+                        max_tokens=4000,
+                    )
+                    result.response_time_seconds = time.time() - start_time
 
-                # Extract results
-                result.response_content = response.content
-                result.success = response.success
+                    # Extract results
+                    result.response_content = response.content
+                    result.success = response.success
 
-                if response.usage:
-                    result.prompt_tokens = response.usage.prompt_tokens
-                    result.completion_tokens = response.usage.completion_tokens
-                    result.total_tokens = response.usage.total_tokens
-                    result.context_size_tokens = response.usage.prompt_tokens
+                    if response.usage:
+                        result.prompt_tokens = response.usage.prompt_tokens
+                        result.completion_tokens = response.usage.completion_tokens
+                        result.total_tokens = response.usage.total_tokens
+                        result.context_size_tokens = response.usage.prompt_tokens
 
-                # Process tool calls
-                if response.tool_calls:
-                    for tc in response.tool_calls:
-                        result.tool_calls.append(ToolCallRecord(
-                            name=tc.name,
-                            parameters=tc.parameters,
-                            result=tc.result,
-                            success=tc.success,
-                            error=tc.error,
-                        ))
-                    result.tool_call_count = len(response.tool_calls)
-                    result.successful_tool_calls = sum(1 for tc in response.tool_calls if tc.success)
+                    # Process tool calls
+                    if response.tool_calls:
+                        for tc in response.tool_calls:
+                            result.tool_calls.append(ToolCallRecord(
+                                name=tc.name,
+                                parameters=tc.parameters,
+                                result=tc.result,
+                                success=tc.success,
+                                error=tc.error,
+                            ))
+                        result.tool_call_count = len(response.tool_calls)
+                        result.successful_tool_calls = sum(1 for tc in response.tool_calls if tc.success)
 
-                # Extract patch from response (simple heuristic)
-                result.generated_patch = self._extract_patch(response.content)
+                    # Extract patch from response (simple heuristic)
+                    result.generated_patch = self._extract_patch(response.content)
 
-                if not response.success:
-                    result.error_message = response.error_message
+                    if not response.success:
+                        result.error_message = response.error_message
 
             finally:
                 # Restore original tool states

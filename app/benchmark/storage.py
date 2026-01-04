@@ -23,126 +23,145 @@ from ..models.benchmark import (
 class Storage:
     """Async SQLite storage for benchmark data."""
 
+    # Class-level flag to track initialization across all instances
+    _global_initialized = False
+    # Store the absolute path to avoid issues with working directory changes
+    _absolute_db_path = None
+
     def __init__(self, db_path: str = "benchmark.db"):
-        self.db_path = Path(db_path)
-        self._initialized = False
+        # Convert to absolute path on first initialization
+        if Storage._absolute_db_path is None:
+            Storage._absolute_db_path = Path(db_path).resolve()
+        self.db_path = Storage._absolute_db_path
 
     @asynccontextmanager
     async def _get_db(self):
-        """Get database connection with row factory."""
-        async with aiosqlite.connect(self.db_path) as db:
+        """Get database connection with row factory. Auto-initializes on first use."""
+        # Auto-initialize if not done yet
+        if not Storage._global_initialized:
+            await self._do_initialize()
+
+        async with aiosqlite.connect(self.db_path, timeout=30.0) as db:
             db.row_factory = aiosqlite.Row
+            # Enable WAL mode for better concurrent write handling
+            await db.execute("PRAGMA journal_mode=WAL")
+            await db.execute("PRAGMA busy_timeout=30000")
             yield db
 
-    async def initialize(self):
-        """Initialize database schema."""
-        if self._initialized:
+    async def _do_initialize(self):
+        """Actually perform initialization."""
+        if Storage._global_initialized:
             return
 
-        async with self._get_db() as db:
-            # Experiments table
-            await db.execute("""
-                CREATE TABLE IF NOT EXISTS experiments (
-                    id TEXT PRIMARY KEY,
-                    name TEXT NOT NULL,
-                    description TEXT,
-                    status TEXT DEFAULT 'pending',
-                    config TEXT NOT NULL,
-                    created_at TEXT NOT NULL,
-                    started_at TEXT,
-                    completed_at TEXT,
-                    total_instances INTEGER DEFAULT 0,
-                    completed_instances INTEGER DEFAULT 0
-                )
-            """)
-
-            # Experiment results table
-            await db.execute("""
-                CREATE TABLE IF NOT EXISTS experiment_results (
-                    id TEXT PRIMARY KEY,
-                    experiment_id TEXT NOT NULL,
-                    instance_id TEXT NOT NULL,
-                    provider TEXT NOT NULL,
-                    model TEXT NOT NULL,
-                    tool_set TEXT NOT NULL,
-                    response_content TEXT,
-                    generated_patch TEXT,
-                    raw_response TEXT,
-                    response_time_seconds REAL,
-                    started_at TEXT,
-                    completed_at TEXT,
-                    prompt_tokens INTEGER,
-                    completion_tokens INTEGER,
-                    total_tokens INTEGER,
-                    tool_calls TEXT,
-                    tool_call_count INTEGER DEFAULT 0,
-                    successful_tool_calls INTEGER DEFAULT 0,
-                    context_size_chars INTEGER,
-                    context_size_tokens INTEGER,
-                    success INTEGER DEFAULT 0,
-                    error_message TEXT,
-                    FOREIGN KEY (experiment_id) REFERENCES experiments(id),
-                    UNIQUE(experiment_id, instance_id, provider, model, tool_set)
-                )
-            """)
-
-            # Test results table
-            await db.execute("""
-                CREATE TABLE IF NOT EXISTS test_results (
-                    id TEXT PRIMARY KEY,
-                    result_id TEXT NOT NULL,
-                    experiment_id TEXT NOT NULL,
-                    instance_id TEXT NOT NULL,
-                    patch_applied INTEGER DEFAULT 0,
-                    patch_error TEXT,
-                    fail_to_pass_total INTEGER DEFAULT 0,
-                    fail_to_pass_passed INTEGER DEFAULT 0,
-                    pass_to_pass_total INTEGER DEFAULT 0,
-                    pass_to_pass_passed INTEGER DEFAULT 0,
-                    resolved INTEGER DEFAULT 0,
-                    test_output TEXT,
-                    execution_time_seconds REAL,
-                    executed_at TEXT,
-                    FOREIGN KEY (result_id) REFERENCES experiment_results(id),
-                    FOREIGN KEY (experiment_id) REFERENCES experiments(id)
-                )
-            """)
-
-            # Experiment metrics table
-            await db.execute("""
-                CREATE TABLE IF NOT EXISTS experiment_metrics (
-                    experiment_id TEXT PRIMARY KEY,
-                    overall_success_rate REAL DEFAULT 0,
-                    success_rate_by_provider TEXT,
-                    success_rate_by_tool_set TEXT,
-                    tool_usage_by_provider TEXT,
-                    avg_tool_calls_per_instance TEXT,
-                    avg_tokens_by_provider TEXT,
-                    avg_context_size_by_provider TEXT,
-                    avg_response_time_by_provider TEXT,
-                    total_runtime_seconds REAL DEFAULT 0,
-                    success_by_repo TEXT,
-                    updated_at TEXT,
-                    FOREIGN KEY (experiment_id) REFERENCES experiments(id)
-                )
-            """)
-
-            # Create indices
-            await db.execute("CREATE INDEX IF NOT EXISTS idx_results_experiment ON experiment_results(experiment_id)")
-            await db.execute("CREATE INDEX IF NOT EXISTS idx_results_instance ON experiment_results(instance_id)")
-            await db.execute("CREATE INDEX IF NOT EXISTS idx_results_provider ON experiment_results(provider)")
-            await db.execute("CREATE INDEX IF NOT EXISTS idx_results_success ON experiment_results(success)")
-            await db.execute("CREATE INDEX IF NOT EXISTS idx_test_results_experiment ON test_results(experiment_id)")
-            await db.execute("CREATE INDEX IF NOT EXISTS idx_test_results_resolved ON test_results(resolved)")
-
+        async with aiosqlite.connect(self.db_path) as db:
+            db.row_factory = aiosqlite.Row
+            await self._create_tables(db)
             await db.commit()
-            self._initialized = True
+
+        Storage._global_initialized = True
+        print("Database tables created successfully")
+
+    async def _create_tables(self, db):
+        """Create all database tables."""
+        # Experiments table
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS experiments (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                description TEXT,
+                status TEXT DEFAULT 'pending',
+                config TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                started_at TEXT,
+                completed_at TEXT,
+                total_instances INTEGER DEFAULT 0,
+                completed_instances INTEGER DEFAULT 0
+            )
+        """)
+
+        # Experiment results table
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS experiment_results (
+                id TEXT PRIMARY KEY,
+                experiment_id TEXT NOT NULL,
+                instance_id TEXT NOT NULL,
+                provider TEXT NOT NULL,
+                model TEXT NOT NULL,
+                tool_set TEXT NOT NULL,
+                response_content TEXT,
+                generated_patch TEXT,
+                raw_response TEXT,
+                success INTEGER DEFAULT 0,
+                error_message TEXT,
+                prompt_tokens INTEGER,
+                completion_tokens INTEGER,
+                total_tokens INTEGER,
+                context_size_chars INTEGER,
+                context_size_tokens INTEGER,
+                response_time_seconds REAL,
+                tool_calls TEXT,
+                tool_call_count INTEGER DEFAULT 0,
+                successful_tool_calls INTEGER DEFAULT 0,
+                started_at TEXT,
+                completed_at TEXT,
+                FOREIGN KEY (experiment_id) REFERENCES experiments(id)
+            )
+        """)
+
+        # Test results table
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS test_results (
+                id TEXT PRIMARY KEY,
+                result_id TEXT NOT NULL,
+                experiment_id TEXT NOT NULL,
+                instance_id TEXT NOT NULL,
+                patch_applied INTEGER DEFAULT 0,
+                patch_error TEXT,
+                fail_to_pass_total INTEGER DEFAULT 0,
+                fail_to_pass_passed INTEGER DEFAULT 0,
+                pass_to_pass_total INTEGER DEFAULT 0,
+                pass_to_pass_passed INTEGER DEFAULT 0,
+                resolved INTEGER DEFAULT 0,
+                test_output TEXT,
+                execution_time_seconds REAL,
+                created_at TEXT,
+                FOREIGN KEY (result_id) REFERENCES experiment_results(id),
+                FOREIGN KEY (experiment_id) REFERENCES experiments(id)
+            )
+        """)
+
+        # Experiment metrics table
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS experiment_metrics (
+                experiment_id TEXT PRIMARY KEY,
+                overall_success_rate REAL,
+                success_rate_by_provider TEXT,
+                success_rate_by_tool_set TEXT,
+                tool_usage_by_provider TEXT,
+                avg_tool_calls_per_instance TEXT,
+                avg_tokens_by_provider TEXT,
+                avg_context_size_by_provider TEXT,
+                avg_response_time_by_provider TEXT,
+                success_by_repo TEXT,
+                total_runtime_seconds REAL,
+                updated_at TEXT,
+                FOREIGN KEY (experiment_id) REFERENCES experiments(id)
+            )
+        """)
+
+        # Create indexes
+        await db.execute("CREATE INDEX IF NOT EXISTS idx_results_experiment ON experiment_results(experiment_id)")
+        await db.execute("CREATE INDEX IF NOT EXISTS idx_results_provider ON experiment_results(provider)")
+        await db.execute("CREATE INDEX IF NOT EXISTS idx_test_results_experiment ON test_results(experiment_id)")
+
+    async def initialize(self):
+        """Initialize database schema (for backward compatibility)."""
+        await self._do_initialize()
 
     # ==================== Experiments ====================
 
     async def create_experiment(self, experiment: Experiment) -> Experiment:
         """Create a new experiment."""
-        await self.initialize()
         async with self._get_db() as db:
             await db.execute("""
                 INSERT INTO experiments (id, name, description, status, config, created_at,
@@ -165,7 +184,6 @@ class Storage:
 
     async def get_experiment(self, experiment_id: str) -> Optional[Experiment]:
         """Get experiment by ID."""
-        await self.initialize()
         async with self._get_db() as db:
             cursor = await db.execute(
                 "SELECT * FROM experiments WHERE id = ?",
@@ -178,7 +196,6 @@ class Storage:
 
     async def list_experiments(self, limit: int = 100, offset: int = 0) -> List[Experiment]:
         """List all experiments."""
-        await self.initialize()
         async with self._get_db() as db:
             cursor = await db.execute(
                 "SELECT * FROM experiments ORDER BY created_at DESC LIMIT ? OFFSET ?",
@@ -189,7 +206,6 @@ class Storage:
 
     async def update_experiment(self, experiment: Experiment) -> None:
         """Update an experiment."""
-        await self.initialize()
         async with self._get_db() as db:
             await db.execute("""
                 UPDATE experiments SET
@@ -217,7 +233,6 @@ class Storage:
 
     async def delete_experiment(self, experiment_id: str) -> None:
         """Delete experiment and all related data."""
-        await self.initialize()
         async with self._get_db() as db:
             # Delete in order due to foreign keys
             await db.execute("DELETE FROM test_results WHERE experiment_id = ?", (experiment_id,))
@@ -245,7 +260,6 @@ class Storage:
 
     async def save_result(self, result: ExperimentResult) -> None:
         """Save or update an experiment result."""
-        await self.initialize()
         async with self._get_db() as db:
             tool_calls_json = json.dumps([tc.model_dump() for tc in result.tool_calls])
             raw_response_json = json.dumps(result.raw_response) if result.raw_response else None
@@ -287,7 +301,6 @@ class Storage:
 
     async def get_result(self, result_id: str) -> Optional[ExperimentResult]:
         """Get a single result by ID."""
-        await self.initialize()
         async with self._get_db() as db:
             cursor = await db.execute(
                 "SELECT * FROM experiment_results WHERE id = ?",
@@ -307,7 +320,6 @@ class Storage:
         offset: int = 0
     ) -> List[ExperimentResult]:
         """Get results for an experiment with optional filters."""
-        await self.initialize()
         async with self._get_db() as db:
             query = "SELECT * FROM experiment_results WHERE experiment_id = ?"
             params: List[Any] = [experiment_id]
@@ -328,7 +340,6 @@ class Storage:
 
     async def get_completed_result_keys(self, experiment_id: str) -> set:
         """Get set of (instance_id, provider, model, tool_set) for completed results."""
-        await self.initialize()
         async with self._get_db() as db:
             cursor = await db.execute("""
                 SELECT instance_id, provider, model, tool_set
@@ -340,7 +351,6 @@ class Storage:
 
     async def count_results(self, experiment_id: str, success_only: bool = False) -> int:
         """Count results for an experiment."""
-        await self.initialize()
         async with self._get_db() as db:
             query = "SELECT COUNT(*) as count FROM experiment_results WHERE experiment_id = ?"
             if success_only:
@@ -389,7 +399,6 @@ class Storage:
 
     async def save_test_result(self, test_result: TestResult) -> None:
         """Save a test result."""
-        await self.initialize()
         async with self._get_db() as db:
             await db.execute("""
                 INSERT OR REPLACE INTO test_results
@@ -423,7 +432,6 @@ class Storage:
         resolved_only: bool = False
     ) -> List[TestResult]:
         """Get test results for an experiment."""
-        await self.initialize()
         async with self._get_db() as db:
             query = "SELECT * FROM test_results WHERE experiment_id = ?"
             if resolved_only:
@@ -435,7 +443,6 @@ class Storage:
 
     async def count_test_results(self, experiment_id: str, resolved_only: bool = False) -> int:
         """Count test results for an experiment."""
-        await self.initialize()
         async with self._get_db() as db:
             query = "SELECT COUNT(*) as count FROM test_results WHERE experiment_id = ?"
             if resolved_only:
@@ -467,7 +474,6 @@ class Storage:
 
     async def save_metrics(self, metrics: ExperimentMetrics) -> None:
         """Save or update experiment metrics."""
-        await self.initialize()
         async with self._get_db() as db:
             await db.execute("""
                 INSERT OR REPLACE INTO experiment_metrics
@@ -495,7 +501,6 @@ class Storage:
 
     async def get_metrics(self, experiment_id: str) -> Optional[ExperimentMetrics]:
         """Get metrics for an experiment."""
-        await self.initialize()
         async with self._get_db() as db:
             cursor = await db.execute(
                 "SELECT * FROM experiment_metrics WHERE experiment_id = ?",
