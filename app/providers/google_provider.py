@@ -8,25 +8,65 @@ from ..models.responses import LLMResponse, TokenUsage
 
 
 class GoogleProvider(BaseAIProvider):
+    """Google Gemini provider with proper tool schema conversion."""
+
+    # Type mapping from JSON Schema to Google Schema
+    TYPE_MAP = {
+        "string": "STRING",
+        "integer": "INTEGER",
+        "number": "NUMBER",
+        "boolean": "BOOLEAN",
+        "array": "ARRAY",
+        "object": "OBJECT",
+    }
+
+    # Fields not supported by Google Schema
+    UNSUPPORTED_FIELDS = {"minimum", "maximum", "default", "examples", "enum", "format", "pattern"}
+
     def __init__(self, api_key: str, model: str = "gemini-2.5-flash-lite", **kwargs):
         super().__init__(api_key, model, **kwargs)
         if api_key:
             genai.configure(api_key=api_key)
         # Initialize client without any tools to avoid conflicts
         self.client = genai.GenerativeModel(model_name=model)
+
+    def _convert_schema_to_google(self, schema: Dict[str, Any]) -> Dict[str, Any]:
+        """Recursively convert JSON Schema to Google Schema format."""
+        if not isinstance(schema, dict):
+            return schema
+
+        result = {}
+
+        # Convert type to uppercase
+        if "type" in schema:
+            type_val = schema["type"]
+            if isinstance(type_val, str):
+                result["type"] = self.TYPE_MAP.get(type_val.lower(), "STRING")
+            else:
+                result["type"] = "STRING"  # Fallback
+
+        # Copy description
+        if "description" in schema:
+            result["description"] = str(schema["description"])
+
+        # Handle properties (for object types)
+        if "properties" in schema:
+            result["properties"] = {}
+            for prop_name, prop_def in schema["properties"].items():
+                result["properties"][prop_name] = self._convert_schema_to_google(prop_def)
+
+        # Handle required fields
+        if "required" in schema:
+            result["required"] = schema["required"]
+
+        # Handle array items
+        if "items" in schema:
+            result["items"] = self._convert_schema_to_google(schema["items"])
+
+        return result
     
-    async def _make_api_call(self, messages: List[ChatMessage], temperature: float = 0.7, 
+    async def _make_api_call(self, messages: List[ChatMessage], temperature: float = 0.7,
                            max_tokens: int = 1000, tools: Optional[List[Dict[str, Any]]] = None, **kwargs) -> Any:
-        # Debug logging
-        print(f"Google Provider Debug:")
-        print(f"  tools parameter: {tools}")
-        print(f"  kwargs keys: {list(kwargs.keys())}")
-        print(f"  kwargs: {kwargs}")
-        
-        # Remove any tools from kwargs to avoid conflicts
-        filtered_kwargs = {k: v for k, v in kwargs.items() if k != 'tools'}
-        print(f"  filtered_kwargs: {filtered_kwargs}")
-        
         # Convert messages to Gemini format
         conversation_parts = []
         
@@ -52,54 +92,26 @@ class GoogleProvider(BaseAIProvider):
         }
         generation_config["max_output_tokens"] = max_tokens
         
-        # Prepare tools if provided - use Google's to_tools converter
-        google_tools = None
+        # Prepare tools if provided - use proper schema conversion
+        tool_dicts = None
         if tools:
             try:
-                import google.generativeai.types.content_types as ct
-                
-                # Convert to Google's expected format - fix schema types
+                # Convert each tool to Google's format using recursive conversion
                 function_declarations = []
                 for tool in tools:
-                    # Convert schema to Google's format (object -> OBJECT)
-                    google_params = tool["parameters"].copy()
-                    if google_params.get("type") == "object":
-                        google_params["type"] = "OBJECT"
-                    
-                    # Convert property types and remove unsupported fields
-                    if "properties" in google_params:
-                        for prop_def in google_params["properties"].values():
-                            if prop_def.get("type") == "string":
-                                prop_def["type"] = "STRING"
-                            elif prop_def.get("type") == "integer":
-                                prop_def["type"] = "INTEGER"
-                            elif prop_def.get("type") == "boolean":
-                                prop_def["type"] = "BOOLEAN"
-                            elif prop_def.get("type") == "array":
-                                prop_def["type"] = "ARRAY"
-                            
-                            # Remove unsupported fields for Google Schema
-                            unsupported_fields = ["minimum", "maximum", "default"]
-                            for field in unsupported_fields:
-                                prop_def.pop(field, None)
-                    
+                    google_params = self._convert_schema_to_google(tool["parameters"])
                     function_declarations.append({
                         "name": tool["name"],
                         "description": tool["description"],
                         "parameters": google_params
                     })
-                
-                tool_dicts = [{
+
+                tool_dicts = {
                     "function_declarations": function_declarations
-                }]
-                
-                print(f"  Tool dicts before conversion: {tool_dicts}")
-                google_tools = ct.to_tools(tool_dicts)
-                print(f"  Converted tools: {google_tools}")
-                
+                }
             except Exception as e:
-                print(f"  Tool conversion failed: {str(e)}")
-                google_tools = None
+                print(f"Google tool conversion failed: {str(e)}")
+                tool_dicts = None
         
         # Google Generative AI doesn't have native async support yet
         # We'll use the sync method but wrap it
@@ -107,34 +119,30 @@ class GoogleProvider(BaseAIProvider):
         
         def _generate_with_tools():
             try:
-                if google_tools:
-                    # Try initializing client with tools in constructor
-                    print(f"  Creating new client with tools in constructor")
+                if tool_dicts:
+                    # Create client with tools in constructor
                     try:
                         client_with_tools = genai.GenerativeModel(
                             model_name=self.model,
-                            tools=tool_dicts[0]  # Pass the dict directly 
+                            tools=[tool_dicts]
                         )
-                        print(f"  Client created successfully with tools")
                         return client_with_tools.generate_content(
                             conversation_parts,
                             generation_config=generation_config
                         )
                     except Exception as init_error:
-                        print(f"  Client initialization with tools failed: {str(init_error)}")
-                        # Fallback: try without tools
+                        print(f"Google client with tools failed: {str(init_error)}, falling back")
                         return self.client.generate_content(
                             conversation_parts,
                             generation_config=generation_config
                         )
                 else:
-                    print(f"  Calling generate_content without tools")
                     return self.client.generate_content(
                         conversation_parts,
                         generation_config=generation_config
                     )
             except Exception as e:
-                print(f"  Google API call failed: {str(e)}")
+                print(f"Google API call failed: {str(e)}")
                 raise
         
         response = await asyncio.get_event_loop().run_in_executor(None, _generate_with_tools)

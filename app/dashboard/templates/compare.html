@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block title %}Compare Providers - SWE-bench Benchmark{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom: 20px;">Provider Comparison</h2>
+
+<div class="card">
+    <h2>Select Experiment</h2>
+    <form method="get" style="display: flex; gap: 10px; align-items: center;">
+        <select name="experiment_id" style="padding: 10px; border-radius: 6px; border: 1px solid var(--gray-200); flex: 1;">
+            <option value="">-- Select an experiment --</option>
+            {% for exp in experiments %}
+            <option value="{{ exp.id }}" {% if selected_experiment and selected_experiment.id == exp.id %}selected{% endif %}>
+                {{ exp.name }} ({{ exp.status.value }})
+            </option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-primary">Compare</button>
+    </form>
+</div>
+
+{% if selected_experiment and comparison_data %}
+<div class="stats-grid" style="margin-top: 20px;">
+    {% for provider, rate in comparison_data.success_rate.items() %}
+    <div class="stat-card">
+        <div class="label">{{ provider | capitalize }} Success Rate</div>
+        <div class="value" style="color: {% if loop.index == 1 %}var(--primary){% elif loop.index == 2 %}var(--success){% else %}var(--warning){% endif %};">
+            {{ "%.1f"|format(rate * 100) }}%
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <h2>Success Rate Comparison</h2>
+        <div class="chart-container">
+            <canvas id="successChart"></canvas>
+        </div>
+    </div>
+    <div class="card">
+        <h2>Average Response Time (s)</h2>
+        <div class="chart-container">
+            <canvas id="timeChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <h2>Average Token Usage</h2>
+        <div class="chart-container">
+            <canvas id="tokenChart"></canvas>
+        </div>
+    </div>
+    <div class="card">
+        <h2>Average Tool Calls</h2>
+        <div class="chart-container">
+            <canvas id="toolCallChart"></canvas>
+        </div>
+    </div>
+</div>
+
+{% if tool_analysis %}
+<div class="card">
+    <h2>Tool Efficiency Analysis</h2>
+    <p style="color: var(--gray-600); margin-bottom: 20px;">How each tool correlates with success</p>
+
+    {% if tool_analysis.tool_correlation %}
+    <table>
+        <thead>
+            <tr>
+                <th>Tool</th>
+                <th>Times Used</th>
+                <th>Success When Used</th>
+                <th>Resolve Rate When Used</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tool, data in tool_analysis.tool_correlation.items() %}
+            <tr>
+                <td><strong>{{ tool }}</strong></td>
+                <td>{{ data.times_used }}</td>
+                <td>{{ "%.1f"|format(data.success_when_used * 100) }}%</td>
+                <td>{{ "%.1f"|format(data.resolve_when_used * 100) }}%</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Tool Set Comparison</h2>
+    {% if tool_analysis.tool_set_comparison %}
+    <table>
+        <thead>
+            <tr>
+                <th>Tool Set</th>
+                <th>Instances</th>
+                <th>Avg Tool Calls</th>
+                <th>Success Rate</th>
+                <th>Resolve Rate</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ts, data in tool_analysis.tool_set_comparison.items() %}
+            <tr>
+                <td><strong>{{ ts }}</strong></td>
+                <td>{{ data.total_instances }}</td>
+                <td>{{ "%.1f"|format(data.avg_tool_calls) }}</td>
+                <td>{{ "%.1f"|format(data.success_rate * 100) }}%</td>
+                <td>{{ "%.1f"|format(data.resolve_rate * 100) }}%</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if context_analysis %}
+<div class="card">
+    <h2>Context Window Impact</h2>
+    <p style="color: var(--gray-600); margin-bottom: 20px;">How context size affects success rate</p>
+    <div class="chart-container">
+        <canvas id="contextChart"></canvas>
+    </div>
+</div>
+{% endif %}
+
+{% elif not selected_experiment %}
+<div class="card">
+    <div class="empty-state">
+        <h3>Select an experiment to compare</h3>
+        <p>Choose an experiment from the dropdown above to see provider comparison data.</p>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="empty-state">
+        <h3>No data available</h3>
+        <p>This experiment doesn't have enough results for comparison yet.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if comparison_data %}
+<script>
+const colors = ['#3b82f6', '#10b981', '#f59e0b'];
+
+// Success rate chart
+new Chart(document.getElementById('successChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+        labels: {{ comparison_data.success_rate.keys() | list | tojson }},
+        datasets: [{
+            label: 'Success Rate (%)',
+            data: {{ comparison_data.success_rate.values() | list | map('multiply', 100) | list | tojson }},
+            backgroundColor: colors
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, max: 100 } }
+    }
+});
+
+// Response time chart
+new Chart(document.getElementById('timeChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+        labels: {{ comparison_data.avg_response_time.keys() | list | tojson }},
+        datasets: [{
+            label: 'Avg Response Time (s)',
+            data: {{ comparison_data.avg_response_time.values() | list | tojson }},
+            backgroundColor: colors
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+    }
+});
+
+// Token usage chart
+new Chart(document.getElementById('tokenChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+        labels: {{ comparison_data.avg_tokens.keys() | list | tojson }},
+        datasets: [{
+            label: 'Avg Tokens',
+            data: {{ comparison_data.avg_tokens.values() | list | tojson }},
+            backgroundColor: colors
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+    }
+});
+
+// Tool calls chart
+new Chart(document.getElementById('toolCallChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+        labels: {{ comparison_data.avg_tool_calls.keys() | list | tojson }},
+        datasets: [{
+            label: 'Avg Tool Calls',
+            data: {{ comparison_data.avg_tool_calls.values() | list | tojson }},
+            backgroundColor: colors
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+    }
+});
+
+{% if context_analysis %}
+// Context analysis chart
+const contextData = {{ context_analysis | tojson }};
+new Chart(document.getElementById('contextChart').getContext('2d'), {
+    type: 'line',
+    data: {
+        labels: Object.keys(contextData),
+        datasets: [{
+            label: 'Success Rate (%)',
+            data: Object.values(contextData).map(d => d.success_rate * 100),
+            borderColor: '#3b82f6',
+            tension: 0.3,
+            fill: false
+        }, {
+            label: 'Resolve Rate (%)',
+            data: Object.values(contextData).map(d => d.resolve_rate * 100),
+            borderColor: '#10b981',
+            tension: 0.3,
+            fill: false
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: { beginAtZero: true, max: 100 }
+        }
+    }
+});
+{% endif %}
+</script>
+{% endif %}
+{% endblock %}

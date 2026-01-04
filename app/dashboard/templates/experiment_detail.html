@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}{{ experiment.name }} - SWE-bench Benchmark{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 20px;">
+    <a href="/dashboard/experiments" style="color: var(--gray-600); text-decoration: none;">&larr; Back to Experiments</a>
+</div>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div>
+        <h2 style="margin-bottom: 5px;">{{ experiment.name }}</h2>
+        <p style="color: var(--gray-600);">{{ experiment.description or 'No description' }}</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <span class="badge badge-{{ experiment.status.value }}" style="font-size: 1rem; padding: 8px 16px;">{{ experiment.status.value }}</span>
+        {% if experiment.status.value == 'pending' or experiment.status.value == 'paused' %}
+        <button onclick="startExperiment('{{ experiment.id }}')" class="btn btn-success">Start</button>
+        {% elif experiment.status.value == 'running' %}
+        <button onclick="stopExperiment('{{ experiment.id }}')" class="btn btn-danger">Stop</button>
+        {% endif %}
+        <a href="/api/v1/benchmark/experiments/{{ experiment.id }}/export" class="btn" style="background: var(--gray-200);" target="_blank">Export JSON</a>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="label">Total Instances</div>
+        <div class="value">{{ experiment.total_instances }}</div>
+    </div>
+    <div class="stat-card success">
+        <div class="label">Completed</div>
+        <div class="value">{{ experiment.completed_instances }}</div>
+    </div>
+    <div class="stat-card primary">
+        <div class="label">Success Rate</div>
+        <div class="value">{{ "%.1f"|format(metrics.overall_success_rate * 100 if metrics else 0) }}%</div>
+    </div>
+    <div class="stat-card">
+        <div class="label">Test Results</div>
+        <div class="value">{{ test_results | length }}</div>
+    </div>
+</div>
+
+{% if metrics and metrics.success_rate_by_provider %}
+<div class="grid-2">
+    <div class="card">
+        <h2>Success Rate by Provider</h2>
+        <div class="chart-container">
+            <canvas id="providerChart"></canvas>
+        </div>
+    </div>
+    <div class="card">
+        <h2>Tool Usage by Provider</h2>
+        <div class="chart-container">
+            <canvas id="toolChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <h2>Average Tokens by Provider</h2>
+        <div class="chart-container">
+            <canvas id="tokenChart"></canvas>
+        </div>
+    </div>
+    <div class="card">
+        <h2>Response Time by Provider</h2>
+        <div class="chart-container">
+            <canvas id="timeChart"></canvas>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="card">
+    <h2>Configuration</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+        <div>
+            <strong>Providers:</strong>
+            <div style="margin-top: 5px;">
+                {% for p in experiment.config.providers %}
+                <span class="badge" style="background: var(--gray-100);">{{ p }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        <div>
+            <strong>Models:</strong>
+            <div style="margin-top: 5px; font-size: 0.875rem; color: var(--gray-600);">
+                {% for p, m in experiment.config.models.items() %}
+                {{ p }}: {{ m }}<br>
+                {% endfor %}
+            </div>
+        </div>
+        <div>
+            <strong>Tool Sets:</strong>
+            <div style="margin-top: 5px;">
+                {% for ts in experiment.config.tool_sets %}
+                <span class="badge" style="background: var(--gray-100);">{{ ts.name }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        <div>
+            <strong>Max Concurrent:</strong>
+            <div style="margin-top: 5px;">{{ experiment.config.max_concurrent }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Recent Results</h2>
+    {% if results %}
+    <table>
+        <thead>
+            <tr>
+                <th>Instance</th>
+                <th>Provider</th>
+                <th>Tool Set</th>
+                <th>Success</th>
+                <th>Tool Calls</th>
+                <th>Tokens</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in results %}
+            <tr>
+                <td style="font-family: monospace; font-size: 0.875rem;">{{ r.instance_id[:40] }}...</td>
+                <td><span class="badge" style="background: var(--gray-100);">{{ r.provider }}</span></td>
+                <td>{{ r.tool_set }}</td>
+                <td>
+                    {% if r.success %}
+                    <span style="color: var(--success);">&#10003;</span>
+                    {% else %}
+                    <span style="color: var(--danger);">&#10007;</span>
+                    {% endif %}
+                </td>
+                <td>{{ r.tool_call_count }}</td>
+                <td>{{ r.total_tokens or '-' }}</td>
+                <td>{{ "%.2f"|format(r.response_time_seconds) if r.response_time_seconds else '-' }}s</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <p>No results yet</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+{% if metrics and metrics.success_rate_by_provider %}
+// Provider success rate chart
+const providerCtx = document.getElementById('providerChart').getContext('2d');
+new Chart(providerCtx, {
+    type: 'bar',
+    data: {
+        labels: {{ metrics.success_rate_by_provider.keys() | list | tojson }},
+        datasets: [{
+            label: 'Success Rate (%)',
+            data: {{ metrics.success_rate_by_provider.values() | list | map('multiply', 100) | list | tojson }},
+            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, max: 100 } }
+    }
+});
+
+// Tool usage chart
+const toolCtx = document.getElementById('toolChart').getContext('2d');
+const toolData = {{ metrics.tool_usage_by_provider | tojson }};
+const toolLabels = [...new Set(Object.values(toolData).flatMap(v => Object.keys(v)))];
+new Chart(toolCtx, {
+    type: 'bar',
+    data: {
+        labels: Object.keys(toolData),
+        datasets: toolLabels.map((tool, i) => ({
+            label: tool,
+            data: Object.keys(toolData).map(p => toolData[p][tool] || 0),
+            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'][i % 4]
+        }))
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true } }
+    }
+});
+
+// Token usage chart
+const tokenCtx = document.getElementById('tokenChart').getContext('2d');
+new Chart(tokenCtx, {
+    type: 'bar',
+    data: {
+        labels: {{ metrics.avg_tokens_by_provider.keys() | list | tojson }},
+        datasets: [{
+            label: 'Avg Tokens',
+            data: {{ metrics.avg_tokens_by_provider.values() | list | tojson }},
+            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+    }
+});
+
+// Response time chart
+const timeCtx = document.getElementById('timeChart').getContext('2d');
+new Chart(timeCtx, {
+    type: 'bar',
+    data: {
+        labels: {{ metrics.avg_response_time_by_provider.keys() | list | tojson }},
+        datasets: [{
+            label: 'Avg Response Time (s)',
+            data: {{ metrics.avg_response_time_by_provider.values() | list | tojson }},
+            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+    }
+});
+{% endif %}
+
+async function startExperiment(id) {
+    try {
+        const response = await fetch(`/api/v1/benchmark/experiments/${id}/start`, { method: 'POST' });
+        if (response.ok) location.reload();
+        else alert('Failed to start experiment');
+    } catch (e) { alert('Error: ' + e.message); }
+}
+
+async function stopExperiment(id) {
+    try {
+        const response = await fetch(`/api/v1/benchmark/experiments/${id}/stop`, { method: 'POST' });
+        if (response.ok) location.reload();
+        else alert('Failed to stop experiment');
+    } catch (e) { alert('Error: ' + e.message); }
+}
+</script>
+{% endblock %}

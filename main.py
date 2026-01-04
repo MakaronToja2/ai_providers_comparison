@@ -1,7 +1,10 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from app.config.settings import get_settings
 from app.core.routes import router
 from app.core.tool_manager import initialize_tools
+from app.dashboard.routes import router as dashboard_router
 
 app = FastAPI(
     title="LLM Comparison API",
@@ -12,11 +15,18 @@ app = FastAPI(
 # Initialize tools on startup
 initialize_tools()
 
+# Include routers
 app.include_router(router, prefix="/api/v1")
+app.include_router(dashboard_router)
+
+# Mount static files
+static_path = Path(__file__).parent / "app" / "dashboard" / "static"
+if static_path.exists():
+    app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
 
 @app.get("/")
 async def root():
-    return {"message": "LLM Comparison API is running"}
+    return {"message": "LLM Comparison API is running. Visit /dashboard for the web UI."}
 
 @app.get("/health")
 async def health_check():

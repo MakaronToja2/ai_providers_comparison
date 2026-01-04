@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Experiments - SWE-bench Benchmark{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>All Experiments</h2>
+</div>
+
+<div class="card">
+    {% if experiments %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Progress</th>
+                <th>Providers</th>
+                <th>Tool Sets</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exp in experiments %}
+            <tr>
+                <td>
+                    <a href="/dashboard/experiments/{{ exp.id }}" style="color: var(--primary); text-decoration: none; font-weight: 500;">
+                        {{ exp.name }}
+                    </a>
+                </td>
+                <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">
+                    {{ exp.description or '-' }}
+                </td>
+                <td>
+                    <span class="badge badge-{{ exp.status.value }}">{{ exp.status.value }}</span>
+                </td>
+                <td style="width: 150px;">
+                    <div class="progress-bar">
+                        {% set progress = (exp.completed_instances / exp.total_instances * 100) if exp.total_instances > 0 else 0 %}
+                        <div class="fill" style="width: {{ progress }}%"></div>
+                    </div>
+                    <small style="color: var(--gray-600);">{{ exp.completed_instances }} / {{ exp.total_instances }}</small>
+                </td>
+                <td>
+                    {% for p in exp.config.providers %}
+                    <span class="badge" style="background: var(--gray-100);">{{ p }}</span>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for ts in exp.config.tool_sets %}
+                    <span class="badge" style="background: var(--gray-100);">{{ ts.name }}</span>
+                    {% endfor %}
+                </td>
+                <td>{{ exp.created_at.strftime('%Y-%m-%d') }}</td>
+                <td>
+                    <div style="display: flex; gap: 5px;">
+                        <a href="/dashboard/experiments/{{ exp.id }}" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.875rem;">View</a>
+                        {% if exp.status.value == 'pending' or exp.status.value == 'paused' %}
+                        <button onclick="startExperiment('{{ exp.id }}')" class="btn btn-success" style="padding: 6px 12px; font-size: 0.875rem;">Start</button>
+                        {% elif exp.status.value == 'running' %}
+                        <button onclick="stopExperiment('{{ exp.id }}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.875rem;">Stop</button>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <h3>No experiments yet</h3>
+        <p>Create your first experiment using the API</p>
+        <pre style="background: var(--gray-100); padding: 20px; border-radius: 8px; text-align: left; display: inline-block; margin-top: 20px;">
+POST /api/v1/benchmark/experiments
+{
+  "name": "My First Experiment",
+  "providers": ["openai", "anthropic", "google"],
+  "limit": 10
+}</pre>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function startExperiment(id) {
+    try {
+        const response = await fetch(`/api/v1/benchmark/experiments/${id}/start`, {
+            method: 'POST'
+        });
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('Failed to start experiment');
+        }
+    } catch (e) {
+        alert('Error: ' + e.message);
+    }
+}
+
+async function stopExperiment(id) {
+    try {
+        const response = await fetch(`/api/v1/benchmark/experiments/${id}/stop`, {
+            method: 'POST'
+        });
+        if (response.ok) {
+            location.reload();
+        } else {
+            alert('Failed to stop experiment');
+        }
+    } catch (e) {
+        alert('Error: ' + e.message);
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - SWE-bench Benchmark{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom: 20px;">Dashboard Overview</h2>
+
+<div class="stats-grid">
+    <div class="stat-card primary">
+        <div class="label">Total Experiments</div>
+        <div class="value">{{ total_experiments }}</div>
+    </div>
+    <div class="stat-card" style="--accent: var(--primary);">
+        <div class="label">Running</div>
+        <div class="value" style="color: var(--primary);">{{ running_count }}</div>
+    </div>
+    <div class="stat-card success">
+        <div class="label">Completed</div>
+        <div class="value">{{ completed_count }}</div>
+    </div>
+</div>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin-bottom: 0;">Recent Experiments</h2>
+        <a href="/dashboard/experiments" class="btn btn-primary">View All</a>
+    </div>
+
+    {% if experiments %}
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Progress</th>
+                <th>Providers</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exp in experiments %}
+            <tr>
+                <td>
+                    <a href="/dashboard/experiments/{{ exp.id }}" style="color: var(--primary); text-decoration: none; font-weight: 500;">
+                        {{ exp.name }}
+                    </a>
+                </td>
+                <td>
+                    <span class="badge badge-{{ exp.status.value }}">{{ exp.status.value }}</span>
+                </td>
+                <td style="width: 200px;">
+                    <div class="progress-bar">
+                        {% set progress = (exp.completed_instances / exp.total_instances * 100) if exp.total_instances > 0 else 0 %}
+                        <div class="fill" style="width: {{ progress }}%"></div>
+                    </div>
+                    <small style="color: var(--gray-600);">{{ exp.completed_instances }} / {{ exp.total_instances }}</small>
+                </td>
+                <td>{{ exp.config.providers | join(', ') }}</td>
+                <td>{{ exp.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>
+                    <a href="/dashboard/experiments/{{ exp.id }}" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.875rem;">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <h3>No experiments yet</h3>
+        <p>Create your first experiment using the API</p>
+        <a href="/docs#/benchmark/create_experiment_api_v1_benchmark_experiments_post" class="btn btn-primary" style="margin-top: 20px;">API Documentation</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <h2>Quick Actions</h2>
+        <p style="color: var(--gray-600); margin-bottom: 20px;">Use the API to create and manage experiments</p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="/docs" class="btn btn-primary" target="_blank">API Docs</a>
+            <a href="/dashboard/compare" class="btn" style="background: var(--gray-200);">Compare Providers</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>About This Tool</h2>
+        <p style="color: var(--gray-600);">
+            This dashboard helps you run and analyze SWE-bench experiments across multiple AI providers
+            (OpenAI, Anthropic, Google) to compare their performance on software engineering tasks.
+        </p>
+    </div>
+</div>
+{% endblock %}
