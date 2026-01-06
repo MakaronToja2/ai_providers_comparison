@@ -136,7 +136,8 @@ class GoogleProvider(BaseAIProvider):
                             generation_config=generation_config
                         )
                     except Exception as init_error:
-                        print(f"Google client with tools failed: {str(init_error)}, falling back")
+                        print(f"[GOOGLE ERROR] Tool initialization failed: {str(init_error)}")
+                        print(f"[GOOGLE ERROR] Falling back to NO TOOLS - this will hurt performance!")
                         return self.client.generate_content(
                             conversation_parts,
                             generation_config=generation_config

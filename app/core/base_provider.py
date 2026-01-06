@@ -167,6 +167,61 @@ class BaseAIProvider(ABC):
             # Combine all accumulated content
             final_content = "\n\n".join(all_content_parts) if all_content_parts else ""
 
+            # Check if we have a valid patch or explicit failure marker in content
+            has_patch = "```diff" in final_content or "--- a/" in final_content or "+++ b/" in final_content
+            has_cannot_solve = "<<<CANNOT_SOLVE>>>" in final_content
+
+            # If no valid output after tool loop, force one final call WITHOUT tools
+            # This handles: max iterations, early loop exit, truncation, tool setup failure, etc.
+            # Trigger if: tools were available AND (used tools OR have some content) AND no valid output
+            should_force_answer = (
+                not has_patch and
+                not has_cannot_solve and
+                tools_spec is not None and  # Tools were available
+                (all_tool_calls or final_content)  # Either used tools or got some content
+            )
+
+            if should_force_answer:
+                # Log that we're forcing a final answer
+                print(f"[{self.provider_name}] Forcing final answer: iterations={iteration}, tool_calls={len(all_tool_calls)}, content_len={len(final_content)}")
+
+                # Build context from what was explored
+                exploration_summary = ""
+                if all_tool_calls:
+                    tool_names = [tc.name for tc in all_tool_calls]
+                    exploration_summary = f"You have explored the codebase using: {', '.join(tool_names)}. "
+
+                # Add a message asking for final answer
+                conversation.append(ChatMessage(
+                    role="user",
+                    content=f"{exploration_summary}Now provide your final answer. "
+                            "You MUST output either:\n"
+                            "1. A ```diff``` patch with your fix, OR\n"
+                            "2. <<<CANNOT_SOLVE>>> if you truly cannot fix it\n\n"
+                            "Do not ask for more information. Make your best attempt at a patch NOW."
+                ))
+
+                # Make final call WITHOUT tools to force a text response
+                try:
+                    raw_response = await self._make_api_call(
+                        messages=conversation,
+                        temperature=temperature,
+                        max_tokens=max_tokens,
+                        tools=None,  # No tools - force text response
+                        **kwargs
+                    )
+
+                    content, usage, _ = self._parse_response(raw_response)
+                    if content:
+                        final_content = final_content + "\n\n" + content if final_content else content
+                    if usage:
+                        total_usage.prompt_tokens += usage.prompt_tokens
+                        total_usage.completion_tokens += usage.completion_tokens
+                        total_usage.total_tokens += usage.total_tokens
+                except Exception as e:
+                    # If final call fails, keep what we have
+                    pass
+
             return LLMResponse(
                 provider=self.provider_name,
                 model=self.model,
