@@ -1,0 +1,18 @@
+diff --git a/pydicom/jsonrep.py b/pydicom/jsonrep.py
+index 1234567..89abcde 100644
+--- a/pydicom/jsonrep.py
++++ b/pydicom/jsonrep.py
+@@ -210,6 +210,7 @@ class DatasetJSONDecoder:
+-                else:
+-                    value_key = unique_value_keys[0]
+-                    elem = DataElement.from_json(
+-                        self.dataset_class, key, vr,
+-                        val[value_key], value_key
+-                    )
++                else:
++                    value_key = unique_value_keys[0]
++                    elem = DataElement.from_json(
++                        self.dataset_class, key, vr,
++                        val[value_key], value_key,
++                        bulk_data_uri_handler=self.bulk_data_uri_handler
++                    )

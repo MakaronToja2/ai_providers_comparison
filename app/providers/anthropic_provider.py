@@ -1,4 +1,5 @@
 from typing import List, Dict, Any, Optional
+import os
 import time
 import anthropic
 
@@ -6,9 +7,13 @@ from ..core.base_provider import BaseAIProvider
 from ..models.requests import ChatMessage
 from ..models.responses import LLMResponse, TokenUsage
 
+# Default model from environment or fallback
+DEFAULT_ANTHROPIC_MODEL = os.getenv("ANTHROPIC_DEFAULT_MODEL", "claude-haiku-4-5-20251001")
+
 
 class AnthropicProvider(BaseAIProvider):
-    def __init__(self, api_key: str, model: str = "claude-3-haiku-20240307", **kwargs):
+    def __init__(self, api_key: str, model: str = None, **kwargs):
+        model = model or DEFAULT_ANTHROPIC_MODEL
         super().__init__(api_key, model, **kwargs)
         self.client = anthropic.AsyncAnthropic(api_key=api_key)
     

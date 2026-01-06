@@ -17,6 +17,14 @@ class ExperimentStatus(str, Enum):
     FAILED = "failed"
 
 
+class ResultStatus(str, Enum):
+    """Status of an individual result - what the model produced."""
+    SUCCESS_PATCH_GENERATED = "success_patch_generated"  # Valid patch extracted
+    FAILURE_EXPLICIT = "failure_explicit"  # Model admitted it cannot solve (<<<CANNOT_SOLVE>>>)
+    HALLUCINATION_FORMAT_ERROR = "hallucination_format_error"  # Model responded but no valid output
+    API_ERROR = "api_error"  # Provider API error
+
+
 class ToolSetConfig(BaseModel):
     """Configuration for a set of tools to test."""
     name: str
@@ -32,6 +40,7 @@ class ExperimentConfig(BaseModel):
     tool_sets: List[ToolSetConfig] = Field(default_factory=lambda: [
         ToolSetConfig(name="all_tools", enabled_tools=["read_file", "search_code", "list_directory"])
     ])
+    split: str = "dev"  # SWE-bench split: "dev", "lite", "test", "verified"
     context_limit: Optional[int] = None  # Token limit for context
     instance_ids: Optional[List[str]] = None  # Specific instances to run
     repos: Optional[List[str]] = None  # Filter by repos
@@ -71,6 +80,7 @@ class ExperimentResult(BaseModel):
     provider: str
     model: str
     tool_set: str  # Name of the tool set used
+    split: str = "dev"  # SWE-bench split used
 
     # Response data
     response_content: Optional[str] = None
@@ -98,6 +108,7 @@ class ExperimentResult(BaseModel):
 
     # Status
     success: bool = False
+    result_status: Optional[ResultStatus] = None  # Detailed outcome classification
     error_message: Optional[str] = None
 
 
@@ -131,10 +142,18 @@ class ExperimentMetrics(BaseModel):
     """Aggregated metrics for an experiment."""
     experiment_id: str
 
-    # Success rates
+    # Success rates (API call success - less meaningful)
     overall_success_rate: float = 0.0
     success_rate_by_provider: Dict[str, float] = Field(default_factory=dict)
     success_rate_by_tool_set: Dict[str, float] = Field(default_factory=dict)
+
+    # Patch generation rates (more meaningful metric)
+    overall_patch_rate: float = 0.0
+    patch_rate_by_provider: Dict[str, float] = Field(default_factory=dict)
+
+    # Result status breakdown (thesis-relevant)
+    status_counts: Dict[str, int] = Field(default_factory=dict)  # ResultStatus -> count
+    status_by_provider: Dict[str, Dict[str, int]] = Field(default_factory=dict)  # provider -> status -> count
 
     # Tool usage patterns
     tool_usage_by_provider: Dict[str, Dict[str, int]] = Field(default_factory=dict)
@@ -162,6 +181,7 @@ class CreateExperimentRequest(BaseModel):
     providers: List[str] = ["openai", "anthropic", "google"]
     models: Optional[Dict[str, str]] = None  # If None, use defaults
     tool_sets: Optional[List[ToolSetConfig]] = None
+    split: str = "dev"  # SWE-bench split: "dev", "lite", "test", "verified"
     context_limit: Optional[int] = None
     instance_ids: Optional[List[str]] = None
     repos: Optional[List[str]] = None

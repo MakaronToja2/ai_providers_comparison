@@ -97,11 +97,15 @@ class BaseAIProvider(ABC):
         temperature: float = 0.7,
         max_tokens: int = 1000,
         use_tools: bool = True,
+        max_tool_iterations: int = 10,
         **kwargs
     ) -> LLMResponse:
-        """Generate response with retry logic and standardized output"""
+        """Generate response with agentic tool loop and standardized output"""
         start_time = time.time()
-        
+        all_tool_calls = []
+        total_usage = TokenUsage(prompt_tokens=0, completion_tokens=0, total_tokens=0)
+        conversation = list(messages)  # Copy messages for the loop
+
         try:
             # Get available tools if enabled
             tools_spec = None
@@ -109,60 +113,71 @@ class BaseAIProvider(ABC):
                 tool_definitions = tool_registry.get_tool_definitions()
                 if tool_definitions:
                     tools_spec = [tool.model_dump() for tool in tool_definitions]
-            
-            raw_response = await self._make_api_call(
-                messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                tools=tools_spec,
-                **kwargs
-            )
-            
-            content, usage, tool_calls_data = self._parse_response(raw_response)
-            
-            # Execute any tool calls
-            executed_tool_calls = []
-            if tool_calls_data:
+
+            all_content_parts = []  # Accumulate ALL content throughout iterations
+            iteration = 0
+
+            while iteration < max_tool_iterations:
+                iteration += 1
+
+                raw_response = await self._make_api_call(
+                    messages=conversation,
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    tools=tools_spec,
+                    **kwargs
+                )
+
+                content, usage, tool_calls_data = self._parse_response(raw_response)
+
+                # Accumulate usage
+                if usage:
+                    total_usage.prompt_tokens += usage.prompt_tokens
+                    total_usage.completion_tokens += usage.completion_tokens
+                    total_usage.total_tokens += usage.total_tokens
+
+                # Always accumulate content (fixes bug where content was lost during tool iterations)
+                if content:
+                    all_content_parts.append(content)
+
+                # If no tool calls, we're done
+                if not tool_calls_data:
+                    break
+
+                # Execute tool calls
+                tool_results = []
                 for tool_call_data in tool_calls_data:
                     tool_name = tool_call_data.get("name")
                     parameters = tool_call_data.get("parameters", {})
-                    
+
                     executed_call = await self._execute_tool_call(tool_name, parameters)
-                    executed_tool_calls.append(executed_call)
-            
+                    all_tool_calls.append(executed_call)
+                    tool_results.append(executed_call)
+
+                # Add assistant message with tool calls to conversation
+                assistant_content = content or f"Calling tools: {', '.join(tc.name for tc in tool_results)}"
+                conversation.append(ChatMessage(role="assistant", content=assistant_content))
+
+                # Add tool results to conversation
+                tool_result_text = self._format_tool_results(tool_results)
+                conversation.append(ChatMessage(role="user", content=tool_result_text))
+
             response_time = time.time() - start_time
-            
-            # Convert raw_response to dict if it's not already
-            raw_response_dict = None
-            if isinstance(raw_response, dict):
-                raw_response_dict = raw_response
-            elif hasattr(raw_response, 'model_dump'):
-                try:
-                    raw_response_dict = raw_response.model_dump()
-                except:
-                    raw_response_dict = None
-            elif hasattr(raw_response, 'dict'):
-                try:
-                    raw_response_dict = raw_response.dict()
-                except:
-                    raw_response_dict = None
-            elif hasattr(raw_response, '__dict__'):
-                try:
-                    raw_response_dict = {k: str(v) for k, v in raw_response.__dict__.items()}
-                except:
-                    raw_response_dict = None
-            
+
+            # Combine all accumulated content
+            final_content = "\n\n".join(all_content_parts) if all_content_parts else ""
+
             return LLMResponse(
                 provider=self.provider_name,
                 model=self.model,
-                content=content,
-                usage=usage,
+                content=final_content,
+                usage=total_usage if total_usage.total_tokens > 0 else None,
                 response_time=response_time,
                 success=True,
-                raw_response=raw_response_dict,
-                tool_calls=executed_tool_calls if executed_tool_calls else None
+                raw_response=None,  # Don't store all raw responses
+                tool_calls=all_tool_calls if all_tool_calls else None
             )
-            
+
         except Exception as e:
             response_time = time.time() - start_time
             return LLMResponse(
@@ -171,8 +186,20 @@ class BaseAIProvider(ABC):
                 content="",
                 response_time=response_time,
                 success=False,
-                error_message=str(e)
+                error_message=str(e),
+                tool_calls=all_tool_calls if all_tool_calls else None
             )
+
+    def _format_tool_results(self, tool_calls: List[ToolCall]) -> str:
+        """Format tool call results for sending back to the LLM."""
+        results = []
+        for tc in tool_calls:
+            if tc.success:
+                result_str = json.dumps(tc.result, indent=2) if tc.result else "Success"
+                results.append(f"## Tool: {tc.name}\n{result_str}")
+            else:
+                results.append(f"## Tool: {tc.name}\nError: {tc.error}")
+        return "Here are the tool results:\n\n" + "\n\n".join(results)
     
     async def health_check(self) -> bool:
         """Check if the provider is healthy and accessible"""

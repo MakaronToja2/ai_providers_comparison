@@ -14,6 +14,7 @@ from typing import List, Optional, Tuple
 from ..models.benchmark import TestResult, ExperimentResult
 from ..utils.swe_bench_loader import SWEBenchLoader
 from .storage import Storage
+from .patch_extractor import patch_extractor
 
 
 class TestEvaluator:
@@ -45,6 +46,8 @@ class TestEvaluator:
         Returns:
             TestResult with evaluation outcome
         """
+        print(f"[Evaluator] Evaluating {result.instance_id} ({result.provider})")
+
         test_result = TestResult(
             result_id=result.id,
             experiment_id=result.experiment_id,
@@ -57,12 +60,13 @@ class TestEvaluator:
             return test_result
 
         try:
-            # Get instance data
+            # Get instance data (use split from result, fallback to "dev")
+            split = getattr(result, 'split', 'dev') or 'dev'
             instance = await asyncio.get_event_loop().run_in_executor(
                 None,
                 self.swe_bench_loader.get_instance,
                 result.instance_id,
-                "dev"
+                split
             )
 
             if not instance:
@@ -70,25 +74,37 @@ class TestEvaluator:
                 await self.storage.save_test_result(test_result)
                 return test_result
 
-            # Get test lists
-            fail_to_pass = instance.get("FAIL_TO_PASS", [])
-            pass_to_pass = instance.get("PASS_TO_PASS", [])
+            # Get test lists (use attribute access, not dict)
+            fail_to_pass = instance.FAIL_TO_PASS or []
+            pass_to_pass = instance.PASS_TO_PASS or []
 
             test_result.fail_to_pass_total = len(fail_to_pass)
             test_result.pass_to_pass_total = len(pass_to_pass)
 
-            # Clone/checkout repository
-            repo_path = await self._get_repo(
-                instance["repo"],
-                instance["base_commit"]
+            # Clone/checkout repository (cached)
+            cached_repo = await self._get_repo(
+                instance.repo,
+                instance.base_commit
             )
 
-            if not repo_path:
+            if not cached_repo:
                 test_result.patch_error = "Failed to clone repository"
                 await self.storage.save_test_result(test_result)
                 return test_result
 
+            # Create unique working copy for this evaluation to avoid race conditions
+            work_dir = Path(tempfile.mkdtemp(prefix=f"eval_{result.id[:8]}_"))
+            repo_path = work_dir / "repo"
+
             try:
+                # Copy cached repo to working directory
+                print(f"[Evaluator] Copying repo to {repo_path}...")
+                await asyncio.get_event_loop().run_in_executor(
+                    None,
+                    lambda: shutil.copytree(cached_repo, repo_path, symlinks=True)
+                )
+                print(f"[Evaluator] Working copy ready")
+
                 # Apply patch
                 apply_success, apply_error = await self._apply_patch(
                     repo_path,
@@ -133,8 +149,9 @@ class TestEvaluator:
                 )
 
             finally:
-                # Reset repository
-                await self._reset_repo(repo_path)
+                # Clean up working directory (unique to this evaluation)
+                if work_dir.exists():
+                    shutil.rmtree(work_dir, ignore_errors=True)
 
         except Exception as e:
             test_result.patch_error = str(e)
@@ -201,6 +218,7 @@ class TestEvaluator:
         # Clone repository
         try:
             clone_url = f"https://github.com/{repo}.git"
+            print(f"[Evaluator] Cloning {clone_url} to {repo_path}")
 
             result = await asyncio.get_event_loop().run_in_executor(
                 None,
@@ -213,7 +231,10 @@ class TestEvaluator:
             )
 
             if result.returncode != 0:
+                print(f"[Evaluator] Clone failed: {result.stderr}")
                 return None
+
+            print(f"[Evaluator] Clone succeeded, fetching commit {commit[:8]}")
 
             # Fetch the specific commit
             result = await asyncio.get_event_loop().run_in_executor(
@@ -226,6 +247,9 @@ class TestEvaluator:
                     timeout=60
                 )
             )
+
+            if result.returncode != 0:
+                print(f"[Evaluator] Fetch failed (might be ok): {result.stderr}")
 
             # Checkout the commit
             result = await asyncio.get_event_loop().run_in_executor(
@@ -240,6 +264,7 @@ class TestEvaluator:
             )
 
             if result.returncode != 0:
+                print(f"[Evaluator] Checkout {commit[:8]} failed, trying FETCH_HEAD")
                 # Try with FETCH_HEAD
                 result = await asyncio.get_event_loop().run_in_executor(
                     None,
@@ -251,11 +276,14 @@ class TestEvaluator:
                         timeout=30
                     )
                 )
+                if result.returncode != 0:
+                    print(f"[Evaluator] FETCH_HEAD checkout also failed: {result.stderr}")
 
+            print(f"[Evaluator] Repo ready at {repo_path}")
             return repo_path if repo_path.exists() else None
 
         except Exception as e:
-            print(f"Failed to clone {repo}: {e}")
+            print(f"[Evaluator] Failed to clone {repo}: {e}")
             return None
 
     async def _apply_patch(
@@ -265,28 +293,54 @@ class TestEvaluator:
     ) -> Tuple[bool, Optional[str]]:
         """Apply a patch to the repository."""
         try:
+            # Normalize patch to fix common issues:
+            # - Add a/ and b/ path prefixes
+            # - Fix hunk header line counts
+            # - Add leading spaces to context lines
+            normalized = patch_extractor._normalize_patch(patch)
+            print(f"[Evaluator] Patch normalized: {len(patch)} -> {len(normalized)} chars")
+            patch = normalized
+
             # Write patch to temp file
             patch_file = repo_path / ".generated_patch.diff"
-            patch_file.write_text(patch)
+            patch_file.write_text(patch, encoding='utf-8')
 
-            # Try applying with git apply
-            result = await asyncio.get_event_loop().run_in_executor(
-                None,
-                lambda: subprocess.run(
-                    ["git", "apply", "--check", str(patch_file)],
-                    cwd=repo_path,
-                    capture_output=True,
-                    text=True,
-                    timeout=30
-                )
-            )
+            # Log patch details for debugging
+            patch_lines = patch.split('\n')
+            print(f"[Evaluator] Applying patch ({len(patch)} chars, {len(patch_lines)} lines) to {repo_path}")
+            print(f"[Evaluator] Patch preview (first 15 lines):")
+            for i, line in enumerate(patch_lines[:15]):
+                # Show line with visible representation of leading chars
+                display = repr(line[:80]) if len(line) > 80 else repr(line)
+                print(f"[Evaluator]   {i+1:2d}: {display}")
 
-            if result.returncode != 0:
-                # Try with patch command as fallback
+            # Try multiple strategies to apply the patch
+            strategies = [
+                # Strategy 1: Standard git apply with -p1 (for a/b prefixed patches)
+                (["git", "apply", "--check", "--verbose", str(patch_file)],
+                 ["git", "apply", str(patch_file)]),
+                # Strategy 2: git apply with --ignore-whitespace (more lenient)
+                (["git", "apply", "--check", "--ignore-whitespace", str(patch_file)],
+                 ["git", "apply", "--ignore-whitespace", str(patch_file)]),
+                # Strategy 3: git apply with -p0 (no path stripping)
+                (["git", "apply", "--check", "-p0", str(patch_file)],
+                 ["git", "apply", "-p0", str(patch_file)]),
+                # Strategy 4: patch command with -p1
+                (["patch", "-p1", "--dry-run", "-i", str(patch_file)],
+                 ["patch", "-p1", "-i", str(patch_file)]),
+                # Strategy 5: patch command with -p0
+                (["patch", "-p0", "--dry-run", "-i", str(patch_file)],
+                 ["patch", "-p0", "-i", str(patch_file)]),
+            ]
+
+            applied = False
+            last_error = ""
+
+            for i, (check_cmd, apply_cmd) in enumerate(strategies):
                 result = await asyncio.get_event_loop().run_in_executor(
                     None,
-                    lambda: subprocess.run(
-                        ["patch", "-p1", "--dry-run", "-i", str(patch_file)],
+                    lambda cmd=check_cmd: subprocess.run(
+                        cmd,
                         cwd=repo_path,
                         capture_output=True,
                         text=True,
@@ -294,38 +348,36 @@ class TestEvaluator:
                     )
                 )
 
-                if result.returncode != 0:
-                    return False, f"Patch cannot be applied: {result.stderr}"
-
-                # Apply for real with patch
-                result = await asyncio.get_event_loop().run_in_executor(
-                    None,
-                    lambda: subprocess.run(
-                        ["patch", "-p1", "-i", str(patch_file)],
-                        cwd=repo_path,
-                        capture_output=True,
-                        text=True,
-                        timeout=30
+                if result.returncode == 0:
+                    print(f"[Evaluator] Strategy {i+1} check passed: {' '.join(check_cmd[:3])}")
+                    # Apply for real
+                    result = await asyncio.get_event_loop().run_in_executor(
+                        None,
+                        lambda cmd=apply_cmd: subprocess.run(
+                            cmd,
+                            cwd=repo_path,
+                            capture_output=True,
+                            text=True,
+                            timeout=30
+                        )
                     )
-                )
-            else:
-                # Apply for real with git
-                result = await asyncio.get_event_loop().run_in_executor(
-                    None,
-                    lambda: subprocess.run(
-                        ["git", "apply", str(patch_file)],
-                        cwd=repo_path,
-                        capture_output=True,
-                        text=True,
-                        timeout=30
-                    )
-                )
+                    if result.returncode == 0:
+                        applied = True
+                        break
+                    else:
+                        last_error = result.stderr
+                else:
+                    last_error = result.stderr
+                    if i == 0:  # Only log first failure in detail
+                        print(f"[Evaluator] Strategy {i+1} failed: {result.stderr[:300]}")
 
             patch_file.unlink(missing_ok=True)
 
-            if result.returncode != 0:
-                return False, f"Patch application failed: {result.stderr}"
+            if not applied:
+                print(f"[Evaluator] All strategies failed. Last error: {last_error[:200]}")
+                return False, f"Patch cannot be applied: {last_error}"
 
+            print(f"[Evaluator] Patch applied successfully")
             return True, None
 
         except Exception as e:
@@ -343,34 +395,43 @@ class TestEvaluator:
 
         passed = 0
         output_lines = []
+        per_test_timeout = max(30, timeout // len(test_names)) if test_names else timeout
 
-        for test_name in test_names:
+        print(f"[Evaluator] Running {len(test_names)} tests (timeout: {per_test_timeout}s each)")
+
+        for i, test_name in enumerate(test_names):
             try:
+                print(f"[Evaluator]   Test {i+1}/{len(test_names)}: {test_name[:60]}...")
                 # Try running with pytest
                 result = await asyncio.get_event_loop().run_in_executor(
                     None,
                     lambda tn=test_name: subprocess.run(
-                        ["python", "-m", "pytest", tn, "-v", "--tb=short"],
+                        ["python", "-m", "pytest", tn, "-v", "--tb=short", "-x"],
                         cwd=repo_path,
                         capture_output=True,
                         text=True,
-                        timeout=timeout // len(test_names) if test_names else timeout
+                        timeout=per_test_timeout
                     )
                 )
 
                 if result.returncode == 0:
                     passed += 1
                     output_lines.append(f"PASS: {test_name}")
+                    print(f"[Evaluator]     -> PASS")
                 else:
                     output_lines.append(f"FAIL: {test_name}")
+                    print(f"[Evaluator]     -> FAIL")
                     if result.stderr:
                         output_lines.append(result.stderr[:500])
 
             except subprocess.TimeoutExpired:
                 output_lines.append(f"TIMEOUT: {test_name}")
+                print(f"[Evaluator]     -> TIMEOUT (>{per_test_timeout}s)")
             except Exception as e:
                 output_lines.append(f"ERROR: {test_name} - {str(e)}")
+                print(f"[Evaluator]     -> ERROR: {str(e)[:50]}")
 
+        print(f"[Evaluator] Tests complete: {passed}/{len(test_names)} passed")
         return passed, "\n".join(output_lines)
 
     async def _reset_repo(self, repo_path: Path) -> None:

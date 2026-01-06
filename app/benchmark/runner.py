@@ -3,9 +3,11 @@ Benchmark runner for executing SWE-bench experiments.
 Handles batch processing with concurrency, resume capability, and progress tracking.
 """
 import asyncio
+import os
+import re
 import time
 from datetime import datetime
-from typing import AsyncGenerator, List, Optional, Set, Tuple
+from typing import AsyncGenerator, Dict, List, Optional, Set, Tuple
 from dataclasses import dataclass
 
 from ..core.provider_factory import ProviderFactory
@@ -17,6 +19,7 @@ from ..models.benchmark import (
     ExperimentConfig,
     ExperimentStatus,
     ExperimentResult,
+    ResultStatus,
     ToolCallRecord,
     ProgressUpdate,
 )
@@ -24,6 +27,7 @@ from ..utils.swe_bench_loader import SWEBenchLoader
 from ..utils.repo_context import RepoContext
 from .storage import Storage
 from .rate_limiter import RateLimiterManager
+from .patch_extractor import patch_extractor
 
 
 @dataclass
@@ -41,6 +45,7 @@ class WorkItem:
     patch: Optional[str]
     fail_to_pass: List[str]
     pass_to_pass: List[str]
+    split: str = "dev"
 
 
 class ExperimentRunner:
@@ -209,26 +214,29 @@ class ExperimentRunner:
                             patch=instance.patch,
                             fail_to_pass=instance.FAIL_TO_PASS or [],
                             pass_to_pass=instance.PASS_TO_PASS or [],
+                            split=config.split or "dev",
                         ))
 
         return work_items
 
     async def _load_instances(self, config: ExperimentConfig) -> List[dict]:
         """Load SWE-bench instances based on config filters."""
-        # Load the dev split (or could be configurable)
+        split = config.split or "dev"
+
+        # Load the specified split
         await asyncio.get_event_loop().run_in_executor(
-            None, self.swe_bench_loader.load_dataset, "dev"
+            None, self.swe_bench_loader.load_dataset, split
         )
 
         # Get all instances
         all_instance_ids = await asyncio.get_event_loop().run_in_executor(
-            None, self.swe_bench_loader.list_instances, "dev", 1000
+            None, self.swe_bench_loader.list_instances, split, 1000
         )
 
         instances = []
         for instance_id in all_instance_ids:
             instance = await asyncio.get_event_loop().run_in_executor(
-                None, self.swe_bench_loader.get_instance, instance_id, "dev"
+                None, self.swe_bench_loader.get_instance, instance_id, split
             )
             if instance:
                 # Apply filters
@@ -256,6 +264,7 @@ class ExperimentRunner:
             provider=work.provider,
             model=work.model,
             tool_set=work.tool_set_name,
+            split=work.split,
             started_at=datetime.utcnow(),
         )
 
@@ -277,11 +286,13 @@ class ExperimentRunner:
                     result.context_size_chars = sum(len(m.content) for m in messages)
 
                     # Generate response
+                    # Note: 8000 tokens gives models more room to explore AND produce a final diff
+                    # Previously 4000 was too low - models got truncated mid-response
                     start_time = time.time()
                     response = await provider.generate_response(
                         messages=messages,
                         temperature=0.3,
-                        max_tokens=4000,
+                        max_tokens=8000,
                     )
                     result.response_time_seconds = time.time() - start_time
 
@@ -308,11 +319,29 @@ class ExperimentRunner:
                         result.tool_call_count = len(response.tool_calls)
                         result.successful_tool_calls = sum(1 for tc in response.tool_calls if tc.success)
 
-                    # Extract patch from response (simple heuristic)
-                    result.generated_patch = self._extract_patch(response.content)
+                    # Classify the result status
+                    cannot_solve_info = self._check_cannot_solve(response.content)
 
-                    if not response.success:
-                        result.error_message = response.error_message
+                    if cannot_solve_info:
+                        # Model honestly admitted it cannot solve - this is better than hallucination
+                        result.success = False
+                        result.result_status = ResultStatus.FAILURE_EXPLICIT
+                        result.error_message = f"Model admitted failure: {cannot_solve_info['reason']} - {cannot_solve_info['explanation']}"
+                    else:
+                        # Try to extract patch from response
+                        result.generated_patch = self._extract_patch(response.content)
+
+                        if result.generated_patch:
+                            # Successfully extracted a patch
+                            result.success = True
+                            result.result_status = ResultStatus.SUCCESS_PATCH_GENERATED
+                            if not response.success:
+                                result.error_message = response.error_message
+                        else:
+                            # Model responded but produced no valid output
+                            result.success = False
+                            result.result_status = ResultStatus.HALLUCINATION_FORMAT_ERROR
+                            result.error_message = "No valid patch generated (missing ```diff``` block or <<<CANNOT_SOLVE>>> marker)"
 
             finally:
                 # Restore original tool states
@@ -321,6 +350,7 @@ class ExperimentRunner:
 
         except Exception as e:
             result.success = False
+            result.result_status = ResultStatus.API_ERROR
             result.error_message = str(e)
 
         result.completed_at = datetime.utcnow()
@@ -330,25 +360,54 @@ class ExperimentRunner:
 
         return result
 
+    # Standardized failure markers for when model cannot solve
+    CANNOT_SOLVE_MARKER = "<<<CANNOT_SOLVE>>>"
+    CANNOT_SOLVE_REASONS = [
+        "insufficient_context",      # Can't find relevant code
+        "too_complex",               # Problem is too complex to solve
+        "unclear_requirements",      # Bug report is unclear
+        "missing_dependencies",      # Would need external info/deps
+    ]
+
     def _build_analysis_messages(self, work: WorkItem) -> List[ChatMessage]:
         """Build the prompt messages for analyzing an instance."""
-        system_prompt = """You are an expert software engineer analyzing a bug report from a GitHub issue.
-Your task is to understand the problem and propose a solution in the form of a code patch.
+        system_prompt = """You are an expert software engineer tasked with fixing a bug from a GitHub issue.
 
-You have access to the following tools to explore the codebase:
-- read_file: Read the contents of a file
-- search_code: Search for code patterns using regex
-- list_directory: List files in a directory
+IMPORTANT: Your response MUST end with either:
+1. A complete patch in unified diff format, OR
+2. A standardized failure response if you truly cannot solve it
 
-Use these tools to understand the codebase structure and find relevant code before proposing a fix.
+You have access to tools to explore the codebase:
+- read_file: Read file contents (use file_path parameter)
+- search_code: Search for patterns using regex (use pattern parameter)
+- list_directory: List directory contents (use directory_path parameter)
 
-When you have enough information, provide a patch in unified diff format that fixes the issue.
-Format your patch inside a code block with ```diff ... ``` markers."""
+Workflow:
+1. Use tools to find the relevant code (2-5 tool calls should be enough)
+2. Analyze the bug and determine the fix
+3. OUTPUT A COMPLETE PATCH in unified diff format
 
-        user_message = f"""## Repository
-{work.repo}
+Your response MUST contain a patch formatted as:
+```diff
+--- a/path/to/file.py
++++ b/path/to/file.py
+@@ -line,count +line,count @@
+ context line
+-removed line
++added line
+ context line
+```
 
-## Problem Statement
+IF AND ONLY IF you genuinely cannot produce a patch after exploring the code, respond with EXACTLY:
+<<<CANNOT_SOLVE>>>
+reason: [insufficient_context|too_complex|unclear_requirements|missing_dependencies]
+explanation: [brief explanation of why you cannot solve this]
+
+DO NOT use <<<CANNOT_SOLVE>>> if you can make any reasonable attempt at a patch. A partial or uncertain patch is better than giving up. Only use this if you truly cannot determine what changes to make."""
+
+        user_message = f"""## Repository: {work.repo}
+
+## Bug Report
 {work.problem_statement}
 """
 
@@ -359,7 +418,12 @@ Format your patch inside a code block with ```diff ... ``` markers."""
 """
 
         user_message += """
-Please analyze this issue and provide a fix. Start by exploring the codebase to understand the relevant code, then provide a patch."""
+## Instructions
+1. Use the tools to locate the relevant code (be efficient - don't over-explore)
+2. Identify the root cause of the bug
+3. Generate a fix as a unified diff patch
+
+Remember: Your response MUST end with either a ```diff``` code block OR <<<CANNOT_SOLVE>>> marker. No other response format is acceptable."""
 
         return [
             ChatMessage(role="system", content=system_prompt),
@@ -367,33 +431,57 @@ Please analyze this issue and provide a fix. Start by exploring the codebase to 
         ]
 
     def _extract_patch(self, content: Optional[str]) -> Optional[str]:
-        """Extract a patch from the response content."""
+        """Extract a patch from the response content using the robust extractor."""
         if not content:
             return None
 
-        # Look for diff code blocks
-        import re
-        diff_pattern = r'```(?:diff)?\s*\n(.*?)```'
-        matches = re.findall(diff_pattern, content, re.DOTALL)
-
-        if matches:
-            # Return the first diff-like block
-            for match in matches:
-                if match.strip().startswith(('+', '-', '@@', 'diff', '---', '+++')):
-                    return match.strip()
-                if 'diff' in match.lower() or '@@' in match:
-                    return match.strip()
+        # Use the robust patch extractor
+        patch = patch_extractor.extract(content)
+        if patch:
+            return patch
 
         return None
 
-    def _get_default_model(self, provider: str) -> str:
-        """Get default model for a provider."""
-        defaults = {
-            "openai": "gpt-4o-mini",
-            "anthropic": "claude-3-haiku-20240307",
-            "google": "gemini-2.5-flash-lite",
+    def _check_cannot_solve(self, content: Optional[str]) -> Optional[Dict[str, str]]:
+        """Check if the response contains a <<<CANNOT_SOLVE>>> marker.
+
+        Returns:
+            Dict with 'reason' and 'explanation' if marker found, None otherwise.
+        """
+        if not content:
+            return None
+
+        if self.CANNOT_SOLVE_MARKER not in content:
+            return None
+
+        # Found the marker - try to extract reason and explanation
+        result = {
+            "reason": "unknown",
+            "explanation": "Model indicated it cannot solve this problem"
         }
-        return defaults.get(provider, "unknown")
+
+        # Try to extract reason
+        reason_match = re.search(r'reason:\s*(\w+)', content, re.IGNORECASE)
+        if reason_match:
+            reason = reason_match.group(1).lower()
+            if reason in self.CANNOT_SOLVE_REASONS:
+                result["reason"] = reason
+
+        # Try to extract explanation
+        explanation_match = re.search(r'explanation:\s*(.+?)(?:\n|$)', content, re.IGNORECASE)
+        if explanation_match:
+            result["explanation"] = explanation_match.group(1).strip()[:200]  # Limit length
+
+        return result
+
+    def _get_default_model(self, provider: str) -> str:
+        """Get default model for a provider from environment or defaults."""
+        env_defaults = {
+            "openai": os.getenv("OPENAI_DEFAULT_MODEL", "gpt-4.1-mini"),
+            "anthropic": os.getenv("ANTHROPIC_DEFAULT_MODEL", "claude-haiku-4-5-20251001"),
+            "google": os.getenv("GOOGLE_DEFAULT_MODEL", "gemini-2.5-flash-lite"),
+        }
+        return env_defaults.get(provider, "unknown")
 
 
 # Global runner instance

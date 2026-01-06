@@ -1,0 +1,47 @@
+diff --git a/pvlib/pvsystem.py b/pvlib/pvsystem.py
+index 1234567..89abcde 100644
+--- a/pvlib/pvsystem.py
++++ b/pvlib/pvsystem.py
+@@ -240,19 +240,23 @@ class PVSystem:
+-        if arrays is None:
+-            arrays = [Array(surface_tilt=surface_tilt,
+-                            surface_azimuth=surface_azimuth,
+-                            albedo=albedo,
+-                            surface_type=surface_type,
+-                            module=module,
+-                            module_type=module_type,
+-                            module_parameters=module_parameters,
+-                            temperature_model_parameters=temperature_model_parameters,
+-                            modules_per_string=modules_per_string,
+-                            strings_per_inverter=strings_per_inverter,
+-                            inverter=inverter,
+-                            inverter_parameters=inverter_parameters,
+-                            racking_model=racking_model,
+-                            losses_parameters=losses_parameters)]
+-        elif len(arrays) == 0:
+-            raise ValueError("PVSystem must have at least one Array. "
+-                             "If you want to create a PVSystem instance "
+-                             "without arrays, set arrays=None.")
++        if arrays is None:
++            arrays = [Array(surface_tilt=surface_tilt,
++                            surface_azimuth=surface_azimuth,
++                            albedo=albedo,
++                            surface_type=surface_type,
++                            module=module,
++                            module_type=module_type,
++                            module_parameters=module_parameters,
++                            temperature_model_parameters=temperature_model_parameters,
++                            modules_per_string=modules_per_string,
++                            strings_per_inverter=strings_per_inverter,
++                            inverter=inverter,
++                            inverter_parameters=inverter_parameters,
++                            racking_model=racking_model,
++                            losses_parameters=losses_parameters)]
++        elif isinstance(arrays, Array):
++            arrays = [arrays]
++        elif len(arrays) == 0:
++            raise ValueError("PVSystem must have at least one Array. "
++                             "If you want to create a PVSystem instance "
++                             "without arrays, set arrays=None.")
++
++        self.arrays = arrays

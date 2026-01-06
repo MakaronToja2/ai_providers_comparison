@@ -8,7 +8,12 @@ class Settings(BaseSettings):
     openai_api_key: Optional[str] = None
     anthropic_api_key: Optional[str] = None
     google_api_key: Optional[str] = None
-    
+
+    # Default models for each provider
+    openai_default_model: str = "gpt-4.1-mini"
+    anthropic_default_model: str = "claude-haiku-4-5-20251001"
+    google_default_model: str = "gemini-2.5-flash-lite"
+
     # Default model parameters
     default_temperature: float = 0.7
     default_max_tokens: int = 1000

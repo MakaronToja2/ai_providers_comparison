@@ -1,0 +1,35 @@
+diff --git a/src/marshmallow/schema.py b/src/marshmallow/schema.py
+index abcdef12..12345678 100644
+--- a/src/marshmallow/schema.py
++++ b/src/marshmallow/schema.py
+@@ -878,14 +878,16 @@ def _invoke_field_validators(self, unmarshal, data, many):
+-        else:
+-            try:
+-                value = data[field_obj.attribute or field_name]
+-            except KeyError:
+-                pass
+-            else:
+-                validated_value = unmarshal.call_and_store(
+-                    getter_func=validator,
+-                    data=value,
+-                    field_name=field_obj.load_from or field_name,
+-                    field_obj=field_obj
+-                )
+-                if validated_value is missing:
+-                    data.pop(field_name, None)
++        else:
++            if data is None:
++                return
++            try:
++                value = data[field_obj.attribute or field_name]
++            except KeyError:
++                pass
++            else:
++                validated_value = unmarshal.call_and_store(
++                    getter_func=validator,
++                    data=value,
++                    field_name=field_obj.load_from or field_name,
++                    field_obj=field_obj
++                )
++                if validated_value is missing:
++                    data.pop(field_name, None)

@@ -1,0 +1,23 @@
+diff --git a/pydicom/valuerep.py b/pydicom/valuerep.py
+index 6f7d8a3..b9c3f2e 100644
+--- a/pydicom/valuerep.py
++++ b/pydicom/valuerep.py
+@@ -800,5 +800,13 @@ class PersonName:
+-    def __bool__(self):
+-        if self.original_string is None:
+-            return (bool(self._components) and
+-                    (len(self._components) > 1 or bool(self._components[0])))
+-        return bool(self.original_string)
++    def __bool__(self):
++        if self.original_string is None:
++            return (bool(self._components) and
++                    (len(self._components) > 1 or bool(self._components[0])))
++        return bool(self.original_string)
++
++    def __contains__(self, item):
++        """Allow 'in' operator to check if a substring is in the PersonName string."""
++        return item in str(self)
++
++    def __getattr__(self, name):
++        """Delegate attribute access to the string representation for str methods."""
++        return getattr(str(self), name)

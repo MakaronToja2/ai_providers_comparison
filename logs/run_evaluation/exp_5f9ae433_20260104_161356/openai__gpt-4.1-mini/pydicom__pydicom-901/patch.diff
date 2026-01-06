@@ -1,0 +1,48 @@
+@@ -45,6 +45,4 @@
+-# Logging system and debug function to change logging level
+-logger = logging.getLogger('pydicom')
+-handler = logging.StreamHandler()
+-formatter = logging.Formatter("%(message)s")
+-handler.setFormatter(formatter)
+-logger.addHandler(handler)
++logger = logging.getLogger('pydicom')
++
++
++debugging = False
+@@ -121,20 +117,16 @@
+-def debug(debug_on=True):
+-    """Turn debugging of DICOM file reading and writing on or off.
+-    When debugging is on, file location and details about the
+-    elements read at that location are logged to the 'pydicom'
+-    logger using python's logging module.
+-
+-    :param debug_on: True (default) to turn on debugging,
+-    False to turn off.
+-    """
+-    global logger, debugging
+-    if debug_on:
+-        logger.setLevel(logging.DEBUG)
+-        debugging = True
+-    else:
+-        logger.setLevel(logging.WARNING)
+-        debugging = False
+-
+-
+-# force level=WARNING, in case logging default is set differently (issue 103)
+-debug(False)
++def debug(debug_on=True):
++    """Turn debugging of DICOM file reading and writing on or off.
++    When debugging is on, file location and details about the
++    elements read at that location are logged to the 'pydicom'
++    logger using python's logging module.
++
++    :param debug_on: True (default) to turn on debugging,
++    False to turn off.
++    """
++    global debugging
++    debugging = bool(debug_on)
++
++    if debugging:
++        logger.setLevel(logging.DEBUG)
++    else:
++        logger.setLevel(logging.WARNING)

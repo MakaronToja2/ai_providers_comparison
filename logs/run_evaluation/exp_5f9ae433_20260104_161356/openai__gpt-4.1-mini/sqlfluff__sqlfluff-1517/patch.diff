@@ -1,0 +1,58 @@
+diff --git a/src/sqlfluff/core/linter/linter.py b/src/sqlfluff/core/linter/linter.py
+index 1a2b3c4..5d6e7f8 100644
+--- a/src/sqlfluff/core/linter/linter.py
++++ b/src/sqlfluff/core/linter/linter.py
+@@ -290,7 +290,29 @@ class Linter:
+-        if tokens:
+-            parsed, pvs = cls._parse_tokens(
+-                tokens, rendered.config, recurse=recurse, fname=rendered.fname
+-            )
+-            violations += pvs
+-        else:
+-            parsed = None
++        if tokens:
++            try:
++                parsed, pvs = cls._parse_tokens(
++                    tokens, rendered.config, recurse=recurse, fname=rendered.fname
++                )
++                violations += pvs
++            except RuntimeError as err:
++                # Catch the "Dropped elements in sequence matching" error and convert to unparsable violation
++                err_msg = str(err)
++                if "Dropped elements in sequence matching" in err_msg:
++                    from sqlfluff.core.parser.segments.base import UnparsableSegment
++                    # Create an UnparsableSegment with the raw string from the templated file if possible
++                    raw_str = rendered.templated_file.raw if rendered.templated_file else rendered.raw_str
++                    unparsable_seg = UnparsableSegment(raw=raw_str)
++                    # Create a violation for unparsable section
++                    from sqlfluff.core.errors import SQLParseError
++                    violations.append(
++                        SQLParseError(
++                            message="Found unparsable section",
++                            line_no=1,
++                            line_pos=1,
++                            raw=raw_str,
++                        )
++                    )
++                    parsed = unparsable_seg
++                else:
++                    raise
++        else:
++            parsed = None
+@@ -313,8 +349,8 @@ class Linter:
+-        return ParsedString(
+-            parsed,
+-            violations,
+-            time_dict,
+-            rendered.templated_file,
+-            rendered.config,
+-            rendered.fname,
+-        )
++        return ParsedString(
++            parsed,
++            violations,
++            time_dict,
++            rendered.templated_file,
++            rendered.config,
++            rendered.fname,
++        )

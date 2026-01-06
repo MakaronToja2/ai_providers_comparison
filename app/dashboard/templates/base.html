@@ -231,7 +231,8 @@
             <ul>
                 <li><a href="/dashboard" class="{% if request.url.path == '/dashboard' or request.url.path == '/dashboard/' %}active{% endif %}">Home</a></li>
                 <li><a href="/dashboard/experiments" class="{% if '/experiments' in request.url.path and 'compare' not in request.url.path %}active{% endif %}">Experiments</a></li>
-                <li><a href="/dashboard/compare" class="{% if 'compare' in request.url.path %}active{% endif %}">Compare</a></li>
+                <li><a href="/dashboard/compare" class="{% if request.url.path == '/dashboard/compare' %}active{% endif %}">Compare Providers</a></li>
+                <li><a href="/dashboard/compare-experiments" class="{% if 'compare-experiments' in request.url.path %}active{% endif %}">Compare Experiments</a></li>
                 <li><a href="/docs" target="_blank">API Docs</a></li>
             </ul>
         </div>

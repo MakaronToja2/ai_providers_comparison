@@ -4,6 +4,15 @@ File reading tool for repository browsing
 import os
 from typing import Dict, Any, Optional, List
 from ..core.tools import BaseTool, ToolResult
+from ..utils.repo_context import get_current_repo_path
+
+
+def _resolve_path(relative_path: str) -> str:
+    """Resolve a relative path using the current repo context."""
+    repo_path = get_current_repo_path()
+    if repo_path:
+        return os.path.join(repo_path, relative_path)
+    return relative_path
 
 
 class FileReaderTool(BaseTool):
@@ -45,7 +54,7 @@ class FileReaderTool(BaseTool):
             "required": ["file_path"]
         }
     
-    async def execute(self, file_path: str, start_line: Optional[int] = None, 
+    async def execute(self, file_path: str, start_line: Optional[int] = None,
                      end_line: Optional[int] = None, max_lines: int = 500, **kwargs) -> ToolResult:
         """Read file content with line range support and safety checks"""
         try:
@@ -57,25 +66,28 @@ class FileReaderTool(BaseTool):
                     data=None,
                     error="File path must be relative to repository root"
                 )
-            
+
+            # Resolve to absolute path using repo context
+            absolute_path = _resolve_path(normalized_path)
+
             # Check if file exists
-            if not os.path.exists(normalized_path):
+            if not os.path.exists(absolute_path):
                 return ToolResult(
                     success=False,
                     data=None,
                     error=f"File not found: {normalized_path}"
                 )
-            
+
             # Check if it's a file (not directory)
-            if not os.path.isfile(normalized_path):
+            if not os.path.isfile(absolute_path):
                 return ToolResult(
                     success=False,
                     data=None,
                     error=f"Path is not a file: {normalized_path}"
                 )
-            
+
             # Read file content with line range support
-            with open(normalized_path, 'r', encoding='utf-8') as f:
+            with open(absolute_path, 'r', encoding='utf-8') as f:
                 all_lines = f.readlines()
             
             total_lines = len(all_lines)
@@ -147,23 +159,22 @@ class DirectoryListTool(BaseTool):
             "properties": {
                 "directory_path": {
                     "type": "string",
-                    "description": "Path to directory to list (relative to repository root, default: '.')",
-                    "default": "."
+                    "description": "Path to directory to list (relative to repository root, default: '.')"
                 },
                 "show_hidden": {
                     "type": "boolean",
-                    "description": "Include hidden files (starting with .)",
-                    "default": False
+                    "description": "Include hidden files (starting with .)"
                 },
                 "file_types": {
                     "type": "array",
                     "items": {"type": "string"},
                     "description": "Filter by file extensions (e.g., ['.py', '.js'])"
                 }
-            }
+            },
+            "required": []
         }
     
-    async def execute(self, directory_path: str = ".", show_hidden: bool = False, 
+    async def execute(self, directory_path: str = ".", show_hidden: bool = False,
                      file_types: Optional[List[str]] = None, **kwargs) -> ToolResult:
         """List directory contents with filtering"""
         try:
@@ -175,30 +186,34 @@ class DirectoryListTool(BaseTool):
                     data=None,
                     error="Directory path must be relative to repository root"
                 )
-            
-            if not os.path.exists(normalized_path):
+
+            # Resolve to absolute path using repo context
+            absolute_path = _resolve_path(normalized_path)
+
+            if not os.path.exists(absolute_path):
                 return ToolResult(
                     success=False,
                     data=None,
                     error=f"Directory not found: {normalized_path}"
                 )
-            
-            if not os.path.isdir(normalized_path):
+
+            if not os.path.isdir(absolute_path):
                 return ToolResult(
                     success=False,
                     data=None,
                     error=f"Path is not a directory: {normalized_path}"
                 )
-            
+
             # List directory contents
             items = []
-            for item in os.listdir(normalized_path):
+            for item in os.listdir(absolute_path):
                 if not show_hidden and item.startswith('.'):
                     continue
-                
-                item_path = os.path.join(normalized_path, item)
-                is_dir = os.path.isdir(item_path)
-                
+
+                item_abs_path = os.path.join(absolute_path, item)
+                item_rel_path = os.path.join(normalized_path, item)
+                is_dir = os.path.isdir(item_abs_path)
+
                 # Filter by file types if specified
                 if file_types and not is_dir:
                     file_ext = os.path.splitext(item)[1]
@@ -208,7 +223,7 @@ class DirectoryListTool(BaseTool):
                 items.append({
                     "name": item,
                     "type": "directory" if is_dir else "file",
-                    "path": item_path,
+                    "path": item_rel_path,
                     "extension": os.path.splitext(item)[1] if not is_dir else None
                 })
             

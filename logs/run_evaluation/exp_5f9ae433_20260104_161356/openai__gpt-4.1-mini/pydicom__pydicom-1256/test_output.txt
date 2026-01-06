@@ -1,0 +1,675 @@
++ source /opt/miniconda3/bin/activate
+++ _CONDA_ROOT=/opt/miniconda3
+++ . /opt/miniconda3/etc/profile.d/conda.sh
++++ export CONDA_EXE=/opt/miniconda3/bin/conda
++++ CONDA_EXE=/opt/miniconda3/bin/conda
++++ export _CE_M=
++++ _CE_M=
++++ export _CE_CONDA=
++++ _CE_CONDA=
++++ export CONDA_PYTHON_EXE=/opt/miniconda3/bin/python
++++ CONDA_PYTHON_EXE=/opt/miniconda3/bin/python
++++ '[' -z '' ']'
++++ export CONDA_SHLVL=0
++++ CONDA_SHLVL=0
++++ '[' -n '' ']'
++++++ dirname /opt/miniconda3/bin/conda
+++++ dirname /opt/miniconda3/bin
++++ PATH=/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
++++ export PATH
++++ '[' -z '' ']'
++++ PS1=
+++ conda activate
+++ local cmd=activate
+++ case "$cmd" in
+++ __conda_activate activate
+++ '[' -n '' ']'
+++ local ask_conda
++++ PS1=
++++ __conda_exe shell.posix activate
++++ /opt/miniconda3/bin/conda shell.posix activate
+++ ask_conda='PS1='\''(base) '\''
+export PATH='\''/opt/miniconda3/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'\''
+export CONDA_PREFIX='\''/opt/miniconda3'\''
+export CONDA_SHLVL='\''1'\''
+export CONDA_DEFAULT_ENV='\''base'\''
+export CONDA_PROMPT_MODIFIER='\''(base) '\''
+export CONDA_EXE='\''/opt/miniconda3/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/opt/miniconda3/bin/python'\'''
+++ eval 'PS1='\''(base) '\''
+export PATH='\''/opt/miniconda3/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'\''
+export CONDA_PREFIX='\''/opt/miniconda3'\''
+export CONDA_SHLVL='\''1'\''
+export CONDA_DEFAULT_ENV='\''base'\''
+export CONDA_PROMPT_MODIFIER='\''(base) '\''
+export CONDA_EXE='\''/opt/miniconda3/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/opt/miniconda3/bin/python'\'''
++++ PS1='(base) '
++++ export PATH=/opt/miniconda3/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
++++ PATH=/opt/miniconda3/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
++++ export CONDA_PREFIX=/opt/miniconda3
++++ CONDA_PREFIX=/opt/miniconda3
++++ export CONDA_SHLVL=1
++++ CONDA_SHLVL=1
++++ export CONDA_DEFAULT_ENV=base
++++ CONDA_DEFAULT_ENV=base
++++ export 'CONDA_PROMPT_MODIFIER=(base) '
++++ CONDA_PROMPT_MODIFIER='(base) '
++++ export CONDA_EXE=/opt/miniconda3/bin/conda
++++ CONDA_EXE=/opt/miniconda3/bin/conda
++++ export _CE_M=
++++ _CE_M=
++++ export _CE_CONDA=
++++ _CE_CONDA=
++++ export CONDA_PYTHON_EXE=/opt/miniconda3/bin/python
++++ CONDA_PYTHON_EXE=/opt/miniconda3/bin/python
+++ __conda_hashr
+++ '[' -n '' ']'
+++ '[' -n '' ']'
+++ hash -r
++ conda activate testbed
++ local cmd=activate
++ case "$cmd" in
++ __conda_activate activate testbed
++ '[' -n '' ']'
++ local ask_conda
+++ PS1='(base) '
+++ __conda_exe shell.posix activate testbed
+++ /opt/miniconda3/bin/conda shell.posix activate testbed
++ ask_conda='PS1='\''(testbed) '\''
+export PATH='\''/opt/miniconda3/envs/testbed/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'\''
+export CONDA_PREFIX='\''/opt/miniconda3/envs/testbed'\''
+export CONDA_SHLVL='\''2'\''
+export CONDA_DEFAULT_ENV='\''testbed'\''
+export CONDA_PROMPT_MODIFIER='\''(testbed) '\''
+export CONDA_PREFIX_1='\''/opt/miniconda3'\''
+export CONDA_EXE='\''/opt/miniconda3/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/opt/miniconda3/bin/python'\'''
++ eval 'PS1='\''(testbed) '\''
+export PATH='\''/opt/miniconda3/envs/testbed/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'\''
+export CONDA_PREFIX='\''/opt/miniconda3/envs/testbed'\''
+export CONDA_SHLVL='\''2'\''
+export CONDA_DEFAULT_ENV='\''testbed'\''
+export CONDA_PROMPT_MODIFIER='\''(testbed) '\''
+export CONDA_PREFIX_1='\''/opt/miniconda3'\''
+export CONDA_EXE='\''/opt/miniconda3/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/opt/miniconda3/bin/python'\'''
+++ PS1='(testbed) '
+++ export PATH=/opt/miniconda3/envs/testbed/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+++ PATH=/opt/miniconda3/envs/testbed/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+++ export CONDA_PREFIX=/opt/miniconda3/envs/testbed
+++ CONDA_PREFIX=/opt/miniconda3/envs/testbed
+++ export CONDA_SHLVL=2
+++ CONDA_SHLVL=2
+++ export CONDA_DEFAULT_ENV=testbed
+++ CONDA_DEFAULT_ENV=testbed
+++ export 'CONDA_PROMPT_MODIFIER=(testbed) '
+++ CONDA_PROMPT_MODIFIER='(testbed) '
+++ export CONDA_PREFIX_1=/opt/miniconda3
+++ CONDA_PREFIX_1=/opt/miniconda3
+++ export CONDA_EXE=/opt/miniconda3/bin/conda
+++ CONDA_EXE=/opt/miniconda3/bin/conda
+++ export _CE_M=
+++ _CE_M=
+++ export _CE_CONDA=
+++ _CE_CONDA=
+++ export CONDA_PYTHON_EXE=/opt/miniconda3/bin/python
+++ CONDA_PYTHON_EXE=/opt/miniconda3/bin/python
++ __conda_hashr
++ '[' -n '' ']'
++ '[' -n '' ']'
++ hash -r
++ cd /testbed
++ git config --global --add safe.directory /testbed
++ cd /testbed
++ git status
+On branch main
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   pydicom/jsonrep.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	pydicom/jsonrep.py.rej
+
+no changes added to commit (use "git add" and/or "git commit -a")
++ git show
+commit c9e522968e9dac9df90a47e0d0275434775171bc
+Author: SWE-bench <setup@swebench.config>
+Date:   Tue May 6 23:51:38 2025 +0000
+
+    SWE-bench
++ git -c core.fileMode=false diff 49a3da4a3d9c24d7e8427a25048a1c7d5c4f7724
+diff --git a/pydicom/jsonrep.py b/pydicom/jsonrep.py
+index c6ef519c3..7a4c14735 100644
+--- a/pydicom/jsonrep.py
++++ b/pydicom/jsonrep.py
+@@ -226,7 +226,8 @@ class JsonDataElementConverter:
+                     value_key = unique_value_keys[0]
+                     elem = DataElement.from_json(
+                         self.dataset_class, key, vr,
+-                        val[value_key], value_key
++                        val[value_key], value_key,
++                        bulk_data_uri_handler=self.bulk_data_uri_handler
+                     )
+                 ds.add(elem)
+         return ds
++ source /opt/miniconda3/bin/activate
+++ _CONDA_ROOT=/opt/miniconda3
+++ . /opt/miniconda3/etc/profile.d/conda.sh
++++ export CONDA_EXE=/opt/miniconda3/bin/conda
++++ CONDA_EXE=/opt/miniconda3/bin/conda
++++ export _CE_M=
++++ _CE_M=
++++ export _CE_CONDA=
++++ _CE_CONDA=
++++ export CONDA_PYTHON_EXE=/opt/miniconda3/bin/python
++++ CONDA_PYTHON_EXE=/opt/miniconda3/bin/python
++++ '[' -z x ']'
+++ conda activate
+++ local cmd=activate
+++ case "$cmd" in
+++ __conda_activate activate
+++ '[' -n '' ']'
+++ local ask_conda
++++ PS1='(testbed) '
++++ __conda_exe shell.posix activate
++++ /opt/miniconda3/bin/conda shell.posix activate
+++ ask_conda='PS1='\''(base) '\''
+export PATH='\''/opt/miniconda3/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'\''
+export CONDA_PREFIX='\''/opt/miniconda3'\''
+export CONDA_SHLVL='\''3'\''
+export CONDA_DEFAULT_ENV='\''base'\''
+export CONDA_PROMPT_MODIFIER='\''(base) '\''
+export CONDA_PREFIX_2='\''/opt/miniconda3/envs/testbed'\''
+export CONDA_EXE='\''/opt/miniconda3/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/opt/miniconda3/bin/python'\'''
+++ eval 'PS1='\''(base) '\''
+export PATH='\''/opt/miniconda3/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'\''
+export CONDA_PREFIX='\''/opt/miniconda3'\''
+export CONDA_SHLVL='\''3'\''
+export CONDA_DEFAULT_ENV='\''base'\''
+export CONDA_PROMPT_MODIFIER='\''(base) '\''
+export CONDA_PREFIX_2='\''/opt/miniconda3/envs/testbed'\''
+export CONDA_EXE='\''/opt/miniconda3/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/opt/miniconda3/bin/python'\'''
++++ PS1='(base) '
++++ export PATH=/opt/miniconda3/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
++++ PATH=/opt/miniconda3/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
++++ export CONDA_PREFIX=/opt/miniconda3
++++ CONDA_PREFIX=/opt/miniconda3
++++ export CONDA_SHLVL=3
++++ CONDA_SHLVL=3
++++ export CONDA_DEFAULT_ENV=base
++++ CONDA_DEFAULT_ENV=base
++++ export 'CONDA_PROMPT_MODIFIER=(base) '
++++ CONDA_PROMPT_MODIFIER='(base) '
++++ export CONDA_PREFIX_2=/opt/miniconda3/envs/testbed
++++ CONDA_PREFIX_2=/opt/miniconda3/envs/testbed
++++ export CONDA_EXE=/opt/miniconda3/bin/conda
++++ CONDA_EXE=/opt/miniconda3/bin/conda
++++ export _CE_M=
++++ _CE_M=
++++ export _CE_CONDA=
++++ _CE_CONDA=
++++ export CONDA_PYTHON_EXE=/opt/miniconda3/bin/python
++++ CONDA_PYTHON_EXE=/opt/miniconda3/bin/python
+++ __conda_hashr
+++ '[' -n '' ']'
+++ '[' -n '' ']'
+++ hash -r
++ conda activate testbed
++ local cmd=activate
++ case "$cmd" in
++ __conda_activate activate testbed
++ '[' -n '' ']'
++ local ask_conda
+++ PS1='(base) '
+++ __conda_exe shell.posix activate testbed
+++ /opt/miniconda3/bin/conda shell.posix activate testbed
++ ask_conda='PS1='\''(testbed) '\''
+export PATH='\''/opt/miniconda3/envs/testbed/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'\''
+export CONDA_PREFIX='\''/opt/miniconda3/envs/testbed'\''
+export CONDA_SHLVL='\''4'\''
+export CONDA_DEFAULT_ENV='\''testbed'\''
+export CONDA_PROMPT_MODIFIER='\''(testbed) '\''
+export CONDA_PREFIX_3='\''/opt/miniconda3'\''
+export CONDA_EXE='\''/opt/miniconda3/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/opt/miniconda3/bin/python'\'''
++ eval 'PS1='\''(testbed) '\''
+export PATH='\''/opt/miniconda3/envs/testbed/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'\''
+export CONDA_PREFIX='\''/opt/miniconda3/envs/testbed'\''
+export CONDA_SHLVL='\''4'\''
+export CONDA_DEFAULT_ENV='\''testbed'\''
+export CONDA_PROMPT_MODIFIER='\''(testbed) '\''
+export CONDA_PREFIX_3='\''/opt/miniconda3'\''
+export CONDA_EXE='\''/opt/miniconda3/bin/conda'\''
+export _CE_M='\'''\''
+export _CE_CONDA='\'''\''
+export CONDA_PYTHON_EXE='\''/opt/miniconda3/bin/python'\'''
+++ PS1='(testbed) '
+++ export PATH=/opt/miniconda3/envs/testbed/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+++ PATH=/opt/miniconda3/envs/testbed/bin:/opt/miniconda3/condabin:/opt/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+++ export CONDA_PREFIX=/opt/miniconda3/envs/testbed
+++ CONDA_PREFIX=/opt/miniconda3/envs/testbed
+++ export CONDA_SHLVL=4
+++ CONDA_SHLVL=4
+++ export CONDA_DEFAULT_ENV=testbed
+++ CONDA_DEFAULT_ENV=testbed
+++ export 'CONDA_PROMPT_MODIFIER=(testbed) '
+++ CONDA_PROMPT_MODIFIER='(testbed) '
+++ export CONDA_PREFIX_3=/opt/miniconda3
+++ CONDA_PREFIX_3=/opt/miniconda3
+++ export CONDA_EXE=/opt/miniconda3/bin/conda
+++ CONDA_EXE=/opt/miniconda3/bin/conda
+++ export _CE_M=
+++ _CE_M=
+++ export _CE_CONDA=
+++ _CE_CONDA=
+++ export CONDA_PYTHON_EXE=/opt/miniconda3/bin/python
+++ CONDA_PYTHON_EXE=/opt/miniconda3/bin/python
++ __conda_hashr
++ '[' -n '' ']'
++ '[' -n '' ']'
++ hash -r
++ python -m pip install -e .
+Obtaining file:///testbed
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Installing collected packages: pydicom
+  Attempting uninstall: pydicom
+    Found existing installation: pydicom 2.2.0.dev0
+    Uninstalling pydicom-2.2.0.dev0:
+      Successfully uninstalled pydicom-2.2.0.dev0
+  DEPRECATION: Legacy editable install of pydicom==2.2.0.dev0 from file:///testbed (setup.py develop) is deprecated. pip 25.3 will enforce this behaviour change. A possible replacement is to add a pyproject.toml or enable --use-pep517, and use setuptools >= 64. If the resulting installation is not behaving as expected, try using --config-settings editable_mode=compat. Please consult the setuptools documentation for more information. Discussion can be found at https://github.com/pypa/pip/issues/11457
+  Running setup.py develop for pydicom
+Successfully installed pydicom
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
++ git checkout 49a3da4a3d9c24d7e8427a25048a1c7d5c4f7724 pydicom/tests/test_json.py
+Updated 0 paths from cf3db18aa
++ git apply -v -
+<stdin>:15: trailing whitespace.
+                "vr": "SQ", 
+Checking patch pydicom/tests/test_json.py...
+Applied patch pydicom/tests/test_json.py cleanly.
+warning: 1 line adds whitespace errors.
++ : '>>>>> Start Test Output'
++ pytest -rA pydicom/tests/test_json.py
+============================= test session starts ==============================
+platform linux -- Python 3.9.21, pytest-8.3.5, pluggy-1.5.0
+rootdir: /testbed
+collected 23 items
+
+pydicom/tests/test_json.py F.........F....F......F                       [100%]
+
+=================================== FAILURES ===================================
+____________________ TestPersonName.test_json_pn_from_file _____________________
+
+self = <pydicom.tests.test_json.TestPersonName object at 0x7c35fe31e670>
+
+    def test_json_pn_from_file(self):
+        with open(get_testdata_file("test_PN.json")) as s:
+>           ds = Dataset.from_json(s.read())
+
+pydicom/tests/test_json.py:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+pydicom/dataset.py:2270: in from_json
+    data_element = DataElement.from_json(
+pydicom/dataelem.py:275: in from_json
+    elem_value = converter.get_element_values()
+pydicom/jsonrep.py:126: in get_element_values
+    element_value = [self.get_regular_element_value(v)
+pydicom/jsonrep.py:126: in <listcomp>
+    element_value = [self.get_regular_element_value(v)
+pydicom/jsonrep.py:175: in get_regular_element_value
+    return self.get_sequence_item(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <pydicom.jsonrep.JsonDataElementConverter object at 0x7c35fd887880>
+value = {'04000550': {'Value': [{'00100010': {'Value': [{...}], 'vr': 'PN'}, '00100020': {'Value': [''], 'vr': 'LO'}, '00100030': {'Value': [''], 'vr': 'DA'}, '00100040': {'Value': ['M'], 'vr': 'CS'}, ...}], 'vr': 'SQ'}}
+
+    def get_sequence_item(self, value):
+        """Return a sequence item for the JSON dict `value`.
+    
+        Parameters
+        ----------
+        value : dict or None
+            The sequence item from the JSON entry.
+    
+        Returns
+        -------
+        dataset_class
+            The decoded dataset item.
+    
+        Raises
+        ------
+        KeyError
+            If the "vr" key is missing for a contained element
+        """
+        ds = self.dataset_class()
+        if value:
+            for key, val in value.items():
+                if 'vr' not in val:
+                    fmt = 'Data element "{}" must have key "vr".'
+                    raise KeyError(fmt.format(self.tag))
+                vr = val['vr']
+                unique_value_keys = tuple(
+                    set(val.keys()) & set(JSON_VALUE_KEYS)
+                )
+                from pydicom import DataElement
+                from pydicom.dataelem import empty_value_for_VR
+                if not unique_value_keys:
+                    # data element with no value
+                    elem = DataElement(
+                        tag=int(key, 16),
+                        value=empty_value_for_VR(vr),
+                        VR=vr)
+                else:
+                    value_key = unique_value_keys[0]
+                    elem = DataElement.from_json(
+                        self.dataset_class, key, vr,
+                        val[value_key], value_key,
+>                       bulk_data_uri_handler=self.bulk_data_uri_handler
+                    )
+E                   AttributeError: 'JsonDataElementConverter' object has no attribute 'bulk_data_uri_handler'
+
+pydicom/jsonrep.py:230: AttributeError
+_________________ TestDataSetToJson.test_json_from_dicom_file __________________
+
+self = <pydicom.tests.test_json.TestDataSetToJson object at 0x7c35fe2b8340>
+no_numpy_use = None
+
+    def test_json_from_dicom_file(self, no_numpy_use):
+        ds1 = Dataset(dcmread(get_testdata_file("CT_small.dcm")))
+        ds_json = ds1.to_json()
+>       ds2 = Dataset.from_json(ds_json)
+
+pydicom/tests/test_json.py:165: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+pydicom/dataset.py:2270: in from_json
+    data_element = DataElement.from_json(
+pydicom/dataelem.py:275: in from_json
+    elem_value = converter.get_element_values()
+pydicom/jsonrep.py:126: in get_element_values
+    element_value = [self.get_regular_element_value(v)
+pydicom/jsonrep.py:126: in <listcomp>
+    element_value = [self.get_regular_element_value(v)
+pydicom/jsonrep.py:175: in get_regular_element_value
+    return self.get_sequence_item(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <pydicom.jsonrep.JsonDataElementConverter object at 0x7c35fd72e2b0>
+value = {'00100020': {'Value': ['ABCD1234'], 'vr': 'LO'}, '00100022': {'Value': ['TEXT'], 'vr': 'CS'}}
+
+    def get_sequence_item(self, value):
+        """Return a sequence item for the JSON dict `value`.
+    
+        Parameters
+        ----------
+        value : dict or None
+            The sequence item from the JSON entry.
+    
+        Returns
+        -------
+        dataset_class
+            The decoded dataset item.
+    
+        Raises
+        ------
+        KeyError
+            If the "vr" key is missing for a contained element
+        """
+        ds = self.dataset_class()
+        if value:
+            for key, val in value.items():
+                if 'vr' not in val:
+                    fmt = 'Data element "{}" must have key "vr".'
+                    raise KeyError(fmt.format(self.tag))
+                vr = val['vr']
+                unique_value_keys = tuple(
+                    set(val.keys()) & set(JSON_VALUE_KEYS)
+                )
+                from pydicom import DataElement
+                from pydicom.dataelem import empty_value_for_VR
+                if not unique_value_keys:
+                    # data element with no value
+                    elem = DataElement(
+                        tag=int(key, 16),
+                        value=empty_value_for_VR(vr),
+                        VR=vr)
+                else:
+                    value_key = unique_value_keys[0]
+                    elem = DataElement.from_json(
+                        self.dataset_class, key, vr,
+                        val[value_key], value_key,
+>                       bulk_data_uri_handler=self.bulk_data_uri_handler
+                    )
+E                   AttributeError: 'JsonDataElementConverter' object has no attribute 'bulk_data_uri_handler'
+
+pydicom/jsonrep.py:230: AttributeError
+______________________ TestSequence.test_nested_sequences ______________________
+
+self = <pydicom.tests.test_json.TestSequence object at 0x7c35fe2b8490>
+
+    def test_nested_sequences(self):
+        test1_json = get_testdata_file("test1.json")
+        with open(test1_json) as f:
+            with pytest.warns(UserWarning,
+                              match='no bulk data URI handler provided '):
+>               ds = Dataset.from_json(f.read())
+
+pydicom/tests/test_json.py:280: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+pydicom/dataset.py:2270: in from_json
+    data_element = DataElement.from_json(
+pydicom/dataelem.py:275: in from_json
+    elem_value = converter.get_element_values()
+pydicom/jsonrep.py:126: in get_element_values
+    element_value = [self.get_regular_element_value(v)
+pydicom/jsonrep.py:126: in <listcomp>
+    element_value = [self.get_regular_element_value(v)
+pydicom/jsonrep.py:175: in get_regular_element_value
+    return self.get_sequence_item(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <pydicom.jsonrep.JsonDataElementConverter object at 0x7c35fe2ede20>
+value = {'00080100': {'Value': ['113100'], 'vr': 'SH'}, '00080102': {'Value': ['DCM'], 'vr': 'SH'}, '00080104': {'Value': ['Basic Application Confidentiality Profile'], 'vr': 'LO'}}
+
+    def get_sequence_item(self, value):
+        """Return a sequence item for the JSON dict `value`.
+    
+        Parameters
+        ----------
+        value : dict or None
+            The sequence item from the JSON entry.
+    
+        Returns
+        -------
+        dataset_class
+            The decoded dataset item.
+    
+        Raises
+        ------
+        KeyError
+            If the "vr" key is missing for a contained element
+        """
+        ds = self.dataset_class()
+        if value:
+            for key, val in value.items():
+                if 'vr' not in val:
+                    fmt = 'Data element "{}" must have key "vr".'
+                    raise KeyError(fmt.format(self.tag))
+                vr = val['vr']
+                unique_value_keys = tuple(
+                    set(val.keys()) & set(JSON_VALUE_KEYS)
+                )
+                from pydicom import DataElement
+                from pydicom.dataelem import empty_value_for_VR
+                if not unique_value_keys:
+                    # data element with no value
+                    elem = DataElement(
+                        tag=int(key, 16),
+                        value=empty_value_for_VR(vr),
+                        VR=vr)
+                else:
+                    value_key = unique_value_keys[0]
+                    elem = DataElement.from_json(
+                        self.dataset_class, key, vr,
+                        val[value_key], value_key,
+>                       bulk_data_uri_handler=self.bulk_data_uri_handler
+                    )
+E                   AttributeError: 'JsonDataElementConverter' object has no attribute 'bulk_data_uri_handler'
+
+pydicom/jsonrep.py:230: AttributeError
+
+During handling of the above exception, another exception occurred:
+
+self = <pydicom.tests.test_json.TestSequence object at 0x7c35fe2b8490>
+
+    def test_nested_sequences(self):
+        test1_json = get_testdata_file("test1.json")
+        with open(test1_json) as f:
+            with pytest.warns(UserWarning,
+                              match='no bulk data URI handler provided '):
+>               ds = Dataset.from_json(f.read())
+E               Failed: DID NOT WARN. No warnings of type (<class 'UserWarning'>,) were emitted.
+E                Emitted warnings: [].
+
+pydicom/tests/test_json.py:280: Failed
+_____________ TestBinary.test_bulk_data_reader_is_called_within_SQ _____________
+
+self = <pydicom.tests.test_json.TestBinary object at 0x7c35fd887a30>
+
+    def test_bulk_data_reader_is_called_within_SQ(self):
+        def bulk_data_reader(_):
+            return b'xyzzy'
+    
+        json_data = {
+            "003a0200": {
+                "vr": "SQ",
+                "Value": [
+                    {
+                        "54001010": {
+                            "vr": "OW",
+                            "BulkDataURI": "https://a.dummy.url"
+                        }
+                    }
+                ]
+            }
+        }
+    
+>       ds = Dataset().from_json(json.dumps(json_data), bulk_data_reader)
+
+pydicom/tests/test_json.py:376: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+pydicom/dataset.py:2270: in from_json
+    data_element = DataElement.from_json(
+pydicom/dataelem.py:275: in from_json
+    elem_value = converter.get_element_values()
+pydicom/jsonrep.py:126: in get_element_values
+    element_value = [self.get_regular_element_value(v)
+pydicom/jsonrep.py:126: in <listcomp>
+    element_value = [self.get_regular_element_value(v)
+pydicom/jsonrep.py:175: in get_regular_element_value
+    return self.get_sequence_item(value)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <pydicom.jsonrep.JsonDataElementConverter object at 0x7c35fde70130>
+value = {'54001010': {'BulkDataURI': 'https://a.dummy.url', 'vr': 'OW'}}
+
+    def get_sequence_item(self, value):
+        """Return a sequence item for the JSON dict `value`.
+    
+        Parameters
+        ----------
+        value : dict or None
+            The sequence item from the JSON entry.
+    
+        Returns
+        -------
+        dataset_class
+            The decoded dataset item.
+    
+        Raises
+        ------
+        KeyError
+            If the "vr" key is missing for a contained element
+        """
+        ds = self.dataset_class()
+        if value:
+            for key, val in value.items():
+                if 'vr' not in val:
+                    fmt = 'Data element "{}" must have key "vr".'
+                    raise KeyError(fmt.format(self.tag))
+                vr = val['vr']
+                unique_value_keys = tuple(
+                    set(val.keys()) & set(JSON_VALUE_KEYS)
+                )
+                from pydicom import DataElement
+                from pydicom.dataelem import empty_value_for_VR
+                if not unique_value_keys:
+                    # data element with no value
+                    elem = DataElement(
+                        tag=int(key, 16),
+                        value=empty_value_for_VR(vr),
+                        VR=vr)
+                else:
+                    value_key = unique_value_keys[0]
+                    elem = DataElement.from_json(
+                        self.dataset_class, key, vr,
+                        val[value_key], value_key,
+>                       bulk_data_uri_handler=self.bulk_data_uri_handler
+                    )
+E                   AttributeError: 'JsonDataElementConverter' object has no attribute 'bulk_data_uri_handler'
+
+pydicom/jsonrep.py:230: AttributeError
+=============================== warnings summary ===============================
+pydicom/data/data_manager.py:52
+  /testbed/pydicom/data/data_manager.py:52: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+    from pkg_resources import iter_entry_points
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED pydicom/tests/test_json.py::TestPersonName::test_pn_components_to_json
+PASSED pydicom/tests/test_json.py::TestPersonName::test_pn_components_from_json
+PASSED pydicom/tests/test_json.py::TestPersonName::test_empty_value
+PASSED pydicom/tests/test_json.py::TestPersonName::test_multi_value_to_json
+PASSED pydicom/tests/test_json.py::TestPersonName::test_dataelem_from_json
+PASSED pydicom/tests/test_json.py::TestAT::test_to_json
+PASSED pydicom/tests/test_json.py::TestAT::test_from_json
+PASSED pydicom/tests/test_json.py::TestAT::test_invalid_value_in_json
+PASSED pydicom/tests/test_json.py::TestAT::test_invalid_tag_in_json
+PASSED pydicom/tests/test_json.py::TestDataSetToJson::test_roundtrip
+PASSED pydicom/tests/test_json.py::TestDataSetToJson::test_dataset_dumphandler
+PASSED pydicom/tests/test_json.py::TestDataSetToJson::test_dataelement_dumphandler
+PASSED pydicom/tests/test_json.py::TestDataSetToJson::test_sort_order
+PASSED pydicom/tests/test_json.py::TestBinary::test_inline_binary
+PASSED pydicom/tests/test_json.py::TestBinary::test_invalid_inline_binary
+PASSED pydicom/tests/test_json.py::TestBinary::test_valid_bulkdata_uri
+PASSED pydicom/tests/test_json.py::TestBinary::test_invalid_bulkdata_uri
+PASSED pydicom/tests/test_json.py::TestBinary::test_bulk_data_reader_is_called
+PASSED pydicom/tests/test_json.py::TestBinary::test_bulk_data_reader_is_called_2
+FAILED pydicom/tests/test_json.py::TestPersonName::test_json_pn_from_file - A...
+FAILED pydicom/tests/test_json.py::TestDataSetToJson::test_json_from_dicom_file
+FAILED pydicom/tests/test_json.py::TestSequence::test_nested_sequences - Fail...
+FAILED pydicom/tests/test_json.py::TestBinary::test_bulk_data_reader_is_called_within_SQ
+=================== 4 failed, 19 passed, 1 warning in 0.55s ====================
++ : '>>>>> End Test Output'
++ git checkout 49a3da4a3d9c24d7e8427a25048a1c7d5c4f7724 pydicom/tests/test_json.py
+Updated 1 path from cf3db18aa

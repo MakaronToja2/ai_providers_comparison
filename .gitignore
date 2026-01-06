@@ -136,3 +136,5 @@ claude_history.json
 .claude_context
 claude_artifacts/
 CLAUDE.md
+
+benchmark*

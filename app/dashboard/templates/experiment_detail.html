@@ -19,11 +19,40 @@
         {% elif experiment.status.value == 'running' %}
         <button onclick="stopExperiment('{{ experiment.id }}')" class="btn btn-danger">Stop</button>
         {% endif %}
-        <a href="/api/v1/benchmark/experiments/{{ experiment.id }}/export" class="btn" style="background: var(--gray-200);" target="_blank">Export JSON</a>
+        {% if experiment.status.value == 'completed' or experiment.completed_instances > 0 %}
+        <div style="position: relative; display: inline-block;">
+            <button onclick="toggleEvalMenu()" class="btn" style="background: var(--warning); color: white;">
+                Evaluate ▾
+            </button>
+            <div id="evalMenu" style="display: none; position: absolute; top: 100%; right: 0; background: white; border: 1px solid var(--gray-200); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 100; min-width: 280px;">
+                <div style="padding: 12px; border-bottom: 1px solid var(--gray-200);">
+                    <strong style="color: var(--gray-800);">Choose Evaluation Method</strong>
+                </div>
+                <button onclick="evaluateSWEBench('{{ experiment.id }}')" style="width: 100%; padding: 12px; text-align: left; border: none; background: none; cursor: pointer; display: block;" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='none'">
+                    <div style="font-weight: 600; color: var(--success);">🐳 SWE-bench (Docker)</div>
+                    <div style="font-size: 0.75rem; color: var(--gray-600); margin-top: 4px;">Official harness with proper environments. Accurate resolve rates. Requires Docker.</div>
+                </button>
+                <button onclick="evaluateExperiment('{{ experiment.id }}')" style="width: 100%; padding: 12px; text-align: left; border: none; background: none; cursor: pointer; display: block; border-top: 1px solid var(--gray-100);" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='none'">
+                    <div style="font-weight: 600; color: var(--warning);">⚡ Quick Evaluate</div>
+                    <div style="font-size: 0.75rem; color: var(--gray-600); margin-top: 4px;">Fast patch application check. May have environment issues.</div>
+                </button>
+                <button onclick="exportPredictions('{{ experiment.id }}')" style="width: 100%; padding: 12px; text-align: left; border: none; background: none; cursor: pointer; display: block; border-top: 1px solid var(--gray-100);" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='none'">
+                    <div style="font-weight: 600; color: var(--primary);">📄 Export Predictions</div>
+                    <div style="font-size: 0.75rem; color: var(--gray-600); margin-top: 4px;">Export JSONL for manual SWE-bench evaluation.</div>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+        <a href="/api/v1/benchmark/experiments/{{ experiment.id }}/export?format=csv" class="btn" style="background: var(--gray-200);" target="_blank">Export CSV</a>
     </div>
 </div>
 
 <div class="stats-grid">
+    <div class="stat-card">
+        <div class="label">Dataset Split</div>
+        <div class="value" style="font-size: 1.5rem;">{{ experiment.config.split or 'dev' }}</div>
+        <small style="color: var(--gray-600);">{% if experiment.config.split == 'lite' %}SWE-bench Lite{% elif experiment.config.split == 'dev' %}Development set{% elif experiment.config.split == 'verified' %}Verified subset{% else %}Full test set{% endif %}</small>
+    </div>
     <div class="stat-card">
         <div class="label">Total Instances</div>
         <div class="value">{{ experiment.total_instances }}</div>
@@ -33,19 +62,23 @@
         <div class="value">{{ experiment.completed_instances }}</div>
     </div>
     <div class="stat-card primary">
-        <div class="label">Success Rate</div>
-        <div class="value">{{ "%.1f"|format(metrics.overall_success_rate * 100 if metrics else 0) }}%</div>
+        <div class="label">Patch Rate</div>
+        <div class="value">{{ "%.1f"|format(metrics.overall_patch_rate * 100 if metrics and metrics.overall_patch_rate else 0) }}%</div>
+        <small style="color: var(--gray-600);">Valid patches generated</small>
     </div>
-    <div class="stat-card">
-        <div class="label">Test Results</div>
-        <div class="value">{{ test_results | length }}</div>
+    <div class="stat-card {% if test_results %}success{% endif %}">
+        <div class="label">Resolve Rate</div>
+        {% set resolved_count = test_results | selectattr('resolved') | list | length %}
+        {% set total_tested = test_results | length %}
+        <div class="value">{{ "%.1f"|format((resolved_count / total_tested * 100) if total_tested > 0 else 0) }}%</div>
+        <small style="color: var(--gray-600);">{{ resolved_count }}/{{ total_tested }} tested</small>
     </div>
 </div>
 
-{% if metrics and metrics.success_rate_by_provider %}
+{% if metrics and metrics.patch_rate_by_provider %}
 <div class="grid-2">
     <div class="card">
-        <h2>Success Rate by Provider</h2>
+        <h2>Patch Generation Rate by Provider</h2>
         <div class="chart-container">
             <canvas id="providerChart"></canvas>
         </div>
@@ -69,6 +102,28 @@
         <h2>Response Time by Provider</h2>
         <div class="chart-container">
             <canvas id="timeChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Result Status Breakdown (Thesis-relevant) -->
+<div class="grid-2">
+    <div class="card">
+        <h2>Result Status Breakdown</h2>
+        <p style="color: var(--gray-600); font-size: 0.875rem; margin-bottom: 15px;">
+            How models responded: valid patch, explicit failure, or format error
+        </p>
+        <div class="chart-container">
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+    <div class="card">
+        <h2>Status by Provider</h2>
+        <p style="color: var(--gray-600); font-size: 0.875rem; margin-bottom: 15px;">
+            Compare how each model handles failures
+        </p>
+        <div class="chart-container">
+            <canvas id="statusByProviderChart"></canvas>
         </div>
     </div>
 </div>
@@ -117,7 +172,7 @@
                 <th>Instance</th>
                 <th>Provider</th>
                 <th>Tool Set</th>
-                <th>Success</th>
+                <th>Patch</th>
                 <th>Tool Calls</th>
                 <th>Tokens</th>
                 <th>Time</th>
@@ -130,10 +185,10 @@
                 <td><span class="badge" style="background: var(--gray-100);">{{ r.provider }}</span></td>
                 <td>{{ r.tool_set }}</td>
                 <td>
-                    {% if r.success %}
-                    <span style="color: var(--success);">&#10003;</span>
+                    {% if r.generated_patch %}
+                    <span style="color: var(--success);" title="Patch generated">&#10003;</span>
                     {% else %}
-                    <span style="color: var(--danger);">&#10007;</span>
+                    <span style="color: var(--danger);" title="No patch">&#10007;</span>
                     {% endif %}
                 </td>
                 <td>{{ r.tool_call_count }}</td>
@@ -149,21 +204,83 @@
     </div>
     {% endif %}
 </div>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h2 style="margin-bottom: 0;">Test Evaluation Results</h2>
+        {% if test_results | length < results | length %}
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="badge badge-running">Evaluating... {{ test_results | length }}/{{ results | length }}</span>
+            <small style="color: var(--gray-600);">Auto-refreshing</small>
+        </div>
+        {% endif %}
+    </div>
+    {% if test_results %}
+    <table>
+        <thead>
+            <tr>
+                <th>Instance</th>
+                <th>Patch Applied</th>
+                <th>Tests Passed</th>
+                <th>Resolved</th>
+                <th>Error</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tr in test_results %}
+            <tr>
+                <td style="font-family: monospace; font-size: 0.875rem;">{{ tr.instance_id[:40] }}...</td>
+                <td>
+                    {% if tr.patch_applied %}
+                    <span style="color: var(--success);">&#10003;</span>
+                    {% else %}
+                    <span style="color: var(--danger);">&#10007;</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if tr.fail_to_pass_total %}
+                    {{ tr.fail_to_pass_passed or 0 }}/{{ tr.fail_to_pass_total }} F2P,
+                    {{ tr.pass_to_pass_passed or 0 }}/{{ tr.pass_to_pass_total }} P2P
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if tr.resolved %}
+                    <span style="color: var(--success); font-weight: bold;">&#10003; RESOLVED</span>
+                    {% else %}
+                    <span style="color: var(--gray-600);">&#10007;</span>
+                    {% endif %}
+                </td>
+                <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; font-size: 0.75rem; color: var(--danger);">
+                    {{ tr.patch_error or '' }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <p>No test evaluations yet</p>
+        <p style="font-size: 0.875rem; color: var(--gray-600);">Click "Evaluate Tests" to run tests on generated patches</p>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-{% if metrics and metrics.success_rate_by_provider %}
-// Provider success rate chart
-const successRates = {{ metrics.success_rate_by_provider | tojson }};
+{% if metrics and metrics.patch_rate_by_provider %}
+// Provider patch rate chart
+const patchRates = {{ metrics.patch_rate_by_provider | tojson }};
 const providerCtx = document.getElementById('providerChart').getContext('2d');
 new Chart(providerCtx, {
     type: 'bar',
     data: {
-        labels: Object.keys(successRates),
+        labels: Object.keys(patchRates),
         datasets: [{
-            label: 'Success Rate (%)',
-            data: Object.values(successRates).map(v => v * 100),
+            label: 'Patch Rate (%)',
+            data: Object.values(patchRates).map(v => v * 100),
             backgroundColor: ['#3b82f6', '#10b981', '#f59e0b']
         }]
     },
@@ -235,6 +352,80 @@ new Chart(timeCtx, {
         scales: { y: { beginAtZero: true } }
     }
 });
+
+// Result Status breakdown (thesis-relevant)
+const statusCounts = {{ metrics.status_counts | tojson if metrics.status_counts else '{}' }};
+const statusLabels = {
+    'success_patch_generated': '✅ Patch Generated',
+    'failure_explicit': '🚫 Explicit Failure',
+    'hallucination_format_error': '⚠️ Format Error',
+    'api_error': '❌ API Error'
+};
+const statusColors = {
+    'success_patch_generated': '#10b981',
+    'failure_explicit': '#6366f1',
+    'hallucination_format_error': '#f59e0b',
+    'api_error': '#ef4444'
+};
+
+if (Object.keys(statusCounts).length > 0) {
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(statusCounts).map(k => statusLabels[k] || k),
+            datasets: [{
+                data: Object.values(statusCounts),
+                backgroundColor: Object.keys(statusCounts).map(k => statusColors[k] || '#9ca3af')
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct = ((context.raw / total) * 100).toFixed(1);
+                            return `${context.label}: ${context.raw} (${pct}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Status by provider (stacked bar)
+const statusByProvider = {{ metrics.status_by_provider | tojson if metrics.status_by_provider else '{}' }};
+if (Object.keys(statusByProvider).length > 0) {
+    const providers = Object.keys(statusByProvider);
+    const allStatuses = ['success_patch_generated', 'failure_explicit', 'hallucination_format_error', 'api_error'];
+
+    const statusProviderCtx = document.getElementById('statusByProviderChart').getContext('2d');
+    new Chart(statusProviderCtx, {
+        type: 'bar',
+        data: {
+            labels: providers,
+            datasets: allStatuses.map(status => ({
+                label: statusLabels[status] || status,
+                data: providers.map(p => statusByProvider[p][status] || 0),
+                backgroundColor: statusColors[status] || '#9ca3af'
+            }))
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } },
+            scales: {
+                x: { stacked: true },
+                y: { stacked: true, beginAtZero: true }
+            }
+        }
+    });
+}
 {% endif %}
 
 async function startExperiment(id) {
@@ -252,5 +443,77 @@ async function stopExperiment(id) {
         else alert('Failed to stop experiment');
     } catch (e) { alert('Error: ' + e.message); }
 }
+
+function toggleEvalMenu() {
+    const menu = document.getElementById('evalMenu');
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+// Close menu when clicking outside
+document.addEventListener('click', function(e) {
+    const menu = document.getElementById('evalMenu');
+    if (menu && !e.target.closest('#evalMenu') && !e.target.closest('[onclick="toggleEvalMenu()"]')) {
+        menu.style.display = 'none';
+    }
+});
+
+async function evaluateExperiment(id) {
+    document.getElementById('evalMenu').style.display = 'none';
+
+    if (!confirm('Start Quick Evaluation?\n\nThis will clone repositories and apply patches. Note: Tests may fail due to environment issues.')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/v1/benchmark/experiments/${id}/evaluate`, { method: 'POST' });
+        if (response.ok) {
+            alert('Quick evaluation started! The page will auto-refresh to show progress.');
+            location.reload();
+        } else {
+            const error = await response.json();
+            alert('Failed to start evaluation: ' + (error.detail || 'Unknown error'));
+        }
+    } catch (e) { alert('Error: ' + e.message); }
+}
+
+async function evaluateSWEBench(id) {
+    document.getElementById('evalMenu').style.display = 'none';
+
+    if (!confirm('Start SWE-bench Evaluation?\n\n⚠️ Requirements:\n• Docker must be running\n• First run downloads ~67GB of images\n• May take 30+ minutes\n\nThis uses the official SWE-bench harness for accurate results.')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/v1/benchmark/experiments/${id}/evaluate-swebench`, { method: 'POST' });
+        const data = await response.json();
+
+        if (response.ok) {
+            alert(`SWE-bench evaluation started!\n\nPatches to evaluate: ${data.patches_to_evaluate}\nDataset: ${data.dataset}\n\nCheck terminal logs for progress. This may take a while.`);
+            location.reload();
+        } else {
+            alert('Failed to start SWE-bench evaluation: ' + (data.detail || 'Unknown error'));
+        }
+    } catch (e) { alert('Error: ' + e.message); }
+}
+
+async function exportPredictions(id) {
+    document.getElementById('evalMenu').style.display = 'none';
+
+    try {
+        const response = await fetch(`/api/v1/benchmark/experiments/${id}/export-predictions`, { method: 'POST' });
+        const data = await response.json();
+
+        if (response.ok) {
+            alert(`Predictions exported!\n\nFile: ${data.predictions_path}\n\nTo evaluate manually:\npython -m swebench.harness.run_evaluation \\\n  --predictions_path ${data.predictions_path} \\\n  --dataset_name princeton-nlp/SWE-bench_Lite \\\n  --max_workers 4`);
+        } else {
+            alert('Failed to export predictions: ' + (data.detail || 'Unknown error'));
+        }
+    } catch (e) { alert('Error: ' + e.message); }
+}
+
+// Auto-refresh when evaluation is in progress
+{% if test_results | length < results | length and test_results | length > 0 %}
+setTimeout(() => location.reload(), 10000);  // Refresh every 10 seconds
+{% endif %}
 </script>
 {% endblock %}

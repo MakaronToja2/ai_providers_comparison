@@ -1,0 +1,23 @@
+diff --git a/src/marshmallow/fields.py b/src/marshmallow/fields.py
+index 0b18e7d..a1b2c3d 100644
+--- a/src/marshmallow/fields.py
++++ b/src/marshmallow/fields.py
+@@ -1110,7 +1110,11 @@ class DateTime(Field):
+-    def _bind_to_schema(self, field_name, schema):
+-        super()._bind_to_schema(field_name, schema)
+-        self.format = (
+-            self.format
+-            or getattr(schema.opts, self.SCHEMA_OPTS_VAR_NAME)
+-            or self.DEFAULT_FORMAT
+-        )
++    def _bind_to_schema(self, field_name, schema):
++        super()._bind_to_schema(field_name, schema)
++        # Use schema.opts if available, else fallback to root.opts
++        opts = getattr(schema, "opts", None)
++        if opts is None and hasattr(self, "root"):
++            opts = getattr(self.root, "opts", None)
++        self.format = (
++            self.format
++            or (getattr(opts, self.SCHEMA_OPTS_VAR_NAME) if opts else None)
++            or self.DEFAULT_FORMAT
++        )

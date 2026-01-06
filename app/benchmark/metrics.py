@@ -10,6 +10,7 @@ from ..models.benchmark import (
     ExperimentResult,
     TestResult,
     ExperimentMetrics,
+    ResultStatus,
 )
 from .storage import Storage
 
@@ -47,7 +48,7 @@ class MetricsCalculator:
             repo = r.instance_id.split('__')[0] if '__' in r.instance_id else 'unknown'
             by_repo[repo].append(r)
 
-        # Calculate success rates
+        # Calculate success rates (API success - less meaningful)
         metrics.overall_success_rate = self._success_rate(results)
         metrics.success_rate_by_provider = {
             p: self._success_rate(rs) for p, rs in by_provider.items()
@@ -57,6 +58,18 @@ class MetricsCalculator:
         }
         metrics.success_by_repo = {
             repo: self._success_rate(rs) for repo, rs in by_repo.items()
+        }
+
+        # Calculate patch generation rates (more meaningful)
+        metrics.overall_patch_rate = self._patch_rate(results)
+        metrics.patch_rate_by_provider = {
+            p: self._patch_rate(rs) for p, rs in by_provider.items()
+        }
+
+        # Calculate result status breakdown (for thesis analysis)
+        metrics.status_counts = self._count_statuses(results)
+        metrics.status_by_provider = {
+            p: self._count_statuses(rs) for p, rs in by_provider.items()
         }
 
         # Calculate tool usage patterns
@@ -95,11 +108,39 @@ class MetricsCalculator:
         return metrics
 
     def _success_rate(self, results: List[ExperimentResult]) -> float:
-        """Calculate success rate for a list of results."""
+        """Calculate success rate for a list of results (API call success)."""
         if not results:
             return 0.0
         successes = sum(1 for r in results if r.success)
         return successes / len(results)
+
+    def _patch_rate(self, results: List[ExperimentResult]) -> float:
+        """Calculate patch generation rate (more meaningful than API success)."""
+        if not results:
+            return 0.0
+        patches = sum(1 for r in results if r.generated_patch)
+        return patches / len(results)
+
+    def _count_statuses(self, results: List[ExperimentResult]) -> Dict[str, int]:
+        """Count results by ResultStatus."""
+        counts = {
+            ResultStatus.SUCCESS_PATCH_GENERATED.value: 0,
+            ResultStatus.FAILURE_EXPLICIT.value: 0,
+            ResultStatus.HALLUCINATION_FORMAT_ERROR.value: 0,
+            ResultStatus.API_ERROR.value: 0,
+        }
+        for r in results:
+            if r.result_status:
+                counts[r.result_status.value] = counts.get(r.result_status.value, 0) + 1
+            else:
+                # Legacy results without status - infer from other fields
+                if r.generated_patch:
+                    counts[ResultStatus.SUCCESS_PATCH_GENERATED.value] += 1
+                elif r.error_message and "API" in r.error_message:
+                    counts[ResultStatus.API_ERROR.value] += 1
+                else:
+                    counts[ResultStatus.HALLUCINATION_FORMAT_ERROR.value] += 1
+        return counts
 
     def _tool_usage_by_provider(
         self,
@@ -158,10 +199,13 @@ class MetricsCalculator:
                 if r.id in test_by_result_id
             ]
 
+            patches_generated = sum(1 for r in provider_results if r.generated_patch)
             stats["by_provider"][provider] = {
                 "total": len(provider_results),
                 "successful": sum(1 for r in provider_results if r.success),
                 "success_rate": self._success_rate(provider_results),
+                "patches_generated": patches_generated,
+                "patch_rate": self._patch_rate(provider_results),
                 "resolved": sum(1 for tr in provider_test_results if tr.resolved),
                 "resolve_rate": (
                     sum(1 for tr in provider_test_results if tr.resolved) / len(provider_test_results)
@@ -229,6 +273,7 @@ class MetricsCalculator:
 
         return {
             "success_rate": metrics.success_rate_by_provider,
+            "patch_rate": metrics.patch_rate_by_provider,
             "avg_tokens": metrics.avg_tokens_by_provider,
             "avg_response_time": metrics.avg_response_time_by_provider,
             "avg_tool_calls": metrics.avg_tool_calls_per_instance,
@@ -340,3 +385,70 @@ class MetricsCalculator:
             }
 
         return analysis
+
+    async def compare_experiments(
+        self,
+        experiment_ids: List[str]
+    ) -> Dict:
+        """Compare multiple experiments side-by-side (for thesis cross-experiment analysis)."""
+        comparison = {
+            "experiments": [],
+            "metrics_by_experiment": {},
+            "combined_summary": {
+                "success_rates": {},
+                "avg_tokens": {},
+                "avg_response_times": {},
+                "avg_tool_calls": {},
+                "total_instances": {},
+            }
+        }
+
+        for exp_id in experiment_ids:
+            experiment = await self.storage.get_experiment(exp_id)
+            if not experiment:
+                continue
+
+            # Get or calculate metrics
+            metrics = await self.storage.get_metrics(exp_id)
+            if not metrics:
+                metrics = await self.calculate_metrics(exp_id)
+
+            # Get results for detailed stats
+            results = await self.storage.get_results_for_experiment(exp_id, limit=10000)
+            test_results = await self.storage.get_test_results_for_experiment(exp_id)
+            test_by_result_id = {tr.result_id: tr for tr in test_results}
+
+            resolved_count = sum(1 for tr in test_results if tr.resolved)
+            resolve_rate = resolved_count / len(test_results) if test_results else 0
+
+            exp_data = {
+                "id": exp_id,
+                "name": experiment.name,
+                "status": experiment.status.value,
+                "providers": experiment.config.providers,
+                "tool_sets": [ts.name for ts in experiment.config.tool_sets],
+                "total_instances": len(results),
+                "success_rate": metrics.overall_success_rate,
+                "resolve_rate": resolve_rate,
+                "avg_tokens": mean([r.total_tokens for r in results if r.total_tokens]) if any(r.total_tokens for r in results) else 0,
+                "avg_response_time": mean([r.response_time_seconds for r in results if r.response_time_seconds]) if any(r.response_time_seconds for r in results) else 0,
+                "avg_tool_calls": mean([r.tool_call_count for r in results]) if results else 0,
+            }
+
+            comparison["experiments"].append(exp_data)
+            comparison["metrics_by_experiment"][exp_id] = {
+                "success_rate_by_provider": metrics.success_rate_by_provider,
+                "avg_tokens_by_provider": metrics.avg_tokens_by_provider,
+                "avg_response_time_by_provider": metrics.avg_response_time_by_provider,
+                "tool_usage_by_provider": metrics.tool_usage_by_provider,
+            }
+
+            # Aggregate for combined summary
+            exp_label = experiment.name
+            comparison["combined_summary"]["success_rates"][exp_label] = metrics.overall_success_rate
+            comparison["combined_summary"]["avg_tokens"][exp_label] = exp_data["avg_tokens"]
+            comparison["combined_summary"]["avg_response_times"][exp_label] = exp_data["avg_response_time"]
+            comparison["combined_summary"]["avg_tool_calls"][exp_label] = exp_data["avg_tool_calls"]
+            comparison["combined_summary"]["total_instances"][exp_label] = len(results)
+
+        return comparison

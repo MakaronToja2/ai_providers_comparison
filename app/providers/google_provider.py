@@ -1,10 +1,14 @@
 from typing import List, Dict, Any, Optional
+import os
 import time
 import google.generativeai as genai
 
 from ..core.base_provider import BaseAIProvider
 from ..models.requests import ChatMessage
 from ..models.responses import LLMResponse, TokenUsage
+
+# Default model from environment or fallback
+DEFAULT_GOOGLE_MODEL = os.getenv("GOOGLE_DEFAULT_MODEL", "gemini-2.5-flash-lite")
 
 
 class GoogleProvider(BaseAIProvider):
@@ -23,7 +27,8 @@ class GoogleProvider(BaseAIProvider):
     # Fields not supported by Google Schema
     UNSUPPORTED_FIELDS = {"minimum", "maximum", "default", "examples", "enum", "format", "pattern"}
 
-    def __init__(self, api_key: str, model: str = "gemini-2.5-flash-lite", **kwargs):
+    def __init__(self, api_key: str, model: str = None, **kwargs):
+        model = model or DEFAULT_GOOGLE_MODEL
         super().__init__(api_key, model, **kwargs)
         if api_key:
             genai.configure(api_key=api_key)
@@ -160,25 +165,45 @@ class GoogleProvider(BaseAIProvider):
                     if hasattr(part, 'text') and part.text:
                         text_content += part.text
                     elif hasattr(part, 'function_call'):
-                        # Google tool call format
+                        # Google tool call format - convert protobuf to JSON-serializable dict
                         function_call = part.function_call
+                        # Convert MapComposite/RepeatedComposite to regular Python types
+                        params = {}
+                        if function_call.args:
+                            for key, value in function_call.args.items():
+                                # Handle different protobuf value types
+                                if hasattr(value, 'items'):  # It's a dict-like
+                                    params[key] = dict(value)
+                                elif hasattr(value, '__iter__') and not isinstance(value, str):
+                                    params[key] = list(value)
+                                else:
+                                    params[key] = value
                         tool_calls.append({
                             "name": function_call.name,
-                            "parameters": dict(function_call.args) if function_call.args else {}
+                            "parameters": params
                         })
         
         # Fallback to direct text access if the above doesn't work
         if not text_content and hasattr(raw_response, 'text'):
             text_content = raw_response.text
         
-        # Google's usage information might be limited
+        # Google's usage information - check actual fields
         usage = None
         if hasattr(raw_response, 'usage_metadata'):
             usage_data = raw_response.usage_metadata
+            # Debug: log what we actually receive
+            prompt_tokens = getattr(usage_data, 'prompt_token_count', None)
+            completion_tokens = getattr(usage_data, 'candidates_token_count', None)
+            total_tokens = getattr(usage_data, 'total_token_count', None)
+
+            # Log if we're getting empty values
+            if prompt_tokens is None and completion_tokens is None:
+                print(f"[Google] Warning: usage_metadata exists but fields are missing. Raw: {usage_data}")
+
             usage = TokenUsage(
-                prompt_tokens=getattr(usage_data, 'prompt_token_count', 0),
-                completion_tokens=getattr(usage_data, 'candidates_token_count', 0),
-                total_tokens=getattr(usage_data, 'total_token_count', 0)
+                prompt_tokens=prompt_tokens or 0,
+                completion_tokens=completion_tokens or 0,
+                total_tokens=total_tokens or (prompt_tokens or 0) + (completion_tokens or 0)
             )
         
         return text_content, usage, tool_calls if tool_calls else None

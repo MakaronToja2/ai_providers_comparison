@@ -1,0 +1,11 @@
+diff --git a/astroid/nodes/as_string.py b/astroid/nodes/as_string.py
+index 1234567..89abcde 100644
+--- a/astroid/nodes/as_string.py
++++ b/astroid/nodes/as_string.py
+@@ -100,1 +100,5 @@ class AsStringVisitor:
+-    # visit_<node> methods ###########################################
++    # visit_<node> methods ###########################################
++
++    def visit_unknown(self, node):
++        return "Unknown"
++

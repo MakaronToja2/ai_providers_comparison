@@ -5,6 +5,15 @@ import os
 import subprocess
 from typing import Dict, Any, Optional
 from ..core.tools import BaseTool, ToolResult
+from ..utils.repo_context import get_current_repo_path
+
+
+def _resolve_path(relative_path: str) -> str:
+    """Resolve a relative path using the current repo context."""
+    repo_path = get_current_repo_path()
+    if repo_path:
+        return os.path.join(repo_path, relative_path)
+    return relative_path
 
 
 class CodeSearchTool(BaseTool):
@@ -52,7 +61,7 @@ class CodeSearchTool(BaseTool):
             "required": ["pattern"]
         }
     
-    async def execute(self, pattern: str, file_pattern: str = "*", directory: str = ".", 
+    async def execute(self, pattern: str, file_pattern: str = "*", directory: str = ".",
                      case_sensitive: bool = False, max_results: int = 20, **kwargs) -> ToolResult:
         """Search for code patterns in the repository"""
         try:
@@ -64,14 +73,18 @@ class CodeSearchTool(BaseTool):
                     data=None,
                     error="Directory path must be relative to repository root"
                 )
-            
+
+            # Resolve to absolute path using repo context
+            absolute_dir = _resolve_path(normalized_dir)
+            repo_base = get_current_repo_path() or "."
+
             # Build search command
             try:
                 # Try ripgrep first (faster and better)
                 cmd = ["rg", "-n"]
                 if not case_sensitive:
                     cmd.append("-i")
-                
+
                 # Add file type filtering if specified
                 if file_pattern != "*":
                     if file_pattern.startswith("*."):
@@ -79,33 +92,33 @@ class CodeSearchTool(BaseTool):
                         cmd.extend(["--type-add", f"custom:*.{ext}", "--type", "custom"])
                     else:
                         cmd.extend(["-g", file_pattern])
-                
-                cmd.extend([pattern, normalized_dir])
-                
+
+                cmd.extend([pattern, absolute_dir])
+
                 result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
                 if result.returncode != 0 and result.returncode != 1:
                     raise subprocess.CalledProcessError(result.returncode, cmd)
                 output = result.stdout
-                
+
             except (subprocess.CalledProcessError, FileNotFoundError):
                 # Fallback to grep
                 cmd = ["grep", "-rn"]
                 if not case_sensitive:
                     cmd.append("-i")
                 cmd.append("-E")  # Extended regex
-                
+
                 if file_pattern != "*":
                     cmd.extend(["--include", file_pattern])
-                
-                cmd.extend([pattern, normalized_dir])
-                
+
+                cmd.extend([pattern, absolute_dir])
+
                 result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
                 output = result.stdout
             
             # Parse results
             matches = []
             lines = output.strip().split('\n') if output.strip() else []
-            
+
             for line in lines[:max_results]:
                 if ':' in line:
                     parts = line.split(':', 2)
@@ -113,10 +126,10 @@ class CodeSearchTool(BaseTool):
                         file_path = parts[0]
                         line_number = parts[1]
                         content = parts[2]
-                        
+
                         # Make file path relative to repo root
-                        rel_path = os.path.relpath(file_path, '.')
-                        
+                        rel_path = os.path.relpath(file_path, repo_base)
+
                         matches.append({
                             "file_path": rel_path,
                             "line_number": int(line_number) if line_number.isdigit() else 0,

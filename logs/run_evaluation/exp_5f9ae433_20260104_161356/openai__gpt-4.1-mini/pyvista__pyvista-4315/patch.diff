@@ -1,0 +1,43 @@
+diff --git a/pyvista/core/grid.py b/pyvista/core/grid.py
+index 1234567..89abcde 100644
+--- a/pyvista/core/grid.py
++++ b/pyvista/core/grid.py
+@@ -120,14 +120,25 @@ class RectilinearGrid(_vtk.vtkRectilinearGrid, Grid, RectilinearGridFilters):
+         elif len(args) == 3 or len(args) == 2:
+-            arg0_is_arr = isinstance(args[0], np.ndarray)
+-            arg1_is_arr = isinstance(args[1], np.ndarray)
+-            if len(args) == 3:
+-                arg2_is_arr = isinstance(args[2], np.ndarray)
+-            else:
+-                arg2_is_arr = False
+-
+-            if all([arg0_is_arr, arg1_is_arr, arg2_is_arr]):
+-                self._from_arrays(args[0], args[1], args[2], check_duplicates)
+-            elif all([arg0_is_arr, arg1_is_arr]):
+-                self._from_arrays(args[0], args[1], None, check_duplicates)
+-            else:
+-                raise TypeError(\"Arguments not understood by `RectilinearGrid`.\")
++            # Convert sequences to np.ndarray
++            def to_array(x):
++                if isinstance(x, np.ndarray):
++                    return x
++                # Accept sequences (list, tuple) and convert to ndarray
++                try:
++                    return np.asarray(x)
++                except Exception:
++                    return x
++
++            arg0 = to_array(args[0])
++            arg1 = to_array(args[1])
++            arg2 = to_array(args[2]) if len(args) == 3 else None
++
++            arg0_is_arr = isinstance(arg0, np.ndarray)
++            arg1_is_arr = isinstance(arg1, np.ndarray)
++            arg2_is_arr = isinstance(arg2, np.ndarray) if arg2 is not None else False
++
++            if all([arg0_is_arr, arg1_is_arr, arg2_is_arr]):
++                self._from_arrays(arg0, arg1, arg2, check_duplicates)
++            elif all([arg0_is_arr, arg1_is_arr]):
++                self._from_arrays(arg0, arg1, None, check_duplicates)
++            else:
++                raise TypeError(\"Arguments not understood by `RectilinearGrid`.\")

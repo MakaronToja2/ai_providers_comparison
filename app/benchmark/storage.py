@@ -124,7 +124,7 @@ class Storage:
                 resolved INTEGER DEFAULT 0,
                 test_output TEXT,
                 execution_time_seconds REAL,
-                created_at TEXT,
+                executed_at TEXT,
                 FOREIGN KEY (result_id) REFERENCES experiment_results(id),
                 FOREIGN KEY (experiment_id) REFERENCES experiments(id)
             )
@@ -137,6 +137,10 @@ class Storage:
                 overall_success_rate REAL,
                 success_rate_by_provider TEXT,
                 success_rate_by_tool_set TEXT,
+                overall_patch_rate REAL,
+                patch_rate_by_provider TEXT,
+                status_counts TEXT,
+                status_by_provider TEXT,
                 tool_usage_by_provider TEXT,
                 avg_tool_calls_per_instance TEXT,
                 avg_tokens_by_provider TEXT,
@@ -153,6 +157,64 @@ class Storage:
         await db.execute("CREATE INDEX IF NOT EXISTS idx_results_experiment ON experiment_results(experiment_id)")
         await db.execute("CREATE INDEX IF NOT EXISTS idx_results_provider ON experiment_results(provider)")
         await db.execute("CREATE INDEX IF NOT EXISTS idx_test_results_experiment ON test_results(experiment_id)")
+
+        # Run migrations for existing databases
+        await self._run_migrations(db)
+
+    async def _run_migrations(self, db):
+        """Run database migrations for schema changes."""
+        # Check if test_results has executed_at column (might have old created_at)
+        cursor = await db.execute("PRAGMA table_info(test_results)")
+        columns = await cursor.fetchall()
+        column_names = [col[1] for col in columns]
+
+        if 'created_at' in column_names and 'executed_at' not in column_names:
+            # Rename created_at to executed_at
+            await db.execute("ALTER TABLE test_results RENAME COLUMN created_at TO executed_at")
+            await db.commit()
+            print("[Migration] Renamed test_results.created_at to executed_at")
+
+        # Add new metrics columns if missing
+        cursor = await db.execute("PRAGMA table_info(experiment_metrics)")
+        metrics_columns = await cursor.fetchall()
+        metrics_column_names = [col[1] for col in metrics_columns]
+
+        new_metrics_cols = [
+            ("overall_patch_rate", "REAL"),
+            ("patch_rate_by_provider", "TEXT"),
+            ("status_counts", "TEXT"),
+            ("status_by_provider", "TEXT"),
+        ]
+
+        for col_name, col_type in new_metrics_cols:
+            if col_name not in metrics_column_names:
+                try:
+                    await db.execute(f"ALTER TABLE experiment_metrics ADD COLUMN {col_name} {col_type}")
+                    await db.commit()
+                    print(f"[Migration] Added experiment_metrics.{col_name}")
+                except Exception as e:
+                    print(f"[Migration] Column {col_name} may already exist: {e}")
+
+        # Add split and result_status columns to experiment_results if missing
+        cursor = await db.execute("PRAGMA table_info(experiment_results)")
+        results_columns = await cursor.fetchall()
+        results_column_names = [col[1] for col in results_columns]
+
+        if 'split' not in results_column_names:
+            try:
+                await db.execute("ALTER TABLE experiment_results ADD COLUMN split TEXT DEFAULT 'dev'")
+                await db.commit()
+                print("[Migration] Added experiment_results.split")
+            except Exception:
+                pass
+
+        if 'result_status' not in results_column_names:
+            try:
+                await db.execute("ALTER TABLE experiment_results ADD COLUMN result_status TEXT")
+                await db.commit()
+                print("[Migration] Added experiment_results.result_status")
+            except Exception:
+                pass
 
     async def initialize(self):
         """Initialize database schema (for backward compatibility)."""
@@ -478,16 +540,22 @@ class Storage:
             await db.execute("""
                 INSERT OR REPLACE INTO experiment_metrics
                 (experiment_id, overall_success_rate, success_rate_by_provider,
-                 success_rate_by_tool_set, tool_usage_by_provider, avg_tool_calls_per_instance,
+                 success_rate_by_tool_set, overall_patch_rate, patch_rate_by_provider,
+                 status_counts, status_by_provider,
+                 tool_usage_by_provider, avg_tool_calls_per_instance,
                  avg_tokens_by_provider, avg_context_size_by_provider,
                  avg_response_time_by_provider, total_runtime_seconds,
                  success_by_repo, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 metrics.experiment_id,
                 metrics.overall_success_rate,
                 json.dumps(metrics.success_rate_by_provider),
                 json.dumps(metrics.success_rate_by_tool_set),
+                metrics.overall_patch_rate,
+                json.dumps(metrics.patch_rate_by_provider),
+                json.dumps(metrics.status_counts),
+                json.dumps(metrics.status_by_provider),
                 json.dumps(metrics.tool_usage_by_provider),
                 json.dumps(metrics.avg_tool_calls_per_instance),
                 json.dumps(metrics.avg_tokens_by_provider),
@@ -513,11 +581,22 @@ class Storage:
 
     def _row_to_metrics(self, row: aiosqlite.Row) -> ExperimentMetrics:
         """Convert database row to ExperimentMetrics model."""
+        # Handle new columns that may not exist in old databases
+        def safe_get(key, default="{}"):
+            try:
+                return row[key]
+            except (KeyError, IndexError):
+                return default
+
         return ExperimentMetrics(
             experiment_id=row["experiment_id"],
             overall_success_rate=row["overall_success_rate"] or 0.0,
             success_rate_by_provider=json.loads(row["success_rate_by_provider"] or "{}"),
             success_rate_by_tool_set=json.loads(row["success_rate_by_tool_set"] or "{}"),
+            overall_patch_rate=safe_get("overall_patch_rate", 0.0) or 0.0,
+            patch_rate_by_provider=json.loads(safe_get("patch_rate_by_provider") or "{}"),
+            status_counts=json.loads(safe_get("status_counts") or "{}"),
+            status_by_provider=json.loads(safe_get("status_by_provider") or "{}"),
             tool_usage_by_provider=json.loads(row["tool_usage_by_provider"] or "{}"),
             avg_tool_calls_per_instance=json.loads(row["avg_tool_calls_per_instance"] or "{}"),
             avg_tokens_by_provider=json.loads(row["avg_tokens_by_provider"] or "{}"),

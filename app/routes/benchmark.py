@@ -3,6 +3,7 @@ API endpoints for benchmark experiments.
 """
 import io
 import json
+import os
 from typing import Optional
 from fastapi import APIRouter, HTTPException, BackgroundTasks
 from fastapi.responses import StreamingResponse, JSONResponse, Response
@@ -12,6 +13,7 @@ from ..benchmark.storage import Storage
 from ..benchmark.runner import ExperimentRunner, get_runner
 from ..benchmark.evaluator import TestEvaluator
 from ..benchmark.metrics import MetricsCalculator
+from ..benchmark.swebench_harness import SWEBenchHarness
 from ..models.benchmark import (
     Experiment,
     ExperimentConfig,
@@ -68,11 +70,11 @@ async def create_experiment(request: CreateExperimentRequest):
     """Create a new benchmark experiment."""
     storage = get_storage()
 
-    # Build config with defaults
+    # Build config with defaults from environment
     models = request.models or {
-        "openai": "gpt-4o-mini",
-        "anthropic": "claude-3-haiku-20240307",
-        "google": "gemini-2.5-flash-lite",
+        "openai": os.getenv("OPENAI_DEFAULT_MODEL", "gpt-4.1-mini"),
+        "anthropic": os.getenv("ANTHROPIC_DEFAULT_MODEL", "claude-haiku-4-5-20251001"),
+        "google": os.getenv("GOOGLE_DEFAULT_MODEL", "gemini-2.5-flash-lite"),
     }
 
     tool_sets = request.tool_sets or [
@@ -88,6 +90,7 @@ async def create_experiment(request: CreateExperimentRequest):
         providers=request.providers,
         models=models,
         tool_sets=tool_sets,
+        split=request.split,
         context_limit=request.context_limit,
         instance_ids=request.instance_ids,
         repos=request.repos,
@@ -292,6 +295,92 @@ async def get_test_results(
     return {"test_results": [tr.model_dump() for tr in test_results]}
 
 
+@router.post("/experiments/{experiment_id}/evaluate-swebench")
+async def evaluate_experiment_swebench(
+    experiment_id: str,
+    background_tasks: BackgroundTasks,
+    max_workers: int = 4,
+    dataset: str = "princeton-nlp/SWE-bench_Lite",
+    split: str = "dev",
+):
+    """
+    Run official SWE-bench evaluation using Docker containers.
+
+    This provides accurate resolve rates by running tests in properly
+    configured environments. Requires Docker to be installed.
+
+    Args:
+        experiment_id: The experiment to evaluate
+        max_workers: Number of parallel Docker containers (default: 4)
+        dataset: SWE-bench dataset to use (default: Lite)
+        split: Dataset split - 'dev' (23 instances) or 'test' (300 instances)
+    """
+    storage = get_storage()
+
+    experiment = await storage.get_experiment(experiment_id)
+    if not experiment:
+        raise HTTPException(status_code=404, detail="Experiment not found")
+
+    # Check if there are patches to evaluate
+    results = await storage.get_results_for_experiment(experiment_id, success_only=True, limit=1000)
+    patches_count = sum(1 for r in results if r.generated_patch)
+
+    if patches_count == 0:
+        raise HTTPException(
+            status_code=400,
+            detail="No patches to evaluate. Run the experiment first to generate patches."
+        )
+
+    harness = SWEBenchHarness(storage, dataset_name=dataset, split=split, max_workers=max_workers)
+
+    # Run in background
+    async def run_swebench():
+        try:
+            result = await harness.evaluate_experiment(experiment_id)
+            print(f"[SWE-bench] Evaluation complete: {result.get('summary', {})}")
+        except Exception as e:
+            print(f"[SWE-bench] Evaluation failed: {e}")
+
+    background_tasks.add_task(run_swebench)
+
+    return {
+        "status": "swebench_evaluation_started",
+        "experiment_id": experiment_id,
+        "patches_to_evaluate": patches_count,
+        "dataset": dataset,
+        "split": split,
+        "max_workers": max_workers,
+        "note": "This uses Docker containers and may take significant time. Check logs for progress."
+    }
+
+
+@router.post("/experiments/{experiment_id}/export-predictions")
+async def export_predictions(experiment_id: str):
+    """
+    Export predictions in SWE-bench format for external evaluation.
+
+    Returns the path to the generated JSONL file that can be used
+    with the official SWE-bench harness directly.
+    """
+    storage = get_storage()
+
+    experiment = await storage.get_experiment(experiment_id)
+    if not experiment:
+        raise HTTPException(status_code=404, detail="Experiment not found")
+
+    harness = SWEBenchHarness(storage)
+
+    try:
+        predictions_path = await harness.export_predictions(experiment_id)
+        return {
+            "status": "exported",
+            "predictions_path": str(predictions_path),
+            "note": "Use this file with: python -m swebench.harness.run_evaluation --predictions_path <path>"
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
 # ==================== Metrics ====================
 
 @router.get("/experiments/{experiment_id}/metrics")
@@ -366,7 +455,9 @@ async def export_experiment(experiment_id: str, format: str = "json"):
                 "provider": r.provider,
                 "model": r.model,
                 "tool_set": r.tool_set,
+                "split": getattr(r, 'split', 'dev') or 'dev',
                 "success": r.success,
+                "result_status": r.result_status.value if r.result_status else None,
                 "error_message": r.error_message or "",
                 "prompt_tokens": r.prompt_tokens or 0,
                 "completion_tokens": r.completion_tokens or 0,

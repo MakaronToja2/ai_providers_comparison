@@ -1,0 +1,58 @@
+diff --git a/astroid/nodes/node_classes.py b/astroid/nodes/node_classes.py
+index 1234567..89abcde 100644
+--- a/astroid/nodes/node_classes.py
++++ b/astroid/nodes/node_classes.py
+@@ -2342,26 +2342,38 @@ class Dict(NodeNG, Instance):
+     def getitem(self, index, context=None):
+         """Get an item from this node.
+ 
+         :param index: The node to use as a subscript index.
+         :type index: Const or Slice
+ 
+         :raises AstroidTypeError: When the given index cannot be used as a
+             subscript index, or if this node is not subscriptable.
+         :raises AstroidIndexError: If the given index does not exist in the
+             dictionary.
+         """
+-        for key, value in self.items:
+-            # TODO(cpopa): no support for overriding yet, {1:2, **{1: 3}}.
+-            if isinstance(key, DictUnpack):
+-                try:
+-                    return value.getitem(index, context)
+-                except (AstroidTypeError, AstroidIndexError):
+-                    continue
+-            for inferredkey in key.infer(context):
+-                if inferredkey is util.Uninferable:
+-                    continue
+-                if isinstance(inferredkey, Const) and isinstance(index, Const):
+-                    if inferredkey.value == index.value:
+-                        return value
+-
+-        raise AstroidIndexError(index)
++        for key, value in self.items:
++            # TODO(cpopa): no support for overriding yet, {1:2, **{1: 3}}.
++            if isinstance(key, DictUnpack):
++                # If value is a reference, infer it first
++                inferred_values = []
++                try:
++                    inferred_values = list(value.infer(context))
++                except Exception:
++                    # If inference fails, treat as uninferable
++                    inferred_values = []
++                for inferred_value in inferred_values:
++                    if inferred_value is util.Uninferable:
++                        continue
++                    try:
++                        return inferred_value.getitem(index, context)
++                    except (AstroidTypeError, AstroidIndexError, AttributeError):
++                        continue
++                # If no inferred value worked, continue to next item
++                continue
++            for inferredkey in key.infer(context):
++                if inferredkey is util.Uninferable:
++                    continue
++                if isinstance(inferredkey, Const) and isinstance(index, Const):
++                    if inferredkey.value == index.value:
++                        return value
++
++        raise AstroidIndexError(index)

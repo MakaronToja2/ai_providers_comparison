@@ -134,3 +134,29 @@ async def compare_view(request: Request, experiment_id: Optional[str] = None):
         "tool_analysis": tool_analysis,
         "context_analysis": context_analysis,
     })
+
+
+@router.get("/compare-experiments", response_class=HTMLResponse)
+async def compare_experiments_view(request: Request, ids: Optional[str] = None):
+    """Cross-experiment comparison page."""
+    storage = get_storage()
+    metrics_calc = get_metrics()
+    await storage.initialize()
+
+    experiments = await storage.list_experiments(limit=100)
+
+    comparison_data = None
+    selected_experiments = []
+
+    if ids:
+        experiment_ids = [id.strip() for id in ids.split(",") if id.strip()]
+        if len(experiment_ids) >= 2:
+            comparison_data = await metrics_calc.compare_experiments(experiment_ids)
+            selected_experiments = experiment_ids
+
+    return templates.TemplateResponse("compare_experiments.html", {
+        "request": request,
+        "experiments": experiments,
+        "selected_experiments": selected_experiments,
+        "comparison_data": comparison_data,
+    })

@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Compare Experiments - SWE-bench Benchmark{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom: 20px;">Cross-Experiment Comparison</h2>
+
+<div class="card">
+    <h2>Select Experiments to Compare</h2>
+    <form id="compareForm" method="get" style="display: flex; flex-direction: column; gap: 15px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            {% for exp in experiments %}
+            <label style="display: flex; align-items: center; gap: 5px; padding: 8px 12px; background: var(--gray-50); border-radius: 6px; cursor: pointer;">
+                <input type="checkbox" name="exp" value="{{ exp.id }}"
+                    {% if exp.id in selected_experiments %}checked{% endif %}>
+                <span>{{ exp.name }}</span>
+                <span class="badge badge-{{ exp.status.value }}" style="font-size: 0.7rem;">{{ exp.status.value }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Compare Selected</button>
+            <small style="margin-left: 10px; color: var(--gray-600);">Select at least 2 experiments</small>
+        </div>
+    </form>
+</div>
+
+{% if comparison_data and comparison_data.experiments %}
+<div class="stats-grid" style="margin-top: 20px;">
+    {% for exp in comparison_data.experiments %}
+    <div class="stat-card">
+        <div class="label">{{ exp.name }}</div>
+        <div class="value" style="font-size: 1.5rem;">{{ "%.1f"|format(exp.success_rate * 100) }}%</div>
+        <small style="color: var(--gray-600);">{{ exp.total_instances }} instances</small>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <h2>Success Rate Comparison</h2>
+        <div class="chart-container">
+            <canvas id="successChart"></canvas>
+        </div>
+    </div>
+    <div class="card">
+        <h2>Average Tokens</h2>
+        <div class="chart-container">
+            <canvas id="tokenChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <h2>Average Response Time (s)</h2>
+        <div class="chart-container">
+            <canvas id="timeChart"></canvas>
+        </div>
+    </div>
+    <div class="card">
+        <h2>Average Tool Calls</h2>
+        <div class="chart-container">
+            <canvas id="toolCallChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Detailed Comparison</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Experiment</th>
+                <th>Providers</th>
+                <th>Tool Sets</th>
+                <th>Instances</th>
+                <th>Success Rate</th>
+                <th>Resolve Rate</th>
+                <th>Avg Tokens</th>
+                <th>Avg Time</th>
+                <th>Avg Tool Calls</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exp in comparison_data.experiments %}
+            <tr>
+                <td>
+                    <a href="/dashboard/experiments/{{ exp.id }}" style="color: var(--primary); text-decoration: none; font-weight: 500;">
+                        {{ exp.name }}
+                    </a>
+                </td>
+                <td>
+                    {% for p in exp.providers %}
+                    <span class="badge" style="background: var(--gray-100);">{{ p }}</span>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for ts in exp.tool_sets %}
+                    <span class="badge" style="background: var(--gray-100);">{{ ts }}</span>
+                    {% endfor %}
+                </td>
+                <td>{{ exp.total_instances }}</td>
+                <td style="color: {% if exp.success_rate > 0.5 %}var(--success){% elif exp.success_rate > 0.3 %}var(--warning){% else %}var(--danger){% endif %};">
+                    {{ "%.1f"|format(exp.success_rate * 100) }}%
+                </td>
+                <td style="color: {% if exp.resolve_rate > 0.3 %}var(--success){% elif exp.resolve_rate > 0.1 %}var(--warning){% else %}var(--danger){% endif %};">
+                    {{ "%.1f"|format(exp.resolve_rate * 100) }}%
+                </td>
+                <td>{{ "%.0f"|format(exp.avg_tokens) }}</td>
+                <td>{{ "%.2f"|format(exp.avg_response_time) }}s</td>
+                <td>{{ "%.1f"|format(exp.avg_tool_calls) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% elif selected_experiments | length < 2 and selected_experiments | length > 0 %}
+<div class="card">
+    <div class="empty-state">
+        <h3>Select at least 2 experiments</h3>
+        <p>You need to select at least 2 experiments to compare.</p>
+    </div>
+</div>
+{% elif not selected_experiments %}
+<div class="card">
+    <div class="empty-state">
+        <h3>Select experiments to compare</h3>
+        <p>Choose 2 or more experiments from the checkboxes above to see a side-by-side comparison.</p>
+        <p style="margin-top: 15px; font-size: 0.875rem;">
+            Tip: Compare experiments with different tool sets to analyze tool ablation,
+            or experiments with different providers to compare model performance.
+        </p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Handle form submission - build query string from checkboxes
+document.getElementById('compareForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const checkboxes = this.querySelectorAll('input[name="exp"]:checked');
+    const ids = Array.from(checkboxes).map(cb => cb.value).join(',');
+    if (ids) {
+        window.location.href = '/dashboard/compare-experiments?ids=' + encodeURIComponent(ids);
+    } else {
+        alert('Please select at least 2 experiments to compare');
+    }
+});
+
+{% if comparison_data and comparison_data.combined_summary %}
+const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+const summary = {{ comparison_data.combined_summary | tojson }};
+
+// Success rate chart
+new Chart(document.getElementById('successChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+        labels: Object.keys(summary.success_rates),
+        datasets: [{
+            label: 'Success Rate (%)',
+            data: Object.values(summary.success_rates).map(v => v * 100),
+            backgroundColor: colors.slice(0, Object.keys(summary.success_rates).length)
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, max: 100 } }
+    }
+});
+
+// Token chart
+new Chart(document.getElementById('tokenChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+        labels: Object.keys(summary.avg_tokens),
+        datasets: [{
+            label: 'Avg Tokens',
+            data: Object.values(summary.avg_tokens),
+            backgroundColor: colors.slice(0, Object.keys(summary.avg_tokens).length)
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+    }
+});
+
+// Response time chart
+new Chart(document.getElementById('timeChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+        labels: Object.keys(summary.avg_response_times),
+        datasets: [{
+            label: 'Avg Response Time (s)',
+            data: Object.values(summary.avg_response_times),
+            backgroundColor: colors.slice(0, Object.keys(summary.avg_response_times).length)
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+    }
+});
+
+// Tool calls chart
+new Chart(document.getElementById('toolCallChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+        labels: Object.keys(summary.avg_tool_calls),
+        datasets: [{
+            label: 'Avg Tool Calls',
+            data: Object.values(summary.avg_tool_calls),
+            backgroundColor: colors.slice(0, Object.keys(summary.avg_tool_calls).length)
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+    }
+});
+{% endif %}
+</script>
+{% endblock %}

@@ -1,0 +1,33 @@
+diff --git a/src/sqlfluff/rules/L031.py b/src/sqlfluff/rules/L031.py
+index 1234567..89abcde 100644
+--- a/src/sqlfluff/rules/L031.py
++++ b/src/sqlfluff/rules/L031.py
+@@ -42,9 +42,19 @@ class Rule_L031(BaseRule):
+-            return (
+-                self._lint_aliases_in_join(
+-                    base_table,
+-                    from_expression_elements,
+-                    column_reference_segments,
+-                    segment,
+-                )
+-                or None
+-            )
++            # Check if there is any join present in the from_clause_and_after segments
++            join_present = any(
++                clause.is_type("join_clause") or clause.is_type("join_expression")
++                for clause in from_clause_and_after
++            )
++
++            # If no join present, do not raise L031 violations
++            if not join_present:
++                return None
++
++            return (
++                self._lint_aliases_in_join(
++                    base_table,
++                    from_expression_elements,
++                    column_reference_segments,
++                    segment,
++                )
++                or None
++            )

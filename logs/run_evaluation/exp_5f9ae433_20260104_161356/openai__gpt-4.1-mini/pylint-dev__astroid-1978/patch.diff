@@ -1,0 +1,24 @@
+diff --git a/astroid/raw_building.py b/astroid/raw_building.py
+index 7a1e1b8..f9c7e2a 100644
+--- a/astroid/raw_building.py
++++ b/astroid/raw_building.py
+@@ -463,11 +463,13 @@
+         if real_name != self._module.__name__:
+             # check if it sounds valid and then add an import node, else use a
+             # dummy node
+-            try:
+-                getattr(sys.modules[modname], name)
+-            except (KeyError, AttributeError):
+-                attach_dummy_node(node, name, member)
+-            else:
+-                attach_import_node(node, modname, name)
++            try:
++                with warnings.catch_warnings():
++                    warnings.simplefilter("ignore", FutureWarning)
++                    getattr(sys.modules[modname], name)
++            except (KeyError, AttributeError):
++                attach_dummy_node(node, name, member)
++            else:
++                attach_import_node(node, modname, name)
+             return True
+         return False

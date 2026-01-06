@@ -1,0 +1,13 @@
+--- a/src/sqlfluff/rules/L031.py
++++ b/src/sqlfluff/rules/L031.py
+@@ -118,6 +118,10 @@
+         # A buffer to keep any violations.
+         violation_buff = []
+ 
++        # Check if there are any join conditions
++        if not any(expr.is_type("join") for expr in from_expression_elements):
++            return None
++
+         to_check = list(
+             self._filter_table_expressions(base_table, from_expression_elements)
+         )

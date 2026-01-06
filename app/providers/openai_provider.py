@@ -1,4 +1,5 @@
 from typing import List, Dict, Any, Optional
+import os
 import time
 import json
 import openai
@@ -8,9 +9,13 @@ from ..core.base_provider import BaseAIProvider
 from ..models.requests import ChatMessage
 from ..models.responses import LLMResponse, TokenUsage
 
+# Default model from environment or fallback
+DEFAULT_OPENAI_MODEL = os.getenv("OPENAI_DEFAULT_MODEL", "gpt-4.1-mini")
+
 
 class OpenAIProvider(BaseAIProvider):
-    def __init__(self, api_key: str, model: str = "gpt-4o-mini", **kwargs):
+    def __init__(self, api_key: str, model: str = None, **kwargs):
+        model = model or DEFAULT_OPENAI_MODEL
         super().__init__(api_key, model, **kwargs)
         self.client = AsyncOpenAI(api_key=api_key)
     

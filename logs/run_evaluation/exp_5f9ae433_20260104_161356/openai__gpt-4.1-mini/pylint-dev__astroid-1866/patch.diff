@@ -1,0 +1,35 @@
+--- a/astroid/brain/brain_builtin_inference.py
++++ b/astroid/brain/brain_builtin_inference.py
+@@ -937,1 +937,2 @@
+-    pos_values: list[str] = [i.value for i in inferred_positional]
++    # Convert None values to string "None" to avoid TypeError in format
++    pos_values: list[str] = [str(i.value) if i.value is None else i.value for i in inferred_positional]
+@@ -945,1 +953,4 @@
+-    keyword_values: dict[str, str] = {k: v.value for k, v in inferred_keyword.items()}
++    # Convert None values to string "None" to avoid TypeError in format
++    keyword_values: dict[str, str] = {
++        k: str(v.value) if v.value is None else v.value for k, v in inferred_keyword.items()
++    }
+@@ -957,5 +973,17 @@
+-    try:
+-        formatted_string = format_template.format(*pos_values, **keyword_values)
+-    except (IndexError, KeyError):
+-        # If there is an IndexError there are too few arguments to interpolate
+-        return iter([util.Uninferable])
++    try:
++        formatted_string = format_template.format(*pos_values, **keyword_values)
++    except (IndexError, KeyError):
++        # If there is an IndexError there are too few arguments to interpolate
++        return iter([util.Uninferable])
++    except TypeError as exc:
++        # Catch TypeError from unsupported format string for NoneType
++        if "NoneType" in str(exc):
++            # Convert None values to string and try again
++            pos_values = [str(v) for v in pos_values]
++            keyword_values = {k: str(v) for k, v in keyword_values.items()}
++            try:
++                formatted_string = format_template.format(*pos_values, **keyword_values)
++            except Exception:
++                return iter([util.Uninferable])
++        else:
++            raise

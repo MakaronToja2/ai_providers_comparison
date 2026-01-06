@@ -39,9 +39,20 @@
             </div>
 
             <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Dataset Split *</label>
+                <select name="split" style="width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px;">
+                    <option value="dev">dev (23 instances) - Quick testing</option>
+                    <option value="lite">lite (300 instances) - SWE-bench Lite</option>
+                    <option value="test">test (2294 instances) - Full SWE-bench</option>
+                    <option value="verified">verified (500 instances) - Human-verified subset</option>
+                </select>
+                <small style="color: var(--gray-600);">Start with 'dev' for testing, use 'lite' for thesis results</small>
+            </div>
+
+            <div style="margin-bottom: 15px;">
                 <label style="display: block; margin-bottom: 5px; font-weight: 500;">Instance Limit</label>
-                <input type="number" name="limit" value="10" min="1" max="300" style="width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px;">
-                <small style="color: var(--gray-600);">Number of SWE-bench instances (max 300)</small>
+                <input type="number" name="limit" value="10" min="1" max="2294" style="width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px;">
+                <small style="color: var(--gray-600);">Number of instances to run (leave high to run all)</small>
             </div>
 
             <div style="margin-bottom: 15px;">
@@ -75,6 +86,7 @@
             <tr>
                 <th>Name</th>
                 <th>Description</th>
+                <th>Split</th>
                 <th>Status</th>
                 <th>Progress</th>
                 <th>Providers</th>
@@ -93,6 +105,11 @@
                 </td>
                 <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">
                     {{ exp.description or '-' }}
+                </td>
+                <td>
+                    <span class="badge" style="background: {% if exp.config.split == 'lite' %}var(--primary){% elif exp.config.split == 'dev' %}var(--gray-200){% else %}var(--warning){% endif %}; {% if exp.config.split == 'lite' %}color: white;{% endif %}">
+                        {{ exp.config.split or 'dev' }}
+                    </span>
                 </td>
                 <td>
                     <span class="badge badge-{{ exp.status.value }}">{{ exp.status.value }}</span>
@@ -123,6 +140,15 @@
                         {% elif exp.status.value == 'running' %}
                         <button onclick="stopExperiment('{{ exp.id }}')" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.875rem;">Stop</button>
                         {% endif %}
+                        {% if exp.status.value == 'completed' or exp.completed_instances > 0 %}
+                        <div style="position: relative; display: inline-block;">
+                            <button onclick="toggleEvalMenu('{{ exp.id }}')" class="btn" style="padding: 6px 12px; font-size: 0.875rem; background: var(--warning); color: white;">Eval ▾</button>
+                            <div id="evalMenu-{{ exp.id }}" class="eval-menu" style="display: none; position: absolute; top: 100%; right: 0; background: white; border: 1px solid var(--gray-200); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 100; min-width: 200px;">
+                                <button onclick="evaluateSWEBench('{{ exp.id }}')" class="eval-option">🐳 SWE-bench</button>
+                                <button onclick="evaluateQuick('{{ exp.id }}')" class="eval-option">⚡ Quick</button>
+                            </div>
+                        </div>
+                        {% endif %}
                         {% if exp.status.value != 'running' %}
                         <button onclick="deleteExperiment('{{ exp.id }}', '{{ exp.name }}')" class="btn" style="padding: 6px 12px; font-size: 0.875rem; background: var(--gray-100); color: var(--danger);">Delete</button>
                         {% endif %}
@@ -135,12 +161,13 @@
     {% else %}
     <div class="empty-state">
         <h3>No experiments yet</h3>
-        <p>Create your first experiment using the API</p>
+        <p>Click "+ New Experiment" to create your first experiment</p>
         <pre style="background: var(--gray-100); padding: 20px; border-radius: 8px; text-align: left; display: inline-block; margin-top: 20px;">
 POST /api/v1/benchmark/experiments
 {
   "name": "My First Experiment",
   "providers": ["openai", "anthropic", "google"],
+  "split": "dev",  // or "lite" for thesis
   "limit": 10
 }</pre>
     </div>
@@ -200,6 +227,7 @@ async function createExperiment(event) {
         name: formData.get('name'),
         description: formData.get('description') || null,
         providers: providers,
+        split: formData.get('split'),
         limit: parseInt(formData.get('limit')),
         max_concurrent: parseInt(formData.get('max_concurrent')),
         tool_sets: [toolSetConfig]
@@ -274,5 +302,75 @@ async function deleteExperiment(id, name) {
         alert('Error: ' + e.message);
     }
 }
+
+function toggleEvalMenu(id) {
+    // Close all other menus first
+    document.querySelectorAll('.eval-menu').forEach(menu => {
+        if (menu.id !== 'evalMenu-' + id) {
+            menu.style.display = 'none';
+        }
+    });
+    const menu = document.getElementById('evalMenu-' + id);
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+// Close menus when clicking outside
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.eval-menu') && !e.target.closest('[onclick^="toggleEvalMenu"]')) {
+        document.querySelectorAll('.eval-menu').forEach(menu => {
+            menu.style.display = 'none';
+        });
+    }
+});
+
+async function evaluateQuick(id) {
+    document.querySelectorAll('.eval-menu').forEach(m => m.style.display = 'none');
+
+    if (!confirm('Start Quick Evaluation?\n\nNote: Tests may fail due to environment issues.')) return;
+
+    try {
+        const response = await fetch(`/api/v1/benchmark/experiments/${id}/evaluate`, { method: 'POST' });
+        if (response.ok) {
+            alert('Quick evaluation started! Refresh later to see results.');
+        } else {
+            const error = await response.json();
+            alert('Failed: ' + (error.detail || 'Unknown error'));
+        }
+    } catch (e) { alert('Error: ' + e.message); }
+}
+
+async function evaluateSWEBench(id) {
+    document.querySelectorAll('.eval-menu').forEach(m => m.style.display = 'none');
+
+    if (!confirm('Start SWE-bench Evaluation?\n\n⚠️ Requires Docker (downloads ~67GB first run).\n\nThis uses the official harness for accurate results.')) return;
+
+    try {
+        const response = await fetch(`/api/v1/benchmark/experiments/${id}/evaluate-swebench`, { method: 'POST' });
+        const data = await response.json();
+        if (response.ok) {
+            alert(`SWE-bench started! Patches: ${data.patches_to_evaluate}. Check terminal for progress.`);
+        } else {
+            alert('Failed: ' + (data.detail || 'Unknown error'));
+        }
+    } catch (e) { alert('Error: ' + e.message); }
+}
 </script>
+
+<style>
+.eval-option {
+    width: 100%;
+    padding: 10px 12px;
+    text-align: left;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+.eval-option:hover {
+    background: var(--gray-100);
+}
+.eval-option:not(:last-child) {
+    border-bottom: 1px solid var(--gray-100);
+}
+</style>
 {% endblock %}

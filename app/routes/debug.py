@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter
 
 from ..models.requests import AIProvider, ChatMessage
@@ -12,7 +13,7 @@ async def debug_test_openai():
     try:
         provider = ProviderFactory.create_provider(
             provider_type=AIProvider.OPENAI,
-            model="gpt-4o-mini"
+            model=os.getenv("OPENAI_DEFAULT_MODEL", "gpt-4.1-mini")
         )
         
         test_messages = [ChatMessage(role="user", content="Hi")]
@@ -42,7 +43,7 @@ async def debug_test_anthropic():
     try:
         provider = ProviderFactory.create_provider(
             provider_type=AIProvider.ANTHROPIC,
-            model="claude-3-haiku-20240307"
+            model=os.getenv("ANTHROPIC_DEFAULT_MODEL", "claude-haiku-4-5-20251001")
         )
         
         test_messages = [ChatMessage(role="user", content="Hi")]

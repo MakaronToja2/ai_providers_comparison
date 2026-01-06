@@ -1,0 +1,8 @@
+--- a/pvlib/irradiance.py
++++ b/pvlib/irradiance.py
+@@ -882,1 +882,4 @@
+-    term3 = 1 + np.sqrt(HB / ghi) * (tools.sind(0.5 * surface_tilt) ** 3)
++    # Avoid division by zero when ghi is zero
++    term3 = 1 + np.where(ghi > 0,
++                         np.sqrt(HB / ghi) * (tools.sind(0.5 * surface_tilt) ** 3),
++                         0)

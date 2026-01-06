@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter, HTTPException
 from typing import Dict, Any
 
@@ -65,11 +66,11 @@ async def analyze_instance(request: SWEBenchAnalysisRequest):
         if not instance:
             raise HTTPException(status_code=404, detail=f"Instance {request.instance_id} not found")
         
-        # Create provider
+        # Create provider with default models from environment
         default_models = {
-            AIProvider.OPENAI: "gpt-4o-mini",
-            AIProvider.ANTHROPIC: "claude-3-haiku-20240307", 
-            AIProvider.GOOGLE: "gemini-2.5-flash-lite"
+            AIProvider.OPENAI: os.getenv("OPENAI_DEFAULT_MODEL", "gpt-4.1-mini"),
+            AIProvider.ANTHROPIC: os.getenv("ANTHROPIC_DEFAULT_MODEL", "claude-haiku-4-5-20251001"),
+            AIProvider.GOOGLE: os.getenv("GOOGLE_DEFAULT_MODEL", "gemini-2.5-flash-lite")
         }
         
         model = request.model or default_models.get(request.provider, "default")
@@ -153,33 +154,32 @@ Use these tools to understand the codebase context and provide a detailed analys
 Start by exploring the affected files mentioned in the patch to understand the full context."""
         
     elif request.analysis_type == "solution_generation":
-        prompt = f"""Generate a solution for this software issue:
+        prompt = f"""Generate a solution for this software issue.
 
 {base_info}
 
-Provide:
-1. Step-by-step solution approach
-2. Code changes needed (if applicable)
-3. Potential risks or side effects
-4. Testing strategy
-5. Alternative approaches if any
+You must strictly follow these rules:
 
-Focus on practical, implementable solutions."""
-        
-    elif request.analysis_type == "code_review":
-        prompt = f"""Perform a code review of this pull request:
+1. **Analysis:** Briefly explain the root cause and your plan.
+2. **Success Output:** If you can fix the issue, provide the code changes in a standard Unified Diff format wrapped in a code block.
+   - The diff must start with `diff --git` or `---` / `+++` headers.
+   - Use standard diff markers (`+`, `-`, `@@`).
+   - Example:
+     ```diff
+     --- a/file.py
+     +++ b/file.py
+     @@ -10,1 +10,1 @@
+     - old_code
+     + new_code
+     ```
+3. **Failure Output:** If you genuinely cannot solve this, respond with EXACTLY:
+<<<CANNOT_SOLVE>>>
+reason: [insufficient_context|too_complex|unclear_requirements|missing_dependencies]
+explanation: [brief explanation]
 
-{base_info}
-
-Review aspects:
-1. Code quality and best practices
-2. Potential bugs or issues
-3. Performance implications
-4. Maintainability concerns
-5. Test coverage adequacy
-6. Documentation needs
-
-Provide constructive feedback."""
+DO NOT describe the code changes in plain text without a diff.
+A partial or uncertain patch is better than giving up - only use <<<CANNOT_SOLVE>>> if you truly cannot make any attempt.
+"""
         
     else:
         prompt = f"""Analyze this software development issue:

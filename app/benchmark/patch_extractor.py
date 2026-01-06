@@ -91,15 +91,122 @@ class PatchExtractor:
         return has_additions or has_deletions
 
     def _normalize_patch(self, patch: str) -> str:
-        """Normalize a patch by cleaning up formatting."""
+        """Normalize a patch by cleaning up formatting and fixing common issues."""
         lines = patch.strip().split('\n')
         normalized = []
+        in_hunk = False
+        hunk_lines = []  # Collect lines for current hunk to recalculate header
+        hunk_header_idx = -1
 
         for line in lines:
             # Remove trailing whitespace but preserve leading
-            normalized.append(line.rstrip())
+            line = line.rstrip()
 
-        return '\n'.join(normalized)
+            # Track when we're inside a hunk (after @@ line)
+            if line.startswith('@@'):
+                # If we had a previous hunk, finalize it
+                if hunk_lines and hunk_header_idx >= 0:
+                    self._fix_hunk_header(normalized, hunk_header_idx, hunk_lines)
+                    normalized.extend(hunk_lines)
+                    hunk_lines = []
+
+                in_hunk = True
+                hunk_header_idx = len(normalized)
+                normalized.append(line)  # Will be fixed later
+                continue
+
+            # Normalize --- and +++ headers to have a/ and b/ prefixes
+            if line.startswith('--- '):
+                in_hunk = False
+                # Finalize any pending hunk
+                if hunk_lines and hunk_header_idx >= 0:
+                    self._fix_hunk_header(normalized, hunk_header_idx, hunk_lines)
+                    normalized.extend(hunk_lines)
+                    hunk_lines = []
+                    hunk_header_idx = -1
+
+                path = line[4:]
+                # Add a/ prefix if not present and not /dev/null
+                if not path.startswith(('a/', '/dev/null')):
+                    path = 'a/' + path
+                normalized.append('--- ' + path)
+                continue
+
+            if line.startswith('+++ '):
+                in_hunk = False
+                path = line[4:]
+                # Add b/ prefix if not present and not /dev/null
+                if not path.startswith(('b/', '/dev/null')):
+                    path = 'b/' + path
+                normalized.append('+++ ' + path)
+                continue
+
+            if line.startswith('diff --git'):
+                in_hunk = False
+                # Finalize any pending hunk
+                if hunk_lines and hunk_header_idx >= 0:
+                    self._fix_hunk_header(normalized, hunk_header_idx, hunk_lines)
+                    normalized.extend(hunk_lines)
+                    hunk_lines = []
+                    hunk_header_idx = -1
+                normalized.append(line)
+                continue
+
+            # Inside a hunk, lines should start with +, -, space, or \
+            if in_hunk:
+                if line.startswith(('+', '-', ' ', '\\')):
+                    hunk_lines.append(line)
+                elif line == '':
+                    # Empty line in hunk should be a context line (just a space)
+                    hunk_lines.append(' ')
+                else:
+                    # Line without proper prefix - assume it's a context line
+                    # This fixes LLMs that forget the leading space
+                    hunk_lines.append(' ' + line)
+            else:
+                normalized.append(line)
+
+        # Finalize last hunk
+        if hunk_lines and hunk_header_idx >= 0:
+            self._fix_hunk_header(normalized, hunk_header_idx, hunk_lines)
+            normalized.extend(hunk_lines)
+
+        # Ensure patch ends with newline (required by git)
+        result = '\n'.join(normalized)
+        if not result.endswith('\n'):
+            result += '\n'
+
+        return result
+
+    def _fix_hunk_header(self, lines: List[str], header_idx: int, hunk_lines: List[str]) -> None:
+        """Fix the hunk header at header_idx to match actual line counts."""
+        if header_idx < 0 or header_idx >= len(lines):
+            return
+
+        old_header = lines[header_idx]
+        match = re.match(r'^@@\s*-(\d+)(?:,\d+)?\s+\+(\d+)(?:,\d+)?\s*@@(.*)$', old_header)
+        if not match:
+            return
+
+        old_start = match.group(1)
+        new_start = match.group(2)
+        context_after = match.group(3)
+
+        # Count lines in hunk
+        old_count = 0
+        new_count = 0
+        for line in hunk_lines:
+            if line.startswith('-'):
+                old_count += 1
+            elif line.startswith('+'):
+                new_count += 1
+            elif line.startswith(' ') or line.startswith('\\'):
+                old_count += 1
+                new_count += 1
+
+        # Build corrected header
+        new_header = f"@@ -{old_start},{old_count} +{new_start},{new_count} @@{context_after}"
+        lines[header_idx] = new_header
 
     def extract_all(self, content: str) -> List[str]:
         """Extract all patches from content."""

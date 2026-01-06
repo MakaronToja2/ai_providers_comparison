@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter, HTTPException, Depends
 
 from ..models.requests import AIProvider
@@ -17,11 +18,11 @@ async def health_check(settings: Settings = Depends(get_settings)):
         
         for provider_type in available_providers:
             try:
-                # Use the cheapest models for health_check
+                # Use the default models from environment for health_check
                 default_models = {
-                    AIProvider.OPENAI: "gpt-4o-mini",
-                    AIProvider.ANTHROPIC: "claude-3-haiku-20240307",
-                    AIProvider.GOOGLE: "gemini-2.5-flash-lite"
+                    AIProvider.OPENAI: os.getenv("OPENAI_DEFAULT_MODEL", "gpt-4.1-mini"),
+                    AIProvider.ANTHROPIC: os.getenv("ANTHROPIC_DEFAULT_MODEL", "claude-haiku-4-5-20251001"),
+                    AIProvider.GOOGLE: os.getenv("GOOGLE_DEFAULT_MODEL", "gemini-2.5-flash-lite")
                 }
                 
                 model = default_models.get(provider_type, "default")
