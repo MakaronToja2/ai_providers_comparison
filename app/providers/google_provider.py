@@ -192,14 +192,30 @@ class GoogleProvider(BaseAIProvider):
         usage = None
         if hasattr(raw_response, 'usage_metadata'):
             usage_data = raw_response.usage_metadata
-            # Debug: log what we actually receive
-            prompt_tokens = getattr(usage_data, 'prompt_token_count', None)
-            completion_tokens = getattr(usage_data, 'candidates_token_count', None)
-            total_tokens = getattr(usage_data, 'total_token_count', None)
 
-            # Log if we're getting empty values
+            # Try multiple attribute names (API versions vary)
+            prompt_tokens = (
+                getattr(usage_data, 'prompt_token_count', None) or
+                getattr(usage_data, 'input_tokens', None) or
+                getattr(usage_data, 'promptTokenCount', None)
+            )
+            completion_tokens = (
+                getattr(usage_data, 'candidates_token_count', None) or
+                getattr(usage_data, 'output_tokens', None) or
+                getattr(usage_data, 'candidatesTokenCount', None)
+            )
+            total_tokens = (
+                getattr(usage_data, 'total_token_count', None) or
+                getattr(usage_data, 'totalTokenCount', None)
+            )
+
+            # Debug: log all available attributes if we can't find tokens
             if prompt_tokens is None and completion_tokens is None:
-                print(f"[Google] Warning: usage_metadata exists but fields are missing. Raw: {usage_data}")
+                available_attrs = [attr for attr in dir(usage_data) if not attr.startswith('_')]
+                print(f"[Google] Warning: Cannot find token counts. Available attrs: {available_attrs}")
+                # Try to get raw dict representation
+                if hasattr(usage_data, '__dict__'):
+                    print(f"[Google] usage_data.__dict__: {usage_data.__dict__}")
 
             usage = TokenUsage(
                 prompt_tokens=prompt_tokens or 0,

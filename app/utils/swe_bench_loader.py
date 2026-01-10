@@ -10,31 +10,40 @@ logger = logging.getLogger(__name__)
 
 class SWEBenchLoader:
     """Utility class for loading and managing SWE-bench dataset"""
-    
+
+    # Map our split names to HuggingFace dataset and actual split
+    DATASET_MAP = {
+        "dev": ("SWE-bench/SWE-bench_Lite", "dev"),        # 23 instances (development)
+        "lite": ("SWE-bench/SWE-bench_Lite", "test"),      # 300 instances (lite benchmark)
+        "test": ("SWE-bench/SWE-bench", "test"),           # 2294 instances (full benchmark)
+        "verified": ("SWE-bench/SWE-bench_Verified", "test"),  # 500 instances (human verified)
+    }
+
     def __init__(self):
         self._dataset_cache: Dict[str, pd.DataFrame] = {}
         self._load_times: Dict[str, datetime] = {}
-    
+
     def load_dataset(self, split: str = "dev") -> SWEBenchDatasetInfo:
         """
         Load SWE-bench dataset split
-        
+
         Args:
-            split: Dataset split to load ('dev' or 'test')
-            
+            split: Dataset split to load ('dev', 'lite', 'test', or 'verified')
+
         Returns:
             Dataset information
         """
-        if split not in ["dev", "test"]:
-            raise ValueError("Split must be 'dev' or 'test'")
-        
+        if split not in self.DATASET_MAP:
+            raise ValueError(f"Split must be one of: {list(self.DATASET_MAP.keys())}")
+
         try:
-            logger.info(f"Loading SWE-bench {split} dataset...")
-            
+            dataset_name, hf_split = self.DATASET_MAP[split]
+            logger.info(f"Loading SWE-bench {split} dataset ({dataset_name}, split={hf_split})...")
+
             # Use datasets library instead of direct parquet reading
             from datasets import load_dataset
-            
-            dataset = load_dataset("SWE-bench/SWE-bench_Lite", split=split)
+
+            dataset = load_dataset(dataset_name, split=hf_split)
             df = dataset.to_pandas()
             
             # Cache the dataset

@@ -171,4 +171,96 @@ Models must produce either:
 
 ---
 
+## Thesis Experiment Plan
+
+### Experiment 1: "Baseline with Escape Hatch" (Current)
+**Status:** Running on 300 instances (lite split)
+
+**Configuration:**
+- Allows `<<<CANNOT_SOLVE>>>` option
+- Models can choose to not produce a patch if uncertain
+
+**Hypothesis:** OpenAI will confidently produce patches while Anthropic/Google will be more conservative and use the escape hatch more often.
+
+**Preliminary Finding:** Confirmed - OpenAI produces patches 91-100% of time, Anthropic/Google only 40% even with forcing mechanism.
+
+**Branch:** Current main branch (checkpointed before Experiment 2)
+
+---
+
+### Experiment 2: "Forced Patch Generation"
+**Status:** Planned
+
+**Configuration:**
+- Remove `<<<CANNOT_SOLVE>>>` option entirely
+- Models MUST produce a diff patch, no exceptions
+- More aggressive forcing prompt
+
+**Hypothesis:** When forced to always produce patches:
+1. Conservative models (Anthropic/Google) may produce lower quality patches
+2. Patch generation rate will increase to 80-90%
+3. Quality/accuracy will vary by provider
+
+**Questions to Answer:**
+- Do conservative models produce worse patches when forced?
+- Is OpenAI's confidence justified by higher accuracy?
+- What's the quality vs quantity tradeoff?
+
+---
+
+### Experiment 3: "Patch Evaluation with SWE-bench Harness"
+**Status:** Planned (after Experiments 1 & 2)
+
+**Configuration:**
+- Run official SWE-bench evaluation harness on generated patches
+- Test if patches actually fix the bugs (pass test cases)
+
+**Metrics:**
+- **Resolve Rate**: % of patches that pass all tests
+- **Partial Success**: % of patches that pass some tests
+- **Regression Rate**: % of patches that break existing tests
+
+**Questions to Answer:**
+- Which provider produces patches that actually work?
+- Is high patch generation rate correlated with accuracy?
+- Do forced patches have lower resolve rate?
+
+---
+
+### Additional Experiment Ideas
+
+| Experiment | Variable | Question | Priority |
+|------------|----------|----------|----------|
+| Temperature Study | 0.1 vs 0.3 vs 0.7 | Does creativity help or hurt? | Medium |
+| Tools vs No Tools | Enable/disable agentic loop | How much do tools help? | High |
+| Model Tiers | GPT-4 vs GPT-4o-mini, Claude Sonnet vs Haiku | Cost vs quality tradeoff | High |
+| Prompt Styles | Direct vs Chain-of-thought | Does explicit reasoning help? | Medium |
+| Context Size | With/without hints | How much context matters? | Low |
+| Token Budget | 4000 vs 8000 vs 16000 | Does more space help? | Medium |
+
+---
+
+## Dataset Splits Available
+
+| Split | Dataset | Instances | Use Case |
+|-------|---------|-----------|----------|
+| dev | SWE-bench_Lite | 23 | Quick testing, debugging |
+| lite | SWE-bench_Lite | 300 | Main benchmark (thesis) |
+| test | SWE-bench | 2294 | Full benchmark (if needed) |
+| verified | SWE-bench_Verified | 500 | Human-verified subset |
+
+---
+
+## Key Observations So Far
+
+1. **OpenAI follows instructions better**: Even without forcing, OpenAI produces patches consistently. This suggests better instruction-following capability.
+
+2. **Anthropic/Google are more "honest"**: These models prefer to admit uncertainty rather than hallucinate. This is arguably better behavior, but harder to evaluate.
+
+3. **Forcing is essential for comparison**: Without forcing, we can't compare patch quality across providers since Anthropic/Google often don't produce patches.
+
+4. **Tool usage patterns differ**: Need to analyze if providers use tools differently and if that correlates with success.
+
+---
+
 *Last updated: 2026-01-06*
