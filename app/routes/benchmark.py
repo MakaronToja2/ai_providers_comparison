@@ -91,6 +91,8 @@ async def create_experiment(request: CreateExperimentRequest):
         models=models,
         tool_sets=tool_sets,
         split=request.split,
+        experiment_mode=request.experiment_mode,
+        max_tool_iterations=request.max_tool_iterations,
         context_limit=request.context_limit,
         instance_ids=request.instance_ids,
         repos=request.repos,
@@ -191,6 +193,33 @@ async def stop_experiment(experiment_id: str):
 
     await runner.stop_experiment(experiment_id)
     return {"status": "stopping", "experiment_id": experiment_id}
+
+
+@router.get("/experiments/running")
+async def get_running_experiments():
+    """Get list of all currently running experiments."""
+    runner = get_experiment_runner()
+    storage = get_storage()
+
+    running_ids = list(runner._running_experiments)
+    running_experiments = []
+
+    for exp_id in running_ids:
+        experiment = await storage.get_experiment(exp_id)
+        if experiment:
+            running_experiments.append({
+                "id": exp_id,
+                "name": experiment.name,
+                "status": experiment.status.value,
+                "completed": experiment.completed_instances,
+                "total": experiment.total_instances,
+                "progress": f"{experiment.completed_instances}/{experiment.total_instances}",
+            })
+
+    return {
+        "count": len(running_experiments),
+        "experiments": running_experiments
+    }
 
 
 @router.get("/experiments/{experiment_id}/stream")
@@ -301,7 +330,8 @@ async def evaluate_experiment_swebench(
     background_tasks: BackgroundTasks,
     max_workers: int = 4,
     dataset: str = "princeton-nlp/SWE-bench_Lite",
-    split: str = "dev",
+    split: Optional[str] = None,  # If None, use experiment's config split
+    resume: bool = True,  # If True, skip already-evaluated predictions
 ):
     """
     Run official SWE-bench evaluation using Docker containers.
@@ -313,13 +343,30 @@ async def evaluate_experiment_swebench(
         experiment_id: The experiment to evaluate
         max_workers: Number of parallel Docker containers (default: 4)
         dataset: SWE-bench dataset to use (default: Lite)
-        split: Dataset split - 'dev' (23 instances) or 'test' (300 instances)
+        split: Dataset split - if not provided, uses experiment's config split
+               'lite' and 'verified' map to 'test' split for SWE-bench harness
+        resume: If True (default), skip already-evaluated predictions and import
+                their results. Set to False to re-evaluate everything.
     """
     storage = get_storage()
 
     experiment = await storage.get_experiment(experiment_id)
     if not experiment:
         raise HTTPException(status_code=404, detail="Experiment not found")
+
+    # Use experiment's split if not explicitly provided
+    if split is None:
+        config_split = experiment.config.split or "dev"
+        # Map our split names to SWE-bench harness split names
+        # 'lite' and 'verified' use the 'test' split in SWE-bench
+        split_mapping = {
+            "dev": "dev",
+            "lite": "test",
+            "test": "test",
+            "verified": "test",
+        }
+        split = split_mapping.get(config_split, "dev")
+        print(f"[SWE-bench] Using split '{split}' from experiment config (was '{config_split}')")
 
     # Check if there are patches to evaluate
     results = await storage.get_results_for_experiment(experiment_id, success_only=True, limit=1000)
@@ -333,24 +380,46 @@ async def evaluate_experiment_swebench(
 
     harness = SWEBenchHarness(storage, dataset_name=dataset, split=split, max_workers=max_workers)
 
-    # Run in background
+    # Generate run_id for this evaluation
+    from datetime import datetime
+    run_id = f"exp_{experiment_id[:8]}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+    # Run in background with incremental progress saving
     async def run_swebench():
         try:
-            result = await harness.evaluate_experiment(experiment_id)
+            # First export predictions
+            predictions_path = await harness.export_predictions(experiment_id)
+            print(f"[SWE-bench] Predictions exported to {predictions_path}")
+
+            # Run evaluation with incremental saving and progress reporting
+            result = await harness.run_evaluation_with_progress(
+                predictions_path=predictions_path,
+                run_id=run_id,
+                experiment_id=experiment_id,
+                poll_interval=30,  # Check for new results every 30 seconds
+                progress_every=10,  # Report progress every 10 evaluations
+                resume=resume,  # Skip already-evaluated predictions
+            )
             print(f"[SWE-bench] Evaluation complete: {result.get('summary', {})}")
         except Exception as e:
+            import traceback
             print(f"[SWE-bench] Evaluation failed: {e}")
+            traceback.print_exc()
 
     background_tasks.add_task(run_swebench)
 
     return {
         "status": "swebench_evaluation_started",
         "experiment_id": experiment_id,
+        "run_id": run_id,
         "patches_to_evaluate": patches_count,
         "dataset": dataset,
         "split": split,
         "max_workers": max_workers,
-        "note": "This uses Docker containers and may take significant time. Check logs for progress."
+        "resume": resume,
+        "note": "Results are saved incrementally. Progress logged every 10 evaluations. "
+                "Resume mode will skip already-evaluated predictions." if resume else
+                "Results are saved incrementally. Progress logged every 10 evaluations."
     }
 
 
@@ -467,6 +536,12 @@ async def export_experiment(experiment_id: str, format: str = "json"):
                 "tool_call_count": r.tool_call_count,
                 "successful_tool_calls": r.successful_tool_calls,
                 "has_patch": bool(r.generated_patch),
+                # Self-reflection metrics (Experiment 3)
+                "reflection_prompt_tokens": r.reflection_prompt_tokens or 0,
+                "reflection_completion_tokens": r.reflection_completion_tokens or 0,
+                "reflection_total_tokens": r.reflection_total_tokens or 0,
+                "reflection_outcome": r.reflection_outcome or "",
+                "patch_was_revised": bool(r.original_patch),  # True if test-guided revision occurred
                 "patch_applied": tr.patch_applied if tr else None,
                 "resolved": tr.resolved if tr else None,
                 "fail_to_pass_total": tr.fail_to_pass_total if tr else None,

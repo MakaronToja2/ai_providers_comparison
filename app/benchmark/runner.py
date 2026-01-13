@@ -7,7 +7,7 @@ import os
 import re
 import time
 from datetime import datetime
-from typing import AsyncGenerator, Dict, List, Optional, Set, Tuple
+from typing import Any, AsyncGenerator, Dict, List, Optional, Set, Tuple
 from dataclasses import dataclass
 
 from ..core.provider_factory import ProviderFactory
@@ -19,6 +19,7 @@ from ..models.benchmark import (
     ExperimentConfig,
     ExperimentStatus,
     ExperimentResult,
+    ExperimentMode,
     ResultStatus,
     ToolCallRecord,
     ProgressUpdate,
@@ -28,6 +29,7 @@ from ..utils.repo_context import RepoContext
 from .storage import Storage
 from .rate_limiter import RateLimiterManager
 from .patch_extractor import patch_extractor
+from .evaluator import TestEvaluator
 
 
 @dataclass
@@ -46,6 +48,8 @@ class WorkItem:
     fail_to_pass: List[str]
     pass_to_pass: List[str]
     split: str = "dev"
+    experiment_mode: ExperimentMode = ExperimentMode.BASELINE
+    max_tool_iterations: int = 10
 
 
 class ExperimentRunner:
@@ -215,6 +219,8 @@ class ExperimentRunner:
                             fail_to_pass=instance.FAIL_TO_PASS or [],
                             pass_to_pass=instance.PASS_TO_PASS or [],
                             split=config.split or "dev",
+                            experiment_mode=config.experiment_mode,
+                            max_tool_iterations=config.max_tool_iterations,
                         ))
 
         return work_items
@@ -293,6 +299,8 @@ class ExperimentRunner:
                         messages=messages,
                         temperature=0.3,
                         max_tokens=8000,
+                        max_tool_iterations=work.max_tool_iterations,
+                        experiment_mode=work.experiment_mode.value,
                     )
                     result.response_time_seconds = time.time() - start_time
 
@@ -305,6 +313,13 @@ class ExperimentRunner:
                         result.completion_tokens = response.usage.completion_tokens
                         result.total_tokens = response.usage.total_tokens
                         result.context_size_tokens = response.usage.prompt_tokens
+
+                    # Extract self-reflection metrics (tracked separately for cost analysis)
+                    if response.reflection:
+                        result.reflection_prompt_tokens = response.reflection.prompt_tokens
+                        result.reflection_completion_tokens = response.reflection.completion_tokens
+                        result.reflection_total_tokens = response.reflection.total_tokens
+                        result.reflection_outcome = response.reflection.outcome
 
                     # Process tool calls
                     if response.tool_calls:
@@ -337,6 +352,56 @@ class ExperimentRunner:
                             result.result_status = ResultStatus.SUCCESS_PATCH_GENERATED
                             if not response.success:
                                 result.error_message = response.error_message
+
+                            # TEST-GUIDED SELF-REFLECTION for self_reflect mode
+                            if work.experiment_mode == ExperimentMode.SELF_REFLECT:
+                                try:
+                                    print(f"[{work.provider}] Running inline evaluation for test-guided reflection...")
+
+                                    # Run inline evaluation
+                                    test_results = await self._run_inline_evaluation(
+                                        result, work, repo_ctx
+                                    )
+
+                                    if test_results and not test_results.get("resolved", False):
+                                        # Tests failed - ask model to reflect and revise
+                                        print(f"[{work.provider}] Tests failed, requesting revision...")
+
+                                        revised_content, reflection_metrics = await provider.do_reflection_with_test_results(
+                                            original_content=response.content,
+                                            conversation_history=response.conversation_history or [],  # Use FULL context with file contents
+                                            test_results=test_results,
+                                            temperature=0.3,
+                                            max_tokens=4000,
+                                        )
+
+                                        # Update result with reflection metrics
+                                        if reflection_metrics:
+                                            result.reflection_prompt_tokens = reflection_metrics.prompt_tokens
+                                            result.reflection_completion_tokens = reflection_metrics.completion_tokens
+                                            result.reflection_total_tokens = reflection_metrics.total_tokens
+                                            result.reflection_outcome = reflection_metrics.outcome
+
+                                        # Try to extract revised patch
+                                        revised_patch = self._extract_patch(revised_content)
+                                        if revised_patch:
+                                            print(f"[{work.provider}] Got revised patch from reflection")
+                                            # Store original patch for comparison
+                                            result.original_patch = result.generated_patch
+                                            result.generated_patch = revised_patch
+                                            result.response_content = revised_content
+                                        else:
+                                            print(f"[{work.provider}] No revised patch extracted, keeping original")
+
+                                    elif test_results and test_results.get("resolved", False):
+                                        # Tests passed on first try!
+                                        print(f"[{work.provider}] Tests passed on first patch!")
+                                        result.reflection_outcome = "tests_passed"
+
+                                except Exception as e:
+                                    print(f"[{work.provider}] Inline evaluation failed: {e}")
+                                    result.reflection_outcome = "eval_failed"
+
                         else:
                             # Model responded but produced no valid output
                             result.success = False
@@ -370,24 +435,31 @@ class ExperimentRunner:
     ]
 
     def _build_analysis_messages(self, work: WorkItem) -> List[ChatMessage]:
-        """Build the prompt messages for analyzing an instance."""
-        system_prompt = """You are an expert software engineer tasked with fixing a bug from a GitHub issue.
+        """Build the prompt messages for analyzing an instance.
 
-IMPORTANT: Your response MUST end with either:
-1. A complete patch in unified diff format, OR
-2. A standardized failure response if you truly cannot solve it
+        Prompts are mode-aware:
+        - BASELINE: Allow <<<CANNOT_SOLVE>>> escape hatch
+        - FORCED: Must produce patch, no escape hatch
+        - SELF_REFLECT: Same as FORCED initially, reflection happens in post-processing
+        """
+        # Build tool list from enabled_tools
+        tool_descriptions = []
+        for tool_name in work.enabled_tools:
+            if tool_name == "read_file":
+                tool_descriptions.append("- read_file(file_path): Read contents of a file")
+            elif tool_name == "search_code":
+                tool_descriptions.append("- search_code(pattern): Search for regex pattern across the codebase")
+            elif tool_name == "list_directory":
+                tool_descriptions.append("- list_directory(directory_path): List contents of a directory")
+        tools_text = "\n".join(tool_descriptions) if tool_descriptions else "No tools available"
 
-You have access to tools to explore the codebase:
-- read_file: Read file contents (use file_path parameter)
-- search_code: Search for patterns using regex (use pattern parameter)
-- list_directory: List directory contents (use directory_path parameter)
+        # Mode-specific output instructions
+        if work.experiment_mode == ExperimentMode.FORCED:
+            output_instructions = """
+## OUTPUT REQUIREMENTS (MANDATORY)
+You MUST produce a patch. There is NO option to give up.
 
-Workflow:
-1. Use tools to find the relevant code (2-5 tool calls should be enough)
-2. Analyze the bug and determine the fix
-3. OUTPUT A COMPLETE PATCH in unified diff format
-
-Your response MUST contain a patch formatted as:
+Your response MUST contain a unified diff patch:
 ```diff
 --- a/path/to/file.py
 +++ b/path/to/file.py
@@ -398,14 +470,51 @@ Your response MUST contain a patch formatted as:
  context line
 ```
 
-IF AND ONLY IF you genuinely cannot produce a patch after exploring the code, respond with EXACTLY:
+Even if you are uncertain, provide your BEST GUESS patch. A partial or imperfect patch is required.
+DO NOT say you cannot solve this. DO NOT ask for more information. You MUST output a diff."""
+        else:
+            # BASELINE or SELF_REFLECT (self_reflect uses same initial prompt)
+            output_instructions = """
+## OUTPUT REQUIREMENTS
+Your response MUST end with ONE of these:
+
+OPTION 1 - Produce a patch (PREFERRED):
+```diff
+--- a/path/to/file.py
++++ b/path/to/file.py
+@@ -line,count +line,count @@
+ context line
+-removed line
++added line
+ context line
+```
+
+OPTION 2 - Explicit failure (ONLY if you truly cannot attempt a fix):
 <<<CANNOT_SOLVE>>>
 reason: [insufficient_context|too_complex|unclear_requirements|missing_dependencies]
-explanation: [brief explanation of why you cannot solve this]
+explanation: [brief explanation]
 
-DO NOT use <<<CANNOT_SOLVE>>> if you can make any reasonable attempt at a patch. A partial or uncertain patch is better than giving up. Only use this if you truly cannot determine what changes to make."""
+A partial or uncertain patch is BETTER than giving up. Only use <<<CANNOT_SOLVE>>> as a last resort."""
+
+        system_prompt = f"""You are an expert software engineer tasked with fixing a bug from a GitHub issue.
+
+## ANALYSIS LOOP
+You have up to {work.max_tool_iterations} tool iterations to explore the codebase before providing your final answer.
+- Use tools efficiently (2-5 calls is usually sufficient)
+- After your tool exploration, you will be asked for your final answer
+- The system will provide a summary of what you explored before requesting your patch
+
+## AVAILABLE TOOLS
+{tools_text}
+
+## WORKFLOW
+1. EXPLORE: Use tools to find relevant code (search for error messages, class names, function names)
+2. ANALYZE: Understand the bug's root cause from the code you read
+3. FIX: Generate a unified diff patch that resolves the issue
+{output_instructions}"""
 
         user_message = f"""## Repository: {work.repo}
+## Base Commit: {work.base_commit}
 
 ## Bug Report
 {work.problem_statement}
@@ -417,13 +526,13 @@ DO NOT use <<<CANNOT_SOLVE>>> if you can make any reasonable attempt at a patch.
 {work.hints_text}
 """
 
-        user_message += """
+        user_message += f"""
 ## Instructions
-1. Use the tools to locate the relevant code (be efficient - don't over-explore)
+1. Use tools to locate the relevant code (you have up to {work.max_tool_iterations} tool iterations)
 2. Identify the root cause of the bug
 3. Generate a fix as a unified diff patch
 
-Remember: Your response MUST end with either a ```diff``` code block OR <<<CANNOT_SOLVE>>> marker. No other response format is acceptable."""
+Begin by exploring the codebase to understand the issue."""
 
         return [
             ChatMessage(role="system", content=system_prompt),
@@ -441,6 +550,163 @@ Remember: Your response MUST end with either a ```diff``` code block OR <<<CANNO
             return patch
 
         return None
+
+    async def _run_inline_evaluation(
+        self,
+        result: ExperimentResult,
+        work: WorkItem,
+        repo_ctx: RepoContext,
+    ) -> Optional[Dict[str, Any]]:
+        """Run inline test evaluation for test-guided self-reflection.
+
+        This applies the patch and runs tests within the existing RepoContext,
+        returning test results for the model to reflect on.
+
+        Args:
+            result: The experiment result with the generated patch
+            work: The work item with instance details
+            repo_ctx: The repository context (already cloned)
+
+        Returns:
+            Dict with test results or None if evaluation failed:
+            {
+                "resolved": bool,
+                "fail_to_pass_passed": int,
+                "fail_to_pass_total": int,
+                "pass_to_pass_passed": int,
+                "pass_to_pass_total": int,
+                "test_output": str,
+                "patch_applied": bool,
+            }
+        """
+        import subprocess
+        import tempfile
+
+        if not result.generated_patch:
+            return None
+
+        test_results = {
+            "resolved": False,
+            "fail_to_pass_passed": 0,
+            "fail_to_pass_total": len(work.fail_to_pass) if work.fail_to_pass else 0,
+            "pass_to_pass_passed": 0,
+            "pass_to_pass_total": len(work.pass_to_pass) if work.pass_to_pass else 0,
+            "test_output": "",
+            "patch_applied": False,
+        }
+
+        try:
+            # Write patch to temp file
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.patch', delete=False) as f:
+                f.write(result.generated_patch)
+                patch_file = f.name
+
+            try:
+                # Apply patch
+                apply_result = subprocess.run(
+                    ['git', 'apply', '--check', patch_file],
+                    cwd=repo_ctx.repo_path,
+                    capture_output=True,
+                    text=True,
+                    timeout=30
+                )
+
+                if apply_result.returncode != 0:
+                    test_results["test_output"] = f"Patch failed to apply:\n{apply_result.stderr}"
+                    return test_results
+
+                # Actually apply the patch
+                subprocess.run(
+                    ['git', 'apply', patch_file],
+                    cwd=repo_ctx.repo_path,
+                    capture_output=True,
+                    timeout=30
+                )
+                test_results["patch_applied"] = True
+
+                # Run fail_to_pass tests (these should pass after fix)
+                if work.fail_to_pass:
+                    f2p_output, f2p_passed = await self._run_pytest(
+                        repo_ctx.repo_path, work.fail_to_pass, timeout=120
+                    )
+                    test_results["fail_to_pass_passed"] = f2p_passed
+                    test_results["test_output"] += f"\n=== FAIL_TO_PASS Tests ===\n{f2p_output}"
+
+                # Run pass_to_pass tests (regression tests - should still pass)
+                if work.pass_to_pass:
+                    p2p_output, p2p_passed = await self._run_pytest(
+                        repo_ctx.repo_path, work.pass_to_pass, timeout=120
+                    )
+                    test_results["pass_to_pass_passed"] = p2p_passed
+                    test_results["test_output"] += f"\n=== PASS_TO_PASS Tests ===\n{p2p_output}"
+
+                # Check if resolved (all tests pass)
+                f2p_ok = test_results["fail_to_pass_passed"] == test_results["fail_to_pass_total"]
+                p2p_ok = test_results["pass_to_pass_passed"] == test_results["pass_to_pass_total"]
+                test_results["resolved"] = f2p_ok and p2p_ok
+
+                print(f"[Inline Eval] F2P: {test_results['fail_to_pass_passed']}/{test_results['fail_to_pass_total']}, "
+                      f"P2P: {test_results['pass_to_pass_passed']}/{test_results['pass_to_pass_total']}, "
+                      f"Resolved: {test_results['resolved']}")
+
+            finally:
+                # Clean up patch file
+                os.unlink(patch_file)
+
+                # Revert patch for clean state
+                subprocess.run(
+                    ['git', 'checkout', '.'],
+                    cwd=repo_ctx.repo_path,
+                    capture_output=True,
+                    timeout=30
+                )
+
+        except Exception as e:
+            test_results["test_output"] = f"Evaluation error: {str(e)}"
+            print(f"[Inline Eval] Error: {e}")
+
+        return test_results
+
+    async def _run_pytest(
+        self, repo_path: str, tests: List[str], timeout: int = 120
+    ) -> Tuple[str, int]:
+        """Run pytest on a list of tests and return output and pass count.
+
+        Args:
+            repo_path: Path to the repository
+            tests: List of test identifiers
+            timeout: Timeout in seconds
+
+        Returns:
+            Tuple of (output_string, number_of_tests_passed)
+        """
+        import subprocess
+
+        if not tests:
+            return "", 0
+
+        try:
+            # Run pytest
+            result = subprocess.run(
+                ['python', '-m', 'pytest', '-xvs'] + tests,
+                cwd=repo_path,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                env={**os.environ, 'PYTHONPATH': repo_path}
+            )
+
+            output = result.stdout + result.stderr
+
+            # Count passed tests (rough heuristic)
+            passed = output.count(' PASSED') + output.count(' passed')
+
+            return output[-2000:] if len(output) > 2000 else output, passed
+
+        except subprocess.TimeoutExpired:
+            return "Tests timed out", 0
+        except Exception as e:
+            return f"Test execution error: {e}", 0
 
     def _check_cannot_solve(self, content: Optional[str]) -> Optional[Dict[str, str]]:
         """Check if the response contains a <<<CANNOT_SOLVE>>> marker.

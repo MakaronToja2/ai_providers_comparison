@@ -7,7 +7,7 @@ import aiosqlite
 from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Set
 
 from ..models.benchmark import (
     Experiment,
@@ -104,6 +104,11 @@ class Storage:
                 successful_tool_calls INTEGER DEFAULT 0,
                 started_at TEXT,
                 completed_at TEXT,
+                -- Self-reflection metrics (Experiment 3)
+                reflection_prompt_tokens INTEGER,
+                reflection_completion_tokens INTEGER,
+                reflection_total_tokens INTEGER,
+                reflection_outcome TEXT,
                 FOREIGN KEY (experiment_id) REFERENCES experiments(id)
             )
         """)
@@ -215,6 +220,24 @@ class Storage:
                 print("[Migration] Added experiment_results.result_status")
             except Exception:
                 pass
+
+        # Add self-reflection columns if missing (Experiment 3)
+        reflection_cols = [
+            ("reflection_prompt_tokens", "INTEGER"),
+            ("reflection_completion_tokens", "INTEGER"),
+            ("reflection_total_tokens", "INTEGER"),
+            ("reflection_outcome", "TEXT"),
+            ("original_patch", "TEXT"),  # Stores patch before test-guided revision
+        ]
+
+        for col_name, col_type in reflection_cols:
+            if col_name not in results_column_names:
+                try:
+                    await db.execute(f"ALTER TABLE experiment_results ADD COLUMN {col_name} {col_type}")
+                    await db.commit()
+                    print(f"[Migration] Added experiment_results.{col_name}")
+                except Exception:
+                    pass
 
     async def initialize(self):
         """Initialize database schema (for backward compatibility)."""
@@ -333,8 +356,10 @@ class Storage:
                  response_time_seconds, started_at, completed_at,
                  prompt_tokens, completion_tokens, total_tokens,
                  tool_calls, tool_call_count, successful_tool_calls,
-                 context_size_chars, context_size_tokens, success, error_message)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 context_size_chars, context_size_tokens, success, error_message,
+                 reflection_prompt_tokens, reflection_completion_tokens,
+                 reflection_total_tokens, reflection_outcome, original_patch)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 result.id,
                 result.experiment_id,
@@ -358,6 +383,11 @@ class Storage:
                 result.context_size_tokens,
                 1 if result.success else 0,
                 result.error_message,
+                result.reflection_prompt_tokens,
+                result.reflection_completion_tokens,
+                result.reflection_total_tokens,
+                result.reflection_outcome,
+                result.original_patch,
             ))
             await db.commit()
 
@@ -432,6 +462,13 @@ class Storage:
         if row["raw_response"]:
             raw_response = json.loads(row["raw_response"])
 
+        # Safely get reflection columns (may not exist in old databases)
+        def safe_get(key):
+            try:
+                return row[key]
+            except (KeyError, IndexError):
+                return None
+
         return ExperimentResult(
             id=row["id"],
             experiment_id=row["experiment_id"],
@@ -455,6 +492,12 @@ class Storage:
             context_size_tokens=row["context_size_tokens"],
             success=bool(row["success"]),
             error_message=row["error_message"],
+            # Self-reflection metrics (Experiment 3)
+            reflection_prompt_tokens=safe_get("reflection_prompt_tokens"),
+            reflection_completion_tokens=safe_get("reflection_completion_tokens"),
+            reflection_total_tokens=safe_get("reflection_total_tokens"),
+            reflection_outcome=safe_get("reflection_outcome"),
+            original_patch=safe_get("original_patch"),
         )
 
     # ==================== Test Results ====================
@@ -487,6 +530,57 @@ class Storage:
                 test_result.executed_at.isoformat() if test_result.executed_at else None,
             ))
             await db.commit()
+
+    async def get_test_result_by_result_id(self, result_id: str) -> Optional[TestResult]:
+        """Get a test result by its associated result_id (to check for duplicates)."""
+        async with self._get_db() as db:
+            cursor = await db.execute(
+                "SELECT * FROM test_results WHERE result_id = ?",
+                (result_id,)
+            )
+            row = await cursor.fetchone()
+            if row:
+                return self._row_to_test_result(row)
+            return None
+
+    async def get_test_result_by_instance(self, experiment_id: str, instance_id: str) -> Optional[TestResult]:
+        """Get a test result by experiment_id and instance_id (better duplicate check)."""
+        async with self._get_db() as db:
+            cursor = await db.execute(
+                "SELECT * FROM test_results WHERE experiment_id = ? AND instance_id = ? LIMIT 1",
+                (experiment_id, instance_id)
+            )
+            row = await cursor.fetchone()
+            if row:
+                return self._row_to_test_result(row)
+            return None
+
+    async def get_evaluated_instance_ids(self, experiment_id: str) -> Set[str]:
+        """Get set of instance_ids that already have test results for this experiment."""
+        async with self._get_db() as db:
+            cursor = await db.execute(
+                "SELECT DISTINCT instance_id FROM test_results WHERE experiment_id = ?",
+                (experiment_id,)
+            )
+            rows = await cursor.fetchall()
+            return {row["instance_id"] for row in rows}
+
+    async def get_evaluated_prediction_keys(self, experiment_id: str) -> Set[str]:
+        """Get set of 'provider__model/instance_id' keys that have test results.
+
+        This is used for resume logic - each provider/model combination for each
+        instance is a separate prediction that needs evaluation.
+        """
+        async with self._get_db() as db:
+            # Join test_results with experiment_results to get provider/model info
+            cursor = await db.execute("""
+                SELECT DISTINCT er.provider, er.model, tr.instance_id
+                FROM test_results tr
+                JOIN experiment_results er ON tr.result_id = er.id
+                WHERE tr.experiment_id = ?
+            """, (experiment_id,))
+            rows = await cursor.fetchall()
+            return {f"{row['provider']}__{row['model']}/{row['instance_id']}" for row in rows}
 
     async def get_test_results_for_experiment(
         self,

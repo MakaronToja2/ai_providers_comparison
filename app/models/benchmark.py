@@ -25,6 +25,13 @@ class ResultStatus(str, Enum):
     API_ERROR = "api_error"  # Provider API error
 
 
+class ExperimentMode(str, Enum):
+    """Mode for how the experiment handles model output."""
+    BASELINE = "baseline"  # Exp 1: Allow <<<CANNOT_SOLVE>>> escape hatch
+    FORCED = "forced"  # Exp 2: Must produce patch, no escape hatch
+    SELF_REFLECT = "self_reflect"  # Exp 3: Produce patch, then self-review
+
+
 class ToolSetConfig(BaseModel):
     """Configuration for a set of tools to test."""
     name: str
@@ -41,6 +48,8 @@ class ExperimentConfig(BaseModel):
         ToolSetConfig(name="all_tools", enabled_tools=["read_file", "search_code", "list_directory"])
     ])
     split: str = "dev"  # SWE-bench split: "dev", "lite", "test", "verified"
+    experiment_mode: ExperimentMode = ExperimentMode.BASELINE  # How to handle model output
+    max_tool_iterations: int = 10  # Maximum tool calls before forcing final answer
     context_limit: Optional[int] = None  # Token limit for context
     instance_ids: Optional[List[str]] = None  # Specific instances to run
     repos: Optional[List[str]] = None  # Filter by repos
@@ -92,10 +101,19 @@ class ExperimentResult(BaseModel):
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
 
-    # Token metrics
+    # Token metrics (base generation)
     prompt_tokens: Optional[int] = None
     completion_tokens: Optional[int] = None
     total_tokens: Optional[int] = None
+
+    # Self-reflection token metrics (separate tracking for cost analysis)
+    reflection_prompt_tokens: Optional[int] = None
+    reflection_completion_tokens: Optional[int] = None
+    reflection_total_tokens: Optional[int] = None
+    reflection_outcome: Optional[str] = None  # "approved", "revised", "skipped", "failed", "tests_passed"
+
+    # Test-guided reflection tracking (Experiment 3)
+    original_patch: Optional[str] = None  # Patch before test-guided revision (for comparison)
 
     # Tool usage
     tool_calls: List[ToolCallRecord] = Field(default_factory=list)
@@ -182,6 +200,8 @@ class CreateExperimentRequest(BaseModel):
     models: Optional[Dict[str, str]] = None  # If None, use defaults
     tool_sets: Optional[List[ToolSetConfig]] = None
     split: str = "dev"  # SWE-bench split: "dev", "lite", "test", "verified"
+    experiment_mode: ExperimentMode = ExperimentMode.BASELINE  # baseline, forced, or self_reflect
+    max_tool_iterations: int = 10  # Maximum tool calls before forcing final answer
     context_limit: Optional[int] = None
     instance_ids: Optional[List[str]] = None
     repos: Optional[List[str]] = None

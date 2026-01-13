@@ -16,14 +16,43 @@ class PatchExtractor:
     DIFF_HEADER_PATTERN = re.compile(r'^(diff --git|---|\+\+\+|@@)', re.MULTILINE)
     HUNK_PATTERN = re.compile(r'^@@\s*-\d+(?:,\d+)?\s+\+\d+(?:,\d+)?\s*@@', re.MULTILINE)
 
+    def _extract_from_section(self, section: str) -> Optional[str]:
+        """Extract a patch from a specific section of text."""
+        if not section:
+            return None
+
+        # Try code blocks first
+        for pattern in [self.DIFF_BLOCK_PATTERN, self.PATCH_BLOCK_PATTERN]:
+            matches = pattern.findall(section)
+            for match in matches:
+                if self._is_valid_patch(match):
+                    return self._normalize_patch(match)
+
+        # Try generic code blocks
+        generic_pattern = re.compile(r'```\w*\s*\n(.*?)```', re.DOTALL)
+        for match in generic_pattern.findall(section):
+            if self._is_valid_patch(match):
+                return self._normalize_patch(match)
+
+        return None
+
     def extract(self, content: str) -> Optional[str]:
         """
         Extract a patch from response content.
 
-        Returns the first valid patch found, or None if no patch detected.
+        Returns the best valid patch found, or None if no patch detected.
+        For self-reflection mode, prefers revised patches over original.
         """
         if not content:
             return None
+
+        # Check if this is a self-reflection response with a revised patch
+        # If so, extract from the revised section first
+        if "<<<PATCH_REVISED>>>" in content:
+            revised_section = content.split("<<<PATCH_REVISED>>>")[-1]
+            revised_patch = self._extract_from_section(revised_section)
+            if revised_patch:
+                return revised_patch
 
         # Try explicit diff/patch code blocks first
         for pattern in [self.DIFF_BLOCK_PATTERN, self.PATCH_BLOCK_PATTERN]:

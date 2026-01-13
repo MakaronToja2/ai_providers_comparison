@@ -25,6 +25,73 @@ Comparison of AI providers (OpenAI, Anthropic, Google) on SWE-bench bug-fixing t
 
 ---
 
+## FINAL EXPERIMENT RESULTS (SWE-bench Lite - 100 instances)
+
+### Summary Table
+
+| Experiment | Total Patches | Evaluated | Resolved | Rate |
+|------------|---------------|-----------|----------|------|
+| Exp1: CANNOT_SOLVE allowed | 228/300 | 228 | 79 | **34.6%** |
+| Exp2: Forced patch | 216/300 | 212 | 55 | **25.9%** |
+| Exp3: Self-reflect | 217/300 | 217 | 28 | **12.9%** |
+
+### Results by Provider
+
+#### Experiment 1: Baseline (CANNOT_SOLVE allowed)
+| Provider | Patches | Resolved | Rate |
+|----------|---------|----------|------|
+| Anthropic (claude-haiku-4-5) | 84/100 | 39 | **46.4%** |
+| OpenAI (gpt-4.1-mini) | 100/100 | 31 | **31.0%** |
+| Google (gemini-2.5-flash-lite) | 44/100 | 9 | **20.5%** |
+
+#### Experiment 2: Forced Patch Generation
+| Provider | Patches | Resolved | Rate |
+|----------|---------|----------|------|
+| OpenAI (gpt-4.1-mini) | 100/100 | 30 | **30.0%** |
+| Anthropic (claude-haiku-4-5) | 76/100 | 22 | **28.9%** |
+| Google (gemini-2.5-flash-lite) | 40/100 | 3 | **7.5%** |
+
+#### Experiment 3: Self-Reflect with Test Results
+| Provider | Patches | Resolved | Rate |
+|----------|---------|----------|------|
+| Anthropic (claude-haiku-4-5) | 79/100 | 15 | **19.0%** |
+| Google (gemini-2.5-flash-lite) | 39/100 | 4 | **10.3%** |
+| OpenAI (gpt-4.1-mini) | 99/100 | 9 | **9.1%** |
+
+---
+
+## Key Observations
+
+### 1. Anthropic Performs Best Overall
+- In Experiment 1, Anthropic achieved **46.4%** resolve rate - significantly higher than OpenAI (31%) and Google (20.5%)
+- Anthropic is more conservative about generating patches (84/100 vs OpenAI's 100/100), but when it does generate them, they are higher quality
+- This suggests Anthropic's "honesty" about uncertainty actually correlates with better patch quality
+
+### 2. Forcing Patches Hurts Quality
+- Experiment 2 (forced) had **WORSE** results than Experiment 1 (25.9% vs 34.6%)
+- Google dropped dramatically from 20.5% to 7.5% when forced
+- Hypothesis: When models are forced to produce patches they're uncertain about, quality decreases
+- Exception: OpenAI maintained ~30% in both experiments (already at 100% patch rate)
+
+### 3. Self-Reflection Experiment Had Issues
+- Experiment 3 performed worst at **12.9%** resolve rate
+- **IMPORTANT CAVEAT**: This experiment may have been misconfigured
+- The self-reflection phase may not have received sufficient context after test results
+- All providers performed worse than their Experiment 1 baselines
+- This needs investigation - the implementation may have introduced bugs
+
+### 4. Google Struggles Most
+- Consistently lowest resolve rates across all experiments
+- Patch generation rate also lowest (40-44% vs 76-100% for others)
+- May need different prompting strategy or has fundamental limitations on this task
+
+### 5. Patch Generation vs Quality Trade-off
+- OpenAI: Always generates patches (100%), moderate quality (30-31%)
+- Anthropic: Selective about patches (76-84%), but highest quality when it does (28-46%)
+- Google: Low patch rate AND low quality - double disadvantage
+
+---
+
 ## Bugs Discovered and Fixed
 
 ### Bug 1: Content Lost During Tool Iterations
@@ -147,6 +214,136 @@ Models must produce either:
 
 ---
 
+## Prompts Used (by Experiment Mode)
+
+### Common System Prompt Structure
+All experiments use this base structure:
+```
+You are an expert software engineer tasked with fixing a bug from a GitHub issue.
+
+## ANALYSIS LOOP
+You have up to {max_tool_iterations} tool iterations to explore the codebase.
+- Use tools efficiently (2-5 calls is usually sufficient)
+- After exploration, you will be asked for your final answer
+- The system will provide a summary of what you explored
+
+## AVAILABLE TOOLS
+- read_file(file_path): Read contents of a file
+- search_code(pattern): Search for regex pattern across codebase
+- list_directory(directory_path): List contents of a directory
+
+## WORKFLOW
+1. EXPLORE: Use tools to find relevant code
+2. ANALYZE: Understand the bug's root cause
+3. FIX: Generate a unified diff patch
+```
+
+### Experiment 1: BASELINE Mode
+**Output Instructions:**
+```
+Your response MUST end with ONE of:
+
+OPTION 1 - Produce a patch (PREFERRED):
+```diff
+--- a/path/to/file.py
++++ b/path/to/file.py
+@@ -line,count +line,count @@
+...
+```
+
+OPTION 2 - Explicit failure (ONLY if you truly cannot attempt a fix):
+<<<CANNOT_SOLVE>>>
+reason: [insufficient_context|too_complex|unclear_requirements|missing_dependencies]
+explanation: [brief explanation]
+
+A partial or uncertain patch is BETTER than giving up.
+```
+
+**Forcing Prompt (when no patch produced):**
+```
+## Exploration Summary
+[List of files read, searches made, directories listed]
+
+FINAL ANSWER REQUIRED
+You MUST output ONE of:
+1. A ```diff``` patch with your fix (PREFERRED), OR
+2. <<<CANNOT_SOLVE>>> with reason (only if you truly cannot attempt a fix)
+
+Do not ask for more information. Make your best attempt NOW.
+```
+
+### Experiment 2: FORCED Mode
+**Output Instructions:**
+```
+## OUTPUT REQUIREMENTS (MANDATORY)
+You MUST produce a patch. There is NO option to give up.
+
+Your response MUST contain a unified diff patch.
+Even if you are uncertain, provide your BEST GUESS patch.
+DO NOT say you cannot solve this. You MUST output a diff.
+```
+
+**Forcing Prompt (when no patch produced):**
+```
+## Exploration Summary
+[List of files read, searches made, directories listed]
+
+FINAL ANSWER REQUIRED - NO ESCAPE OPTION
+
+Based on your exploration, you MUST now generate a patch.
+- DO NOT say you cannot solve this
+- DO NOT ask for more information
+- Provide your BEST GUESS even if uncertain
+
+Output a unified diff patch NOW.
+```
+
+### Experiment 3: SELF_REFLECT Mode
+Uses same initial prompts as BASELINE, but adds a reflection phase after patch generation.
+
+**Initial Phase:** Same as BASELINE (allows `<<<CANNOT_SOLVE>>>`)
+
+**Reflection Phase (after patch is generated):**
+```
+## SELF-REFLECTION PHASE
+
+You just generated the following patch:
+[The patch content]
+
+Now critically review your own patch:
+
+1. **Correctness**: Does the patch actually fix the reported bug?
+2. **Completeness**: Are there any edge cases or related code that also needs changes?
+3. **Side Effects**: Could this change break anything else?
+4. **Syntax**: Is the diff format correct? Are line numbers plausible?
+
+After your review, you MUST output ONE of:
+
+**If the patch is good:**
+<<<PATCH_APPROVED>>>
+[Optional brief explanation of why it's correct]
+
+**If you want to revise:**
+<<<PATCH_REVISED>>>
+```diff
+[Your revised patch here]
+```
+[Brief explanation of what you changed and why]
+
+Do NOT simply repeat the same patch. Either approve it or make meaningful improvements.
+```
+
+**Output Markers:**
+- `<<<PATCH_APPROVED>>>` - Model reviewed and approved its own patch
+- `<<<PATCH_REVISED>>>` - Model revised its patch after reflection
+
+**Metrics to Track:**
+- % of patches that were revised vs approved
+- Did revision improve patch quality?
+- Additional token cost of reflection phase
+
+---
+
 ## Recommendations for Further Investigation
 
 1. **Prompt Engineering**: Test different system prompts to improve Anthropic/Google format compliance
@@ -173,57 +370,122 @@ Models must produce either:
 
 ## Thesis Experiment Plan
 
-### Experiment 1: "Baseline with Escape Hatch" (Current)
-**Status:** Running on 300 instances (lite split)
+### Experiment 1: "Baseline with Escape Hatch"
+**Status:** COMPLETED
 
 **Configuration:**
 - Allows `<<<CANNOT_SOLVE>>>` option
 - Models can choose to not produce a patch if uncertain
 
-**Hypothesis:** OpenAI will confidently produce patches while Anthropic/Google will be more conservative and use the escape hatch more often.
+**Results:**
+- Total: 228/300 patches generated, 79 resolved (34.6%)
+- Anthropic: 84 patches, 39 resolved (46.4%) - BEST
+- OpenAI: 100 patches, 31 resolved (31.0%)
+- Google: 44 patches, 9 resolved (20.5%)
 
-**Preliminary Finding:** Confirmed - OpenAI produces patches 91-100% of time, Anthropic/Google only 40% even with forcing mechanism.
-
-**Branch:** Current main branch (checkpointed before Experiment 2)
+**Findings:**
+- Hypothesis CONFIRMED: OpenAI produces patches 100% of the time, while Anthropic (84%) and Google (44%) are more conservative
+- SURPRISING: Anthropic's conservatism correlates with HIGHER quality - 46.4% vs 31% for OpenAI
+- Being selective about when to produce patches appears to be a better strategy
 
 ---
 
 ### Experiment 2: "Forced Patch Generation"
-**Status:** Planned
+**Status:** COMPLETED
 
 **Configuration:**
 - Remove `<<<CANNOT_SOLVE>>>` option entirely
 - Models MUST produce a diff patch, no exceptions
 - More aggressive forcing prompt
 
-**Hypothesis:** When forced to always produce patches:
-1. Conservative models (Anthropic/Google) may produce lower quality patches
-2. Patch generation rate will increase to 80-90%
-3. Quality/accuracy will vary by provider
+**Results:**
+- Total: 216/300 patches generated, 55 resolved (25.9%)
+- OpenAI: 100 patches, 30 resolved (30.0%)
+- Anthropic: 76 patches, 22 resolved (28.9%)
+- Google: 40 patches, 3 resolved (7.5%)
 
-**Questions to Answer:**
-- Do conservative models produce worse patches when forced?
-- Is OpenAI's confidence justified by higher accuracy?
-- What's the quality vs quantity tradeoff?
+**Findings:**
+- Hypothesis PARTIALLY CONFIRMED: Conservative models do produce worse patches when forced
+- UNEXPECTED: Overall resolve rate DROPPED from 34.6% to 25.9%
+- Google suffered most - dropped from 20.5% to 7.5%
+- OpenAI maintained performance (~30%) since it was already generating 100% patches
+- Anthropic dropped from 46.4% to 28.9% - significant quality loss when forced
+- Forcing patches is COUNTERPRODUCTIVE - quality suffers
 
 ---
 
-### Experiment 3: "Patch Evaluation with SWE-bench Harness"
-**Status:** Planned (after Experiments 1 & 2)
+### Experiment 3: "Self-Reflection Strategy"
+**Status:** COMPLETED (with caveats)
 
 **Configuration:**
-- Run official SWE-bench evaluation harness on generated patches
-- Test if patches actually fix the bugs (pass test cases)
+- Phase 1: Model generates initial patch
+- Phase 2: Model receives test results and can revise
+- Phase 3: Model critiques and optionally revises patch
 
-**Metrics:**
-- **Resolve Rate**: % of patches that pass all tests
-- **Partial Success**: % of patches that pass some tests
-- **Regression Rate**: % of patches that break existing tests
+**Results:**
+- Total: 217/300 patches generated, 28 resolved (12.9%)
+- Anthropic: 79 patches, 15 resolved (19.0%)
+- Google: 39 patches, 4 resolved (10.3%)
+- OpenAI: 99 patches, 9 resolved (9.1%)
 
-**Questions to Answer:**
-- Which provider produces patches that actually work?
-- Is high patch generation rate correlated with accuracy?
-- Do forced patches have lower resolve rate?
+**CRITICAL ISSUES:**
+- This experiment performed WORST - significantly below baseline
+- All providers performed worse than their Experiment 1 results
+- **Possible cause**: Implementation issue - self-reflection phase may not have received proper context
+- The test results feedback may not have been integrated correctly into the reflection prompt
+- Needs investigation before drawing conclusions about self-reflection strategy
+
+**Questions Remaining:**
+- Was the implementation correct?
+- Did the model receive adequate context during reflection?
+- Should be re-run with verified implementation
+
+**Future Extension - Cross-Model Review:**
+In a future version, we can extend this to cross-model reflection:
+1. Model A generates patch (no self-reflection)
+2. Model A reviews its own patch
+3. Model B reviews Model A's patch
+4. Model C reviews Model A's patch
+5. Compare: Which model is the best "code reviewer"?
+
+This would answer: *"Which model works best as a patch reviewer/checker?"* - valuable for PR review automation use cases.
+
+---
+
+### Evaluation Methodology
+
+**How We Plan to Evaluate "Best":**
+
+1. **Patch Generation Metrics (Experiments 1 & 2)**
+   - Patch Rate: % of instances where a valid diff was produced
+   - Format Compliance: % that follow the exact output format
+   - Escape Hatch Usage: % that used `<<<CANNOT_SOLVE>>>`
+
+2. **Patch Quality Metrics (SWE-bench Harness)**
+   - Resolve Rate: % of patches that pass ALL test cases
+   - Partial Success: % that pass SOME test cases
+   - Regression Rate: % that break existing tests
+   - Exact Match: % that match the gold patch exactly
+
+3. **Cost-Effectiveness Metrics**
+   - Tokens per patch (prompt + completion)
+   - Cost per successful patch (USD)
+   - Time per patch (seconds)
+
+4. **Self-Reflection Metrics (Experiment 3)**
+   - Delta in resolve rate (before vs after reflection)
+   - Token overhead for reflection step
+   - Cases where reflection helped vs hurt
+
+**Evaluation Pipeline:**
+```
+Generated Patches --> SWE-bench Harness --> Test Results --> Analysis
+                          |
+                          v
+                   Docker containers
+                   Run actual tests
+                   Compare to gold patch
+```
 
 ---
 
@@ -263,4 +525,4 @@ Models must produce either:
 
 ---
 
-*Last updated: 2026-01-06*
+*Last updated: 2026-01-12 (Final experiment results added)*

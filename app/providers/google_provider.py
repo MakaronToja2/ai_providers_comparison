@@ -155,6 +155,9 @@ class GoogleProvider(BaseAIProvider):
         return response
     
     def _parse_response(self, raw_response: Any) -> tuple[str, Optional[TokenUsage], Optional[List[Dict[str, Any]]]]:
+        # Debug: Log what attributes the response has
+        response_attrs = [attr for attr in dir(raw_response) if not attr.startswith('_')]
+        # print(f"[Google DEBUG] Response attributes: {response_attrs}")
         # Extract text content and tool calls
         text_content = ""
         tool_calls = []
@@ -185,12 +188,17 @@ class GoogleProvider(BaseAIProvider):
                         })
         
         # Fallback to direct text access if the above doesn't work
-        if not text_content and hasattr(raw_response, 'text'):
-            text_content = raw_response.text
+        # Only try this if there are no tool calls, as .text fails with function_call parts
+        if not text_content and not tool_calls and hasattr(raw_response, 'text'):
+            try:
+                text_content = raw_response.text
+            except ValueError:
+                # Can happen if response contains non-text parts
+                pass
         
         # Google's usage information - check actual fields
         usage = None
-        if hasattr(raw_response, 'usage_metadata'):
+        if hasattr(raw_response, 'usage_metadata') and raw_response.usage_metadata is not None:
             usage_data = raw_response.usage_metadata
 
             # Try multiple attribute names (API versions vary)
@@ -222,6 +230,13 @@ class GoogleProvider(BaseAIProvider):
                 completion_tokens=completion_tokens or 0,
                 total_tokens=total_tokens or (prompt_tokens or 0) + (completion_tokens or 0)
             )
+
+            # Log successful token capture for debugging
+            if prompt_tokens or completion_tokens:
+                print(f"[Google] Token usage: prompt={prompt_tokens}, completion={completion_tokens}, total={total_tokens}")
+        else:
+            # Log when usage_metadata is missing
+            print(f"[Google] Warning: No usage_metadata in response. Has attr: {hasattr(raw_response, 'usage_metadata')}")
         
         return text_content, usage, tool_calls if tool_calls else None
     

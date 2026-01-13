@@ -50,6 +50,22 @@
             </div>
 
             <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Experiment Mode *</label>
+                <select name="experiment_mode" style="width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px;">
+                    <option value="baseline">Baseline - Allow CANNOT_SOLVE escape (Experiment 1)</option>
+                    <option value="forced">Forced - Must produce patch, no escape (Experiment 2)</option>
+                    <option value="self_reflect">Self-Reflect - Produce patch then review (Experiment 3)</option>
+                </select>
+                <small style="color: var(--gray-600);">How the model handles uncertain situations</small>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Max Tool Iterations</label>
+                <input type="number" name="max_tool_iterations" value="10" min="1" max="20" style="width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px;">
+                <small style="color: var(--gray-600);">Maximum tool calls before forcing final answer</small>
+            </div>
+
+            <div style="margin-bottom: 15px;">
                 <label style="display: block; margin-bottom: 5px; font-weight: 500;">Instance Limit</label>
                 <input type="number" name="limit" value="10" min="1" max="2294" style="width: 100%; padding: 10px; border: 1px solid var(--gray-200); border-radius: 6px;">
                 <small style="color: var(--gray-600);">Number of instances to run (leave high to run all)</small>
@@ -228,6 +244,8 @@ async function createExperiment(event) {
         description: formData.get('description') || null,
         providers: providers,
         split: formData.get('split'),
+        experiment_mode: formData.get('experiment_mode'),
+        max_tool_iterations: parseInt(formData.get('max_tool_iterations')),
         limit: parseInt(formData.get('limit')),
         max_concurrent: parseInt(formData.get('max_concurrent')),
         tool_sets: [toolSetConfig]

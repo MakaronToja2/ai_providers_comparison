@@ -1,0 +1,10 @@
+experiment,provider,model,total_instances,patches_generated,resolved,avg_tokens,avg_response_time,avg_tool_calls
+Experiment1,anthropic,claude-haiku-4-5-20251001,100,84,39,52184.48,82.94120389938354,7.01
+Experiment1,google,gemini-2.5-flash-lite,100,44,9,12633.92,31.925154962539672,1.47
+Experiment1,openai,gpt-4.1-mini,100,100,31,26130.71,86.99312732696534,6.69
+Experiment2,anthropic,claude-haiku-4-5-20251001,100,76,22,49487.04,48.98869055509567,6.77
+Experiment2,google,gemini-2.5-flash-lite,100,40,3,10103.79797979798,21.41678246498108,1.26
+Experiment2,openai,gpt-4.1-mini,100,100,30,26015.21,59.96005053281784,7.02
+Experiment3,anthropic,claude-haiku-4-5-20251001,100,79,15,51407.54639175258,37.963332607746125,6.54
+Experiment3,google,gemini-2.5-flash-lite,100,39,4,12475.92,16.468481657505034,1.6
+Experiment3,openai,gpt-4.1-mini,100,99,9,25525.48,42.24402859210968,6.91
