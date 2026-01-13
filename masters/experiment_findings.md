@@ -525,4 +525,107 @@ Generated Patches --> SWE-bench Harness --> Test Results --> Analysis
 
 ---
 
-*Last updated: 2026-01-12 (Final experiment results added)*
+---
+
+## Experiment 3b: Fixed Self-Reflection (Context Bug Fix)
+
+### The Bug Discovery
+During analysis, we discovered a critical implementation bug in Experiment 3:
+
+**Context Amnesia Bug**: When the model entered the self-reflection phase, it had lost all memory of the code it read during exploration. The conversation history (containing file contents from tool calls) was not passed to the reflection phase.
+
+**Root Cause**: In `runner.py`, the reflection call was passing `original_messages` (the initial empty prompt) instead of `response.conversation_history` (the full conversation with file contents).
+
+### The Fix Applied
+1. Added `conversation_history` field to `LLMResponse` model
+2. Modified `generate_response()` to return the full conversation
+3. Updated `do_reflection_with_test_results()` to accept and use the history
+4. Changed runner to pass `response.conversation_history` to reflection
+
+### Experiment 3b Results (Dev Split - 23 instances)
+
+**Final Evaluation Results:**
+| Provider | Patches | Evaluated | Resolved | Rate |
+|----------|---------|-----------|----------|------|
+| Anthropic (claude-haiku-4-5) | 17/23 | 17 | 2 | **11.8%** |
+| OpenAI (gpt-4.1-mini) | 22/23 | 22 | 0 | **0.0%** |
+| Google (gemini-2.5-flash-lite) | 6/23 | 6 | 1 | **16.7%** |
+| **Total** | **45/69** | **45** | **3** | **6.7%** |
+
+**Resolved Instances:**
+- `anthropic/pydicom__pydicom-1694`
+- `anthropic/sqlfluff__sqlfluff-1733`
+- `google/marshmallow-code__marshmallow-1359`
+
+**Reflection Outcomes (with fix):**
+- `revised`: 38 (84% of patches were revised based on test feedback)
+- `unstructured`: 7 (responded but didn't follow format)
+- `None`: 24 (no patch or tests passed initially)
+
+**Token Usage (shows substantial reflection activity):**
+- Anthropic: ~14,141 avg reflection tokens
+- Google: ~8,878 avg reflection tokens
+- OpenAI: ~5,477 avg reflection tokens
+
+### Key Finding
+**Self-reflection FAILED to improve results** - 6.7% resolve rate vs 34.6% baseline. Common failure modes observed in logs:
+1. **Patch Apply Failures**: "Hunk #1 FAILED at 151" - patches have incorrect line numbers
+2. **Hallucinated Diffs**: Models generate patches that don't match actual file content
+3. **Reflection Doesn't Fix Fundamentally Wrong Approach**: If the initial patch targeted wrong file/function, reflection with test output still can't fix it
+
+---
+
+## Complete Data Export
+
+All experiment data exported to `/exports/`:
+
+| File | Description |
+|------|-------------|
+| `exp1_baseline_lite.csv` | Experiment 1 detailed results (300 rows) |
+| `exp2_forced_lite.csv` | Experiment 2 detailed results (300 rows) |
+| `exp3_selfreflect_broken_lite.csv` | Experiment 3 original (broken context) results |
+| `exp3b_selfreflect_fixed_dev.csv` | Experiment 3b fixed results (dev split) |
+| `master_summary.csv` | Summary by experiment and provider |
+| `reflection_analysis.csv` | Reflection outcome breakdown |
+| `instance_comparison.csv` | Instance-level comparison across experiments |
+| `token_usage.csv` | Token usage analysis |
+
+---
+
+## Final Conclusions
+
+### 1. Provider Rankings (Based on Experiment 1 - Baseline)
+| Rank | Provider | Resolve Rate | Characteristics |
+|------|----------|--------------|-----------------|
+| 1 | **Anthropic** | **46.4%** | Conservative but high quality |
+| 2 | OpenAI | 31.0% | Always produces patches, moderate quality |
+| 3 | Google | 20.5% | Lowest patch rate and quality |
+
+### 2. Key Findings Summary
+
+**A. "Honest" models perform better**: Anthropic's conservative approach (only generating patches when confident) correlates with higher quality.
+
+**B. Forcing patches hurts quality**: Experiment 2 showed forcing models to always produce patches reduced overall quality from 34.6% to 25.9%.
+
+**C. Self-reflection did not help**: Both broken and fixed implementations showed lower resolve rates than baseline:
+- Baseline (Exp1): 34.6%
+- Self-reflect broken (Exp3): 12.9%
+- Self-reflect fixed (Exp3b): **6.7%** (3/45 resolved on dev split)
+
+**D. The fundamental problem with self-reflection**:
+- If the initial patch is fundamentally wrong (wrong file, wrong approach), seeing test failures doesn't provide enough signal
+- The model needs to understand WHY it failed, not just THAT it failed
+- Test output alone doesn't guide meaningful revision
+- Patches often fail to apply due to incorrect line numbers in diffs
+
+### 3. Recommendations for Future Work
+
+1. **Better patch formatting training**: Models struggle with correct line numbers in unified diffs
+2. **Multi-turn debugging**: Instead of single reflection, allow iterative debugging
+3. **Show failing test source code**: Provide the actual test that failed, not just error output
+4. **Use stronger models**: Haiku/mini models may lack capability for complex debugging
+5. **Chain-of-thought for diff generation**: Explicit reasoning about line numbers before generating patches
+
+---
+
+*Last updated: 2026-01-13 (Final results - Experiment 3b evaluated: 3/45 resolved = 6.7%)*
