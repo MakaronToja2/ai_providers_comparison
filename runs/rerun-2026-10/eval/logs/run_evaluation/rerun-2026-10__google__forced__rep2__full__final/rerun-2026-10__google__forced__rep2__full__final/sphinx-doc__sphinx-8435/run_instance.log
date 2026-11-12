@@ -1,0 +1,88 @@
+2026-10-10 18:34:39,222 - INFO - Creating container for sphinx-doc__sphinx-8435...
+2026-10-10 18:34:47,628 - INFO - Container for sphinx-doc__sphinx-8435 created: 3650444fb89a29e62da3d578f074e0869af690b47a5720c727a896f8f1723c97
+2026-10-10 18:34:52,626 - INFO - Container for sphinx-doc__sphinx-8435 started: 3650444fb89a29e62da3d578f074e0869af690b47a5720c727a896f8f1723c97
+2026-10-10 18:34:52,627 - INFO - Intermediate patch for sphinx-doc__sphinx-8435 written to logs/run_evaluation/rerun-2026-10__google__forced__rep2__full__final/rerun-2026-10__google__forced__rep2__full__final/sphinx-doc__sphinx-8435/patch.diff, now applying to container...
+2026-10-10 18:34:52,735 - INFO - >>>>> Applied Patch:
+Checking patch sphinx/ext/autodoc/importer.py...
+warning: sphinx/ext/autodoc/importer.py has type 100755, expected 100644
+Applied patch sphinx/ext/autodoc/importer.py cleanly.
+
+2026-10-10 18:34:52,941 - INFO - Git diff before:
+diff --git a/sphinx/ext/autodoc/importer.py b/sphinx/ext/autodoc/importer.py
+index adfa6d05d..bf1e61efb 100755
+--- a/sphinx/ext/autodoc/importer.py
++++ b/sphinx/ext/autodoc/importer.py
+@@ -229,18 +229,29 @@ def get_object_members(subject: Any, objpath: List[str], attrgetter: Callable,
+         for name in _getannotations(cls):
+             name = unmangle(cls, name)
+             if name and name not in members:
+-                members[name] = Attribute(name, i == 0, INSTANCEATTR)
++                # Resolve type aliases for annotated attributes
++                type_hint = _getannotations(cls)[name]
++                resolved_type = resolve_type_hint(type_hint, subject, type_aliases=analyzer.config.autodoc_type_aliases)
++                members[name] = Attribute(name, i == 0, resolved_type)
+ 
+     if analyzer:
+         # append instance attributes (cf. self.attr1) if analyzer knows
+         namespace = '.'.join(objpath)
+         for (ns, name) in analyzer.find_attr_docs():
+             if namespace == ns and name not in members:
++                # For instance attributes found via analyzer, we don't have direct type info here.
++                # A more robust solution might involve deeper introspection or relying on
++                # ModuleAnalyzer to provide type information if possible.
++                # For now, we'll use INSTANCEATTR as a placeholder, but ideally,
++                # we'd try to resolve the type if available.
++                # A potential improvement would be to pass type_aliases to ModuleAnalyzer
++                # or have it return type information.
+                 members[name] = Attribute(name, True, INSTANCEATTR)
+ 
+     return members
+ 
+ 
++from sphinx.util.typing import resolve_type_hint
+ from sphinx.ext.autodoc.mock import (MockFinder, MockLoader, _MockModule, _MockObject,  # NOQA
+                                      mock)
+2026-10-10 18:34:52,941 - INFO - Eval script for sphinx-doc__sphinx-8435 written to logs/run_evaluation/rerun-2026-10__google__forced__rep2__full__final/rerun-2026-10__google__forced__rep2__full__final/sphinx-doc__sphinx-8435/eval.sh; copying to container...
+2026-10-10 18:34:57,585 - INFO - Test runtime: 4.58 seconds
+2026-10-10 18:34:57,586 - INFO - Test output for sphinx-doc__sphinx-8435 written to logs/run_evaluation/rerun-2026-10__google__forced__rep2__full__final/rerun-2026-10__google__forced__rep2__full__final/sphinx-doc__sphinx-8435/test_output.txt
+2026-10-10 18:34:57,627 - INFO - Git diff after:
+diff --git a/sphinx/ext/autodoc/importer.py b/sphinx/ext/autodoc/importer.py
+index adfa6d05d..bf1e61efb 100755
+--- a/sphinx/ext/autodoc/importer.py
++++ b/sphinx/ext/autodoc/importer.py
+@@ -229,18 +229,29 @@ def get_object_members(subject: Any, objpath: List[str], attrgetter: Callable,
+         for name in _getannotations(cls):
+             name = unmangle(cls, name)
+             if name and name not in members:
+-                members[name] = Attribute(name, i == 0, INSTANCEATTR)
++                # Resolve type aliases for annotated attributes
++                type_hint = _getannotations(cls)[name]
++                resolved_type = resolve_type_hint(type_hint, subject, type_aliases=analyzer.config.autodoc_type_aliases)
++                members[name] = Attribute(name, i == 0, resolved_type)
+ 
+     if analyzer:
+         # append instance attributes (cf. self.attr1) if analyzer knows
+         namespace = '.'.join(objpath)
+         for (ns, name) in analyzer.find_attr_docs():
+             if namespace == ns and name not in members:
++                # For instance attributes found via analyzer, we don't have direct type info here.
++                # A more robust solution might involve deeper introspection or relying on
++                # ModuleAnalyzer to provide type information if possible.
++                # For now, we'll use INSTANCEATTR as a placeholder, but ideally,
++                # we'd try to resolve the type if available.
++                # A potential improvement would be to pass type_aliases to ModuleAnalyzer
++                # or have it return type information.
+                 members[name] = Attribute(name, True, INSTANCEATTR)
+ 
+     return members
+ 
+ 
++from sphinx.util.typing import resolve_type_hint
+ from sphinx.ext.autodoc.mock import (MockFinder, MockLoader, _MockModule, _MockObject,  # NOQA
+                                      mock)
+2026-10-10 18:34:57,627 - INFO - Grading answer for sphinx-doc__sphinx-8435...
+2026-10-10 18:34:57,629 - INFO - report: {'sphinx-doc__sphinx-8435': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['tests/test_ext_autodoc_configs.py::test_autodoc_type_aliases']}, 'PASS_TO_PASS': {'success': [], 'failure': ['tests/test_ext_autodoc_configs.py::test_autoclass_content_class', 'tests/test_ext_autodoc_configs.py::test_autoclass_content_init', 'tests/test_ext_autodoc_configs.py::test_autoclass_content_both', 'tests/test_ext_autodoc_configs.py::test_autodoc_inherit_docstrings', 'tests/test_ext_autodoc_configs.py::test_autodoc_docstring_signature', 'tests/test_ext_autodoc_configs.py::test_autoclass_content_and_docstring_signature_class', 'tests/test_ext_autodoc_configs.py::test_autoclass_content_and_docstring_signature_init', 'tests/test_ext_autodoc_configs.py::test_autoclass_content_and_docstring_signature_both', 'tests/test_ext_autodoc_configs.py::test_mocked_module_imports', 'tests/test_ext_autodoc_configs.py::test_autodoc_typehints_signature', 'tests/test_ext_autodoc_configs.py::test_autodoc_typehints_none', 'tests/test_ext_autodoc_configs.py::test_autodoc_typehints_none_for_overload', 'tests/test_ext_autodoc_configs.py::test_autodoc_typehints_description', 'tests/test_ext_autodoc_configs.py::test_autodoc_typehints_description_for_invalid_node', 'tests/test_ext_autodoc_configs.py::test_autodoc_default_options', 'tests/test_ext_autodoc_configs.py::test_autodoc_default_options_with_values']}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sphinx-doc__sphinx-8435: resolved: False
+2026-10-10 18:34:57,629 - INFO - Attempting to stop container sweb.eval.sphinx-doc__sphinx-8435.rerun-2026-10__google__forced__rep2__full__final...
+2026-10-10 18:35:19,550 - INFO - Attempting to remove container sweb.eval.sphinx-doc__sphinx-8435.rerun-2026-10__google__forced__rep2__full__final...
+2026-10-10 18:35:20,623 - INFO - Container sweb.eval.sphinx-doc__sphinx-8435.rerun-2026-10__google__forced__rep2__full__final removed.

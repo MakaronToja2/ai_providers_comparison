@@ -1,0 +1,22 @@
+diff --git a/sympy/simplify/trigsimp.py b/sympy/simplify/trigsimp.py
+index 8ba346adbe..0f8be77299 100644
+--- a/sympy/simplify/trigsimp.py
++++ b/sympy/simplify/trigsimp.py
+@@ -1002,6 +1002,17 @@ def __trigsimp(expr, deep=False):
+             for pattern, result in matchers_add:
+                 if not _dotrig(expr, pattern):
+                     continue
++                res = expr.match(pattern)
++                if res is not None:
++                    # if "d" contains any trig or hyperbolic funcs with
++                    # argument "a" or "b" then skip the simplification;
++                    # this isn't perfect -- see tests
++                    if not (a in res and b in res) or any(
++                        w.args[0] in (res[a], res[b]) for w in res[d].atoms(
++                            TrigonometricFunction, HyperbolicFunction)):
++                        continue
++                    expr = result.subs(res)
++                    break
+                 expr = TR10i(expr)
+                 if expr.has(HyperbolicFunction):
+                     res = expr.match(pattern)

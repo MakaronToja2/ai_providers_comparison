@@ -1,0 +1,44 @@
+2026-10-10 12:47:48,949 - INFO - Creating container for django__django-13447...
+2026-10-10 12:47:49,321 - INFO - Container for django__django-13447 created: 5e1a83aa45af73c8296c2c3aa6ad97c8976e4d9c05426b3c6afaa86a17f49784
+2026-10-10 12:47:49,709 - INFO - Container for django__django-13447 started: 5e1a83aa45af73c8296c2c3aa6ad97c8976e4d9c05426b3c6afaa86a17f49784
+2026-10-10 12:47:49,710 - INFO - Intermediate patch for django__django-13447 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/django__django-13447/patch.diff, now applying to container...
+2026-10-10 12:47:49,881 - INFO - >>>>> Applied Patch:
+Checking patch django/contrib/admin/sites.py...
+warning: django/contrib/admin/sites.py has type 100755, expected 100644
+Applied patch django/contrib/admin/sites.py cleanly.
+
+2026-10-10 12:47:50,547 - INFO - Git diff before:
+diff --git a/django/contrib/admin/sites.py b/django/contrib/admin/sites.py
+index 837dabfea8..74a7eb1054 100755
+--- a/django/contrib/admin/sites.py
++++ b/django/contrib/admin/sites.py
+@@ -461,6 +461,7 @@ class AdminSite:
+ 
+             info = (app_label, model._meta.model_name)
+             model_dict = {
++                'model': model,  # Add the model class here
+                 'name': capfirst(model._meta.verbose_name_plural),
+                 'object_name': model._meta.object_name,
+                 'perms': perms,
+2026-10-10 12:47:50,547 - INFO - Eval script for django__django-13447 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/django__django-13447/eval.sh; copying to container...
+2026-10-10 12:47:57,024 - INFO - Test runtime: 6.41 seconds
+2026-10-10 12:47:57,026 - INFO - Test output for django__django-13447 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/django__django-13447/test_output.txt
+2026-10-10 12:47:57,092 - INFO - Git diff after:
+diff --git a/django/contrib/admin/sites.py b/django/contrib/admin/sites.py
+index 837dabfea8..74a7eb1054 100755
+--- a/django/contrib/admin/sites.py
++++ b/django/contrib/admin/sites.py
+@@ -461,6 +461,7 @@ class AdminSite:
+ 
+             info = (app_label, model._meta.model_name)
+             model_dict = {
++                'model': model,  # Add the model class here
+                 'name': capfirst(model._meta.verbose_name_plural),
+                 'object_name': model._meta.object_name,
+                 'perms': perms,
+2026-10-10 12:47:57,092 - INFO - Grading answer for django__django-13447...
+2026-10-10 12:47:57,097 - INFO - report: {'django__django-13447': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_available_apps (admin_views.test_adminsite.SiteEachContextTest)'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_add_action (admin_views.test_adminsite.SiteActionsTests)', 'test_disable_action (admin_views.test_adminsite.SiteActionsTests)', "AdminSite.get_action() returns an action even if it's disabled.", 'test_each_context (admin_views.test_adminsite.SiteEachContextTest)', 'test_each_context_site_url_with_script_name (admin_views.test_adminsite.SiteEachContextTest)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-13447: resolved: True
+2026-10-10 12:47:57,098 - INFO - Attempting to stop container sweb.eval.django__django-13447.rerun-2026-10__google__self_reflect__rep2__full__final...
+2026-10-10 12:48:15,185 - INFO - Attempting to remove container sweb.eval.django__django-13447.rerun-2026-10__google__self_reflect__rep2__full__final...
+2026-10-10 12:48:15,240 - INFO - Container sweb.eval.django__django-13447.rerun-2026-10__google__self_reflect__rep2__full__final removed.

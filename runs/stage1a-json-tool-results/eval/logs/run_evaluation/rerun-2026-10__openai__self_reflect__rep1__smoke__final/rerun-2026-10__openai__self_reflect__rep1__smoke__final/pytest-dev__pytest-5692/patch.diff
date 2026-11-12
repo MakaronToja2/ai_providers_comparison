@@ -1,0 +1,46 @@
+--- a/src/_pytest/junitxml.py
++++ b/src/_pytest/junitxml.py
+@@ class _NodeReporter:
+-    def __init__(self, nodeid, xml):
+-        self.id = nodeid
+-        self.xml = xml
+-        self.add_stats = self.xml.add_stats
+-        self.family = self.xml.family
+-        self.duration = 0
+-        self.properties = []
+-        self.nodes = []
+-        self.testcase = None
+-        self.attrs = {}
+-
+-        # Add hostname and timestamp attributes to the root testsuite element
+-        if nodeid == "":
+-            try:
+-                import socket
+-                hostname = socket.gethostname()
+-            except Exception:
+-                hostname = "unknown"
+-            timestamp = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime())
+-            self.attrs["hostname"] = hostname
+-            self.attrs["timestamp"] = timestamp
++    def __init__(self, nodeid, xml):
++        self.id = nodeid
++        self.xml = xml
++        self.add_stats = self.xml.add_stats
++        self.family = self.xml.family
++        self.duration = 0
++        self.properties = []
++        self.nodes = []
++        self.testcase = None
++        self.attrs = {}
++
++        # Add hostname and timestamp attributes to the root testsuite element
++        # The root testsuite is identified by nodeid being None or empty string
++        if nodeid is None or nodeid == "":
++            try:
++                import socket
++                hostname = socket.gethostname()
++            except Exception:
++                hostname = "unknown"
++            timestamp = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime())
++            self.attrs["hostname"] = hostname
++            self.attrs["timestamp"] = timestamp

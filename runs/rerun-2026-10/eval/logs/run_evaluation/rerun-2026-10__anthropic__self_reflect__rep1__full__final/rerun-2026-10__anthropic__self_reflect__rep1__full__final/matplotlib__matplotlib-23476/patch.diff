@@ -1,0 +1,17 @@
+diff --git a/lib/matplotlib/figure.py b/lib/matplotlib/figure.py
+index c55864243a..b02bfe8edb 100644
+--- a/lib/matplotlib/figure.py
++++ b/lib/matplotlib/figure.py
+@@ -3044,7 +3044,12 @@ class Figure(FigureBase):
+         self.__dict__ = state
+ 
+         # re-initialise some of the unstored state information
++        # Preserve the original DPI before creating a new canvas, as the canvas
++        # initialization will set _original_dpi to the current DPI value, which
++        # may have been scaled by device_pixel_ratio on high-DPI displays.
++        original_dpi = getattr(self, '_original_dpi', self.dpi)
+         FigureCanvasBase(self)  # Set self.canvas.
++        self._original_dpi = original_dpi
+ 
+         if restore_to_pylab:
+             # lazy import to avoid circularity

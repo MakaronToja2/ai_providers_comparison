@@ -1,0 +1,52 @@
+diff --git a/sklearn/utils/_pprint.py b/sklearn/utils/_pprint.py
+index b8686dba5b0..997cf34352a 100644
+--- a/sklearn/utils/_pprint.py
++++ b/sklearn/utils/_pprint.py
+@@ -70,6 +70,7 @@ from collections import OrderedDict
+ from ..base import BaseEstimator
+ from .._config import get_config
+ from . import is_scalar_nan
++import numpy as np
+ 
+ 
+ class KeyValTuple(tuple):
+@@ -93,10 +94,36 @@ def _changed_params(estimator):
+     init_func = getattr(estimator.__init__, 'deprecated_original',
+                         estimator.__init__)
+     init_params = signature(init_func).parameters
+-    init_params = {name: param.default for name, param in init_params.items()}
++    init_defaults = {name: param.default for name, param in init_params.items()}
++
+     for k, v in params.items():
+-        if (v != init_params[k] and
+-                not (is_scalar_nan(init_params[k]) and is_scalar_nan(v))):
++        default_v = init_defaults.get(k)
++
++        # Check if v is different from default_v
++        are_different = False
++        if isinstance(v, np.ndarray):
++            if isinstance(default_v, np.ndarray):
++                # Both are arrays, compare element-wise
++                if not np.array_equal(v, default_v):
++                    are_different = True
++            else:
++                # v is array, default_v is not.
++                # Check if default_v is NaN and v is an array of NaNs.
++                if is_scalar_nan(default_v):
++                    # default_v is a scalar NaN. Check if v is an array of NaNs.
++                    if not np.all(np.isnan(v)):
++                        are_different = True
++                else:
++                    # default_v is not a scalar NaN. Since v is an array and
++                    # default_v is not, they are different.
++                    are_different = True
++        else:
++            # v is not an array. Use original comparison logic.
++            if (v != default_v and
++                    not (is_scalar_nan(default_v) and is_scalar_nan(v))):
++                are_different = True
++
++        if are_different:
+             filtered_params[k] = v
+     return filtered_params
+ 

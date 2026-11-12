@@ -1,0 +1,96 @@
+diff --git a/src/_pytest/assertion/rewrite.py b/src/_pytest/assertion/rewrite.py
+index 2903b8995..fb7e8b70b 100644
+--- a/src/_pytest/assertion/rewrite.py
++++ b/src/_pytest/assertion/rewrite.py
+@@ -964,10 +964,20 @@ warn_explicit(
+         res = self.assign(ast.BinOp(left_expr, binop.op, right_expr))
+         return res, explanation
+ 
++    def _is_all_or_any(self, call):
++        """Check if a call is to all() or any() builtin."""
++        if isinstance(call.func, ast.Name):
++            return call.func.id in ("all", "any")
++        return False
++
+     def visit_Call_35(self, call):
+         """
+         visit `ast.Call` nodes on Python3.5 and after
+         """
++        # Special handling for all() and any() calls
++        if self._is_all_or_any(call) and len(call.args) == 1:
++            return self._unroll_all_any(call)
++        
+         new_func, func_expl = self.visit(call.func)
+         arg_expls = []
+         new_args = []
+@@ -991,6 +1001,70 @@ warn_explicit(
+         outer_expl = "%s\n{%s = %s\n}" % (res_expl, res_expl, expl)
+         return res, outer_expl
+ 
++    def _unroll_all_any(self, call):
++        """Unroll all() or any() calls to provide better error messages."""
++        is_any = call.func.id == "any"
++        arg = call.args[0]
++        
++        # Create a variable to hold the iterable
++        iter_var = self.variable()
++        iter_expr = self.assign(arg)
++        
++        # Create a variable for the loop variable
++        loop_var = self.variable()
++        
++        # Create a variable for the result
++        result_var = self.variable()
++        
++        # Initialize result: True for all(), False for any()
++        init_value = _NameConstant(not is_any)
++        self.statements.append(
++            ast.Assign([ast.Name(result_var, ast.Store())], init_value)
++        )
++        
++        # Create the loop body
++        loop_body = []
++        
++        # Get the element from the iterator
++        loop_item = ast.Name(loop_var, ast.Load())
++        
++        # Visit the loop item to get explanation
++        item_res, item_expl = self.visit(loop_item)
++        
++        # For all(): if not item, set result to False and break
++        # For any(): if item, set result to True and break
++        if is_any:
++            test_expr = item_res
++        else:
++            test_expr = ast.UnaryOp(ast.Not(), item_res)
++        
++        # Create assignment in loop body
++        loop_body.append(
++            ast.Assign([ast.Name(result_var, ast.Store())], 
++                      _NameConstant(is_any))
++        )
++        
++        # Add break statement
++        loop_body.append(ast.Break())
++        
++        # Create the if statement for the loop body
++        if_stmt = ast.If(test_expr, loop_body, [])
++        
++        # Create a for loop that iterates through the iterable
++        for_loop = ast.For(
++            ast.Name(loop_var, ast.Store()),
++            iter_expr,
++            [if_stmt],
++            []
++        )
++        
++        self.statements.append(for_loop)
++        
++        # Return the result variable with explanation
++        res = ast.Name(result_var, ast.Load())
++        expl = call.func.id + "(...)"
++        return res, self.explanation_param(self.display(res))
++
+     def visit_Starred(self, starred):
+         # From Python 3.5, a Starred node can appear in a function call
+         res, expl = self.visit(starred.value)

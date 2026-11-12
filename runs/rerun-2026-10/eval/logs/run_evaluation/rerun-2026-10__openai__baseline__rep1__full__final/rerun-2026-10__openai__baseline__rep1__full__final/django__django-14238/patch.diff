@@ -1,0 +1,27 @@
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 0f53d9c30b..77a7b72730 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -2518,13 +2518,20 @@ class AutoFieldMeta(type):
+ 
+     @property
+     def _subclasses(self):
+-        return (BigAutoField, SmallAutoField)
++        # Include subclasses of BigAutoField and SmallAutoField, not just them directly
++        subclasses = [BigAutoField, SmallAutoField]
++        for cls in [BigAutoField, SmallAutoField]:
++            subclasses.extend(cls.__subclasses__())
++        return tuple(subclasses)
+ 
+     def __instancecheck__(self, instance):
+         return isinstance(instance, self._subclasses) or super().__instancecheck__(instance)
+ 
+     def __subclasscheck__(self, subclass):
+-        return subclass in self._subclasses or super().__subclasscheck__(subclass)
++        # Check if subclass is subclass of any in _subclasses, not just direct membership
++        if any(issubclass(subclass, cls) for cls in self._subclasses):
++            return True
++        return super().__subclasscheck__(subclass)
+ 
+ 
+ class AutoField(AutoFieldMixin, IntegerField, metaclass=AutoFieldMeta):

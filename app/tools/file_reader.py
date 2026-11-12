@@ -54,6 +54,13 @@ class FileReaderTool(BaseTool):
             "required": ["file_path"]
         }
     
+    def render_result(self, data: Any) -> str:
+        """Header with the line range, then the file text exactly as it is on disk."""
+        header = f"File: {data['file_path']}\nLines {data['start_line']}-{data['end_line']} of {data['total_lines']}"
+        if data.get("truncated"):
+            header += " (truncated: more lines follow)"
+        return f"{header}\n\n{data['content']}"
+
     async def execute(self, file_path: str, start_line: Optional[int] = None,
                      end_line: Optional[int] = None, max_lines: int = 500, **kwargs) -> ToolResult:
         """Read file content with line range support and safety checks"""
@@ -174,6 +181,13 @@ class DirectoryListTool(BaseTool):
             "required": []
         }
     
+    def render_result(self, data: Any) -> str:
+        """One entry per line, directories first (as returned)."""
+        lines = [f"Directory: {data['directory']}", f"Items: {data['total_items']}", ""]
+        for item in data["items"]:
+            lines.append(f"[dir]  {item['path']}/" if item["type"] == "directory" else f"[file] {item['path']}")
+        return "\n".join(lines)
+
     async def execute(self, directory_path: str = ".", show_hidden: bool = False,
                      file_types: Optional[List[str]] = None, **kwargs) -> ToolResult:
         """List directory contents with filtering"""

@@ -1,0 +1,41 @@
+diff --git a/sympy/core/expr.py b/sympy/core/expr.py
+index 24d89897f7..d84745f9e6 100644
+--- a/sympy/core/expr.py
++++ b/sympy/core/expr.py
+@@ -120,12 +120,31 @@ def _hashable_content(self):
+         return self._args
+ 
+     def __eq__(self, other):
+-        try:
+-            other = sympify(other)
+-            if not isinstance(other, Expr):
++        # Avoid sympify on strings or objects that have __repr__ that looks like code
++        # because that can cause dangerous eval calls.
++        # Instead, only sympify if other is already an Expr or a safe type.
++        from sympy.core.expr import Expr
++        from sympy.core.sympify import SympifyError
++
++        if isinstance(other, Expr):
++            # safe to compare directly
++            pass
++        else:
++            # If other is a string or has a __repr__ that looks like code, do not sympify.
++            # Only sympify if other is a basic Python numeric type or similar safe types.
++            safe_types = (int, float, complex, bool)
++            if isinstance(other, str):
++                # Strings should not be sympified here to avoid eval of arbitrary code
+                 return False
+-        except (SympifyError, SyntaxError):
+-            return False
++            if not isinstance(other, safe_types):
++                try:
++                    # Try sympify but catch exceptions
++                    other = sympify(other)
++                    if not isinstance(other, Expr):
++                        return False
++                except (SympifyError, SyntaxError):
++                    return False
++
+         # check for pure number expr
+         if  not (self.is_Number and other.is_Number) and (
+                 type(self) != type(other)):

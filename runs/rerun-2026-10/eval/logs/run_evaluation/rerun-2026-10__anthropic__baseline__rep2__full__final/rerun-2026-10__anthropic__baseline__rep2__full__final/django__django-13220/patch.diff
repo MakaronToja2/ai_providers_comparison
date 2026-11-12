@@ -1,0 +1,42 @@
+diff --git a/django/core/exceptions.py b/django/core/exceptions.py
+index dc084b8692..1716f5f964 100644
+--- a/django/core/exceptions.py
++++ b/django/core/exceptions.py
+@@ -182,6 +182,37 @@ class ValidationError(Exception):
+     def __repr__(self):
+         return 'ValidationError(%s)' % self
+ 
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++        if hasattr(self, 'error_dict') and hasattr(other, 'error_dict'):
++            return self.error_dict == other.error_dict
++        if hasattr(self, 'error_dict') or hasattr(other, 'error_dict'):
++            return False
++        # Compare error_list in a way that's independent of order
++        return sorted(self.error_list, key=self._error_key) == sorted(
++            other.error_list, key=self._error_key
++        )
++
++    def __hash__(self):
++        if hasattr(self, 'error_dict'):
++            # For error_dict, create a hash from sorted items
++            return hash(tuple(sorted(self.error_dict.items())))
++        # For error_list, create a hash from sorted errors
++        return hash(tuple(sorted(self.error_list, key=self._error_key)))
++
++    @staticmethod
++    def _error_key(error):
++        """
++        Create a sort key for a ValidationError instance.
++        This allows comparison independent of order.
++        """
++        if hasattr(error, 'message'):
++            # For simple errors, use message, code, and params
++            params_key = tuple(sorted(error.params.items())) if error.params else ()
++            return (error.message, error.code, params_key)
++        return str(error)
++
+ 
+ class EmptyResultSet(Exception):
+     """A database query predicate is impossible."""

@@ -1,0 +1,32 @@
+diff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py
+index 78c4f47b5b..6922ae45ab 100644
+--- a/django/db/models/sql/query.py
++++ b/django/db/models/sql/query.py
+@@ -1926,6 +1926,11 @@ class Query(BaseExpression):
+         return data. If the database backend supports grouping by the
+         primary key, and the query would be equivalent, the optimization
+         will be made automatically.
++
++        Fix for annotation with Subquery returning a single column:
++        If the annotation is a Subquery and is used in group_by, use the
++        Subquery expression itself instead of the alias to avoid ambiguous
++        column references in GROUP BY.
+         """
+         group_by = list(self.select)
+         if self.annotation_select:
+@@ -1943,6 +1948,15 @@ class Query(BaseExpression):
+                     if not allow_aliases:
+                         alias = None
+                     group_by_cols = annotation.get_group_by_cols(alias=alias)
++
++                # Patch: Replace alias with expression for Subquery to avoid ambiguity
++                if isinstance(annotation, Subquery):
++                    # Only replace if the subquery returns a single column
++                    if annotation.get_source_expressions():
++                        # Defensive: check if subquery returns one column
++                        # We assume single column subquery for this fix
++                        group_by_cols = [annotation]
++
+                 group_by.extend(group_by_cols)
+         self.group_by = tuple(group_by)
+ 

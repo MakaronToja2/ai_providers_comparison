@@ -1,0 +1,7 @@
+model,mode,resolved,tests_failed,edit_not_applicable,no_answer
+Claude Haiku 4.5,baseline,3.0,2.0,0.0,0.0
+Claude Haiku 4.5,forced,3.0,2.0,0.0,0.0
+Claude Haiku 4.5,self_reflect,2.0,2.0,1.0,0.0
+Gemini 2.5 Flash-Lite,baseline,2.0,1.0,1.0,1.0
+Gemini 2.5 Flash-Lite,forced,1.0,1.0,2.0,1.0
+Gemini 2.5 Flash-Lite,self_reflect,2.0,0.0,1.0,2.0

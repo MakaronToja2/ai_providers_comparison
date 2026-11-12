@@ -1,0 +1,31 @@
+diff --git a/sympy/printing/pretty/pretty.py b/sympy/printing/pretty/pretty.py
+index 0545797d5f..3079adde93 100644
+--- a/sympy/printing/pretty/pretty.py
++++ b/sympy/printing/pretty/pretty.py
+@@ -825,12 +825,21 @@ def _print_MatAdd(self, expr):
+             if s is None:
+                 s = pform     # First element
+             else:
+-                if S(item.args[0]).is_negative:
+-                    s = prettyForm(*stringPict.next(s, ' '))
+-                    pform = self._print(item)
++                # Check if the term is negative.
++                # If item is a negative number or a negative multiple, print ' - '.
++                # Otherwise, print ' + '.
++                # We avoid using S(item.args[0]) as it can lead to parsing errors.
++                # Instead, we check the term itself.
++                if item.is_negative:
++                    sign = ' - '
++                    # Print the absolute value of the term
++                    term_to_print = self._print(-item)
+                 else:
+-                    s = prettyForm(*stringPict.next(s, ' + '))
+-                s = prettyForm(*stringPict.next(s, pform))
++                    sign = ' + '
++                    term_to_print = pform # This is already self._print(item)
++
++                s = prettyForm(*stringPict.next(s, sign))
++                s = prettyForm(*stringPict.next(s, term_to_print))
+ 
+         return s
+ 

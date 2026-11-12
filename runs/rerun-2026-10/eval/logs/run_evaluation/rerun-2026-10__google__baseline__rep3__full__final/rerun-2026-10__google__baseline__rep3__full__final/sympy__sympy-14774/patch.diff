@@ -1,0 +1,27 @@
+diff --git a/sympy/printing/latex.py b/sympy/printing/latex.py
+index a3ead157c1..d85b9454f2 100644
+--- a/sympy/printing/latex.py
++++ b/sympy/printing/latex.py
+@@ -740,14 +740,20 @@ def _print_Function(self, expr, exp=None):
+                 len(args) == 1 and \
+                 not self._needs_function_brackets(expr.args[0])
+ 
+-            inv_trig_table = ["asin", "acos", "atan", "acot"]
++            inv_trig_table = ["asin", "acos", "atan", "acsc", "asec", "acot"]
+ 
+             # If the function is an inverse trig function, handle the style
+             if func in inv_trig_table:
+                 if inv_trig_style == "abbreviated":
+                     func = func
+                 elif inv_trig_style == "full":
+-                    func = "arc" + func[1:]
++                    # Handle acsc and asec specifically as they don't follow the arc+func[1:] pattern
++                    if func == "acsc":
++                        func = "arccsc"
++                    elif func == "asec":
++                        func = "arcsec"
++                    else:
++                        func = "arc" + func[1:]
+                 elif inv_trig_style == "power":
+                     func = func[1:]
+                     inv_trig_power_case = True

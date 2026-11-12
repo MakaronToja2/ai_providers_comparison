@@ -1,0 +1,52 @@
+diff --git a/src/_pytest/mark/evaluate.py b/src/_pytest/mark/evaluate.py
+index 759191668..5f6653df6 100644
+--- a/src/_pytest/mark/evaluate.py
++++ b/src/_pytest/mark/evaluate.py
+@@ -19,16 +19,10 @@ evalcache_key = StoreKey[Dict[str, Any]]()
+ 
+ 
+ def cached_eval(config: Config, expr: str, d: Dict[str, object]) -> Any:
+-    default = {}  # type: Dict[str, object]
+-    evalcache = config._store.setdefault(evalcache_key, default)
+-    try:
+-        return evalcache[expr]
+-    except KeyError:
+-        import _pytest._code
++    import _pytest._code
+ 
+-        exprcode = _pytest._code.compile(expr, mode="eval")
+-        evalcache[expr] = x = eval(exprcode, d)
+-        return x
++    exprcode = _pytest._code.compile(expr, mode="eval")
++    return eval(exprcode, d)
+ 
+ 
+ class MarkEvaluator:
+@@ -53,10 +47,25 @@ class MarkEvaluator:
+         if not raises:
+             return None
+         return not isinstance(exc, raises)
+-
+     def istrue(self) -> bool:
+         try:
+-            return self._istrue()
++            # Inline cached_eval logic here instead of caching
++            if isinstance(self._mark, Mark):
++                val = self._mark.args[0]
++                if isinstance(val, str):
++                    # Evaluate string expression without caching
++                    d = self.item._obj.__globals__ if hasattr(self.item, "_obj") else {}
++                    import _pytest._code
++
++                    exprcode = _pytest._code.compile(val, mode="eval")
++                    result = eval(exprcode, d)
++                    return bool(result)
++                return bool(val)
++            marks = self._get_marks()
++            if not marks:
++                return False
++            self._mark = marks[0]
++            return self.istrue()
+         except TEST_OUTCOME:
+             self.exc = sys.exc_info()
+             if isinstance(self.exc[1], SyntaxError):

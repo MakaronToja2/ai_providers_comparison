@@ -1,0 +1,54 @@
+diff --git a/django/db/backends/sqlite3/schema.py b/django/db/backends/sqlite3/schema.py
+index f0c81c123b..8047808af2 100644
+--- a/django/db/backends/sqlite3/schema.py
++++ b/django/db/backends/sqlite3/schema.py
+@@ -237,6 +237,20 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+             ]
+ 
+         constraints = list(model._meta.constraints)
++        # Separate constraints that need to be deferred (those with expressions)
++        constraints_to_defer = [
++            constraint for constraint in constraints
++            if isinstance(constraint, UniqueConstraint) and (
++                constraint.condition or
++                constraint.contains_expressions or
++                constraint.include or
++                constraint.deferrable
++            )
++        ]
++        constraints_for_table = [
++            constraint for constraint in constraints
++            if constraint not in constraints_to_defer
++        ]
+ 
+         # Provide isolated instances of the fields to the new model body so
+         # that the existing model's internals aren't interfered with when
+@@ -254,7 +268,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+             'unique_together': unique_together,
+             'index_together': index_together,
+             'indexes': indexes,
+-            'constraints': constraints,
++            'constraints': constraints_for_table,
+             'apps': apps,
+         }
+         meta = type("Meta", (), meta_contents)
+@@ -270,7 +284,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+             'unique_together': unique_together,
+             'index_together': index_together,
+             'indexes': indexes,
+-            'constraints': constraints,
++            'constraints': constraints_for_table,
+             'apps': apps,
+         }
+         meta = type("Meta", (), meta_contents)
+@@ -280,6 +294,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+ 
+         # Create a new table with the updated schema.
+         self.create_model(new_model)
++        
++        # Add deferred constraints that couldn't be included in table definition
++        for constraint in constraints_to_defer:
++            self.deferred_sql.append(constraint.create_sql(new_model, self))
+ 
+         # Copy data from the old table into the new table
+         self.execute("INSERT INTO %s (%s) SELECT %s FROM %s" % (

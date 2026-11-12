@@ -1,0 +1,16 @@
+diff --git a/sympy/printing/str.py b/sympy/printing/str.py
+index 0ce283b18b..012d14dc9f 100644
+--- a/sympy/printing/str.py
++++ b/sympy/printing/str.py
+@@ -167,6 +167,11 @@ def _print_GoldenRatio(self, expr):
+     def _print_TribonacciConstant(self, expr):
+         return 'TribonacciConstant'
+ 
++    def _print_Identity(self, expr):
++        # Avoid printing 'I' which lambdify interprets as 1j.
++        # Print 'Identity(n)' where n is the dimension.
++        return 'Identity(%s)' % expr.rows
++
+     def _print_ImaginaryUnit(self, expr):
+         return 'I'
+ 

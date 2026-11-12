@@ -1,0 +1,17 @@
+diff --git a/django/contrib/postgres/forms/array.py b/django/contrib/postgres/forms/array.py
+index ddb022afc3..607c3bb125 100644
+--- a/django/contrib/postgres/forms/array.py
++++ b/django/contrib/postgres/forms/array.py
+@@ -110,6 +110,12 @@ class SimpleArrayField(forms.CharField):
+         else:
+             if initial in self.empty_values and value in self.empty_values:
+                 return False
++        except ValidationError:
++            pass
++        else:
++            data, _ = self._remove_trailing_nulls(data)
++            if initial in self.empty_values and data in self.empty_values:
++                return False
+         return super().has_changed(initial, data)
+ 
+ 

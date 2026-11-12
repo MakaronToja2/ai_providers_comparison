@@ -1,0 +1,22 @@
+diff --git a/sympy/simplify/powsimp.py b/sympy/simplify/powsimp.py
+index 3cf646ca4d..439e4d5f1b 100644
+--- a/sympy/simplify/powsimp.py
++++ b/sympy/simplify/powsimp.py
+@@ -141,6 +141,17 @@ def recurse(arg, **kwargs):
+                 b, e = term.as_base_exp()
+                 if deep:
+                     b, e = [recurse(i) for i in [b, e]]
++
++                # Normalize float exponents to rationals if possible
++                if isinstance(e, Float):
++                    try:
++                        # Convert float to rational
++                        num, den = e.as_integer_ratio()
++                        e = Rational(num, den)
++                    except:
++                        # If conversion fails, keep as float
++                        pass
++
+                 if b.is_Pow or b.func is exp:
+                     # don't let smthg like sqrt(x**a) split into x**a, 1/2
+                     # or else it will be joined as x**(a/2) later

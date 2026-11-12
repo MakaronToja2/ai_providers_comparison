@@ -1,0 +1,13 @@
+diff --git a/lib/matplotlib/offsetbox.py b/lib/matplotlib/offsetbox.py
+index 77768e7383..53dcaae612 100644
+--- a/lib/matplotlib/offsetbox.py
++++ b/lib/matplotlib/offsetbox.py
+@@ -1550,7 +1550,7 @@ class DraggableBase:
+                 self.ref_artist.set_animated(False)
+ 
+     def _check_still_parented(self):
+-        if self.ref_artist.figure is None:
++        if self.ref_artist is None or self.ref_artist.figure is None:
+             self.disconnect()
+             return False
+         else:

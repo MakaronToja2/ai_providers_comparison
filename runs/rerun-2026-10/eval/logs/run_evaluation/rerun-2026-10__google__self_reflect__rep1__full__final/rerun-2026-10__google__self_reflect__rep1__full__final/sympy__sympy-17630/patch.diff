@@ -1,0 +1,32 @@
+diff --git a/sympy/matrices/expressions/blockmatrix.py b/sympy/matrices/expressions/blockmatrix.py
+index 95302a05ca..e0c83788cd 100644
+--- a/sympy/matrices/expressions/blockmatrix.py
++++ b/sympy/matrices/expressions/blockmatrix.py
+@@ -148,11 +148,25 @@ def blocks(self):
+ 
+     @property
+     def rowblocksizes(self):
+-        return [self.blocks[i, 0].rows for i in range(self.blockshape[0])]
++        sizes = []
++        for i in range(self.blockshape[0]):
++            block = self.blocks[i, 0]
++            if block.is_Zero:
++                sizes.append(0)
++            else:
++                sizes.append(block.rows)
++        return sizes
+ 
+     @property
+     def colblocksizes(self):
+-        return [self.blocks[0, i].cols for i in range(self.blockshape[1])]
++        sizes = []
++        for i in range(self.blockshape[1]):
++            block = self.blocks[0, i]
++            if block.is_Zero:
++                sizes.append(0)
++            else:
++                sizes.append(block.cols)
++        return sizes
+ 
+     def structurally_equal(self, other):
+         return (isinstance(other, BlockMatrix)

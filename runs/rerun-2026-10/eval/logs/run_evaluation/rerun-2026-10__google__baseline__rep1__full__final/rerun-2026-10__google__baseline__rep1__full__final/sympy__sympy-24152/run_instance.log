@@ -1,0 +1,56 @@
+2026-10-10 19:32:40,675 - INFO - Creating container for sympy__sympy-24152...
+2026-10-10 19:32:48,091 - INFO - Container for sympy__sympy-24152 created: 95909ac6d48a7f555a22878edece0f56347932d2cf644e077439e903009eb81c
+2026-10-10 19:32:50,241 - INFO - Container for sympy__sympy-24152 started: 95909ac6d48a7f555a22878edece0f56347932d2cf644e077439e903009eb81c
+2026-10-10 19:32:50,242 - INFO - Intermediate patch for sympy__sympy-24152 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep1__full__final/rerun-2026-10__google__baseline__rep1__full__final/sympy__sympy-24152/patch.diff, now applying to container...
+2026-10-10 19:32:50,355 - INFO - >>>>> Applied Patch:
+Checking patch sympy/physics/quantum/tensorproduct.py...
+warning: sympy/physics/quantum/tensorproduct.py has type 100755, expected 100644
+Applied patch sympy/physics/quantum/tensorproduct.py cleanly.
+
+2026-10-10 19:32:50,688 - INFO - Git diff before:
+diff --git a/sympy/physics/quantum/tensorproduct.py b/sympy/physics/quantum/tensorproduct.py
+index 78accaf295..e63092888c 100755
+--- a/sympy/physics/quantum/tensorproduct.py
++++ b/sympy/physics/quantum/tensorproduct.py
+@@ -246,9 +246,10 @@ def _eval_expand_tensorproduct(self, **hints):
+             if isinstance(args[i], Add):
+                 for aa in args[i].args:
+                     tp = TensorProduct(*args[:i] + (aa,) + args[i + 1:])
+-                    if isinstance(tp, TensorProduct):
+-                        tp = tp._eval_expand_tensorproduct()
+-                    add_args.append(tp)
++                    c_part, nc_part = tp.args_cnc()
++                    if len(nc_part) == 1 and isinstance(nc_part[0], TensorProduct):
++                        nc_part = (nc_part[0]._eval_expand_tensorproduct(), )
++                    add_args.append(Mul(*c_part) * Mul(*nc_part))
+                 break
+ 
+         if add_args:
+2026-10-10 19:32:50,689 - INFO - Eval script for sympy__sympy-24152 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep1__full__final/rerun-2026-10__google__baseline__rep1__full__final/sympy__sympy-24152/eval.sh; copying to container...
+2026-10-10 19:32:54,636 - INFO - Test runtime: 3.89 seconds
+2026-10-10 19:32:54,637 - INFO - Test output for sympy__sympy-24152 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep1__full__final/rerun-2026-10__google__baseline__rep1__full__final/sympy__sympy-24152/test_output.txt
+2026-10-10 19:32:54,680 - INFO - Git diff after:
+diff --git a/sympy/physics/quantum/tensorproduct.py b/sympy/physics/quantum/tensorproduct.py
+index 78accaf295..e63092888c 100755
+--- a/sympy/physics/quantum/tensorproduct.py
++++ b/sympy/physics/quantum/tensorproduct.py
+@@ -246,9 +246,10 @@ def _eval_expand_tensorproduct(self, **hints):
+             if isinstance(args[i], Add):
+                 for aa in args[i].args:
+                     tp = TensorProduct(*args[:i] + (aa,) + args[i + 1:])
+-                    if isinstance(tp, TensorProduct):
+-                        tp = tp._eval_expand_tensorproduct()
+-                    add_args.append(tp)
++                    c_part, nc_part = tp.args_cnc()
++                    if len(nc_part) == 1 and isinstance(nc_part[0], TensorProduct):
++                        nc_part = (nc_part[0]._eval_expand_tensorproduct(), )
++                    add_args.append(Mul(*c_part) * Mul(*nc_part))
+                 break
+ 
+         if add_args:
+2026-10-10 19:32:54,680 - INFO - Grading answer for sympy__sympy-24152...
+2026-10-10 19:32:54,681 - INFO - report: {'sympy__sympy-24152': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_tensor_product_expand'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_sparse_matrices', 'test_tensor_product_dagger', 'test_tensor_product_abstract', 'test_tensor_product_commutator', 'test_tensor_product_simp', 'test_issue_5923'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-24152: resolved: True
+2026-10-10 19:32:54,681 - INFO - Attempting to stop container sweb.eval.sympy__sympy-24152.rerun-2026-10__google__baseline__rep1__full__final...
+2026-10-10 19:33:14,797 - INFO - Attempting to remove container sweb.eval.sympy__sympy-24152.rerun-2026-10__google__baseline__rep1__full__final...
+2026-10-10 19:33:16,043 - INFO - Container sweb.eval.sympy__sympy-24152.rerun-2026-10__google__baseline__rep1__full__final removed.

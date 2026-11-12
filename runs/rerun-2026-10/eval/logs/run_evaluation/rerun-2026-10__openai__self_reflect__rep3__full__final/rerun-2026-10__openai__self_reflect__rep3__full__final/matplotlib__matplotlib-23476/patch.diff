@@ -1,0 +1,20 @@
+diff --git a/lib/matplotlib/figure.py b/lib/matplotlib/figure.py
+index c55864243a..053518214a 100644
+--- a/lib/matplotlib/figure.py
++++ b/lib/matplotlib/figure.py
+@@ -3046,6 +3046,15 @@ class Figure(FigureBase):
+         # re-initialise some of the unstored state information
+         FigureCanvasBase(self)  # Set self.canvas.
+ 
++        # Fix for M1 Mac: dpi is doubled on unpickling, so reset dpi to original
++        # value if it appears doubled.
++        # This is a heuristic: if dpi is exactly twice the rcParams default dpi,
++        # reset it to the default dpi.
++        import matplotlib as mpl
++        default_dpi = mpl.rcParams['figure.dpi']
++        if abs(self.dpi - 2 * default_dpi) < 1e-6:
++            self.dpi = default_dpi
++
+         if restore_to_pylab:
+             # lazy import to avoid circularity
+             import matplotlib.pyplot as plt

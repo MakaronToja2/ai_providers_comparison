@@ -1,0 +1,13 @@
+diff --git a/django/db/backends/sqlite3/schema.py b/django/db/backends/sqlite3/schema.py
+index f0c81c123b..ce6e129490 100644
+--- a/django/db/backends/sqlite3/schema.py
++++ b/django/db/backends/sqlite3/schema.py
+@@ -421,7 +421,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+     def add_constraint(self, model, constraint):
+         if isinstance(constraint, UniqueConstraint) and (
+             constraint.condition or
+-            constraint.contains_expressions or
++            constraint.expressions or
+             constraint.include or
+             constraint.deferrable
+         ):

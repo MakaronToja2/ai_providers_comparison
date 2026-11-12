@@ -1,0 +1,137 @@
+2026-10-10 14:48:44,840 - INFO - Creating container for django__django-10924...
+2026-10-10 14:48:56,942 - INFO - Container for django__django-10924 created: 9804603e22856fbc5b5d4c65764620ada68982195b5fccb15d2f93016129c961
+2026-10-10 14:49:10,802 - INFO - Container for django__django-10924 started: 9804603e22856fbc5b5d4c65764620ada68982195b5fccb15d2f93016129c961
+2026-10-10 14:49:10,802 - INFO - Intermediate patch for django__django-10924 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep2__full__final/rerun-2026-10__anthropic__forced__rep2__full__final/django__django-10924/patch.diff, now applying to container...
+2026-10-10 14:49:11,081 - INFO - >>>>> Applied Patch:
+Checking patch django/db/models/fields/__init__.py...
+warning: django/db/models/fields/__init__.py has type 100755, expected 100644
+Checking patch django/forms/fields.py...
+warning: django/forms/fields.py has type 100755, expected 100644
+Applied patch django/db/models/fields/__init__.py cleanly.
+Applied patch django/forms/fields.py cleanly.
+
+2026-10-10 14:49:12,156 - INFO - Git diff before:
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 0c64748ccd..bd21c7de49 100755
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1687,7 +1687,7 @@ class FilePathField(Field):
+ 
+     def deconstruct(self):
+         name, path, args, kwargs = super().deconstruct()
+-        if self.path != '':
++        if self.path != '' and self.path is not None:
+             kwargs['path'] = self.path
+         if self.match is not None:
+             kwargs['match'] = self.match
+@@ -1709,7 +1709,7 @@ class FilePathField(Field):
+ 
+     def formfield(self, **kwargs):
+         return super().formfield(**{
+-            'path': self.path,
++            'path': self.path() if callable(self.path) else self.path,
+             'match': self.match,
+             'recursive': self.recursive,
+             'form_class': forms.FilePathField,
+diff --git a/django/forms/fields.py b/django/forms/fields.py
+index a977256525..82957b5d12 100755
+--- a/django/forms/fields.py
++++ b/django/forms/fields.py
+@@ -1090,23 +1090,26 @@ class FilePathField(ChoiceField):
+         if self.match is not None:
+             self.match_re = re.compile(self.match)
+ 
++        # Resolve callable path
++        path_to_use = self.path() if callable(self.path) else self.path
++
+         if recursive:
+-            for root, dirs, files in sorted(os.walk(self.path)):
++            for root, dirs, files in sorted(os.walk(path_to_use)):
+                 if self.allow_files:
+                     for f in sorted(files):
+                         if self.match is None or self.match_re.search(f):
+                             f = os.path.join(root, f)
+-                            self.choices.append((f, f.replace(path, "", 1)))
++                            self.choices.append((f, f.replace(path_to_use, "", 1)))
+                 if self.allow_folders:
+                     for f in sorted(dirs):
+                         if f == '__pycache__':
+                             continue
+                         if self.match is None or self.match_re.search(f):
+                             f = os.path.join(root, f)
+-                            self.choices.append((f, f.replace(path, "", 1)))
++                            self.choices.append((f, f.replace(path_to_use, "", 1)))
+         else:
+             choices = []
+-            for f in os.scandir(self.path):
++            for f in os.scandir(path_to_use):
+                 if f.name == '__pycache__':
+                     continue
+                 if (((self.allow_files and f.is_file()) or
+2026-10-10 14:49:12,156 - INFO - Eval script for django__django-10924 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep2__full__final/rerun-2026-10__anthropic__forced__rep2__full__final/django__django-10924/eval.sh; copying to container...
+2026-10-10 14:49:29,423 - INFO - Test runtime: 17.00 seconds
+2026-10-10 14:49:29,427 - INFO - Test output for django__django-10924 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep2__full__final/rerun-2026-10__anthropic__forced__rep2__full__final/django__django-10924/test_output.txt
+2026-10-10 14:49:29,571 - INFO - Git diff after:
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 0c64748ccd..bd21c7de49 100755
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1687,7 +1687,7 @@ class FilePathField(Field):
+ 
+     def deconstruct(self):
+         name, path, args, kwargs = super().deconstruct()
+-        if self.path != '':
++        if self.path != '' and self.path is not None:
+             kwargs['path'] = self.path
+         if self.match is not None:
+             kwargs['match'] = self.match
+@@ -1709,7 +1709,7 @@ class FilePathField(Field):
+ 
+     def formfield(self, **kwargs):
+         return super().formfield(**{
+-            'path': self.path,
++            'path': self.path() if callable(self.path) else self.path,
+             'match': self.match,
+             'recursive': self.recursive,
+             'form_class': forms.FilePathField,
+diff --git a/django/forms/fields.py b/django/forms/fields.py
+index a977256525..82957b5d12 100755
+--- a/django/forms/fields.py
++++ b/django/forms/fields.py
+@@ -1090,23 +1090,26 @@ class FilePathField(ChoiceField):
+         if self.match is not None:
+             self.match_re = re.compile(self.match)
+ 
++        # Resolve callable path
++        path_to_use = self.path() if callable(self.path) else self.path
++
+         if recursive:
+-            for root, dirs, files in sorted(os.walk(self.path)):
++            for root, dirs, files in sorted(os.walk(path_to_use)):
+                 if self.allow_files:
+                     for f in sorted(files):
+                         if self.match is None or self.match_re.search(f):
+                             f = os.path.join(root, f)
+-                            self.choices.append((f, f.replace(path, "", 1)))
++                            self.choices.append((f, f.replace(path_to_use, "", 1)))
+                 if self.allow_folders:
+                     for f in sorted(dirs):
+                         if f == '__pycache__':
+                             continue
+                         if self.match is None or self.match_re.search(f):
+                             f = os.path.join(root, f)
+-                            self.choices.append((f, f.replace(path, "", 1)))
++                            self.choices.append((f, f.replace(path_to_use, "", 1)))
+         else:
+             choices = []
+-            for f in os.scandir(self.path):
++            for f in os.scandir(path_to_use):
+                 if f.name == '__pycache__':
+                     continue
+                 if (((self.allow_files and f.is_file()) or
+2026-10-10 14:49:29,572 - INFO - Grading answer for django__django-10924...
+2026-10-10 14:49:29,581 - INFO - report: {'django__django-10924': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_callable_path (model_fields.test_filepathfield.FilePathFieldTests)'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_path (model_fields.test_filepathfield.FilePathFieldTests)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-10924: resolved: True
+2026-10-10 14:49:29,583 - INFO - Attempting to stop container sweb.eval.django__django-10924.rerun-2026-10__anthropic__forced__rep2__full__final...
+2026-10-10 14:49:49,173 - INFO - Attempting to remove container sweb.eval.django__django-10924.rerun-2026-10__anthropic__forced__rep2__full__final...
+2026-10-10 14:49:51,862 - INFO - Container sweb.eval.django__django-10924.rerun-2026-10__anthropic__forced__rep2__full__final removed.

@@ -1,0 +1,33 @@
+diff --git a/pylint/lint/expand_modules.py b/pylint/lint/expand_modules.py
+index 289e1afce..95e726617 100644
+--- a/pylint/lint/expand_modules.py
++++ b/pylint/lint/expand_modules.py
+@@ -24,16 +24,24 @@ def _modpath_from_file(filename: str, is_namespace: bool, path: list[str]) -> li
+ 
+ 
+ def get_python_path(filepath: str) -> str:
+-    """TODO This get the python path with the (bad) assumption that there is always
+-    an __init__.py.
++    """Get the python path for a given file or directory.
+ 
+-    This is not true since python 3.3 and is causing problem.
++    This function was originally written with the assumption that there is always
++    an __init__.py file in packages, which is not true since Python 3.3 (PEP 420).
++    This caused problems when a directory without __init__.py was treated as a package.
++
++    The fix is to handle the case where the path is a module file with the same name
++    as a directory, and to avoid assuming __init__.py presence.
+     """
+     dirname = os.path.realpath(os.path.expanduser(filepath))
+     if not os.path.isdir(dirname):
+         dirname = os.path.dirname(dirname)
++
++    # If the directory is a package (has __init__.py), go up until no __init__.py found
++    # Otherwise, just return the directory containing the file
+     while True:
+-        if not os.path.exists(os.path.join(dirname, "__init__.py")):
++        init_file = os.path.join(dirname, "__init__.py")
++        if not os.path.exists(init_file):
+             return dirname
+         old_dirname = dirname
+         dirname = os.path.dirname(dirname)

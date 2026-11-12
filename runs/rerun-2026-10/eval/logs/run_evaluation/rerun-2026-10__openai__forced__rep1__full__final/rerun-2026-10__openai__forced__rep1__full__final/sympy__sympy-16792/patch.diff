@@ -1,0 +1,23 @@
+diff --git a/sympy/utilities/autowrap.py b/sympy/utilities/autowrap.py
+index bd6afb12d1..41dd76c80c 100644
+--- a/sympy/utilities/autowrap.py
++++ b/sympy/utilities/autowrap.py
+@@ -347,6 +347,18 @@ def dump_pyx(self, routines, f, prefix):
+ 
+         This file contains all the definitions of the routines in c code and
+         refers to the header file.
++        """
++        for routine in routines:
++            # Fix argument types for array arguments that do not appear in the expression
++            # This ensures the C function signature matches the expected pointer type
++            for arg in routine.arguments:
++                # If argument is an array but not in the expression, force pointer type
++                if arg.is_array and arg.name not in routine.expr.free_symbols:
++                    # Patch the argument type to pointer type
++                    # This is a workaround since the routine may infer scalar type incorrectly
++                    arg.type = arg.type.replace('double', 'double *')
++
++        # Original dump_pyx code follows
+ 
+         Arguments
+         ---------

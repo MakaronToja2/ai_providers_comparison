@@ -1,0 +1,17 @@
+diff --git a/lib/matplotlib/colors.py b/lib/matplotlib/colors.py
+index 2d3072da04..a90f2a7e0d 100644
+--- a/lib/matplotlib/colors.py
++++ b/lib/matplotlib/colors.py
+@@ -725,6 +725,12 @@ class Colormap:
+                 # Avoid converting large positive values to negative integers.
+                 np.clip(xa, -1, self.N, out=xa)
+                 xa = xa.astype(int)
++        else:
++            # Ensure xa is a signed integer type that can hold out-of-bounds
++            # indices (e.g., self._i_over, self._i_under, self._i_bad).
++            # This is necessary to avoid NumPy 1.24+ deprecation warnings when
++            # assigning out-of-bounds values to small integer types like uint8.
++            xa = xa.astype(int)
+         # Set the over-range indices before the under-range;
+         # otherwise the under-range values get converted to over-range.
+         xa[xa > self.N - 1] = self._i_over

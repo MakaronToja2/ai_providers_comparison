@@ -1,0 +1,29 @@
+diff --git a/django/contrib/admin/helpers.py b/django/contrib/admin/helpers.py
+index 6f0be6b148..32d12afbba 100644
+--- a/django/contrib/admin/helpers.py
++++ b/django/contrib/admin/helpers.py
+@@ -160,10 +160,21 @@ class AdminReadonlyField:
+         else:
+             class_name = field
+ 
+-        if form._meta.labels and class_name in form._meta.labels:
+-            label = form._meta.labels[class_name]
++        # If the widget is a ReadOnlyPasswordHashWidget, it is not labelable,
++        # so do not generate a 'for' attribute for the label.
++        widget = None
++        if field in form.fields:
++            widget = form.fields[field].widget
++        if hasattr(widget, 'read_only') and widget.read_only:
++            # For ReadOnlyPasswordHashWidget, label should not have 'for' attribute.
++            label = form._meta.labels[class_name] if form._meta.labels and class_name in form._meta.labels else None
++            self.label_for = None
+         else:
+-            label = label_for_field(field, form._meta.model, model_admin, form=form)
++            if form._meta.labels and class_name in form._meta.labels:
++                label = form._meta.labels[class_name]
++            else:
++                label = label_for_field(field, form._meta.model, model_admin, form=form)
++            self.label_for = label_for_field(field, form._meta.model, model_admin, form=form)
+ 
+         if form._meta.help_texts and class_name in form._meta.help_texts:
+             help_text = form._meta.help_texts[class_name]

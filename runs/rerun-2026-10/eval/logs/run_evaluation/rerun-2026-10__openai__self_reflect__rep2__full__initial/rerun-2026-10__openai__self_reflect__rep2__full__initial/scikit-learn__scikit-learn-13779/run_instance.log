@@ -1,0 +1,48 @@
+2026-10-10 18:00:27,549 - INFO - Creating container for scikit-learn__scikit-learn-13779...
+2026-10-10 18:00:32,874 - INFO - Container for scikit-learn__scikit-learn-13779 created: 77074853b2bed97924918c0d57aeddcc65ebde3ee2196e73b12777b75e33ecbd
+2026-10-10 18:00:46,013 - INFO - Container for scikit-learn__scikit-learn-13779 started: 77074853b2bed97924918c0d57aeddcc65ebde3ee2196e73b12777b75e33ecbd
+2026-10-10 18:00:46,013 - INFO - Intermediate patch for scikit-learn__scikit-learn-13779 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep2__full__initial/rerun-2026-10__openai__self_reflect__rep2__full__initial/scikit-learn__scikit-learn-13779/patch.diff, now applying to container...
+2026-10-10 18:00:46,113 - INFO - >>>>> Applied Patch:
+Checking patch sklearn/ensemble/voting.py...
+warning: sklearn/ensemble/voting.py has type 100755, expected 100644
+Applied patch sklearn/ensemble/voting.py cleanly.
+
+2026-10-10 18:00:46,277 - INFO - Git diff before:
+diff --git a/sklearn/ensemble/voting.py b/sklearn/ensemble/voting.py
+index 7afa7180c..6f10b791c 100755
+--- a/sklearn/ensemble/voting.py
++++ b/sklearn/ensemble/voting.py
+@@ -270,6 +270,9 @@ class VotingClassifier(_BaseVoting, ClassifierMixin):
+         self.classes_ = self.le_.classes_
+         transformed_y = self.le_.transform(y)
+ 
++        # Filter out None estimators before fitting with sample_weight
++        if sample_weight is not None:
++            self.estimators_ = [est for est in self.estimators_ if est is not None]
+         return super().fit(X, transformed_y, sample_weight)
+ 
+     def predict(self, X):
+2026-10-10 18:00:46,277 - INFO - Eval script for scikit-learn__scikit-learn-13779 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep2__full__initial/rerun-2026-10__openai__self_reflect__rep2__full__initial/scikit-learn__scikit-learn-13779/eval.sh; copying to container...
+2026-10-10 18:00:53,245 - INFO - Test runtime: 6.92 seconds
+2026-10-10 18:00:53,246 - INFO - Test output for scikit-learn__scikit-learn-13779 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep2__full__initial/rerun-2026-10__openai__self_reflect__rep2__full__initial/scikit-learn__scikit-learn-13779/test_output.txt
+2026-10-10 18:00:53,320 - INFO - Git diff after:
+diff --git a/sklearn/ensemble/voting.py b/sklearn/ensemble/voting.py
+index 7afa7180c..6f10b791c 100755
+--- a/sklearn/ensemble/voting.py
++++ b/sklearn/ensemble/voting.py
+@@ -270,6 +270,9 @@ class VotingClassifier(_BaseVoting, ClassifierMixin):
+         self.classes_ = self.le_.classes_
+         transformed_y = self.le_.transform(y)
+ 
++        # Filter out None estimators before fitting with sample_weight
++        if sample_weight is not None:
++            self.estimators_ = [est for est in self.estimators_ if est is not None]
+         return super().fit(X, transformed_y, sample_weight)
+ 
+     def predict(self, X):
+2026-10-10 18:00:53,320 - INFO - Grading answer for scikit-learn__scikit-learn-13779...
+2026-10-10 18:00:53,323 - INFO - report: {'scikit-learn__scikit-learn-13779': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['sklearn/ensemble/tests/test_voting.py::test_none_estimator_with_weights[X0-y0-voter0]', 'sklearn/ensemble/tests/test_voting.py::test_none_estimator_with_weights[X1-y1-voter1]']}, 'PASS_TO_PASS': {'success': ['sklearn/ensemble/tests/test_voting.py::test_estimator_init', 'sklearn/ensemble/tests/test_voting.py::test_predictproba_hardvoting', 'sklearn/ensemble/tests/test_voting.py::test_notfitted', 'sklearn/ensemble/tests/test_voting.py::test_majority_label_iris', 'sklearn/ensemble/tests/test_voting.py::test_tie_situation', 'sklearn/ensemble/tests/test_voting.py::test_weights_iris', 'sklearn/ensemble/tests/test_voting.py::test_weights_regressor', 'sklearn/ensemble/tests/test_voting.py::test_predict_on_toy_problem', 'sklearn/ensemble/tests/test_voting.py::test_predict_proba_on_toy_problem', 'sklearn/ensemble/tests/test_voting.py::test_multilabel', 'sklearn/ensemble/tests/test_voting.py::test_gridsearch', 'sklearn/ensemble/tests/test_voting.py::test_parallel_fit', 'sklearn/ensemble/tests/test_voting.py::test_set_params', 'sklearn/ensemble/tests/test_voting.py::test_set_estimator_none', 'sklearn/ensemble/tests/test_voting.py::test_estimator_weights_format', 'sklearn/ensemble/tests/test_voting.py::test_transform'], 'failure': ['sklearn/ensemble/tests/test_voting.py::test_sample_weight', 'sklearn/ensemble/tests/test_voting.py::test_sample_weight_kwargs']}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for scikit-learn__scikit-learn-13779: resolved: False
+2026-10-10 18:00:53,323 - INFO - Attempting to stop container sweb.eval.scikit-learn__scikit-learn-13779.rerun-2026-10__openai__self_reflect__rep2__full__initial...
+2026-10-10 18:01:10,403 - INFO - Attempting to remove container sweb.eval.scikit-learn__scikit-learn-13779.rerun-2026-10__openai__self_reflect__rep2__full__initial...
+2026-10-10 18:01:11,492 - INFO - Container sweb.eval.scikit-learn__scikit-learn-13779.rerun-2026-10__openai__self_reflect__rep2__full__initial removed.

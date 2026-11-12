@@ -1,0 +1,26 @@
+diff --git a/sympy/core/function.py b/sympy/core/function.py
+index 69df976b8b..7d6299b9b6 100644
+--- a/sympy/core/function.py
++++ b/sympy/core/function.py
+@@ -447,6 +447,21 @@ class Function(Application, Expr):
+     def _diff_wrt(self):
+         return False
+ 
++    @property
++    def kind(self):
++        """
++        Return the kind of the derivative.
++
++        If the function is a MatrixBase, the kind will be MatrixKind with the
++        element kind of the function. Otherwise, it will be UndefinedKind.
++        """
++        from sympy.matrices import MatrixKind
++        from sympy.core.kind import UndefinedKind
++
++        if self.args and isinstance(self.args[0], MatrixBase):
++            return MatrixKind(self.args[0].kind)
++        return UndefinedKind
++
+     @cacheit
+     def __new__(cls, *args, **options):
+         # Handle calls like Function('f')

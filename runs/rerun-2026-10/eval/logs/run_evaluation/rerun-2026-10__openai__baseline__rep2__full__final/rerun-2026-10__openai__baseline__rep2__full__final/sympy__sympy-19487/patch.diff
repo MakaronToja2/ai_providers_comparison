@@ -1,0 +1,18 @@
+diff --git a/sympy/functions/elementary/complexes.py b/sympy/functions/elementary/complexes.py
+index 7fda45982b..370eff9b8d 100644
+--- a/sympy/functions/elementary/complexes.py
++++ b/sympy/functions/elementary/complexes.py
+@@ -394,6 +394,13 @@ def _eval_rewrite_as_Heaviside(self, arg, **kwargs):
+         if arg.is_extended_real:
+             return Heaviside(arg, H0=S(1)/2) * 2 - 1
+ 
++    def _eval_rewrite_as_Abs(self, arg, **kwargs):
++        from sympy.functions.elementary.complexes import Abs
++        # Rewrite sign(z) as z/Abs(z) for nonzero z, else nan
++        # We return Piecewise to handle zero argument safely
++        from sympy import Piecewise, S, Eq
++        return Piecewise((arg / Abs(arg), ~Eq(arg, 0)), (S.NaN, True))
++
+     def _eval_simplify(self, **kwargs):
+         return self.func(self.args[0].factor())  # XXX include doit?
+ 

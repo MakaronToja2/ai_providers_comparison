@@ -1,0 +1,24 @@
+diff --git a/django/db/models/query.py b/django/db/models/query.py
+index 5ac2407ea3..d9f9178639 100644
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -810,11 +810,14 @@ class QuerySet(AltersData):
+                     unique_fields=unique_fields,
+                 )
+                 connection = connections[self.db]
+-                if (
+-                    connection.features.can_return_rows_from_bulk_insert
+-                    and on_conflict is None
+-                ):
+-                    assert len(returned_columns) == len(objs_without_pk)
++                if connection.features.can_return_rows_from_bulk_insert:
++                    # The number of returned rows must match the number of inserted objects.
++                    # This is only guaranteed if the database supports returning rows
++                    # from bulk inserts and we are not ignoring conflicts.
++                    # For ignore_conflicts, the number of returned rows may be less
++                    # than the number of inserted objects.
++                    if on_conflict is None or on_conflict == OnConflict.UPDATE:
++                        assert len(returned_columns) == len(objs_without_pk)
+                 for obj_without_pk, results in zip(objs_without_pk, returned_columns):
+                     for result, field in zip(results, opts.db_returning_fields):
+                         setattr(obj_without_pk, field.attname, result)

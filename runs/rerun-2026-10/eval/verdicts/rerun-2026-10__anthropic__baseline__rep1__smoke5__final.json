@@ -1,0 +1,49 @@
+{
+  "job": "rerun-2026-10__anthropic__baseline__rep1__smoke5",
+  "kind": "final",
+  "subset": "smoke5",
+  "run_id": "rerun-2026-10__anthropic__baseline__rep1__smoke5__final",
+  "counts": {
+    "resolved": 3,
+    "tests_failed": 2
+  },
+  "verdicts": {
+    "django__django-13448": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 7,
+      "p2p_total": 7
+    },
+    "django__django-15347": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 29,
+      "p2p_total": 29
+    },
+    "matplotlib__matplotlib-26011": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 817,
+      "p2p_total": 817
+    },
+    "pytest-dev__pytest-5692": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 1,
+      "f2p_total": 2,
+      "p2p_passed": 68,
+      "p2p_total": 68
+    },
+    "scikit-learn__scikit-learn-13439": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 40,
+      "p2p_total": 40
+    }
+  }
+}

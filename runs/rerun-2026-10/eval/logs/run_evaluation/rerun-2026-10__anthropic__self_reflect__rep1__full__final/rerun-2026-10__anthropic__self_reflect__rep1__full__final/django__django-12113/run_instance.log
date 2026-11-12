@@ -1,0 +1,50 @@
+2026-10-10 14:51:34,871 - INFO - Creating container for django__django-12113...
+2026-10-10 14:51:41,513 - INFO - Container for django__django-12113 created: a03910a22cf69384bbbcb31021b86b46b7987350dbf5e89bd28a77fdd69900e9
+2026-10-10 14:51:51,798 - INFO - Container for django__django-12113 started: a03910a22cf69384bbbcb31021b86b46b7987350dbf5e89bd28a77fdd69900e9
+2026-10-10 14:51:51,799 - INFO - Intermediate patch for django__django-12113 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep1__full__final/rerun-2026-10__anthropic__self_reflect__rep1__full__final/django__django-12113/patch.diff, now applying to container...
+2026-10-10 14:51:52,101 - INFO - >>>>> Applied Patch:
+Checking patch django/test/testcases.py...
+warning: django/test/testcases.py has type 100755, expected 100644
+Applied patch django/test/testcases.py cleanly.
+
+2026-10-10 14:51:53,248 - INFO - Git diff before:
+diff --git a/django/test/testcases.py b/django/test/testcases.py
+index 23459f22cd..f27b72e404 100755
+--- a/django/test/testcases.py
++++ b/django/test/testcases.py
+@@ -1100,6 +1100,10 @@ class TestCase(TransactionTestCase):
+         super().setUpClass()
+         if not cls._databases_support_transactions():
+             return
++        # Close connections to avoid stale connections with locks when using
++        # persistent test databases (e.g., SQLite with --keepdb).
++        for conn in connections.all():
++            conn.close()
+         cls.cls_atomics = cls._enter_atomics()
+ 
+         if cls.fixtures:
+2026-10-10 14:51:53,249 - INFO - Eval script for django__django-12113 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep1__full__final/rerun-2026-10__anthropic__self_reflect__rep1__full__final/django__django-12113/eval.sh; copying to container...
+2026-10-10 14:52:06,761 - INFO - Test runtime: 13.37 seconds
+2026-10-10 14:52:06,764 - INFO - Test output for django__django-12113 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep1__full__final/rerun-2026-10__anthropic__self_reflect__rep1__full__final/django__django-12113/test_output.txt
+2026-10-10 14:52:06,879 - INFO - Git diff after:
+diff --git a/django/test/testcases.py b/django/test/testcases.py
+index 23459f22cd..f27b72e404 100755
+--- a/django/test/testcases.py
++++ b/django/test/testcases.py
+@@ -1100,6 +1100,10 @@ class TestCase(TransactionTestCase):
+         super().setUpClass()
+         if not cls._databases_support_transactions():
+             return
++        # Close connections to avoid stale connections with locks when using
++        # persistent test databases (e.g., SQLite with --keepdb).
++        for conn in connections.all():
++            conn.close()
+         cls.cls_atomics = cls._enter_atomics()
+ 
+         if cls.fixtures:
+2026-10-10 14:52:06,879 - INFO - Grading answer for django__django-12113...
+2026-10-10 14:52:06,885 - INFO - report: {'django__django-12113': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_custom_test_name (backends.sqlite.test_creation.TestDbSignatureTests)']}, 'PASS_TO_PASS': {'success': [], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-12113: resolved: False
+2026-10-10 14:52:06,886 - INFO - Attempting to stop container sweb.eval.django__django-12113.rerun-2026-10__anthropic__self_reflect__rep1__full__final...
+2026-10-10 14:52:27,346 - INFO - Attempting to remove container sweb.eval.django__django-12113.rerun-2026-10__anthropic__self_reflect__rep1__full__final...
+2026-10-10 14:52:29,947 - INFO - Container sweb.eval.django__django-12113.rerun-2026-10__anthropic__self_reflect__rep1__full__final removed.

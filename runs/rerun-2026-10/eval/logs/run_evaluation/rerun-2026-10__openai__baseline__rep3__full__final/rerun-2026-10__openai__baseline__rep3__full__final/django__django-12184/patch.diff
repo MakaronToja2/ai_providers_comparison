@@ -1,0 +1,25 @@
+diff --git a/django/urls/base.py b/django/urls/base.py
+index dd9b2e4c22..a6cea4a1cd 100644
+--- a/django/urls/base.py
++++ b/django/urls/base.py
+@@ -84,6 +84,20 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
+         if ns_pattern:
+             resolver = get_ns_resolver(ns_pattern, resolver, tuple(ns_converters.items()))
+ 
++    # Fix for optional URL parameters causing extra positional arguments
++    if args and kwargs:
++        # If kwargs is not empty and args is not empty, it may be due to optional
++        # URL parameters being passed as positional args.
++        # Convert positional args to kwargs if possible.
++        # This is a workaround for the issue where optional URL params cause extra
++        # positional args in the view.
++        # We try to merge args into kwargs by matching the resolver pattern converters keys.
++        keys = list(resolver.pattern.converters.keys())
++        for i, arg in enumerate(args):
++            if i < len(keys) and keys[i] not in kwargs:
++                kwargs[keys[i]] = arg
++        args = []
++
+     return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+ 
+ 

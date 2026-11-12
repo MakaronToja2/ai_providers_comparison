@@ -1,0 +1,79 @@
+2026-10-07 15:34:43,287 - INFO - Creating container for django__django-13448...
+2026-10-07 15:34:50,958 - INFO - Container for django__django-13448 created: 0fa2b5f7971198654408285d7186d7e871dcab6458f3b632a8f717eaf4de8e5b
+2026-10-07 15:34:51,331 - INFO - Container for django__django-13448 started: 0fa2b5f7971198654408285d7186d7e871dcab6458f3b632a8f717eaf4de8e5b
+2026-10-07 15:34:51,331 - INFO - Intermediate patch for django__django-13448 written to logs/run_evaluation/gold__smoke/gold/django__django-13448/patch.diff, now applying to container...
+2026-10-07 15:34:51,470 - INFO - >>>>> Applied Patch:
+Checking patch django/db/backends/base/creation.py...
+Applied patch django/db/backends/base/creation.py cleanly.
+
+2026-10-07 15:34:54,385 - INFO - Git diff before:
+diff --git a/django/db/backends/base/creation.py b/django/db/backends/base/creation.py
+index 503f7f56fd..48a4a6994e 100755
+--- a/django/db/backends/base/creation.py
++++ b/django/db/backends/base/creation.py
+@@ -58,7 +58,14 @@ class BaseDatabaseCreation:
+         settings.DATABASES[self.connection.alias]["NAME"] = test_database_name
+         self.connection.settings_dict["NAME"] = test_database_name
+ 
+-        if self.connection.settings_dict['TEST']['MIGRATE']:
++        try:
++            if self.connection.settings_dict['TEST']['MIGRATE'] is False:
++                # Disable migrations for all apps.
++                old_migration_modules = settings.MIGRATION_MODULES
++                settings.MIGRATION_MODULES = {
++                    app.label: None
++                    for app in apps.get_app_configs()
++                }
+             # We report migrate messages at one level lower than that
+             # requested. This ensures we don't get flooded with messages during
+             # testing (unless you really ask to be flooded).
+@@ -69,6 +76,9 @@ class BaseDatabaseCreation:
+                 database=self.connection.alias,
+                 run_syncdb=True,
+             )
++        finally:
++            if self.connection.settings_dict['TEST']['MIGRATE'] is False:
++                settings.MIGRATION_MODULES = old_migration_modules
+ 
+         # We then serialize the current state of the database into a string
+         # and store it on the connection. This slightly horrific process is so people
+2026-10-07 15:34:54,385 - INFO - Eval script for django__django-13448 written to logs/run_evaluation/gold__smoke/gold/django__django-13448/eval.sh; copying to container...
+2026-10-07 15:35:00,782 - INFO - Test runtime: 6.34 seconds
+2026-10-07 15:35:00,784 - INFO - Test output for django__django-13448 written to logs/run_evaluation/gold__smoke/gold/django__django-13448/test_output.txt
+2026-10-07 15:35:00,833 - INFO - Git diff after:
+diff --git a/django/db/backends/base/creation.py b/django/db/backends/base/creation.py
+index 503f7f56fd..48a4a6994e 100755
+--- a/django/db/backends/base/creation.py
++++ b/django/db/backends/base/creation.py
+@@ -58,7 +58,14 @@ class BaseDatabaseCreation:
+         settings.DATABASES[self.connection.alias]["NAME"] = test_database_name
+         self.connection.settings_dict["NAME"] = test_database_name
+ 
+-        if self.connection.settings_dict['TEST']['MIGRATE']:
++        try:
++            if self.connection.settings_dict['TEST']['MIGRATE'] is False:
++                # Disable migrations for all apps.
++                old_migration_modules = settings.MIGRATION_MODULES
++                settings.MIGRATION_MODULES = {
++                    app.label: None
++                    for app in apps.get_app_configs()
++                }
+             # We report migrate messages at one level lower than that
+             # requested. This ensures we don't get flooded with messages during
+             # testing (unless you really ask to be flooded).
+@@ -69,6 +76,9 @@ class BaseDatabaseCreation:
+                 database=self.connection.alias,
+                 run_syncdb=True,
+             )
++        finally:
++            if self.connection.settings_dict['TEST']['MIGRATE'] is False:
++                settings.MIGRATION_MODULES = old_migration_modules
+ 
+         # We then serialize the current state of the database into a string
+         # and store it on the connection. This slightly horrific process is so people
+2026-10-07 15:35:00,833 - INFO - Grading answer for django__django-13448...
+2026-10-07 15:35:00,837 - INFO - report: {'django__django-13448': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_migrate_test_setting_false (backends.base.test_creation.TestDbCreationTests)'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_custom_test_name (backends.base.test_creation.TestDbSignatureTests)', 'test_custom_test_name_with_test_prefix (backends.base.test_creation.TestDbSignatureTests)', 'test_default_name (backends.base.test_creation.TestDbSignatureTests)', 'test_migrate_test_setting_true (backends.base.test_creation.TestDbCreationTests)', 'test_circular_reference (backends.base.test_creation.TestDeserializeDbFromString)', 'test_circular_reference_with_natural_key (backends.base.test_creation.TestDeserializeDbFromString)', 'test_self_reference (backends.base.test_creation.TestDeserializeDbFromString)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-13448: resolved: True
+2026-10-07 15:35:00,838 - INFO - Attempting to stop container sweb.eval.django__django-13448.gold__smoke...
+2026-10-07 15:35:19,489 - INFO - Attempting to remove container sweb.eval.django__django-13448.gold__smoke...
+2026-10-07 15:35:19,541 - INFO - Container sweb.eval.django__django-13448.gold__smoke removed.

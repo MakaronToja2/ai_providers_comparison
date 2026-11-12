@@ -1,0 +1,29 @@
+{
+  "job": "rerun-2026-10__google__self_reflect__rep1__smoke5",
+  "experiment_id": "32142d38-3080-5e29-a62f-851b2b053201",
+  "provider": "google",
+  "model": "gemini-2.5-flash-lite",
+  "mode": "self_reflect",
+  "run_idx": 1,
+  "subset": "smoke5",
+  "instances": 5,
+  "status_counts": {
+    "hallucination_format_error": 2,
+    "success_patch_generated": 2,
+    "edit_not_applicable": 1
+  },
+  "incomplete": 0,
+  "api_model_ids": [
+    "gemini-2.5-flash-lite"
+  ],
+  "input_tokens": 250886,
+  "output_tokens": 31642,
+  "cached_input_tokens": 110925,
+  "cost_usd_list_price": 0.037745,
+  "cost_usd_as_billed_estimate": 0.027762,
+  "last_invocation_started": "2026-10-10T08:33:27+00:00",
+  "last_invocation_finished": "2026-10-10T08:34:55+00:00",
+  "harness_commit": "df830ca3b811f3ce273099cbcc89666d5a22f7c9+dirty.3ec5f30592d7",
+  "dataset_revision": "b0dde1093fe417d83b7184254edf8199c1f0dff5",
+  "instances_sha256": "4d38ee52ba38758144edce1e3c7866480dd73d2f5087f9a582d5670e820b9576"
+}

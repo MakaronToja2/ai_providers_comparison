@@ -1,0 +1,31 @@
+diff --git a/django/db/models/query_utils.py b/django/db/models/query_utils.py
+index c2623f099f..f9529533b3 100644
+--- a/django/db/models/query_utils.py
++++ b/django/db/models/query_utils.py
+@@ -51,10 +51,24 @@ class Q(tree.Node):
+         elif not self:
+             return copy.deepcopy(other)
+ 
++        # Defensive copy of children to avoid pickling issues with unpickleable objects like dict_keys
++        def _copy_child(child):
++            try:
++                return copy.deepcopy(child)
++            except TypeError:
++                # If deepcopy fails (e.g. dict_keys), convert to list
++                if hasattr(child, '__iter__') and not isinstance(child, (str, bytes)):
++                    return list(child)
++                return child
++
+         obj = type(self)()
+         obj.connector = conn
+-        obj.add(self, conn)
+-        obj.add(other, conn)
++        # Add children from self
++        for child in self.children:
++            obj.add(_copy_child(child), conn)
++        # Add children from other
++        for child in other.children:
++            obj.add(_copy_child(child), conn)
+         return obj
+ 
+     def __or__(self, other):

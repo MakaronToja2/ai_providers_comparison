@@ -1,0 +1,27 @@
+diff --git a/django/contrib/admin/options.py b/django/contrib/admin/options.py
+index dadd4acfa1..5f869eb67d 100644
+--- a/django/contrib/admin/options.py
++++ b/django/contrib/admin/options.py
+@@ -2031,6 +2031,9 @@ class InlineModelAdmin(BaseModelAdmin):
+     checks_class = InlineModelAdminChecks
+     classes = None
+ 
++    from django.utils.text import capfirst
++    from django.utils.translation import ngettext_lazy
++
+     def __init__(self, parent_model, admin_site):
+         self.admin_site = admin_site
+         self.parent_model = parent_model
+@@ -2040,7 +2043,11 @@ class InlineModelAdmin(BaseModelAdmin):
+         if self.verbose_name is None:
+             self.verbose_name = self.model._meta.verbose_name
+         if self.verbose_name_plural is None:
+-            self.verbose_name_plural = self.model._meta.verbose_name_plural
++            # If verbose_name is set, derive plural from it, else use model's verbose_name_plural
++            if self.verbose_name is not None:
++                self.verbose_name_plural = capfirst(ngettext_lazy(self.verbose_name, self.verbose_name + 's', 2))
++            else:
++                self.verbose_name_plural = self.model._meta.verbose_name_plural
+ 
+     @property
+     def media(self):

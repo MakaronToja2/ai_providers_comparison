@@ -1,0 +1,56 @@
+--- a/sympy/matrices/expressions/blockmatrix.py
++++ b/sympy/matrices/expressions/blockmatrix.py
+@@ -230,13 +230,40 @@
+-    def _entry(self, i, j, **kwargs):
+-        # Find row entry
+-        for row_block, numrows in enumerate(self.rowblocksizes):
+-            if (i < numrows) != False:
+-                break
+-            else:
+-                i -= numrows
+-        for col_block, numcols in enumerate(self.colblocksizes):
+-            if (j < numcols) != False:
+-                break
+-            else:
+-                j -= numcols
+-        return self.blocks[row_block, col_block][i, j]
++    def _entry(self, i, j, **kwargs):
++        # If i or j are symbolic, do not try to resolve to a single block
++        # because the index may refer to different blocks depending on i, j.
++        # Instead, return a Piecewise expression representing the blockwise indexing.
++        from sympy import Piecewise, And, Eq, StrictLessThan
++        from sympy.core.relational import Relational
++
++        # Check if i or j are symbolic expressions that cannot be evaluated as integers
++        if not (i.is_number and j.is_number):
++            conditions = []
++            exprs = []
++            row_start = 0
++            for row_block, numrows in enumerate(self.rowblocksizes):
++                col_start = 0
++                for col_block, numcols in enumerate(self.colblocksizes):
++                    cond = And(StrictLessThan(row_start, i), StrictLessThan(i, row_start + numrows),
++                               StrictLessThan(col_start, j), StrictLessThan(j, col_start + numcols))
++                    # Adjust indices relative to block
++                    expr = self.blocks[row_block, col_block][i - row_start, j - col_start]
++                    conditions.append(cond)
++                    exprs.append(expr)
++                    col_start += numcols
++                row_start += numrows
++            # Add a fallback condition to raise an error if no condition matches
++            exprs.append(None)
++            conditions.append(True)
++            return Piecewise(*[(e, c) for e, c in zip(exprs, conditions) if e is not None])
++
++        # If i and j are numbers, proceed as before
++        for row_block, numrows in enumerate(self.rowblocksizes):
++            if (i < numrows) != False:
++                break
++            else:
++                i -= numrows
++        for col_block, numcols in enumerate(self.colblocksizes):
++            if (j < numcols) != False:
++                break
++            else:
++                j -= numcols
++        return self.blocks[row_block, col_block][i, j]

@@ -1,0 +1,50 @@
+--- a/django/db/backends/base/creation.py
++++ b/django/db/backends/base/creation.py
+@@ -76,18 +76,29 @@
+-        def get_objects():
+-            from django.db.migrations.loader import MigrationLoader
+-            loader = MigrationLoader(self.connection)
+-            for app_config in apps.get_app_configs():
+-                if (
+-                    app_config.models_module is not None and
+-                    app_config.label in loader.migrated_apps and
+-                    app_config.name not in settings.TEST_NON_SERIALIZED_APPS
+-                ):
+-                    for model in app_config.get_models():
+-                        if (
+-                            model._meta.can_migrate(self.connection) and
+-                            router.allow_migrate_model(self.connection.alias, model)
+-                        ):
+-                            queryset = model._default_manager.using(
+-                                self.connection.alias,
+-                            ).order_by(model._meta.pk.name)
+-                            yield from queryset.iterator()
++        def get_objects():
++            from django.db.migrations.loader import MigrationLoader
++            loader = MigrationLoader(self.connection)
++            # If MIGRATE is False, no migrations have been applied, so migrated_apps is empty.
++            # In that case, serialize all apps except those explicitly excluded.
++            migrated_apps = loader.migrated_apps
++            migrate_setting = self.connection.settings_dict.get('TEST', {}).get('MIGRATE', True)
++            for app_config in apps.get_app_configs():
++                if app_config.models_module is None:
++                    continue
++                if not migrate_setting:
++                    # When MIGRATE is False, serialize all apps except those in TEST_NON_SERIALIZED_APPS
++                    if app_config.name in settings.TEST_NON_SERIALIZED_APPS:
++                        continue
++                else:
++                    # When MIGRATE is True, serialize only migrated apps
++                    if app_config.label not in migrated_apps:
++                        continue
++                    if app_config.name in settings.TEST_NON_SERIALIZED_APPS:
++                        continue
++                for model in app_config.get_models():
++                    if (
++                        model._meta.can_migrate(self.connection) and
++                        router.allow_migrate_model(self.connection.alias, model)
++                    ):
++                        queryset = model._default_manager.using(
++                            self.connection.alias,
++                        ).order_by(model._meta.pk.name)
++                        yield from queryset.iterator()

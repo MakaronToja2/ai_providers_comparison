@@ -1,0 +1,18 @@
+diff --git a/sympy/polys/polyoptions.py b/sympy/polys/polyoptions.py
+index 6e504a3057..550a0b391f 100644
+--- a/sympy/polys/polyoptions.py
++++ b/sympy/polys/polyoptions.py
+@@ -480,6 +480,13 @@ def preprocess(cls, domain):
+                 gens = list(map(sympify, r.groups()[1].split(',')))
+                 return sympy.polys.domains.QQ.algebraic_field(*gens)
+ 
++            # Try to parse domain with polynomial domain pattern with nested polynomial domain
++            # e.g. RR[y,z]
++            if domain.startswith('RR[') and domain.endswith(']'):
++                inner = domain[3:-1]
++                gens = list(map(sympify, inner.split(',')))
++                return sympy.polys.domains.RR.poly_ring(*gens)
++
+         raise OptionError('expected a valid domain specification, got %s' % domain)
+ 
+     @classmethod

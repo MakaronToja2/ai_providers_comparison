@@ -1,0 +1,14 @@
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 2a98396cad..ea4c59e0d4 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1013,7 +1013,8 @@ class Field(RegisterLookupMixin):
+         }
+         if self.has_default():
+             if callable(self.default):
+-                defaults["initial"] = self.default
++                # Call the callable default to get the initial value instead of passing the callable itself
++                defaults["initial"] = self.default()
+                 defaults["show_hidden_initial"] = True
+             else:
+                 defaults["initial"] = self.get_default()

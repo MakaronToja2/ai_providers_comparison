@@ -1,0 +1,22 @@
+diff --git a/sympy/core/function.py b/sympy/core/function.py
+index 69df976b8b..9586de68a2 100644
+--- a/sympy/core/function.py
++++ b/sympy/core/function.py
+@@ -1078,6 +1078,17 @@ class Derivative(Expr):
+     If the derivative cannot be performed, and evaluate is True, the
+     order of the variables of differentiation will be made canonical:
+ 
++    @property
++    def kind(self):
++        # Return the kind of the function being differentiated
++        return self.expr.kind
++
++    Notes
++    =====
++
++    The kind attribute returns the kind of the function being differentiated.
++    """
++
+         >>> Derivative(f(x, y), y, x, evaluate=True)
+         Derivative(f(x, y), x, y)
+ 

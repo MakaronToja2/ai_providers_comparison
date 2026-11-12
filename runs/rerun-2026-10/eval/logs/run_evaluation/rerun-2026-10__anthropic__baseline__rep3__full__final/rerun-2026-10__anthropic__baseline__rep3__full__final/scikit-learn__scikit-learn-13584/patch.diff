@@ -1,0 +1,24 @@
+diff --git a/sklearn/utils/_pprint.py b/sklearn/utils/_pprint.py
+index b8686dba5b0..792466227ee 100644
+--- a/sklearn/utils/_pprint.py
++++ b/sklearn/utils/_pprint.py
+@@ -95,7 +95,18 @@ def _changed_params(estimator):
+     init_params = signature(init_func).parameters
+     init_params = {name: param.default for name, param in init_params.items()}
+     for k, v in params.items():
+-        if (v != init_params[k] and
++        # Check if values are different, handling the case where v might be
++        # a numpy array or other object that doesn't support simple comparison
++        try:
++            is_equal = v == init_params[k]
++            # Handle numpy arrays and other objects that return arrays from ==
++            if hasattr(is_equal, '__iter__') and not isinstance(is_equal, str):
++                is_equal = is_equal.all()
++        except (ValueError, TypeError):
++            # If comparison fails, assume they're different
++            is_equal = False
++        
++        if (not is_equal and
+                 not (is_scalar_nan(init_params[k]) and is_scalar_nan(v))):
+             filtered_params[k] = v
+     return filtered_params

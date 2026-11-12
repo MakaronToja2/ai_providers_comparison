@@ -1,0 +1,85 @@
+2026-10-10 18:22:07,958 - INFO - Creating container for sympy__sympy-13043...
+2026-10-10 18:22:21,675 - INFO - Container for sympy__sympy-13043 created: 466593ffabf6b5b7afb2c4b4100e0e8f445fb5c998fd6d06cc8aa8220ea18682
+2026-10-10 18:22:33,773 - INFO - Container for sympy__sympy-13043 started: 466593ffabf6b5b7afb2c4b4100e0e8f445fb5c998fd6d06cc8aa8220ea18682
+2026-10-10 18:22:33,773 - INFO - Intermediate patch for sympy__sympy-13043 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep2__full__final/rerun-2026-10__openai__baseline__rep2__full__final/sympy__sympy-13043/patch.diff, now applying to container...
+2026-10-10 18:22:33,888 - INFO - >>>>> Applied Patch:
+Checking patch sympy/polys/polyclasses.py...
+warning: sympy/polys/polyclasses.py has type 100755, expected 100644
+Checking patch sympy/polys/polytools.py...
+warning: sympy/polys/polytools.py has type 100755, expected 100644
+Applied patch sympy/polys/polyclasses.py cleanly.
+Applied patch sympy/polys/polytools.py cleanly.
+
+2026-10-10 18:22:34,127 - INFO - Git diff before:
+diff --git a/sympy/polys/polyclasses.py b/sympy/polys/polyclasses.py
+index b853060a3..1b5de8199 100755
+--- a/sympy/polys/polyclasses.py
++++ b/sympy/polys/polyclasses.py
+@@ -711,7 +711,10 @@ def compose(f, g):
+     def decompose(f):
+         """Computes functional decomposition of ``f``. """
+         if not f.lev:
+-            return list(map(f.per, dup_decompose(f.rep, f.dom)))
++            result = dup_decompose(f.rep, f.dom)
++            # Sort the result to ensure consistent order
++            result_sorted = sorted(result, key=lambda p: (p.degree(), p))
++            return list(map(f.per, result_sorted))
+         else:
+             raise ValueError('univariate polynomial expected')
+ 
+diff --git a/sympy/polys/polytools.py b/sympy/polys/polytools.py
+index 2cf5e6932..782f8d672 100755
+--- a/sympy/polys/polytools.py
++++ b/sympy/polys/polytools.py
+@@ -2972,7 +2972,9 @@ def decompose(f):
+         else:  # pragma: no cover
+             raise OperationNotSupported(f, 'decompose')
+ 
+-        return list(map(f.per, result))
++        # Sort the result to ensure consistent order
++        result_sorted = sorted(result, key=lambda p: (p.degree(), p))
++        return list(map(f.per, result_sorted))
+ 
+     def shift(f, a):
+         """
+2026-10-10 18:22:34,128 - INFO - Eval script for sympy__sympy-13043 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep2__full__final/rerun-2026-10__openai__baseline__rep2__full__final/sympy__sympy-13043/eval.sh; copying to container...
+2026-10-10 18:22:38,931 - INFO - Test runtime: 4.75 seconds
+2026-10-10 18:22:38,932 - INFO - Test output for sympy__sympy-13043 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep2__full__final/rerun-2026-10__openai__baseline__rep2__full__final/sympy__sympy-13043/test_output.txt
+2026-10-10 18:22:38,994 - INFO - Git diff after:
+diff --git a/sympy/polys/polyclasses.py b/sympy/polys/polyclasses.py
+index b853060a3..1b5de8199 100755
+--- a/sympy/polys/polyclasses.py
++++ b/sympy/polys/polyclasses.py
+@@ -711,7 +711,10 @@ def compose(f, g):
+     def decompose(f):
+         """Computes functional decomposition of ``f``. """
+         if not f.lev:
+-            return list(map(f.per, dup_decompose(f.rep, f.dom)))
++            result = dup_decompose(f.rep, f.dom)
++            # Sort the result to ensure consistent order
++            result_sorted = sorted(result, key=lambda p: (p.degree(), p))
++            return list(map(f.per, result_sorted))
+         else:
+             raise ValueError('univariate polynomial expected')
+ 
+diff --git a/sympy/polys/polytools.py b/sympy/polys/polytools.py
+index 2cf5e6932..782f8d672 100755
+--- a/sympy/polys/polytools.py
++++ b/sympy/polys/polytools.py
+@@ -2972,7 +2972,9 @@ def decompose(f):
+         else:  # pragma: no cover
+             raise OperationNotSupported(f, 'decompose')
+ 
+-        return list(map(f.per, result))
++        # Sort the result to ensure consistent order
++        result_sorted = sorted(result, key=lambda p: (p.degree(), p))
++        return list(map(f.per, result_sorted))
+ 
+     def shift(f, a):
+         """
+2026-10-10 18:22:38,994 - INFO - Grading answer for sympy__sympy-13043...
+2026-10-10 18:22:39,000 - INFO - report: {'sympy__sympy-13043': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_decompose']}, 'PASS_TO_PASS': {'success': ['test_best_origin'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-13043: resolved: False
+2026-10-10 18:22:39,001 - INFO - Attempting to stop container sweb.eval.sympy__sympy-13043.rerun-2026-10__openai__baseline__rep2__full__final...
+2026-10-10 18:23:00,865 - INFO - Attempting to remove container sweb.eval.sympy__sympy-13043.rerun-2026-10__openai__baseline__rep2__full__final...
+2026-10-10 18:23:11,306 - INFO - Container sweb.eval.sympy__sympy-13043.rerun-2026-10__openai__baseline__rep2__full__final removed.

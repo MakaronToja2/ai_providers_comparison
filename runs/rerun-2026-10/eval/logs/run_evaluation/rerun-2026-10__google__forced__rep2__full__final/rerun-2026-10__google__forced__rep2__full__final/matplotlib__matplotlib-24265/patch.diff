@@ -1,0 +1,22 @@
+diff --git a/lib/matplotlib/style/core.py b/lib/matplotlib/style/core.py
+index fb0a5426e6..1db6839a5a 100644
+--- a/lib/matplotlib/style/core.py
++++ b/lib/matplotlib/style/core.py
+@@ -150,6 +150,17 @@ def use(style):
+                 _apply_style(rcParamsDefault, warn=False)
+         elif style in library:
+             _apply_style(library[style])
++        # Handle deprecated seaborn styles that are now prefixed with seaborn-v0_8-
++        elif style.startswith("seaborn-v0_8-"):
++            try:
++                # Try to load the style directly if it's a known seaborn-v0_8 style
++                rc = rc_params_from_file(style, use_default_template=False)
++                _apply_style(rc)
++            except IOError as err:
++                raise IOError(
++                    f"{style!r} not found. Seaborn styles have been moved to the "
++                    f"seaborn package and are available as 'seaborn-v0_8-*'. "
++                    f"Please install seaborn or use a different style.") from err
+         else:
+             try:
+                 rc = rc_params_from_file(style, use_default_template=False)

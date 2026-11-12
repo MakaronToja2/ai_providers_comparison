@@ -1,0 +1,36 @@
+diff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py
+index 78c4f47b5b..c048fc4c54 100644
+--- a/django/db/models/sql/query.py
++++ b/django/db/models/sql/query.py
+@@ -1926,6 +1926,10 @@ class Query(BaseExpression):
+         return data. If the database backend supports grouping by the
+         primary key, and the query would be equivalent, the optimization
+         will be made automatically.
++
++        Fix for ambiguous column references in GROUP BY when annotations
++        contain Subquery expressions: if the group by item is a Subquery,
++        use the full expression rather than the alias.
+         """
+         group_by = list(self.select)
+         if self.annotation_select:
+@@ -1943,7 +1947,19 @@ class Query(BaseExpression):
+                     if not allow_aliases:
+                         alias = None
+                     group_by_cols = annotation.get_group_by_cols(alias=alias)
+-                group_by.extend(group_by_cols)
++                # Fix: replace alias with full expression if annotation is a Subquery
++                fixed_group_by_cols = []
++                for col in group_by_cols:
++                    # col can be an alias string or an expression
++                    # If it's an alias string and the annotation is a Subquery,
++                    # replace with the full expression to avoid ambiguity.
++                    if (isinstance(col, str) and
++                        hasattr(annotation, 'source_expressions') and
++                        any(isinstance(expr, Subquery) for expr in annotation.source_expressions)):
++                        fixed_group_by_cols.append(annotation)
++                    else:
++                        fixed_group_by_cols.append(col)
++                group_by.extend(fixed_group_by_cols)
+         self.group_by = tuple(group_by)
+ 
+     def add_select_related(self, fields):

@@ -1,0 +1,36 @@
+diff --git a/sympy/simplify/trigsimp.py b/sympy/simplify/trigsimp.py
+index 8ba346adbe..844bdd3ac0 100644
+--- a/sympy/simplify/trigsimp.py
++++ b/sympy/simplify/trigsimp.py
+@@ -475,6 +475,31 @@ def trigsimp(expr, **opts):
+ 
+     expr = sympify(expr)
+ 
++    # Check for the specific pattern: sin(a)*sin(b) + cos(a)*cos(b)
++    # This pattern is equivalent to cos(a - b)
++    # We need to ensure this simplification happens even if a and b are Rationals.
++
++    # Create wildcards to match the pattern
++    a, b = Wild('a'), Wild('b')
++    pattern1 = sin(a)*sin(b) + cos(a)*cos(b)
++    pattern2 = cos(a)*cos(b) + sin(a)*sin(b) # Order might be different
++
++    match1 = expr.match(pattern1)
++    match2 = expr.match(pattern2)
++
++    if match1:
++        arg_a, arg_b = match1.get(a), match1.get(b)
++        if isinstance(arg_a, Rational) and isinstance(arg_b, Rational):
++            # Apply the identity cos(a - b)
++            # Use .doit() to ensure simplification of the result (e.g., subtraction of rationals)
++            return cos(arg_a - arg_b).doit()
++
++    if match2:
++        arg_a, arg_b = match2.get(a), match2.get(b)
++        if isinstance(arg_a, Rational) and isinstance(arg_b, Rational):
++            # Apply the identity cos(a - b)
++            return cos(arg_a - arg_b).doit()
++
+     try:
+         return expr._eval_trigsimp(**opts)
+     except AttributeError:

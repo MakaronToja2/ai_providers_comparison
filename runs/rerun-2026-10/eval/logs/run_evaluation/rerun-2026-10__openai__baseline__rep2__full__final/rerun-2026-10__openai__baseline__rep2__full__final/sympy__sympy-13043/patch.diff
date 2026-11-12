@@ -1,0 +1,31 @@
+diff --git a/sympy/polys/polyclasses.py b/sympy/polys/polyclasses.py
+index b853060a3e..1b5de8199f 100644
+--- a/sympy/polys/polyclasses.py
++++ b/sympy/polys/polyclasses.py
+@@ -711,7 +711,10 @@ def compose(f, g):
+     def decompose(f):
+         """Computes functional decomposition of ``f``. """
+         if not f.lev:
+-            return list(map(f.per, dup_decompose(f.rep, f.dom)))
++            result = dup_decompose(f.rep, f.dom)
++            # Sort the result to ensure consistent order
++            result_sorted = sorted(result, key=lambda p: (p.degree(), p))
++            return list(map(f.per, result_sorted))
+         else:
+             raise ValueError('univariate polynomial expected')
+ 
+diff --git a/sympy/polys/polytools.py b/sympy/polys/polytools.py
+index 2cf5e69329..782f8d6729 100644
+--- a/sympy/polys/polytools.py
++++ b/sympy/polys/polytools.py
+@@ -2972,7 +2972,9 @@ def decompose(f):
+         else:  # pragma: no cover
+             raise OperationNotSupported(f, 'decompose')
+ 
+-        return list(map(f.per, result))
++        # Sort the result to ensure consistent order
++        result_sorted = sorted(result, key=lambda p: (p.degree(), p))
++        return list(map(f.per, result_sorted))
+ 
+     def shift(f, a):
+         """

@@ -1,5 +1,7 @@
+import json
+import os
 import pandas as pd
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from datetime import datetime
 import logging
 
@@ -19,9 +21,41 @@ class SWEBenchLoader:
         "verified": ("SWE-bench/SWE-bench_Verified", "test"),  # 500 instances (human verified)
     }
 
+    # Dataset revisions to pin, per split (Hugging Face commit hashes). A pinned revision
+    # keeps the instance set and its fields fixed for the whole study. Override with the
+    # SWEBENCH_REVISION_<SPLIT> environment variable.
+    DATASET_REVISIONS: Dict[str, str] = {}
+
     def __init__(self):
         self._dataset_cache: Dict[str, pd.DataFrame] = {}
         self._load_times: Dict[str, datetime] = {}
+
+    def revision_for(self, split: str) -> Optional[str]:
+        """Pinned dataset revision for a split, or None for the latest."""
+        return os.environ.get(f"SWEBENCH_REVISION_{split.upper()}") or self.DATASET_REVISIONS.get(split)
+
+    @staticmethod
+    def _as_str_list(value: Any) -> Optional[List[str]]:
+        """Normalise a test-id field: older dataset revisions store a JSON string,
+        newer ones a list column (a numpy array once loaded through pandas)."""
+        if value is None:
+            return None
+        if isinstance(value, str):
+            try:
+                value = json.loads(value)
+            except json.JSONDecodeError:
+                return None
+        if hasattr(value, "tolist"):
+            value = value.tolist()
+        if isinstance(value, (list, tuple)):
+            return [str(v) for v in value]
+        return None
+
+    @staticmethod
+    def _as_optional_str(value: Any) -> Optional[str]:
+        if value is None or (isinstance(value, float) and pd.isna(value)):
+            return None
+        return str(value)
 
     def load_dataset(self, split: str = "dev") -> SWEBenchDatasetInfo:
         """
@@ -43,7 +77,7 @@ class SWEBenchLoader:
             # Use datasets library instead of direct parquet reading
             from datasets import load_dataset
 
-            dataset = load_dataset(dataset_name, split=hf_split)
+            dataset = load_dataset(dataset_name, split=hf_split, revision=self.revision_for(split))
             df = dataset.to_pandas()
             
             # Cache the dataset
@@ -94,23 +128,6 @@ class SWEBenchLoader:
         row = instance_rows.iloc[0]
         
         try:
-            # Parse test lists that might come as strings
-            import json
-            
-            fail_to_pass = row.get('FAIL_TO_PASS')
-            if isinstance(fail_to_pass, str):
-                try:
-                    fail_to_pass = json.loads(fail_to_pass)
-                except:
-                    fail_to_pass = None
-            
-            pass_to_pass = row.get('PASS_TO_PASS') 
-            if isinstance(pass_to_pass, str):
-                try:
-                    pass_to_pass = json.loads(pass_to_pass)
-                except:
-                    pass_to_pass = None
-            
             instance = SWEBenchInstance(
                 instance_id=row.get('instance_id', ''),
                 repo=row.get('repo', ''),
@@ -118,14 +135,14 @@ class SWEBenchLoader:
                 patch=row.get('patch', ''),
                 test_patch=row.get('test_patch', ''),
                 problem_statement=row.get('problem_statement', ''),
-                hints_text=row.get('hints_text'),
-                created_at=row.get('created_at'),
-                version=row.get('version'),
-                FAIL_TO_PASS=fail_to_pass,
-                PASS_TO_PASS=pass_to_pass,
-                environment_setup_commit=row.get('environment_setup_commit')
+                hints_text=self._as_optional_str(row.get('hints_text')),
+                created_at=self._as_optional_str(row.get('created_at')),
+                version=self._as_optional_str(row.get('version')),
+                FAIL_TO_PASS=self._as_str_list(row.get('FAIL_TO_PASS')),
+                PASS_TO_PASS=self._as_str_list(row.get('PASS_TO_PASS')),
+                environment_setup_commit=self._as_optional_str(row.get('environment_setup_commit'))
             )
-            
+
             logger.info(f"Retrieved instance {instance_id} from {split} split")
             return instance
             

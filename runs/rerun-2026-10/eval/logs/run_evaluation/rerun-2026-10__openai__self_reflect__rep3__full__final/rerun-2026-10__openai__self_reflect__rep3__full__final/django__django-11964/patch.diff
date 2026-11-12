@@ -1,0 +1,23 @@
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index d610dc86f0..6159bdad7f 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -578,6 +578,18 @@ class Field(RegisterLookupMixin):
+         django.core.exceptions.ValidationError if the data can't be converted.
+         Return the converted value. Subclasses should override this.
+         """
++        # If the field has choices that are subclasses of enum.Enum,
++        # convert the value to the enum member if it is not already.
++        choices = getattr(self, 'choices', None)
++        if choices and hasattr(choices, '__class__') and issubclass(choices.__class__, enum.EnumMeta):
++            # If value is already an enum member, return it as is
++            if isinstance(value, choices):
++                return value
++            # Otherwise, try to convert the value to the enum member by value
++            try:
++                return choices(value)
++            except ValueError:
++                pass
+         return value
+ 
+     @cached_property

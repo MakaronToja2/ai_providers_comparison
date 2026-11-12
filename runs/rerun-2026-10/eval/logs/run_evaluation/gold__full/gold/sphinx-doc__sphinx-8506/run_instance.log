@@ -1,0 +1,69 @@
+2026-10-10 18:22:07,932 - INFO - Creating container for sphinx-doc__sphinx-8506...
+2026-10-10 18:22:18,834 - INFO - Container for sphinx-doc__sphinx-8506 created: 692466af3393c60754f09c6991ea6ea7719d298c5050df045b8732a072a0a149
+2026-10-10 18:22:28,033 - INFO - Container for sphinx-doc__sphinx-8506 started: 692466af3393c60754f09c6991ea6ea7719d298c5050df045b8732a072a0a149
+2026-10-10 18:22:28,034 - INFO - Intermediate patch for sphinx-doc__sphinx-8506 written to logs/run_evaluation/gold__full/gold/sphinx-doc__sphinx-8506/patch.diff, now applying to container...
+2026-10-10 18:22:28,124 - INFO - >>>>> Applied Patch:
+Checking patch sphinx/domains/std.py...
+Applied patch sphinx/domains/std.py cleanly.
+
+2026-10-10 18:22:28,288 - INFO - Git diff before:
+diff --git a/sphinx/domains/std.py b/sphinx/domains/std.py
+index c87217c56..e4285b1ae 100755
+--- a/sphinx/domains/std.py
++++ b/sphinx/domains/std.py
+@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
+ 
+ 
+ # RE for option descriptions
+-option_desc_re = re.compile(r'((?:/|--|-|\+)?[^\s=[]+)(=?\s*.*)')
++option_desc_re = re.compile(r'((?:/|--|-|\+)?[^\s=]+)(=?\s*.*)')
+ # RE for grammar tokens
+ token_re = re.compile(r'`(\w+)`', re.U)
+ 
+@@ -197,6 +197,11 @@ class Cmdoption(ObjectDescription):
+                                location=signode)
+                 continue
+             optname, args = m.groups()
++            if optname.endswith('[') and args.endswith(']'):
++                # optional value surrounded by brackets (ex. foo[=bar])
++                optname = optname[:-1]
++                args = '[' + args
++
+             if count:
+                 signode += addnodes.desc_addname(', ', ', ')
+             signode += addnodes.desc_name(optname, optname)
+2026-10-10 18:22:28,289 - INFO - Eval script for sphinx-doc__sphinx-8506 written to logs/run_evaluation/gold__full/gold/sphinx-doc__sphinx-8506/eval.sh; copying to container...
+2026-10-10 18:22:35,722 - INFO - Test runtime: 7.39 seconds
+2026-10-10 18:22:35,723 - INFO - Test output for sphinx-doc__sphinx-8506 written to logs/run_evaluation/gold__full/gold/sphinx-doc__sphinx-8506/test_output.txt
+2026-10-10 18:22:35,786 - INFO - Git diff after:
+diff --git a/sphinx/domains/std.py b/sphinx/domains/std.py
+index c87217c56..e4285b1ae 100755
+--- a/sphinx/domains/std.py
++++ b/sphinx/domains/std.py
+@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
+ 
+ 
+ # RE for option descriptions
+-option_desc_re = re.compile(r'((?:/|--|-|\+)?[^\s=[]+)(=?\s*.*)')
++option_desc_re = re.compile(r'((?:/|--|-|\+)?[^\s=]+)(=?\s*.*)')
+ # RE for grammar tokens
+ token_re = re.compile(r'`(\w+)`', re.U)
+ 
+@@ -197,6 +197,11 @@ class Cmdoption(ObjectDescription):
+                                location=signode)
+                 continue
+             optname, args = m.groups()
++            if optname.endswith('[') and args.endswith(']'):
++                # optional value surrounded by brackets (ex. foo[=bar])
++                optname = optname[:-1]
++                args = '[' + args
++
+             if count:
+                 signode += addnodes.desc_addname(', ', ', ')
+             signode += addnodes.desc_name(optname, optname)
+2026-10-10 18:22:35,786 - INFO - Grading answer for sphinx-doc__sphinx-8506...
+2026-10-10 18:22:35,791 - INFO - report: {'sphinx-doc__sphinx-8506': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['tests/test_domain_std.py::test_cmd_option_starting_with_bracket'], 'failure': []}, 'PASS_TO_PASS': {'success': ['tests/test_domain_std.py::test_process_doc_handle_figure_caption', 'tests/test_domain_std.py::test_process_doc_handle_table_title', 'tests/test_domain_std.py::test_get_full_qualified_name', 'tests/test_domain_std.py::test_cmd_option_with_optional_value', 'tests/test_domain_std.py::test_glossary', 'tests/test_domain_std.py::test_glossary_warning', 'tests/test_domain_std.py::test_glossary_comment', 'tests/test_domain_std.py::test_glossary_comment2', 'tests/test_domain_std.py::test_glossary_sorted', 'tests/test_domain_std.py::test_glossary_alphanumeric', 'tests/test_domain_std.py::test_glossary_conflicted_labels', 'tests/test_domain_std.py::test_cmdoption', 'tests/test_domain_std.py::test_multiple_cmdoptions', 'tests/test_domain_std.py::test_disabled_docref'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sphinx-doc__sphinx-8506: resolved: True
+2026-10-10 18:22:35,791 - INFO - Attempting to stop container sweb.eval.sphinx-doc__sphinx-8506.gold__full...
+2026-10-10 18:22:59,297 - INFO - Attempting to remove container sweb.eval.sphinx-doc__sphinx-8506.gold__full...
+2026-10-10 18:23:07,068 - INFO - Container sweb.eval.sphinx-doc__sphinx-8506.gold__full removed.

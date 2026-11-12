@@ -1,0 +1,64 @@
+2026-10-10 18:58:22,902 - INFO - Creating container for sympy__sympy-15346...
+2026-10-10 18:58:26,771 - INFO - Container for sympy__sympy-15346 created: db75fa3e470830c8d3875e7a92ffd9efe0ea2ece419f78cefbf776e251dec921
+2026-10-10 18:58:30,138 - INFO - Container for sympy__sympy-15346 started: db75fa3e470830c8d3875e7a92ffd9efe0ea2ece419f78cefbf776e251dec921
+2026-10-10 18:58:30,139 - INFO - Intermediate patch for sympy__sympy-15346 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep1__full__final/rerun-2026-10__anthropic__forced__rep1__full__final/sympy__sympy-15346/patch.diff, now applying to container...
+2026-10-10 18:58:30,273 - INFO - >>>>> Applied Patch:
+Checking patch sympy/simplify/trigsimp.py...
+warning: sympy/simplify/trigsimp.py has type 100755, expected 100644
+Applied patch sympy/simplify/trigsimp.py cleanly.
+
+2026-10-10 18:58:30,677 - INFO - Git diff before:
+diff --git a/sympy/simplify/trigsimp.py b/sympy/simplify/trigsimp.py
+index 8ba346adb..0f8be7729 100755
+--- a/sympy/simplify/trigsimp.py
++++ b/sympy/simplify/trigsimp.py
+@@ -1002,6 +1002,17 @@ def __trigsimp(expr, deep=False):
+             for pattern, result in matchers_add:
+                 if not _dotrig(expr, pattern):
+                     continue
++                res = expr.match(pattern)
++                if res is not None:
++                    # if "d" contains any trig or hyperbolic funcs with
++                    # argument "a" or "b" then skip the simplification;
++                    # this isn't perfect -- see tests
++                    if not (a in res and b in res) or any(
++                        w.args[0] in (res[a], res[b]) for w in res[d].atoms(
++                            TrigonometricFunction, HyperbolicFunction)):
++                        continue
++                    expr = result.subs(res)
++                    break
+                 expr = TR10i(expr)
+                 if expr.has(HyperbolicFunction):
+                     res = expr.match(pattern)
+2026-10-10 18:58:30,677 - INFO - Eval script for sympy__sympy-15346 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep1__full__final/rerun-2026-10__anthropic__forced__rep1__full__final/sympy__sympy-15346/eval.sh; copying to container...
+2026-10-10 18:59:07,110 - INFO - Test runtime: 36.34 seconds
+2026-10-10 18:59:07,112 - INFO - Test output for sympy__sympy-15346 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep1__full__final/rerun-2026-10__anthropic__forced__rep1__full__final/sympy__sympy-15346/test_output.txt
+2026-10-10 18:59:07,174 - INFO - Git diff after:
+diff --git a/sympy/simplify/trigsimp.py b/sympy/simplify/trigsimp.py
+index 8ba346adb..0f8be7729 100755
+--- a/sympy/simplify/trigsimp.py
++++ b/sympy/simplify/trigsimp.py
+@@ -1002,6 +1002,17 @@ def __trigsimp(expr, deep=False):
+             for pattern, result in matchers_add:
+                 if not _dotrig(expr, pattern):
+                     continue
++                res = expr.match(pattern)
++                if res is not None:
++                    # if "d" contains any trig or hyperbolic funcs with
++                    # argument "a" or "b" then skip the simplification;
++                    # this isn't perfect -- see tests
++                    if not (a in res and b in res) or any(
++                        w.args[0] in (res[a], res[b]) for w in res[d].atoms(
++                            TrigonometricFunction, HyperbolicFunction)):
++                        continue
++                    expr = result.subs(res)
++                    break
+                 expr = TR10i(expr)
+                 if expr.has(HyperbolicFunction):
+                     res = expr.match(pattern)
+2026-10-10 18:59:07,174 - INFO - Grading answer for sympy__sympy-15346...
+2026-10-10 18:59:07,176 - INFO - report: {'sympy__sympy-15346': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_issue_15129_trigsimp_methods']}, 'PASS_TO_PASS': {'success': ['test_trigsimp1', 'test_trigsimp1a', 'test_trigsimp2', 'test_issue_4373', 'test_trigsimp3', 'test_issue_4661', 'test_issue_4494', 'test_issue_5948', 'test_issue_4775', 'test_issue_4280', 'test_issue_3210', 'test_trigsimp_issues', 'test_trigsimp_issue_2515', 'test_trigsimp_issue_3826', 'test_trigsimp_issue_4032', 'test_trigsimp_issue_7761', 'test_trigsimp_noncommutative', 'test_hyperbolic_simp', 'test_trigsimp_groebner', 'test_issue_2827_trigsimp_methods', 'test_exptrigsimp', 'test_powsimp_on_numbers'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-15346: resolved: False
+2026-10-10 18:59:07,176 - INFO - Attempting to stop container sweb.eval.sympy__sympy-15346.rerun-2026-10__anthropic__forced__rep1__full__final...
+2026-10-10 18:59:25,267 - INFO - Attempting to remove container sweb.eval.sympy__sympy-15346.rerun-2026-10__anthropic__forced__rep1__full__final...
+2026-10-10 18:59:26,658 - INFO - Container sweb.eval.sympy__sympy-15346.rerun-2026-10__anthropic__forced__rep1__full__final removed.

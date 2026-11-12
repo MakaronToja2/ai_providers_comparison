@@ -1,0 +1,18 @@
+<frozen runpy>:128: RuntimeWarning: 'swebench.harness.run_evaluation' found in sys.modules after import of package 'swebench.harness', but prior to execution of 'swebench.harness.run_evaluation'; this may result in unpredictable behaviour
+Found 5 existing instance images. Will reuse them.
+Running 5 instances...
+Evaluation:   0%|          | 0/5 [00:00<?, ?it/s, error=0, ✓=0, ✖=0]Evaluation:   0%|          | 0/5 [00:27<?, ?it/s, ✓=0, ✖=1, error=0]Evaluation:  20%|██        | 1/5 [00:27<01:48, 27.06s/it, ✓=0, ✖=1, error=0]Evaluation:  20%|██        | 1/5 [00:27<01:48, 27.06s/it, ✓=1, ✖=1, error=0]Evaluation:  40%|████      | 2/5 [00:27<00:33, 11.30s/it, ✓=1, ✖=1, error=0]Evaluation:  40%|████      | 2/5 [00:28<00:33, 11.30s/it, ✓=1, ✖=2, error=0]Evaluation:  60%|██████    | 3/5 [00:28<00:12,  6.48s/it, ✓=1, ✖=2, error=0]Evaluation:  60%|██████    | 3/5 [00:48<00:12,  6.48s/it, ✓=2, ✖=2, error=0]Evaluation:  80%|████████  | 4/5 [00:48<00:11, 11.84s/it, ✓=2, ✖=2, error=0]Evaluation:  80%|████████  | 4/5 [02:22<00:11, 11.84s/it, ✓=3, ✖=2, error=0]Evaluation: 100%|██████████| 5/5 [02:22<00:00, 41.59s/it, ✓=3, ✖=2, error=0]Evaluation: 100%|██████████| 5/5 [02:22<00:00, 28.49s/it, ✓=3, ✖=2, error=0]
+All instances run.
+Cleaning cached images...
+Removed 0 images.
+Total instances: 5
+Instances submitted: 5
+Instances completed: 5
+Instances incomplete: 0
+Instances resolved: 3
+Instances unresolved: 2
+Instances with empty patches: 0
+Instances with errors: 0
+Unstopped containers: 0
+Unremoved images: 5
+Report written to rerun-2026-10__anthropic__baseline__rep1__smoke5__final.rerun-2026-10__anthropic__baseline__rep1__smoke5__final.json

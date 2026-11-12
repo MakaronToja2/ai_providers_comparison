@@ -1,0 +1,16 @@
+diff --git a/sympy/simplify/cse_main.py b/sympy/simplify/cse_main.py
+index d649dd02a9..e169549705 100644
+--- a/sympy/simplify/cse_main.py
++++ b/sympy/simplify/cse_main.py
+@@ -672,8 +672,9 @@ def _rebuild(expr):
+                 raise ValueError("Symbols iterator ran out of symbols.")
+ 
+             if isinstance(orig_expr, MatrixExpr):
+-                sym = MatrixSymbol(sym.name, orig_expr.rows,
+-                    orig_expr.cols)
++                # Create a MatrixSymbol with the same shape but do not keep indexing
++                # This avoids strange behavior with indexing of MatrixSymbols in cse
++                sym = MatrixSymbol(sym.name, orig_expr.rows, orig_expr.cols)
+ 
+             subs[orig_expr] = sym
+             replacements.append((sym, new_expr))

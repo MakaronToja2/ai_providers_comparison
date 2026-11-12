@@ -1,0 +1,106 @@
+2026-10-10 18:13:04,188 - INFO - Creating container for sphinx-doc__sphinx-10325...
+2026-10-10 18:13:09,959 - INFO - Container for sphinx-doc__sphinx-10325 created: 280a10a06de920bbe55eea6e4ecc1cd24bcfde65dd149f3ffb3367572d8e351d
+2026-10-10 18:13:13,176 - INFO - Container for sphinx-doc__sphinx-10325 started: 280a10a06de920bbe55eea6e4ecc1cd24bcfde65dd149f3ffb3367572d8e351d
+2026-10-10 18:13:13,176 - INFO - Intermediate patch for sphinx-doc__sphinx-10325 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep3__full__final/rerun-2026-10__google__self_reflect__rep3__full__final/sphinx-doc__sphinx-10325/patch.diff, now applying to container...
+2026-10-10 18:13:13,268 - INFO - >>>>> Applied Patch:
+Checking patch sphinx/ext/autodoc/__init__.py...
+warning: sphinx/ext/autodoc/__init__.py has type 100755, expected 100644
+Applied patch sphinx/ext/autodoc/__init__.py cleanly.
+
+2026-10-10 18:13:13,460 - INFO - Git diff before:
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 62631f7ff..12d60eb14 100755
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -109,11 +109,15 @@ def exclude_members_option(arg: Any) -> Union[object, Set[str]]:
+     return {x.strip() for x in arg.split(',') if x.strip()}
+ 
+ 
+-def inherited_members_option(arg: Any) -> Union[object, Set[str]]:
+-    """Used to convert the :members: option to auto directives."""
++def inherited_members_option(arg: Any) -> Union[object, List[str]]:
++    """Used to convert the :inherited-members: option to auto directives."""
+     if arg in (None, True):
+         return 'object'
++    elif isinstance(arg, str):
++        # Split comma-separated string into a list of class names
++        return [x.strip() for x in arg.split(',') if x.strip()]
+     else:
++        # If it's already a list or some other type, return it as is
+         return arg
+ 
+ 
+@@ -1710,7 +1714,20 @@ class ClassDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # type:
+                                    (name, self.fullname), type='autodoc')
+             return False, selected
+         elif self.options.inherited_members:
+-            return False, list(members.values())
++            inherited_classes = self.options.inherited_members
++            if isinstance(inherited_classes, list):
++                # Filter members to include only those from specified base classes
++                filtered_members = []
++                for member in members.values():
++                    # Ensure member.class_ is not None and has a __name__ attribute
++                    # member.class_ is the class where the member is defined.
++                    if member.class_ and hasattr(member.class_, '__name__'):
++                        if member.class_.__name__ in inherited_classes:
++                            filtered_members.append(member)
++                return False, filtered_members
++            else:
++                # Default behavior: include all inherited members (e.g., if option was just True)
++                return False, list(members.values())
+         else:
+             return False, [m for m in members.values() if m.class_ == self.object]
+2026-10-10 18:13:13,460 - INFO - Eval script for sphinx-doc__sphinx-10325 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep3__full__final/rerun-2026-10__google__self_reflect__rep3__full__final/sphinx-doc__sphinx-10325/eval.sh; copying to container...
+2026-10-10 18:13:17,200 - INFO - Test runtime: 3.69 seconds
+2026-10-10 18:13:17,201 - INFO - Test output for sphinx-doc__sphinx-10325 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep3__full__final/rerun-2026-10__google__self_reflect__rep3__full__final/sphinx-doc__sphinx-10325/test_output.txt
+2026-10-10 18:13:17,244 - INFO - Git diff after:
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 62631f7ff..12d60eb14 100755
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -109,11 +109,15 @@ def exclude_members_option(arg: Any) -> Union[object, Set[str]]:
+     return {x.strip() for x in arg.split(',') if x.strip()}
+ 
+ 
+-def inherited_members_option(arg: Any) -> Union[object, Set[str]]:
+-    """Used to convert the :members: option to auto directives."""
++def inherited_members_option(arg: Any) -> Union[object, List[str]]:
++    """Used to convert the :inherited-members: option to auto directives."""
+     if arg in (None, True):
+         return 'object'
++    elif isinstance(arg, str):
++        # Split comma-separated string into a list of class names
++        return [x.strip() for x in arg.split(',') if x.strip()]
+     else:
++        # If it's already a list or some other type, return it as is
+         return arg
+ 
+ 
+@@ -1710,7 +1714,20 @@ class ClassDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # type:
+                                    (name, self.fullname), type='autodoc')
+             return False, selected
+         elif self.options.inherited_members:
+-            return False, list(members.values())
++            inherited_classes = self.options.inherited_members
++            if isinstance(inherited_classes, list):
++                # Filter members to include only those from specified base classes
++                filtered_members = []
++                for member in members.values():
++                    # Ensure member.class_ is not None and has a __name__ attribute
++                    # member.class_ is the class where the member is defined.
++                    if member.class_ and hasattr(member.class_, '__name__'):
++                        if member.class_.__name__ in inherited_classes:
++                            filtered_members.append(member)
++                return False, filtered_members
++            else:
++                # Default behavior: include all inherited members (e.g., if option was just True)
++                return False, list(members.values())
+         else:
+             return False, [m for m in members.values() if m.class_ == self.object]
+2026-10-10 18:13:17,244 - INFO - Grading answer for sphinx-doc__sphinx-10325...
+2026-10-10 18:13:17,246 - INFO - report: {'sphinx-doc__sphinx-10325': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['tests/test_ext_autodoc_automodule.py::test_automodule_inherited_members']}, 'PASS_TO_PASS': {'success': ['tests/test_ext_autodoc_automodule.py::test_empty_all', 'tests/test_ext_autodoc_automodule.py::test_automodule', 'tests/test_ext_autodoc_automodule.py::test_automodule_undoc_members', 'tests/test_ext_autodoc_automodule.py::test_automodule_special_members', 'tests/test_ext_autodoc_automodule.py::test_subclass_of_mocked_object'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sphinx-doc__sphinx-10325: resolved: False
+2026-10-10 18:13:17,246 - INFO - Attempting to stop container sweb.eval.sphinx-doc__sphinx-10325.rerun-2026-10__google__self_reflect__rep3__full__final...
+2026-10-10 18:13:34,269 - INFO - Attempting to remove container sweb.eval.sphinx-doc__sphinx-10325.rerun-2026-10__google__self_reflect__rep3__full__final...
+2026-10-10 18:13:35,054 - INFO - Container sweb.eval.sphinx-doc__sphinx-10325.rerun-2026-10__google__self_reflect__rep3__full__final removed.

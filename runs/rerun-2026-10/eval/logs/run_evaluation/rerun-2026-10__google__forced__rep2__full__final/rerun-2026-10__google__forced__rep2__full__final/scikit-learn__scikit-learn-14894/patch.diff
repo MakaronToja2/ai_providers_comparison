@@ -1,0 +1,20 @@
+diff --git a/sklearn/svm/base.py b/sklearn/svm/base.py
+index 64cebe83751..901b0c35f90 100644
+--- a/sklearn/svm/base.py
++++ b/sklearn/svm/base.py
+@@ -280,6 +280,15 @@ class BaseLibSVM(BaseEstimator, metaclass=ABCMeta):
+ 
+         self._warn_from_fit_status()
+ 
++        # Handle the case where there are no support vectors.
++        # This can happen with sparse data and certain parameters.
++        if self.support_vectors_.shape[0] == 0:
++            # If there are no support vectors, set dual_coef_ and intercept_
++            # to empty and return.
++            self.dual_coef_ = sp.csr_matrix([])
++            self.intercept_ = np.array([])
++            return
++
+         if hasattr(self, "classes_"):
+             n_class = len(self.classes_) - 1
+         else:  # regression

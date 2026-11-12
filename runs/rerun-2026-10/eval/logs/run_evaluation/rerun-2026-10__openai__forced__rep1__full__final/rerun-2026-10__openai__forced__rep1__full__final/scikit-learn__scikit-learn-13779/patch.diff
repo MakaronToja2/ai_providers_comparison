@@ -1,0 +1,14 @@
+diff --git a/sklearn/ensemble/voting.py b/sklearn/ensemble/voting.py
+index 7afa7180cc5..f320bb781bf 100644
+--- a/sklearn/ensemble/voting.py
++++ b/sklearn/ensemble/voting.py
+@@ -270,6 +270,9 @@ class VotingClassifier(_BaseVoting, ClassifierMixin):
+         self.classes_ = self.le_.classes_
+         transformed_y = self.le_.transform(y)
+ 
++        # Filter out None estimators before calling super().fit
++        self.estimators = [(name, est) for name, est in self.estimators if est is not None]
++
+         return super().fit(X, transformed_y, sample_weight)
+ 
+     def predict(self, X):

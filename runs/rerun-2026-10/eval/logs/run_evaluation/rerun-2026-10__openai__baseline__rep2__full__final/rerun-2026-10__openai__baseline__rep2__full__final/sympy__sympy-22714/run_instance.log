@@ -1,0 +1,48 @@
+2026-10-10 19:20:32,249 - INFO - Creating container for sympy__sympy-22714...
+2026-10-10 19:20:38,638 - INFO - Container for sympy__sympy-22714 created: 584199edeb4f1ac4475c3434985ebb6b7e41a8fd8505f465c4c8f3f7cfe59ac6
+2026-10-10 19:20:48,652 - INFO - Container for sympy__sympy-22714 started: 584199edeb4f1ac4475c3434985ebb6b7e41a8fd8505f465c4c8f3f7cfe59ac6
+2026-10-10 19:20:48,653 - INFO - Intermediate patch for sympy__sympy-22714 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep2__full__final/rerun-2026-10__openai__baseline__rep2__full__final/sympy__sympy-22714/patch.diff, now applying to container...
+2026-10-10 19:20:48,740 - INFO - >>>>> Applied Patch:
+Checking patch sympy/geometry/point.py...
+warning: sympy/geometry/point.py has type 100755, expected 100644
+Applied patch sympy/geometry/point.py cleanly.
+
+2026-10-10 19:20:50,154 - INFO - Git diff before:
+diff --git a/sympy/geometry/point.py b/sympy/geometry/point.py
+index 73c20334d0..e8ec32b924 100755
+--- a/sympy/geometry/point.py
++++ b/sympy/geometry/point.py
+@@ -911,6 +911,9 @@ class Point2D(Point):
+ 
+     def __new__(cls, *args, _nocheck=False, **kwargs):
+         if not _nocheck:
++            # Pass evaluate flag explicitly to Point to avoid default global evaluate
++            if 'evaluate' not in kwargs:
++                kwargs['evaluate'] = kwargs.get('evaluate', True)
+             kwargs['dim'] = 2
+             args = Point(*args, **kwargs)
+         return GeometryEntity.__new__(cls, *args)
+2026-10-10 19:20:50,154 - INFO - Eval script for sympy__sympy-22714 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep2__full__final/rerun-2026-10__openai__baseline__rep2__full__final/sympy__sympy-22714/eval.sh; copying to container...
+2026-10-10 19:20:57,442 - INFO - Test runtime: 7.24 seconds
+2026-10-10 19:20:57,442 - INFO - Test output for sympy__sympy-22714 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep2__full__final/rerun-2026-10__openai__baseline__rep2__full__final/sympy__sympy-22714/test_output.txt
+2026-10-10 19:20:57,485 - INFO - Git diff after:
+diff --git a/sympy/geometry/point.py b/sympy/geometry/point.py
+index 73c20334d0..e8ec32b924 100755
+--- a/sympy/geometry/point.py
++++ b/sympy/geometry/point.py
+@@ -911,6 +911,9 @@ class Point2D(Point):
+ 
+     def __new__(cls, *args, _nocheck=False, **kwargs):
+         if not _nocheck:
++            # Pass evaluate flag explicitly to Point to avoid default global evaluate
++            if 'evaluate' not in kwargs:
++                kwargs['evaluate'] = kwargs.get('evaluate', True)
+             kwargs['dim'] = 2
+             args = Point(*args, **kwargs)
+         return GeometryEntity.__new__(cls, *args)
+2026-10-10 19:20:57,485 - INFO - Grading answer for sympy__sympy-22714...
+2026-10-10 19:20:57,486 - INFO - report: {'sympy__sympy-22714': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_issue_22684']}, 'PASS_TO_PASS': {'success': ['test_point', 'test_point3D', 'test_Point2D', 'test_issue_9214', 'test_issue_11617', 'test_transform', 'test_concyclic_doctest_bug', 'test_arguments', 'test_unit', 'test_dot', 'test__normalize_dimension'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-22714: resolved: False
+2026-10-10 19:20:57,486 - INFO - Attempting to stop container sweb.eval.sympy__sympy-22714.rerun-2026-10__openai__baseline__rep2__full__final...
+2026-10-10 19:21:17,755 - INFO - Attempting to remove container sweb.eval.sympy__sympy-22714.rerun-2026-10__openai__baseline__rep2__full__final...
+2026-10-10 19:21:19,089 - INFO - Container sweb.eval.sympy__sympy-22714.rerun-2026-10__openai__baseline__rep2__full__final removed.

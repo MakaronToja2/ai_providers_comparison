@@ -1,0 +1,90 @@
+2026-10-10 14:52:45,665 - INFO - Creating container for astropy__astropy-12907...
+2026-10-10 14:52:55,354 - INFO - Container for astropy__astropy-12907 created: a8699f4eb16f003397526d4bedda5d631fd7384fe4b2c66ed95efb53d3e8d4db
+2026-10-10 14:53:02,749 - INFO - Container for astropy__astropy-12907 started: a8699f4eb16f003397526d4bedda5d631fd7384fe4b2c66ed95efb53d3e8d4db
+2026-10-10 14:53:02,750 - INFO - Intermediate patch for astropy__astropy-12907 written to logs/run_evaluation/rerun-2026-10__google__forced__rep3__full__final/rerun-2026-10__google__forced__rep3__full__final/astropy__astropy-12907/patch.diff, now applying to container...
+2026-10-10 14:53:03,039 - INFO - >>>>> Applied Patch:
+Checking patch astropy/modeling/separable.py...
+warning: astropy/modeling/separable.py has type 100755, expected 100644
+Applied patch astropy/modeling/separable.py cleanly.
+
+2026-10-10 14:53:03,981 - INFO - Git diff before:
+diff --git a/astropy/modeling/separable.py b/astropy/modeling/separable.py
+index a308e2729..1ef128b33 100755
+--- a/astropy/modeling/separable.py
++++ b/astropy/modeling/separable.py
+@@ -234,17 +234,23 @@ def _cstack(left, right):
+     noutp = _compute_n_outputs(left, right)
+ 
+     if isinstance(left, Model):
+-        cleft = _coord_matrix(left, 'left', noutp)
++        sepleft = _separable(left)
+     else:
+-        cleft = np.zeros((noutp, left.shape[1]))
+-        cleft[: left.shape[0], : left.shape[1]] = left
++        sepleft = left
++
+     if isinstance(right, Model):
+-        cright = _coord_matrix(right, 'right', noutp)
++        sepright = _separable(right)
+     else:
+-        cright = np.zeros((noutp, right.shape[1]))
+-        cright[-right.shape[0]:, -right.shape[1]:] = 1
++        sepright = right
++
++    n_inputs = sepleft.shape[1] + sepright.shape[1]
++    n_outputs = sepleft.shape[0] + sepright.shape[0]
++
++    combined_matrix = np.zeros((n_outputs, n_inputs), dtype=bool)
++    combined_matrix[:sepleft.shape[0], :sepleft.shape[1]] = sepleft
++    combined_matrix[sepleft.shape[0]:, sepleft.shape[1]:] = sepright
+ 
+-    return np.hstack([cleft, cright])
++    return combined_matrix
+ 
+ 
+ def _cdot(left, right):
+2026-10-10 14:53:03,983 - INFO - Eval script for astropy__astropy-12907 written to logs/run_evaluation/rerun-2026-10__google__forced__rep3__full__final/rerun-2026-10__google__forced__rep3__full__final/astropy__astropy-12907/eval.sh; copying to container...
+2026-10-10 14:54:53,343 - INFO - Test runtime: 109.24 seconds
+2026-10-10 14:54:53,345 - INFO - Test output for astropy__astropy-12907 written to logs/run_evaluation/rerun-2026-10__google__forced__rep3__full__final/rerun-2026-10__google__forced__rep3__full__final/astropy__astropy-12907/test_output.txt
+2026-10-10 14:54:53,422 - INFO - Git diff after:
+diff --git a/astropy/modeling/separable.py b/astropy/modeling/separable.py
+index a308e2729..1ef128b33 100755
+--- a/astropy/modeling/separable.py
++++ b/astropy/modeling/separable.py
+@@ -234,17 +234,23 @@ def _cstack(left, right):
+     noutp = _compute_n_outputs(left, right)
+ 
+     if isinstance(left, Model):
+-        cleft = _coord_matrix(left, 'left', noutp)
++        sepleft = _separable(left)
+     else:
+-        cleft = np.zeros((noutp, left.shape[1]))
+-        cleft[: left.shape[0], : left.shape[1]] = left
++        sepleft = left
++
+     if isinstance(right, Model):
+-        cright = _coord_matrix(right, 'right', noutp)
++        sepright = _separable(right)
+     else:
+-        cright = np.zeros((noutp, right.shape[1]))
+-        cright[-right.shape[0]:, -right.shape[1]:] = 1
++        sepright = right
++
++    n_inputs = sepleft.shape[1] + sepright.shape[1]
++    n_outputs = sepleft.shape[0] + sepright.shape[0]
++
++    combined_matrix = np.zeros((n_outputs, n_inputs), dtype=bool)
++    combined_matrix[:sepleft.shape[0], :sepleft.shape[1]] = sepleft
++    combined_matrix[sepleft.shape[0]:, sepleft.shape[1]:] = sepright
+ 
+-    return np.hstack([cleft, cright])
++    return combined_matrix
+ 
+ 
+ def _cdot(left, right):
+2026-10-10 14:54:53,423 - INFO - Grading answer for astropy__astropy-12907...
+2026-10-10 14:54:53,430 - INFO - report: {'astropy__astropy-12907': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': ['astropy/modeling/tests/test_separable.py::test_separable[compound_model6-result6]', 'astropy/modeling/tests/test_separable.py::test_separable[compound_model9-result9]'], 'failure': []}, 'PASS_TO_PASS': {'success': ['astropy/modeling/tests/test_separable.py::test_coord_matrix', 'astropy/modeling/tests/test_separable.py::test_cdot', 'astropy/modeling/tests/test_separable.py::test_cstack', 'astropy/modeling/tests/test_separable.py::test_arith_oper', 'astropy/modeling/tests/test_separable.py::test_separable[compound_model1-result1]', 'astropy/modeling/tests/test_separable.py::test_separable[compound_model2-result2]', 'astropy/modeling/tests/test_separable.py::test_separable[compound_model3-result3]', 'astropy/modeling/tests/test_separable.py::test_separable[compound_model4-result4]', 'astropy/modeling/tests/test_separable.py::test_separable[compound_model5-result5]', 'astropy/modeling/tests/test_separable.py::test_separable[compound_model7-result7]', 'astropy/modeling/tests/test_separable.py::test_separable[compound_model8-result8]', 'astropy/modeling/tests/test_separable.py::test_custom_model_separable'], 'failure': ['astropy/modeling/tests/test_separable.py::test_separable[compound_model0-result0]']}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for astropy__astropy-12907: resolved: False
+2026-10-10 14:54:53,430 - INFO - Attempting to stop container sweb.eval.astropy__astropy-12907.rerun-2026-10__google__forced__rep3__full__final...
+2026-10-10 14:55:10,056 - INFO - Attempting to remove container sweb.eval.astropy__astropy-12907.rerun-2026-10__google__forced__rep3__full__final...
+2026-10-10 14:55:10,584 - INFO - Container sweb.eval.astropy__astropy-12907.rerun-2026-10__google__forced__rep3__full__final removed.

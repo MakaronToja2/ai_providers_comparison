@@ -1,0 +1,26 @@
+# Environment for the October 2026 reruns (agent runs, analysis, tests).
+# requirements.txt is kept unchanged as the record of the January 2026 runs.
+# Exact resolved versions are saved next to the results (runs/<tag>/pip-freeze.txt).
+anthropic==0.60.0
+openai>=1.109,<2
+google-genai>=1.0
+pydantic>=2.12
+pydantic-settings>=2.1
+httpx>=0.28.1
+tenacity>=8.2
+python-dotenv>=1.0
+aiosqlite>=0.19
+pandas
+datasets
+huggingface-hub
+scipy
+statsmodels
+pytest
+pytest-asyncio
+
+# FastAPI app and dashboard (not used by the rerun scripts)
+fastapi
+uvicorn[standard]
+jinja2
+python-multipart
+tabulate

@@ -1,0 +1,27 @@
+diff --git a/django/core/checks/templates.py b/django/core/checks/templates.py
+index 5214276987..0de9b11dd3 100644
+--- a/django/core/checks/templates.py
++++ b/django/core/checks/templates.py
+@@ -52,12 +52,21 @@ def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
+     errors = []
+     libraries = defaultdict(list)
+ 
++    # Collect all libraries from TEMPLATES OPTIONS 'libraries'
+     for conf in settings.TEMPLATES:
+         custom_libraries = conf.get("OPTIONS", {}).get("libraries", {})
+         for module_name, module_path in custom_libraries.items():
+             libraries[module_name].append(module_path)
+ 
+-    for module_name, module_path in get_template_tag_modules():
++    # Collect all libraries from installed apps
++    installed_libraries = dict(get_template_tag_modules())
++
++    # Remove any libraries that are already declared in TEMPLATES OPTIONS to avoid duplicate error
++    for module_name in custom_libraries.keys():
++        installed_libraries.pop(module_name, None)
++
++    # Add remaining installed libraries
++    for module_name, module_path in installed_libraries.items():
+         libraries[module_name].append(module_path)
+ 
+     for library_name, items in libraries.items():

@@ -1,0 +1,45 @@
+2026-10-10 11:23:32,092 - INFO - Creating container for django__django-10924...
+2026-10-10 11:23:38,696 - INFO - Container for django__django-10924 created: 6253302b9829ba6f907d708b18026f7193535609643b6a1b967811b0ff548670
+2026-10-10 11:23:38,976 - INFO - Container for django__django-10924 started: 6253302b9829ba6f907d708b18026f7193535609643b6a1b967811b0ff548670
+2026-10-10 11:23:38,977 - INFO - Intermediate patch for django__django-10924 written to logs/run_evaluation/gold__full/gold/django__django-10924/patch.diff, now applying to container...
+2026-10-10 11:23:39,289 - INFO - >>>>> Applied Patch:
+Checking patch django/db/models/fields/__init__.py...
+Applied patch django/db/models/fields/__init__.py cleanly.
+
+2026-10-10 11:23:39,953 - INFO - Git diff before:
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 0c64748ccd..4d7eb11151 100755
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1709,7 +1709,7 @@ class FilePathField(Field):
+ 
+     def formfield(self, **kwargs):
+         return super().formfield(**{
+-            'path': self.path,
++            'path': self.path() if callable(self.path) else self.path,
+             'match': self.match,
+             'recursive': self.recursive,
+             'form_class': forms.FilePathField,
+2026-10-10 11:23:39,953 - INFO - Eval script for django__django-10924 written to logs/run_evaluation/gold__full/gold/django__django-10924/eval.sh; copying to container...
+2026-10-10 11:23:51,963 - INFO - Test runtime: 11.69 seconds
+2026-10-10 11:23:51,966 - INFO - Test output for django__django-10924 written to logs/run_evaluation/gold__full/gold/django__django-10924/test_output.txt
+2026-10-10 11:23:52,044 - INFO - Git diff after:
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 0c64748ccd..4d7eb11151 100755
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1709,7 +1709,7 @@ class FilePathField(Field):
+ 
+     def formfield(self, **kwargs):
+         return super().formfield(**{
+-            'path': self.path,
++            'path': self.path() if callable(self.path) else self.path,
+             'match': self.match,
+             'recursive': self.recursive,
+             'form_class': forms.FilePathField,
+2026-10-10 11:23:52,044 - INFO - Grading answer for django__django-10924...
+2026-10-10 11:23:52,049 - INFO - report: {'django__django-10924': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_callable_path (model_fields.test_filepathfield.FilePathFieldTests)'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_path (model_fields.test_filepathfield.FilePathFieldTests)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-10924: resolved: True
+2026-10-10 11:23:52,050 - INFO - Attempting to stop container sweb.eval.django__django-10924.gold__full...
+2026-10-10 11:24:07,291 - INFO - Attempting to remove container sweb.eval.django__django-10924.gold__full...
+2026-10-10 11:24:07,340 - INFO - Container sweb.eval.django__django-10924.gold__full removed.

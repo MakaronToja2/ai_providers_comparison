@@ -1,0 +1,68 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 62631f7ff9..f35a6e2f92 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1313,7 +1313,62 @@ class FunctionDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # typ
+         return args
+ 
+     def document_members(self, all_members: bool = False) -> None:
+-        pass
++        if self.doc_as_attr:
++            return
++
++        # Get the list of inherited members to ignore from options
++        inherited_members_opt = self.options.get('inherited-members')
++        ignore_bases = set()
++        if inherited_members_opt:
++            # Support multiple classes separated by commas or spaces
++            if isinstance(inherited_members_opt, str):
++                classes = [cls.strip() for cls in inherited_members_opt.replace(',', ' ').split()]
++                ignore_bases.update(classes)
++            elif isinstance(inherited_members_opt, (list, tuple)):
++                ignore_bases.update(inherited_members_opt)
++
++        def is_ignored_base(base):
++            # base can be a type or a string name
++            base_name = None
++            if isinstance(base, str):
++                base_name = base
++            elif hasattr(base, '__name__'):
++                base_name = base.__name__
++            elif hasattr(base, '__class__') and hasattr(base.__class__, '__name__'):
++                base_name = base.__class__.__name__
++            return base_name in ignore_bases
++
++        # Collect all members to document
++        all_members_list = []
++        if all_members:
++            # Get all members from the class and its bases except ignored bases
++            for name, member in inspect.getmembers(self.object):
++                # Skip if member is from an ignored base class
++                # Check if member is defined in ignored base classes
++                skip_member = False
++                for base in self.object.__mro__[1:]:
++                    if is_ignored_base(base):
++                        if hasattr(base, name):
++                            skip_member = True
++                            break
++                if not skip_member:
++                    all_members_list.append(name)
++        else:
++            # Use members specified explicitly in options
++            all_members_list = self.options.members or []
++
++        # Remove duplicates while preserving order
++        seen = set()
++        filtered_members = []
++        for m in all_members_list:
++            if m not in seen:
++                filtered_members.append(m)
++                seen.add(m)
++
++        # Now document the filtered members
++        for name in filtered_members:
++            self.document_member(name)
++
+ 
+     def add_directive_header(self, sig: str) -> None:
+         sourcename = self.get_sourcename()

@@ -1,0 +1,102 @@
+2026-10-10 19:29:09,145 - INFO - Creating container for sympy__sympy-21055...
+2026-10-10 19:29:15,139 - INFO - Container for sympy__sympy-21055 created: 076dff328aaf5fad52f71423a32102d4379703aaa699e69d0287518af935fd6a
+2026-10-10 19:29:23,033 - INFO - Container for sympy__sympy-21055 started: 076dff328aaf5fad52f71423a32102d4379703aaa699e69d0287518af935fd6a
+2026-10-10 19:29:23,034 - INFO - Intermediate patch for sympy__sympy-21055 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep1__full__final/rerun-2026-10__anthropic__self_reflect__rep1__full__final/sympy__sympy-21055/patch.diff, now applying to container...
+2026-10-10 19:29:23,149 - INFO - >>>>> Applied Patch:
+Checking patch sympy/assumptions/refine.py...
+warning: sympy/assumptions/refine.py has type 100755, expected 100644
+Applied patch sympy/assumptions/refine.py cleanly.
+
+2026-10-10 19:29:23,431 - INFO - Git diff before:
+diff --git a/sympy/assumptions/refine.py b/sympy/assumptions/refine.py
+index e1f97190c0..15f4f8a4d5 100755
+--- a/sympy/assumptions/refine.py
++++ b/sympy/assumptions/refine.py
+@@ -350,6 +350,29 @@ def refine_sign(expr, assumptions):
+     return expr
+ 
+ 
++def refine_arg(expr, assumptions):
++    """
++    Handler for the argument function.
++
++    Examples
++    ========
++
++    >>> from sympy import Q, arg
++    >>> from sympy.assumptions.refine import refine_arg
++    >>> from sympy.abc import x
++    >>> refine_arg(arg(x), Q.positive(x))
++    0
++    >>> refine_arg(arg(x), Q.negative(x))
++    pi
++    """
++    arg_expr = expr.args[0]
++    if ask(Q.positive(arg_expr), assumptions):
++        return S.Zero
++    if ask(Q.negative(arg_expr), assumptions):
++        return S.Pi
++    return expr
++
++
+ def refine_matrixelement(expr, assumptions):
+     """
+     Handler for symmetric part.
+@@ -380,5 +403,6 @@ def refine_matrixelement(expr, assumptions):
+     're': refine_re,
+     'im': refine_im,
+     'sign': refine_sign,
++    'arg': refine_arg,
+     'MatrixElement': refine_matrixelement
+ }  # type: Dict[str, Callable[[Expr, Boolean], Expr]]
+2026-10-10 19:29:23,431 - INFO - Eval script for sympy__sympy-21055 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep1__full__final/rerun-2026-10__anthropic__self_reflect__rep1__full__final/sympy__sympy-21055/eval.sh; copying to container...
+2026-10-10 19:29:32,503 - INFO - Test runtime: 9.03 seconds
+2026-10-10 19:29:32,503 - INFO - Test output for sympy__sympy-21055 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep1__full__final/rerun-2026-10__anthropic__self_reflect__rep1__full__final/sympy__sympy-21055/test_output.txt
+2026-10-10 19:29:32,553 - INFO - Git diff after:
+diff --git a/sympy/assumptions/refine.py b/sympy/assumptions/refine.py
+index e1f97190c0..15f4f8a4d5 100755
+--- a/sympy/assumptions/refine.py
++++ b/sympy/assumptions/refine.py
+@@ -350,6 +350,29 @@ def refine_sign(expr, assumptions):
+     return expr
+ 
+ 
++def refine_arg(expr, assumptions):
++    """
++    Handler for the argument function.
++
++    Examples
++    ========
++
++    >>> from sympy import Q, arg
++    >>> from sympy.assumptions.refine import refine_arg
++    >>> from sympy.abc import x
++    >>> refine_arg(arg(x), Q.positive(x))
++    0
++    >>> refine_arg(arg(x), Q.negative(x))
++    pi
++    """
++    arg_expr = expr.args[0]
++    if ask(Q.positive(arg_expr), assumptions):
++        return S.Zero
++    if ask(Q.negative(arg_expr), assumptions):
++        return S.Pi
++    return expr
++
++
+ def refine_matrixelement(expr, assumptions):
+     """
+     Handler for symmetric part.
+@@ -380,5 +403,6 @@ def refine_matrixelement(expr, assumptions):
+     're': refine_re,
+     'im': refine_im,
+     'sign': refine_sign,
++    'arg': refine_arg,
+     'MatrixElement': refine_matrixelement
+ }  # type: Dict[str, Callable[[Expr, Boolean], Expr]]
+2026-10-10 19:29:32,553 - INFO - Grading answer for sympy__sympy-21055...
+2026-10-10 19:29:32,555 - INFO - report: {'sympy__sympy-21055': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_arg'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_Abs', 'test_pow1', 'test_pow2', 'test_exp', 'test_Piecewise', 'test_atan2', 'test_re', 'test_im', 'test_complex', 'test_sign', 'test_func_args', 'test_eval_refine', 'test_refine_issue_12724'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-21055: resolved: True
+2026-10-10 19:29:32,555 - INFO - Attempting to stop container sweb.eval.sympy__sympy-21055.rerun-2026-10__anthropic__self_reflect__rep1__full__final...
+2026-10-10 19:29:55,127 - INFO - Attempting to remove container sweb.eval.sympy__sympy-21055.rerun-2026-10__anthropic__self_reflect__rep1__full__final...
+2026-10-10 19:29:57,461 - INFO - Container sweb.eval.sympy__sympy-21055.rerun-2026-10__anthropic__self_reflect__rep1__full__final removed.

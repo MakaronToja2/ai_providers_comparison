@@ -1,0 +1,20 @@
+diff --git a/django/test/testcases.py b/django/test/testcases.py
+index 23459f22cd..20347f3e6a 100644
+--- a/django/test/testcases.py
++++ b/django/test/testcases.py
+@@ -1059,7 +1059,14 @@ def connections_support_transactions(aliases=None):
+     transactions.
+     """
+     conns = connections.all() if aliases is None else (connections[alias] for alias in aliases)
+-    return all(conn.features.supports_transactions for conn in conns)
++    conns = list(conns)
++    if not all(conn.features.supports_transactions for conn in conns):
++        return False
++    # If there are multiple connections and any of them doesn't allow multiple
++    # connections, we can't use transactions for test isolation.
++    if len(conns) > 1:
++        return all(conn.features.test_db_allows_multiple_connections for conn in conns)
++    return True
+ 
+ 
+ class TestCase(TransactionTestCase):

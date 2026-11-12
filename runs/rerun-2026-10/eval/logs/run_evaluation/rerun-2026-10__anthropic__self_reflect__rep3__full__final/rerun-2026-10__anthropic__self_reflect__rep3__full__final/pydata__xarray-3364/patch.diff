@@ -1,0 +1,31 @@
+diff --git a/xarray/core/concat.py b/xarray/core/concat.py
+index ecae2566c..0b834005a 100644
+--- a/xarray/core/concat.py
++++ b/xarray/core/concat.py
+@@ -358,10 +358,22 @@ def _dataset_concat(
+     # n.b. this loop preserves variable order, needed for groupby.
+     for k in datasets[0].variables:
+         if k in concat_over:
+-            try:
+-                vars = ensure_common_dims([ds.variables[k] for ds in datasets])
+-            except KeyError:
+-                raise ValueError("%r is not present in all datasets." % k)
++            vars = []
++            for ds in datasets:
++                if k in ds.variables:
++                    vars.append(ds.variables[k])
++                else:
++                    # Variable is missing in this dataset, create a NaN-filled variable
++                    var_template = datasets[0].variables[k]
++                    # Create a NaN-filled variable with the same dimensions
++                    new_shape = tuple(
++                        1 if d == dim else ds.dims.get(d, var_template.shape[i])
++                        for i, d in enumerate(var_template.dims)
++                    )
++                    new_data = np.full(new_shape, fill_value, dtype=var_template.dtype)
++                    var = Variable(var_template.dims, new_data, var_template.attrs)
++                    vars.append(var)
++            vars = ensure_common_dims(vars)
+             combined = concat_vars(vars, dim, positions)
+             assert isinstance(combined, Variable)
+             result_vars[k] = combined

@@ -1,0 +1,24 @@
+{
+    "total_instances": 1,
+    "submitted_instances": 2,
+    "completed_instances": 1,
+    "resolved_instances": 0,
+    "unresolved_instances": 1,
+    "empty_patch_instances": 0,
+    "error_instances": 0,
+    "completed_ids": [
+        "sympy__sympy-18835"
+    ],
+    "incomplete_ids": [],
+    "empty_patch_ids": [],
+    "submitted_ids": [
+        "django__django-13028",
+        "sympy__sympy-18835"
+    ],
+    "resolved_ids": [],
+    "unresolved_ids": [
+        "sympy__sympy-18835"
+    ],
+    "error_ids": [],
+    "schema_version": 2
+}

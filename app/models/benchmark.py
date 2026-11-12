@@ -22,7 +22,21 @@ class ResultStatus(str, Enum):
     SUCCESS_PATCH_GENERATED = "success_patch_generated"  # Valid patch extracted
     FAILURE_EXPLICIT = "failure_explicit"  # Model admitted it cannot solve (<<<CANNOT_SOLVE>>>)
     HALLUCINATION_FORMAT_ERROR = "hallucination_format_error"  # Model responded but no valid output
-    API_ERROR = "api_error"  # Provider API error
+    EDIT_NOT_APPLICABLE = "edit_not_applicable"  # Edits given, but they do not match the repository's code
+    CONTEXT_OVERFLOW = "context_overflow"  # Conversation exceeded the model's context window
+    API_ERROR = "api_error"  # Provider API error (not a model outcome; re-run on resume)
+    INFRA_ERROR = "infra_error"  # Harness-side failure such as a clone error (re-run on resume)
+
+
+# Statuses that describe what the model did. Everything else is re-run on resume and
+# must not reach the analysis.
+TERMINAL_RESULT_STATUSES = frozenset({
+    ResultStatus.SUCCESS_PATCH_GENERATED,
+    ResultStatus.FAILURE_EXPLICIT,
+    ResultStatus.HALLUCINATION_FORMAT_ERROR,
+    ResultStatus.EDIT_NOT_APPLICABLE,
+    ResultStatus.CONTEXT_OVERFLOW,
+})
 
 
 class ExperimentMode(str, Enum):
@@ -55,6 +69,13 @@ class ExperimentConfig(BaseModel):
     repos: Optional[List[str]] = None  # Filter by repos
     limit: Optional[int] = None  # Limit number of instances
     max_concurrent: int = 3
+    # Provenance of a rerun job (one provider, one mode, one repetition)
+    run_tag: Optional[str] = None
+    run_idx: Optional[int] = None  # Repetition index, 1-based
+    instances_file: Optional[str] = None
+    instances_sha256: Optional[str] = None
+    dataset_revision: Optional[str] = None
+    harness_commit: Optional[str] = None
 
 
 class Experiment(BaseModel):
@@ -110,10 +131,15 @@ class ExperimentResult(BaseModel):
     reflection_prompt_tokens: Optional[int] = None
     reflection_completion_tokens: Optional[int] = None
     reflection_total_tokens: Optional[int] = None
-    reflection_outcome: Optional[str] = None  # "approved", "revised", "skipped", "failed", "tests_passed"
+    reflection_outcome: Optional[str] = None  # "approved", "revised", "unstructured", "skipped"
 
-    # Test-guided reflection tracking (Experiment 3)
-    original_patch: Optional[str] = None  # Patch before test-guided revision (for comparison)
+    # Self-reflection: the patch before the reflection call (generated_patch holds the final one)
+    original_patch: Optional[str] = None
+
+    # Loop statistics and provenance: run_idx, experiment_mode, iterations, termination_reason,
+    # fallback_used, abstained, api_call_count, api_retry_count, api_model_ids,
+    # max_input_tokens, final_diff_blocks, trajectory_path
+    run_meta: Optional[Dict[str, Any]] = None
 
     # Tool usage
     tool_calls: List[ToolCallRecord] = Field(default_factory=list)

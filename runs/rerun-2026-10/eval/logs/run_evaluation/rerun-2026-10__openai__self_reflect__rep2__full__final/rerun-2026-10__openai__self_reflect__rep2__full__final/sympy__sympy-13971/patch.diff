@@ -1,0 +1,38 @@
+diff --git a/sympy/series/sequences.py b/sympy/series/sequences.py
+index 08f36df061..2a8a4cb413 100644
+--- a/sympy/series/sequences.py
++++ b/sympy/series/sequences.py
+@@ -628,6 +628,15 @@ class SeqFormula(SeqExpr):
+     >>> list(s)
+     [0, 1, 4, 9, 16, 25]
+ 
++    LaTeX printing
++
++    >>> from sympy import init_printing
++    >>> init_printing()
++    >>> s
++    \left[0, 1, 4, 9, 16, 25\right]
++
++    To fix the LaTeX rendering of the sequence brackets, we override the _latex method.
++
+     sequence starts from negative infinity
+ 
+     >>> SeqFormula(n**2, (-oo, 0))[0:6]
+@@ -710,6 +719,17 @@ def coeff_mul(self, coeff):
+         formula = self.formula * coeff
+         return SeqFormula(formula, self.args[1])
+ 
++    def _latex(self, printer):
++        # Override LaTeX printer to avoid backslash escaping square brackets
++        # which causes rendering issues in Jupyter and Markdown.
++        # We print the sequence as \left[ ... \right] without escaping the brackets.
++        from sympy.printing.latex import LatexPrinter
++        # Get the LaTeX representation of the sequence elements as a list
++        elements = list(self)
++        # Format elements with printer
++        elements_latex = ", ".join(printer._print(el) for el in elements)
++        return r"\left[ %s \right]" % elements_latex
++
+ 
+ def sequence(seq, limits=None):
+     """Returns appropriate sequence object.

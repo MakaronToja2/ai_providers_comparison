@@ -1,0 +1,20 @@
+diff --git a/django/forms/formsets.py b/django/forms/formsets.py
+index a89c35599f..d6b9ae4ca2 100644
+--- a/django/forms/formsets.py
++++ b/django/forms/formsets.py
+@@ -292,9 +292,15 @@ class BaseFormSet:
+         Return an ErrorList of errors that aren't associated with a particular
+         form -- i.e., from formset.clean(). Return an empty ErrorList if there
+         are none.
++
++        The returned ErrorList has the CSS class 'nonform' to distinguish it
++        from field errors and non-field errors on forms.
+         """
+         if self._non_form_errors is None:
+             self.full_clean()
++        # Add the 'nonform' CSS class to the error_class of the non_form_errors
++        if self._non_form_errors and 'nonform' not in self._non_form_errors.error_class:
++            self._non_form_errors.error_class += ' nonform'
+         return self._non_form_errors
+ 
+     @property

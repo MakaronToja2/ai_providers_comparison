@@ -1,0 +1,20 @@
+diff --git a/django/urls/resolvers.py b/django/urls/resolvers.py
+index 2154a46320..2134eeed4c 100644
+--- a/django/urls/resolvers.py
++++ b/django/urls/resolvers.py
+@@ -346,7 +346,14 @@ class URLPattern:
+             return []
+ 
+     def resolve(self, path):
+-        match = self.pattern.match(path)
++        try:
++            match = self.pattern.match(path)
++        except Exception as e:
++            # If the converter raises Http404, treat it as a non-match and continue
++            from django.http import Http404
++            if isinstance(e, Http404):
++                return None
++            raise
+         if match:
+             new_path, args, kwargs = match
+             # Pass any extra_kwargs as **kwargs.

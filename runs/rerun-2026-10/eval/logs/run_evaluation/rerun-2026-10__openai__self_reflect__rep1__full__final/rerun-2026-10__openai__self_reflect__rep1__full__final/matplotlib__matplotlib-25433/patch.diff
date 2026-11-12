@@ -1,0 +1,28 @@
+diff --git a/lib/matplotlib/widgets.py b/lib/matplotlib/widgets.py
+index ebe5da43e2..04c183971c 100644
+--- a/lib/matplotlib/widgets.py
++++ b/lib/matplotlib/widgets.py
+@@ -983,7 +983,22 @@ class RangeSlider(SliderBase):
+         int
+             Connection id (which can be used to disconnect *func*).
+         """
+-        return self._observers.connect('changed', lambda val: func(val))
++        # Wrap the callback to defer execution to the GUI event loop to avoid blocking widget input
++        # Use the GUI event loop idle callback instead of threading to ensure thread safety
++        import matplotlib
++        def deferred_func(val):
++            fig = self.ax.figure
++            if matplotlib.get_backend().lower().startswith('qt'):
++                # Qt backend: use QTimer.singleShot
++                from matplotlib.backends.qt_compat import QtCore
++                QtCore.QTimer.singleShot(0, lambda: func(val))
++            elif matplotlib.get_backend().lower().startswith('tk'):
++                # Tk backend: use after_idle
++                fig.canvas.get_tk_widget().after_idle(lambda: func(val))
++            else:
++                # Fallback: call directly (may block)
++                func(val)
++        return self._observers.connect('changed', deferred_func)
+ 
+ 
+ def _expand_text_props(props):

@@ -1,0 +1,71 @@
+diff --git a/django/core/exceptions.py b/django/core/exceptions.py
+index dc084b8692..10d61a2d06 100644
+--- a/django/core/exceptions.py
++++ b/django/core/exceptions.py
+@@ -179,6 +179,66 @@ class ValidationError(Exception):
+             return repr(dict(self))
+         return repr(list(self))
+ 
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++        
++        # Both have error_dict
++        if hasattr(self, 'error_dict') and hasattr(other, 'error_dict'):
++            if set(self.error_dict.keys()) != set(other.error_dict.keys()):
++                return False
++            for field in self.error_dict:
++                # Sort error lists for comparison to make order-independent
++                self_errors = sorted(
++                    [self._error_to_comparable(e) for e in self.error_dict[field]]
++                )
++                other_errors = sorted(
++                    [other._error_to_comparable(e) for e in other.error_dict[field]]
++                )
++                if self_errors != other_errors:
++                    return False
++            return True
++        
++        # Both have error_list (but not error_dict)
++        if hasattr(self, 'error_list') and hasattr(other, 'error_list') and \
++           not hasattr(self, 'error_dict') and not hasattr(other, 'error_dict'):
++            # Sort error lists for comparison to make order-independent
++            self_errors = sorted(
++                [self._error_to_comparable(e) for e in self.error_list]
++            )
++            other_errors = sorted(
++                [other._error_to_comparable(e) for e in other.error_list]
++            )
++            return self_errors == other_errors
++        
++        return False
++
++    def _error_to_comparable(self, error):
++        """Convert an error to a comparable form."""
++        message = error.message
++        if error.params:
++            message = message % error.params
++        return (str(message), error.code)
++
++    def __hash__(self):
++        # Since we're implementing __eq__, we should also implement __hash__
++        # to maintain the invariant that objects that compare equal have the same hash
++        if hasattr(self, 'error_dict'):
++            # For error_dict, create a hash from sorted items
++            items = []
++            for field in sorted(self.error_dict.keys()):
++                errors = sorted(
++                    [self._error_to_comparable(e) for e in self.error_dict[field]]
++                )
++                items.append((field, tuple(errors)))
++            return hash(tuple(items))
++        else:
++            # For error_list, create a hash from sorted errors
++            errors = sorted(
++                [self._error_to_comparable(e) for e in self.error_list]
++            )
++            return hash(tuple(errors))
++
+     def __repr__(self):
+         return 'ValidationError(%s)' % self
+ 

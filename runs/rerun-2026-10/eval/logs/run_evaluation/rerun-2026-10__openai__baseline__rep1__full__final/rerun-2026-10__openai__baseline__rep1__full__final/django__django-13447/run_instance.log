@@ -1,0 +1,62 @@
+2026-10-10 11:41:24,402 - INFO - Creating container for django__django-13447...
+2026-10-10 11:41:24,512 - INFO - Container for django__django-13447 created: 0d3edfe43c69b631d2f94b8b394aa154b1160b69926586f2ea3b64662ea43c84
+2026-10-10 11:41:24,702 - INFO - Container for django__django-13447 started: 0d3edfe43c69b631d2f94b8b394aa154b1160b69926586f2ea3b64662ea43c84
+2026-10-10 11:41:24,702 - INFO - Intermediate patch for django__django-13447 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__full__final/rerun-2026-10__openai__baseline__rep1__full__final/django__django-13447/patch.diff, now applying to container...
+2026-10-10 11:41:24,806 - INFO - >>>>> Applied Patch:
+Checking patch django/contrib/admin/sites.py...
+warning: django/contrib/admin/sites.py has type 100755, expected 100644
+Applied patch django/contrib/admin/sites.py cleanly.
+
+2026-10-10 11:41:25,372 - INFO - Git diff before:
+diff --git a/django/contrib/admin/sites.py b/django/contrib/admin/sites.py
+index 837dabfea8..6b48e2b03a 100755
+--- a/django/contrib/admin/sites.py
++++ b/django/contrib/admin/sites.py
+@@ -430,7 +430,7 @@ class AdminSite:
+                     return HttpResponsePermanentRedirect(path)
+         raise Http404
+ 
+-    def _build_app_dict(self, request, label=None):
++    def build_app_dict(self, request, label=None):
+         """
+         Build the app dictionary. The optional `label` parameter filters models
+         of a specific app.
+@@ -466,6 +466,7 @@ class AdminSite:
+                 'perms': perms,
+                 'admin_url': None,
+                 'add_url': None,
++                'model': model,
+             }
+             if perms.get('change') or perms.get('view'):
+                 model_dict['view_only'] = not perms.get('change')
+2026-10-10 11:41:25,373 - INFO - Eval script for django__django-13447 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__full__final/rerun-2026-10__openai__baseline__rep1__full__final/django__django-13447/eval.sh; copying to container...
+2026-10-10 11:41:33,606 - INFO - Test runtime: 8.17 seconds
+2026-10-10 11:41:33,608 - INFO - Test output for django__django-13447 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__full__final/rerun-2026-10__openai__baseline__rep1__full__final/django__django-13447/test_output.txt
+2026-10-10 11:41:33,666 - INFO - Git diff after:
+diff --git a/django/contrib/admin/sites.py b/django/contrib/admin/sites.py
+index 837dabfea8..6b48e2b03a 100755
+--- a/django/contrib/admin/sites.py
++++ b/django/contrib/admin/sites.py
+@@ -430,7 +430,7 @@ class AdminSite:
+                     return HttpResponsePermanentRedirect(path)
+         raise Http404
+ 
+-    def _build_app_dict(self, request, label=None):
++    def build_app_dict(self, request, label=None):
+         """
+         Build the app dictionary. The optional `label` parameter filters models
+         of a specific app.
+@@ -466,6 +466,7 @@ class AdminSite:
+                 'perms': perms,
+                 'admin_url': None,
+                 'add_url': None,
++                'model': model,
+             }
+             if perms.get('change') or perms.get('view'):
+                 model_dict['view_only'] = not perms.get('change')
+2026-10-10 11:41:33,666 - INFO - Grading answer for django__django-13447...
+2026-10-10 11:41:33,671 - INFO - report: {'django__django-13447': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_available_apps (admin_views.test_adminsite.SiteEachContextTest)']}, 'PASS_TO_PASS': {'success': ['test_add_action (admin_views.test_adminsite.SiteActionsTests)', 'test_disable_action (admin_views.test_adminsite.SiteActionsTests)', "AdminSite.get_action() returns an action even if it's disabled."], 'failure': ['test_each_context (admin_views.test_adminsite.SiteEachContextTest)', 'test_each_context_site_url_with_script_name (admin_views.test_adminsite.SiteEachContextTest)']}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-13447: resolved: False
+2026-10-10 11:41:33,671 - INFO - Attempting to stop container sweb.eval.django__django-13447.rerun-2026-10__openai__baseline__rep1__full__final...
+2026-10-10 11:41:49,344 - INFO - Attempting to remove container sweb.eval.django__django-13447.rerun-2026-10__openai__baseline__rep1__full__final...
+2026-10-10 11:41:49,417 - INFO - Container sweb.eval.django__django-13447.rerun-2026-10__openai__baseline__rep1__full__final removed.

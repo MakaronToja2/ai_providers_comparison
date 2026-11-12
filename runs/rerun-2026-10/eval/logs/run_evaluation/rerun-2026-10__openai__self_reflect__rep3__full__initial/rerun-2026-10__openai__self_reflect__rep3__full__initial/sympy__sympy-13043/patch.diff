@@ -1,0 +1,14 @@
+diff --git a/sympy/polys/polytools.py b/sympy/polys/polytools.py
+index 2cf5e69329..19da17417e 100644
+--- a/sympy/polys/polytools.py
++++ b/sympy/polys/polytools.py
+@@ -5577,7 +5577,8 @@ def decompose(f, *gens, **args):
+     if not opt.polys:
+         return [r.as_expr() for r in result]
+     else:
+-        return result
++        # Sort the result to ensure consistent order
++        return sorted(result, key=lambda p: p.as_expr())
+ 
+ 
+ @public

@@ -1,0 +1,17 @@
+diff --git a/django/core/handlers/base.py b/django/core/handlers/base.py
+index 2304e7761d..976acaa1de 100644
+--- a/django/core/handlers/base.py
++++ b/django/core/handlers/base.py
+@@ -101,6 +101,12 @@ class BaseHandler:
+         callback, callback_args, callback_kwargs = resolver_match
+         request.resolver_match = resolver_match
+ 
++        # Fix for optional URL parameters that are None
++        # Remove None values from callback_args and callback_kwargs to avoid passing them as positional args
++        # This is to maintain backward compatibility with views expecting fewer args
++        callback_args = tuple(arg for arg in callback_args if arg is not None)
++        callback_kwargs = {k: v for k, v in callback_kwargs.items() if v is not None}
++
+         # Apply view middleware
+         for middleware_method in self._view_middleware:
+             response = middleware_method(request, callback, callback_args, callback_kwargs)

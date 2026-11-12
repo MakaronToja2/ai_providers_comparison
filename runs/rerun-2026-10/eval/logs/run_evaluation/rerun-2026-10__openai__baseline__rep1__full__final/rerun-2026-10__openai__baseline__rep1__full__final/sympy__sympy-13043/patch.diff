@@ -1,0 +1,14 @@
+diff --git a/sympy/integrals/intpoly.py b/sympy/integrals/intpoly.py
+index fc72bd206f..3f3d673820 100644
+--- a/sympy/integrals/intpoly.py
++++ b/sympy/integrals/intpoly.py
+@@ -593,7 +593,8 @@ def decompose(expr, separate=False):
+         poly_dict[0] = expr
+ 
+     if separate:
+-        return list(poly_dict.values())
++        # Return values sorted by degree keys
++        return [poly_dict[k] for k in sorted(poly_dict.keys())]
+     return poly_dict
+ 
+ 

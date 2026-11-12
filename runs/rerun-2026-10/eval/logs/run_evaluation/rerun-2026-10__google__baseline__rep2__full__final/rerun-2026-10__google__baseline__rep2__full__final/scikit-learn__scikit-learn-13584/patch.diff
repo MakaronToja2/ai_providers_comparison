@@ -1,0 +1,17 @@
+diff --git a/sklearn/utils/_pprint.py b/sklearn/utils/_pprint.py
+index b8686dba5b0..549877392d9 100644
+--- a/sklearn/utils/_pprint.py
++++ b/sklearn/utils/_pprint.py
+@@ -431,5 +431,12 @@ def _safe_repr(object, context, maxlevels, level, changed_only=False):
+         return ("%s(%s)" % (typ.__name__, ", ".join(components)), readable,
+                 recursive)
+ 
++    # Add specific handling for numpy arrays
++    if isinstance(object, np.ndarray):
++        # Return the standard string representation of the numpy array.
++        # This avoids evaluating its truth value.
++        # Mark it as readable (True) and not recursive (False).
++        return repr(object), True, False
++
+     rep = repr(object)
+     return rep, (rep and not rep.startswith('<')), False

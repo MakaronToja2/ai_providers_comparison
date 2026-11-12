@@ -1,0 +1,66 @@
+2026-10-10 13:06:16,567 - INFO - Creating container for django__django-15790...
+2026-10-10 13:06:16,733 - INFO - Container for django__django-15790 created: 708f02d1b796ecd13ddec15eceb382299df389032679941430ea684ed7806e15
+2026-10-10 13:06:17,033 - INFO - Container for django__django-15790 started: 708f02d1b796ecd13ddec15eceb382299df389032679941430ea684ed7806e15
+2026-10-10 13:06:17,034 - INFO - Intermediate patch for django__django-15790 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep2__full__final/rerun-2026-10__openai__forced__rep2__full__final/django__django-15790/patch.diff, now applying to container...
+2026-10-10 13:06:17,159 - INFO - >>>>> Applied Patch:
+Checking patch django/core/checks/templates.py...
+warning: django/core/checks/templates.py has type 100755, expected 100644
+Applied patch django/core/checks/templates.py cleanly.
+
+2026-10-10 13:06:17,752 - INFO - Git diff before:
+diff --git a/django/core/checks/templates.py b/django/core/checks/templates.py
+index 5214276987..e26aa0bab1 100755
+--- a/django/core/checks/templates.py
++++ b/django/core/checks/templates.py
+@@ -52,13 +52,17 @@ def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
+     errors = []
+     libraries = defaultdict(list)
+ 
++    # Collect libraries from TEMPLATES OPTIONS first
+     for conf in settings.TEMPLATES:
+         custom_libraries = conf.get("OPTIONS", {}).get("libraries", {})
+         for module_name, module_path in custom_libraries.items():
+             libraries[module_name].append(module_path)
+ 
++    # Collect libraries from installed apps
+     for module_name, module_path in get_template_tag_modules():
+-        libraries[module_name].append(module_path)
++        # Only add if not already present from TEMPLATES OPTIONS to avoid duplicates
++        if module_path not in libraries[module_name]:
++            libraries[module_name].append(module_path)
+ 
+     for library_name, items in libraries.items():
+         if len(items) > 1:
+2026-10-10 13:06:17,752 - INFO - Eval script for django__django-15790 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep2__full__final/rerun-2026-10__openai__forced__rep2__full__final/django__django-15790/eval.sh; copying to container...
+2026-10-10 13:06:23,062 - INFO - Test runtime: 5.25 seconds
+2026-10-10 13:06:23,065 - INFO - Test output for django__django-15790 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep2__full__final/rerun-2026-10__openai__forced__rep2__full__final/django__django-15790/test_output.txt
+2026-10-10 13:06:23,141 - INFO - Git diff after:
+diff --git a/django/core/checks/templates.py b/django/core/checks/templates.py
+index 5214276987..e26aa0bab1 100755
+--- a/django/core/checks/templates.py
++++ b/django/core/checks/templates.py
+@@ -52,13 +52,17 @@ def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
+     errors = []
+     libraries = defaultdict(list)
+ 
++    # Collect libraries from TEMPLATES OPTIONS first
+     for conf in settings.TEMPLATES:
+         custom_libraries = conf.get("OPTIONS", {}).get("libraries", {})
+         for module_name, module_path in custom_libraries.items():
+             libraries[module_name].append(module_path)
+ 
++    # Collect libraries from installed apps
+     for module_name, module_path in get_template_tag_modules():
+-        libraries[module_name].append(module_path)
++        # Only add if not already present from TEMPLATES OPTIONS to avoid duplicates
++        if module_path not in libraries[module_name]:
++            libraries[module_name].append(module_path)
+ 
+     for library_name, items in libraries.items():
+         if len(items) > 1:
+2026-10-10 13:06:23,141 - INFO - Grading answer for django__django-15790...
+2026-10-10 13:06:23,146 - INFO - report: {'django__django-15790': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_template_tags_same_library_in_installed_apps_libraries (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)'], 'failure': []}, 'PASS_TO_PASS': {'success': ['Error if template loaders are specified and APP_DIRS is True.', 'test_app_dirs_removed (check_framework.test_templates.CheckTemplateSettingsAppDirsTest)', 'test_loaders_removed (check_framework.test_templates.CheckTemplateSettingsAppDirsTest)', 'test_string_if_invalid_both_are_strings (check_framework.test_templates.CheckTemplateStringIfInvalidTest)', 'test_string_if_invalid_first_is_string (check_framework.test_templates.CheckTemplateStringIfInvalidTest)', 'test_string_if_invalid_not_specified (check_framework.test_templates.CheckTemplateStringIfInvalidTest)', 'test_string_if_invalid_not_string (check_framework.test_templates.CheckTemplateStringIfInvalidTest)', 'test_template_tags_with_different_library_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)', 'test_template_tags_with_different_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)', 'test_template_tags_with_same_library_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)', 'test_template_tags_with_same_library_name_and_module_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)', 'test_template_tags_with_same_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-15790: resolved: True
+2026-10-10 13:06:23,147 - INFO - Attempting to stop container sweb.eval.django__django-15790.rerun-2026-10__openai__forced__rep2__full__final...
+2026-10-10 13:06:41,364 - INFO - Attempting to remove container sweb.eval.django__django-15790.rerun-2026-10__openai__forced__rep2__full__final...
+2026-10-10 13:06:41,409 - INFO - Container sweb.eval.django__django-15790.rerun-2026-10__openai__forced__rep2__full__final removed.

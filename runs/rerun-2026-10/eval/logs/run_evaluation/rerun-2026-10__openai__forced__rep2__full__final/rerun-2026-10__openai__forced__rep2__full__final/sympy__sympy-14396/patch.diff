@@ -1,0 +1,28 @@
+diff --git a/sympy/polys/polyoptions.py b/sympy/polys/polyoptions.py
+index 6e504a3057..e58909edf5 100644
+--- a/sympy/polys/polyoptions.py
++++ b/sympy/polys/polyoptions.py
+@@ -480,7 +480,22 @@ def preprocess(cls, domain):
+                 gens = list(map(sympify, r.groups()[1].split(',')))
+                 return sympy.polys.domains.QQ.algebraic_field(*gens)
+ 
+-        raise OptionError('expected a valid domain specification, got %s' % domain)
++            # Try to parse domain of form RR[y,z] or QQ[y,z]
++            if domain.startswith('RR[') or domain.startswith('QQ['):
++                try:
++                    ground = domain[:2]
++                    gens_str = domain[3:-1]
++                    gens = list(map(sympify, gens_str.split(',')))
++                    if ground == 'RR':
++                        return sympy.polys.domains.RR.poly_ring(*gens)
++                    else:
++                        return sympy.polys.domains.QQ.poly_ring(*gens)
++                except Exception:
++                    pass
++
++        raise OptionError(
++            'expected a valid domain specification, got %s. '
++            'For polynomial domains use e.g. "QQ[x,y]", "RR[x,y]", or algebraic fields like "QQ<sqrt2>"' % domain)
+ 
+     @classmethod
+     def postprocess(cls, options):

@@ -1,0 +1,47 @@
+<frozen runpy>:128: RuntimeWarning: 'swebench.harness.run_evaluation' found in sys.modules after import of package 'swebench.harness', but prior to execution of 'swebench.harness.run_evaluation'; this may result in unpredictable behaviour
+Found 6 existing instance images. Will reuse them.
+Running 6 instances...
+Evaluation:   0%|          | 0/6 [00:00<?, ?it/s, error=0, ✓=0, ✖=0]Evaluation:   0%|          | 0/6 [01:08<?, ?it/s, ✓=1, ✖=0, error=0]Evaluation:  17%|█▋        | 1/6 [01:08<05:44, 68.80s/it, ✓=1, ✖=0, error=0]Evaluation:  17%|█▋        | 1/6 [01:08<05:44, 68.80s/it, ✓=2, ✖=0, error=0]Evaluation:  33%|███▎      | 2/6 [01:14<04:35, 68.80s/it, ✓=2, ✖=1, error=0]Evaluation:  50%|█████     | 3/6 [01:14<00:59, 19.79s/it, ✓=2, ✖=1, error=0]Evaluation:  50%|█████     | 3/6 [01:20<00:59, 19.79s/it, ✓=3, ✖=1, error=0]Evaluation:  67%|██████▋   | 4/6 [01:20<00:30, 15.33s/it, ✓=3, ✖=1, error=0]Evaluation:  67%|██████▋   | 4/6 [02:05<00:30, 15.33s/it, ✓=3, ✖=2, error=0]Evaluation:  83%|████████▎ | 5/6 [02:05<00:24, 24.97s/it, ✓=3, ✖=2, error=0]Evaluation:  83%|████████▎ | 5/6 [02:05<00:24, 24.97s/it, ✓=4, ✖=2, error=0]Evaluation: 100%|██████████| 6/6 [02:05<00:00, 17.07s/it, ✓=4, ✖=2, error=0]Evaluation: 100%|██████████| 6/6 [02:05<00:00, 20.97s/it, ✓=4, ✖=2, error=0]
+Traceback (most recent call last):
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/docker/api/client.py", line 275, in _raise_for_status
+    response.raise_for_status()
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/requests/models.py", line 1167, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: http+docker://localhost/v1.55/containers/312a96a7318113691db1e452549efe4aaf8709c508a297bfae7a96458902ae9b/json
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/swebench/harness/run_evaluation.py", line 677, in <module>
+    main(**vars(args))
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/swebench/harness/run_evaluation.py", line 569, in main
+    return make_run_report(
+           ^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/swebench/harness/reporting.py", line 107, in make_run_report
+    containers = client.containers.list(all=True)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/docker/models/containers.py", line 1019, in list
+    containers.append(self.get(r['Id']))
+                      ^^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/docker/models/containers.py", line 955, in get
+    resp = self.client.api.inspect_container(container_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/docker/utils/decorators.py", line 19, in wrapped
+    return f(self, resource_id, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/docker/api/container.py", line 793, in inspect_container
+    return self._result(
+           ^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/docker/api/client.py", line 281, in _result
+    self._raise_for_status(response)
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/docker/api/client.py", line 277, in _raise_for_status
+    raise create_api_error_from_http_exception(e) from e
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/docker/errors.py", line 39, in create_api_error_from_http_exception
+    raise cls(e, response=response, explanation=explanation) from e
+docker.errors.NotFound: 404 Client Error for http+docker://localhost/v1.55/containers/312a96a7318113691db1e452549efe4aaf8709c508a297bfae7a96458902ae9b/json: Not Found ("No such container: 312a96a7318113691db1e452549efe4aaf8709c508a297bfae7a96458902ae9b")
+All instances run.
+Cleaning cached images...
+Removed 0 images.

@@ -1,0 +1,14 @@
+diff --git a/sphinx/ext/napoleon/docstring.py b/sphinx/ext/napoleon/docstring.py
+index 11409e6f6b..6d5b7555d2 100644
+--- a/sphinx/ext/napoleon/docstring.py
++++ b/sphinx/ext/napoleon/docstring.py
+@@ -238,7 +238,8 @@ class GoogleDocstring:
+                 _name = match.group(1)
+                 _type = match.group(2)
+ 
+-        _name = self._escape_args_and_kwargs(_name)
++        if parse_type:
++            _name = self._escape_args_and_kwargs(_name)
+ 
+         if prefer_type and not _type:
+             _type, _name = _name, _type

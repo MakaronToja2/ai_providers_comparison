@@ -1,0 +1,24 @@
+diff --git a/sympy/core/function.py b/sympy/core/function.py
+index 69df976b8b..69efaa451b 100644
+--- a/sympy/core/function.py
++++ b/sympy/core/function.py
+@@ -1368,11 +1368,15 @@ def __new__(cls, expr, *variables, **kwargs):
+         # have been removed because the count was 0
+         for v, c in variable_count:
+             # v must have _diff_wrt True
++            # Special case: if v is a MatrixExpr, allow _diff_wrt to be False,
++            # but still allow differentiation (fixes kind attribute for Derivative of MatrixSymbol)
+             if not v._diff_wrt:
+-                __ = ''  # filler to make error message neater
+-                raise ValueError(filldedent('''
+-                    Can't calculate derivative wrt %s.%s''' % (v,
+-                    __)))
++                from sympy.matrices.expressions.matexpr import MatrixExpr
++                if not isinstance(v, MatrixExpr):
++                    __ = ''  # filler to make error message neater
++                    raise ValueError(filldedent('''
++                        Can't calculate derivative wrt %s.%s''' % (v,
++                        __)))
+ 
+         # We make a special case for 0th derivative, because there is no
+         # good way to unambiguously print this.

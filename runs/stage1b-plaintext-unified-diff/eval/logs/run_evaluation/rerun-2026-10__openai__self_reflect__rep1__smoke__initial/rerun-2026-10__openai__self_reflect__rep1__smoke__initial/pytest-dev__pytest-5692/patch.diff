@@ -1,0 +1,27 @@
+--- a/src/_pytest/junitxml.py
++++ b/src/_pytest/junitxml.py
+@@ -655,10 +655,19 @@
+-        logfile.write('<?xml version="1.0" encoding="utf-8"?>')
+-
+-        suite_node = Junit.testsuite(
++        logfile.write('<?xml version="1.0" encoding="utf-8"?>')
++
++        # Add timestamp and hostname attributes to the testsuite element
++        timestamp = datetime.datetime.utcnow().isoformat()
++        try:
++            hostname = socket.gethostname()
++        except Exception:
++            hostname = "unknown"
++
++        suite_node = Junit.testsuite(
+             name=self.suite_name,
+             tests=str(numtests),
+             skipped=str(self.stats["skipped"]),
+             failures=str(self.stats["failure"]),
+             errors=str(self.stats["error"]),
+-            time="%.3f" % suite_time_delta,
+-        )
++            time="%.3f" % suite_time_delta,
++            timestamp=timestamp,
++            hostname=hostname,
++        )

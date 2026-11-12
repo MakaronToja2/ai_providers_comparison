@@ -1,0 +1,59 @@
+2026-10-10 19:21:31,086 - INFO - Creating container for sympy__sympy-24152...
+2026-10-10 19:21:33,593 - INFO - Container for sympy__sympy-24152 created: 047a9b916c3d4cca1c265693b2bc7965101066b143ef6b381c6b0c4cbb879a08
+2026-10-10 19:21:39,651 - INFO - Container for sympy__sympy-24152 started: 047a9b916c3d4cca1c265693b2bc7965101066b143ef6b381c6b0c4cbb879a08
+2026-10-10 19:21:39,652 - INFO - Intermediate patch for sympy__sympy-24152 written to logs/run_evaluation/gold__full/gold/sympy__sympy-24152/patch.diff, now applying to container...
+2026-10-10 19:21:39,761 - INFO - >>>>> Applied Patch:
+Checking patch sympy/physics/quantum/tensorproduct.py...
+Applied patch sympy/physics/quantum/tensorproduct.py cleanly.
+
+2026-10-10 19:21:40,057 - INFO - Git diff before:
+diff --git a/sympy/physics/quantum/tensorproduct.py b/sympy/physics/quantum/tensorproduct.py
+index 78accaf295..cc2e02f2ec 100755
+--- a/sympy/physics/quantum/tensorproduct.py
++++ b/sympy/physics/quantum/tensorproduct.py
+@@ -246,9 +246,12 @@ def _eval_expand_tensorproduct(self, **hints):
+             if isinstance(args[i], Add):
+                 for aa in args[i].args:
+                     tp = TensorProduct(*args[:i] + (aa,) + args[i + 1:])
+-                    if isinstance(tp, TensorProduct):
+-                        tp = tp._eval_expand_tensorproduct()
+-                    add_args.append(tp)
++                    c_part, nc_part = tp.args_cnc()
++                    # Check for TensorProduct object: is the one object in nc_part, if any:
++                    # (Note: any other object type to be expanded must be added here)
++                    if len(nc_part) == 1 and isinstance(nc_part[0], TensorProduct):
++                        nc_part = (nc_part[0]._eval_expand_tensorproduct(), )
++                    add_args.append(Mul(*c_part)*Mul(*nc_part))
+                 break
+ 
+         if add_args:
+2026-10-10 19:21:40,057 - INFO - Eval script for sympy__sympy-24152 written to logs/run_evaluation/gold__full/gold/sympy__sympy-24152/eval.sh; copying to container...
+2026-10-10 19:21:44,865 - INFO - Test runtime: 4.76 seconds
+2026-10-10 19:21:44,866 - INFO - Test output for sympy__sympy-24152 written to logs/run_evaluation/gold__full/gold/sympy__sympy-24152/test_output.txt
+2026-10-10 19:21:44,911 - INFO - Git diff after:
+diff --git a/sympy/physics/quantum/tensorproduct.py b/sympy/physics/quantum/tensorproduct.py
+index 78accaf295..cc2e02f2ec 100755
+--- a/sympy/physics/quantum/tensorproduct.py
++++ b/sympy/physics/quantum/tensorproduct.py
+@@ -246,9 +246,12 @@ def _eval_expand_tensorproduct(self, **hints):
+             if isinstance(args[i], Add):
+                 for aa in args[i].args:
+                     tp = TensorProduct(*args[:i] + (aa,) + args[i + 1:])
+-                    if isinstance(tp, TensorProduct):
+-                        tp = tp._eval_expand_tensorproduct()
+-                    add_args.append(tp)
++                    c_part, nc_part = tp.args_cnc()
++                    # Check for TensorProduct object: is the one object in nc_part, if any:
++                    # (Note: any other object type to be expanded must be added here)
++                    if len(nc_part) == 1 and isinstance(nc_part[0], TensorProduct):
++                        nc_part = (nc_part[0]._eval_expand_tensorproduct(), )
++                    add_args.append(Mul(*c_part)*Mul(*nc_part))
+                 break
+ 
+         if add_args:
+2026-10-10 19:21:44,911 - INFO - Grading answer for sympy__sympy-24152...
+2026-10-10 19:21:44,912 - INFO - report: {'sympy__sympy-24152': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_tensor_product_expand'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_sparse_matrices', 'test_tensor_product_dagger', 'test_tensor_product_abstract', 'test_tensor_product_commutator', 'test_tensor_product_simp', 'test_issue_5923'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-24152: resolved: True
+2026-10-10 19:21:44,912 - INFO - Attempting to stop container sweb.eval.sympy__sympy-24152.gold__full...
+2026-10-10 19:22:04,471 - INFO - Attempting to remove container sweb.eval.sympy__sympy-24152.gold__full...
+2026-10-10 19:22:05,674 - INFO - Container sweb.eval.sympy__sympy-24152.gold__full removed.

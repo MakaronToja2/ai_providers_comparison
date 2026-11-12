@@ -1,0 +1,52 @@
+2026-10-10 13:18:24,411 - INFO - Creating container for django__django-15400...
+2026-10-10 13:18:24,874 - INFO - Container for django__django-15400 created: b32b1c0531ceb4fd8a0a3d72964578633c549825ff9feabb7582192eb619fbef
+2026-10-10 13:18:25,405 - INFO - Container for django__django-15400 started: b32b1c0531ceb4fd8a0a3d72964578633c549825ff9feabb7582192eb619fbef
+2026-10-10 13:18:25,405 - INFO - Intermediate patch for django__django-15400 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/django__django-15400/patch.diff, now applying to container...
+2026-10-10 13:18:25,541 - INFO - >>>>> Applied Patch:
+Checking patch django/utils/functional.py...
+warning: django/utils/functional.py has type 100755, expected 100644
+Applied patch django/utils/functional.py cleanly.
+
+2026-10-10 13:18:26,166 - INFO - Git diff before:
+diff --git a/django/utils/functional.py b/django/utils/functional.py
+index 9e1be0fe0f..1da894364d 100755
+--- a/django/utils/functional.py
++++ b/django/utils/functional.py
+@@ -432,6 +432,11 @@ class SimpleLazyObject(LazyObject):
+             return result
+         return copy.deepcopy(self._wrapped, memo)
+ 
++    def __radd__(self, other):
++        if self._wrapped is empty:
++            self._setup()
++        return other + self._wrapped
++
+ 
+ def partition(predicate, values):
+     """
+2026-10-10 13:18:26,166 - INFO - Eval script for django__django-15400 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/django__django-15400/eval.sh; copying to container...
+2026-10-10 13:18:33,956 - INFO - Test runtime: 7.72 seconds
+2026-10-10 13:18:33,958 - INFO - Test output for django__django-15400 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/django__django-15400/test_output.txt
+2026-10-10 13:18:34,032 - INFO - Git diff after:
+diff --git a/django/utils/functional.py b/django/utils/functional.py
+index 9e1be0fe0f..1da894364d 100755
+--- a/django/utils/functional.py
++++ b/django/utils/functional.py
+@@ -432,6 +432,11 @@ class SimpleLazyObject(LazyObject):
+             return result
+         return copy.deepcopy(self._wrapped, memo)
+ 
++    def __radd__(self, other):
++        if self._wrapped is empty:
++            self._setup()
++        return other + self._wrapped
++
+ 
+ def partition(predicate, values):
+     """
+2026-10-10 13:18:34,032 - INFO - Grading answer for django__django-15400...
+2026-10-10 13:18:34,037 - INFO - report: {'django__django-15400': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_radd (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)'], 'failure': ['test_add (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)']}, 'PASS_TO_PASS': {'success': ['test_bool (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_bytes (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_class (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_cmp (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_contains (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_copy_class (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_copy_class_no_evaluation (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_copy_list (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_copy_list_no_evaluation (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_deepcopy_class (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_deepcopy_class_no_evaluation (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_deepcopy_list (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_deepcopy_list_no_evaluation (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_delattr (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_delitem (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_dir (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_getattr (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_getitem (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_gt (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_hash (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_iter (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_len (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_lt (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_pickle (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_setattr (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_setattr2 (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_setitem (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_text (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_bool (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_bytes (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_class (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_cmp (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_contains (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_copy_class (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_copy_class_no_evaluation (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_copy_list (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_copy_list_no_evaluation (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_deepcopy_class (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_deepcopy_class_no_evaluation (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_deepcopy_list (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_deepcopy_list_no_evaluation (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_delattr (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_delitem (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_dict (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_dir (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_getattr (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_getitem (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_gt (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_hash (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_iter (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_len (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_list_set (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_lt (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_none (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_pickle (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_repr (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_setattr (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_setattr2 (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_setitem (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_text (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_trace (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'Test in a fairly synthetic setting.'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-15400: resolved: False
+2026-10-10 13:18:34,038 - INFO - Attempting to stop container sweb.eval.django__django-15400.rerun-2026-10__google__self_reflect__rep2__full__final...
+2026-10-10 13:18:52,886 - INFO - Attempting to remove container sweb.eval.django__django-15400.rerun-2026-10__google__self_reflect__rep2__full__final...
+2026-10-10 13:18:53,001 - INFO - Container sweb.eval.django__django-15400.rerun-2026-10__google__self_reflect__rep2__full__final removed.

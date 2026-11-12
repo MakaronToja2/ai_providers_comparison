@@ -1,0 +1,43 @@
+diff --git a/django/db/models/fields/json.py b/django/db/models/fields/json.py
+index 29c6ff0926..17c583a5fe 100644
+--- a/django/db/models/fields/json.py
++++ b/django/db/models/fields/json.py
+@@ -366,14 +366,32 @@ class CaseInsensitiveMixin:
+ class KeyTransformIsNull(lookups.IsNull):
+     # key__isnull=False is the same as has_key='key'
+     def as_oracle(self, compiler, connection):
+-        if not self.rhs:
+-            return HasKey(self.lhs.lhs, self.lhs.key_name).as_oracle(compiler, connection)
+-        return super().as_sql(compiler, connection)
++        if not self.rhs:  # isnull=True
++            # For isnull=True, we want to check if the key does not exist.
++            # JSON_EXISTS returns true if the path exists.
++            lhs, params, key_transforms = self.lhs.preprocess_lhs(compiler, connection)
++            json_path = compile_json_path(key_transforms)
++            # Oracle does not support bind variables for JSON path expressions.
++            # Embed the path directly and negate JSON_EXISTS.
++            # Escape single quotes in the path for SQL string literal.
++            escaped_json_path = json_path.replace("'", "''")
++            sql = f"NOT JSON_EXISTS({lhs}, '{escaped_json_path}')"
++            return sql, params
++        # For isnull=False, delegate to HasKey.
++        return HasKey(self.lhs.lhs, self.lhs.key_name).as_oracle(compiler, connection)
+ 
+     def as_sqlite(self, compiler, connection):
+-        if not self.rhs:
+-            return HasKey(self.lhs.lhs, self.lhs.key_name).as_sqlite(compiler, connection)
+-        return super().as_sql(compiler, connection)
++        if not self.rhs:  # isnull=True
++            # For isnull=True, we want to check if the key does not exist.
++            # JSON_EXTRACT returns NULL if the path does not exist.
++            lhs, params, key_transforms = self.lhs.preprocess_lhs(compiler, connection)
++            json_path = compile_json_path(key_transforms)
++            # Escape '%' for SQLite's printf-style formatting in JSON_EXTRACT
++            json_path = json_path.replace('%', '%%')
++            sql = f"JSON_EXTRACT({lhs}, '{json_path}') IS NULL"
++            return sql, params
++        # For isnull=False, delegate to HasKey.
++        return HasKey(self.lhs.lhs, self.lhs.key_name).as_sqlite(compiler, connection)
+ 
+ 
+ class KeyTransformIn(lookups.In):

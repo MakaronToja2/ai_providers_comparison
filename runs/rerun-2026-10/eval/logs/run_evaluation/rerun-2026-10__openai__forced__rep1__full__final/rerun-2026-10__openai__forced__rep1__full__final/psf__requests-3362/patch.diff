@@ -1,0 +1,16 @@
+diff --git a/requests/models.py b/requests/models.py
+index fbb3c7e6..795cf32e 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -659,6 +659,11 @@ class Response(object):
+ 
+         If decode_unicode is True, content will be decoded using the best
+         available encoding based on the response.
++
++        Note: When decode_unicode=True, the chunks returned are unicode strings,
++        not bytes. This means the chunk size is a hint for the number of bytes
++        to read from the raw stream, but the length of the yielded strings may
++        vary due to decoding.
+         """
+ 
+         def generate():

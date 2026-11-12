@@ -1,0 +1,56 @@
+diff --git a/sympy/printing/latex.py b/sympy/printing/latex.py
+index 737e16cc74..43515cbcbc 100644
+--- a/sympy/printing/latex.py
++++ b/sympy/printing/latex.py
+@@ -1854,11 +1854,49 @@ def _print_PolynomialRingBase(self, expr):
+ 
+     def _print_Poly(self, poly):
+         cls = poly.__class__.__name__
+-        expr = self._print(poly.as_expr())
++        
++        # Build the polynomial expression using terms() to preserve monomial order
++        terms = []
+         gens = list(map(self._print, poly.gens))
++        
++        for monom, coeff in poly.terms():
++            s_monom = []
++            
++            for i, exp in enumerate(monom):
++                if exp > 0:
++                    if exp == 1:
++                        s_monom.append(gens[i])
++                    else:
++                        s_monom.append(gens[i] + "^{%d}" % exp)
++            
++            s_monom_str = " ".join(s_monom) if s_monom else ""
++            
++            if coeff.is_Add:
++                if s_monom_str:
++                    s_coeff = r"\left( " + self._print(coeff) + r" \right)"
++                else:
++                    s_coeff = self._print(coeff)
++            else:
++                s_coeff = self._print(coeff)
++            
++            if not s_monom_str:
++                s_term = s_coeff
++            else:
++                if coeff is S.One:
++                    s_term = s_monom_str
++                elif coeff is S.NegativeOne:
++                    s_term = "- " + s_monom_str
++                else:
++                    s_term = s_coeff + " " + s_monom_str
++            
++            terms.append(s_term)
++        
++        expr = " + ".join(terms).replace(" + -", " - ")
++        
++        gens_str = ", ".join(gens)
+         domain = "domain=%s" % self._print(poly.get_domain())
+ 
+-        args = ", ".join([expr] + gens + [domain])
++        args = ", ".join([expr, gens_str, domain])
+         if cls in accepted_latex_functions:
+             tex = r"\%s {\left (%s \right )}" % (cls, args)
+         else:

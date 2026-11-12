@@ -1,0 +1,19 @@
+diff --git a/django/db/models/constraints.py b/django/db/models/constraints.py
+index d36d076346..bb8d533a64 100644
+--- a/django/db/models/constraints.py
++++ b/django/db/models/constraints.py
+@@ -161,7 +161,13 @@ class UniqueConstraint(BaseConstraint):
+ 
+     @property
+     def contains_expressions(self):
+-        return bool(self.expressions)
++        # Check if any expression is not just a simple field reference.
++        # F('field_name') is a simple field reference and should not be
++        # considered an expression for constraint purposes.
++        for expr in self.expressions:
++            if not (isinstance(expr, F) and not expr.name.count('__')):
++                return True
++        return False
+ 
+     def _get_condition_sql(self, model, schema_editor):
+         if self.condition is None:

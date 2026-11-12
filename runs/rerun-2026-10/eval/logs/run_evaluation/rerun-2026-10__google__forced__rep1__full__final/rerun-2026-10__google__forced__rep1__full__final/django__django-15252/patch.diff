@@ -1,0 +1,14 @@
+diff --git a/django/db/migrations/recorder.py b/django/db/migrations/recorder.py
+index 1a37c6b7d0..46f9a99b1d 100644
+--- a/django/db/migrations/recorder.py
++++ b/django/db/migrations/recorder.py
+@@ -63,6 +63,9 @@ class MigrationRecorder:
+         if self.has_table():
+             return
+         # Make the table
++        # Check if the router allows migration for this model
++        if not self.connection.allow_migrate(self.Migration, self.connection.alias):
++            return
+         try:
+             with self.connection.schema_editor() as editor:
+                 editor.create_model(self.Migration)

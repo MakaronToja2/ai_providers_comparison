@@ -1,0 +1,18 @@
+diff --git a/seaborn/axisgrid.py b/seaborn/axisgrid.py
+index 75349099..9da4f2db 100644
+--- a/seaborn/axisgrid.py
++++ b/seaborn/axisgrid.py
+@@ -1291,6 +1291,13 @@ class PairGrid(Grid):
+ 
+         self._figure = fig
+         self.axes = axes
++        
++        # Handle MultiIndex columns by flattening them
++        if isinstance(data.columns, pd.MultiIndex):
++            # Flatten MultiIndex columns to tuples
++            data = data.copy()
++            data.columns = data.columns.to_flat_index()
++        
+         self.data = data
+ 
+         # Save what we are going to do with the diagonal

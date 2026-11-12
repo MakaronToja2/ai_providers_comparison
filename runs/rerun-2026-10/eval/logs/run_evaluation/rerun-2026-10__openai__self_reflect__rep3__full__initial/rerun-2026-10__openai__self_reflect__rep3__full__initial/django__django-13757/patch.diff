@@ -1,0 +1,36 @@
+diff --git a/django/db/models/fields/json.py b/django/db/models/fields/json.py
+index 29c6ff0926..047dab046d 100644
+--- a/django/db/models/fields/json.py
++++ b/django/db/models/fields/json.py
+@@ -368,12 +368,29 @@ class KeyTransformIsNull(lookups.IsNull):
+     def as_oracle(self, compiler, connection):
+         if not self.rhs:
+             return HasKey(self.lhs.lhs, self.lhs.key_name).as_oracle(compiler, connection)
+-        return super().as_sql(compiler, connection)
++        # For isnull=True, exclude keys that exist with null value on Oracle.
++        # JSON_EXISTS returns TRUE if key exists regardless of value.
++        # So we check key does not exist OR key exists with non-null value.
++        lhs, lhs_params = self.lhs.lhs.as_sql(compiler, connection)
++        key_name = self.lhs.key_name
++        # JSON_EXISTS(%s, '$.key_name') returns TRUE if key exists
++        # JSON_VALUE(%s, '$.key_name') IS NULL checks if value is null
++        sql = (
++            "(NOT JSON_EXISTS(%s, '$.%s') OR "
++            "JSON_VALUE(%s, '$.%s') IS NULL)" % (lhs, key_name, lhs, key_name)
++        )
++        return sql, lhs_params * 2
+ 
+     def as_sqlite(self, compiler, connection):
+         if not self.rhs:
+             return HasKey(self.lhs.lhs, self.lhs.key_name).as_sqlite(compiler, connection)
+-        return super().as_sql(compiler, connection)
++        # For isnull=True, exclude keys that exist with null value on SQLite.
++        lhs, lhs_params = self.lhs.lhs.as_sql(compiler, connection)
++        key_name = self.lhs.key_name
++        # JSON_EXTRACT returns NULL if key does not exist or value is null
++        # We want to match only if key does not exist (i.e. JSON_TYPE is NULL)
++        sql = "JSON_TYPE(%s, '$.%s') IS NULL" % (lhs, key_name)
++        return sql, lhs_params
+ 
+ 
+ class KeyTransformIn(lookups.In):

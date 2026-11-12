@@ -1,0 +1,23 @@
+diff --git a/lib/matplotlib/axes/_axes.py b/lib/matplotlib/axes/_axes.py
+index fdac0f3560..a1a6d2211d 100644
+--- a/lib/matplotlib/axes/_axes.py
++++ b/lib/matplotlib/axes/_axes.py
+@@ -2179,9 +2179,16 @@ class Axes(_AxesBase):
+             # removes the units from unit packages like `pint` that
+             # wrap numpy arrays.
+             try:
++                # Attempt to get the first finite value from x0.
++                # If x0 is empty or contains only non-finite values,
++                # _safe_first_finite will raise StopIteration.
++                # We catch this and return an empty converted dx.
+                 x0 = cbook._safe_first_finite(x0)
+-            except (TypeError, IndexError, KeyError):
+-                pass
++            except (TypeError, IndexError, KeyError, StopIteration):
++                # If x0 is empty or contains only non-finite values,
++                # we cannot determine a reference point. Return an empty
++                # array for the converted dx.
++                return convert(np.array([]))
+ 
+             try:
+                 x = cbook._safe_first_finite(xconv)

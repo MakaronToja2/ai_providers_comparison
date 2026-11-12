@@ -1,0 +1,21 @@
+diff --git a/sympy/core/mod.py b/sympy/core/mod.py
+index 11c800704b..4c63d7d95f 100644
+--- a/sympy/core/mod.py
++++ b/sympy/core/mod.py
+@@ -45,7 +45,15 @@ def doit(p, q):
+ 
+             if q.is_Number:
+                 if p.is_Number:
+-                    return (p % q)
++                                        # Check if p is numerically divisible by q
++                    r = p / q
++                    # Use a tolerance for floating point comparisons
++                    # Check if r is close to an integer
++                    if abs(r - round(r)) < 1e-15:
++                        return S.Zero
++                    else:
++                        # If not divisible, return the standard modulo
++                        return (p % q)
+                 if q == 2:
+                     if p.is_even:
+                         return S.Zero

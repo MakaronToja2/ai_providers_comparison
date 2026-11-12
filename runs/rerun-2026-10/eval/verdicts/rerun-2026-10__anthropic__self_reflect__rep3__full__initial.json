@@ -1,0 +1,179 @@
+{
+  "job": "rerun-2026-10__anthropic__self_reflect__rep3__full",
+  "kind": "initial",
+  "subset": "full",
+  "run_id": "rerun-2026-10__anthropic__self_reflect__rep3__full__initial",
+  "counts": {
+    "tests_failed": 13,
+    "resolved": 9
+  },
+  "verdicts": {
+    "astropy__astropy-7746": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 56,
+      "p2p_total": 56
+    },
+    "django__django-13028": {
+      "status": "resolved",
+      "f2p_passed": 2,
+      "f2p_total": 2,
+      "p2p_passed": 276,
+      "p2p_total": 276
+    },
+    "django__django-13220": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 1,
+      "f2p_total": 4,
+      "p2p_passed": 1,
+      "p2p_total": 1
+    },
+    "django__django-14730": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 119,
+      "p2p_total": 119
+    },
+    "django__django-14997": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 1,
+      "f2p_total": 3,
+      "p2p_passed": 144,
+      "p2p_total": 144
+    },
+    "django__django-17051": {
+      "status": "resolved",
+      "f2p_passed": 5,
+      "f2p_total": 5,
+      "p2p_passed": 39,
+      "p2p_total": 39
+    },
+    "matplotlib__matplotlib-24970": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 253,
+      "p2p_total": 253
+    },
+    "matplotlib__matplotlib-25442": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 275,
+      "p2p_total": 275
+    },
+    "matplotlib__matplotlib-26020": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 48,
+      "p2p_total": 48
+    },
+    "mwaskom__seaborn-3407": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 120,
+      "p2p_total": 120
+    },
+    "psf__requests-3362": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 75,
+      "p2p_total": 75
+    },
+    "pytest-dev__pytest-5103": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 64,
+      "p2p_total": 64
+    },
+    "scikit-learn__scikit-learn-13496": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 19,
+      "p2p_total": 19
+    },
+    "scikit-learn__scikit-learn-13584": {
+      "status": "resolved",
+      "f2p_passed": 6,
+      "f2p_total": 6,
+      "p2p_passed": 3,
+      "p2p_total": 3
+    },
+    "scikit-learn__scikit-learn-14894": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 85,
+      "p2p_total": 85
+    },
+    "sphinx-doc__sphinx-8435": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 16,
+      "p2p_total": 16
+    },
+    "sphinx-doc__sphinx-8506": {
+      "status": "tests_failed",
+      "kind": "both",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 13,
+      "p2p_total": 14
+    },
+    "sympy__sympy-14317": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 1,
+      "f2p_total": 2,
+      "p2p_passed": 116,
+      "p2p_total": 116
+    },
+    "sympy__sympy-18835": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 41,
+      "p2p_total": 41
+    },
+    "sympy__sympy-21055": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 13,
+      "p2p_total": 13
+    },
+    "sympy__sympy-22714": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 11,
+      "p2p_total": 11
+    },
+    "sympy__sympy-22840": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 2,
+      "p2p_passed": 95,
+      "p2p_total": 95
+    }
+  }
+}

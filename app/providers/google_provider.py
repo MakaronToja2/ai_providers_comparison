@@ -1,249 +1,182 @@
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 import os
-import time
-import google.generativeai as genai
+import uuid
 
-from ..core.base_provider import BaseAIProvider
-from ..models.requests import ChatMessage
-from ..models.responses import LLMResponse, TokenUsage
+from google import genai
+from google.genai import types, errors
+
+from ..core.base_provider import BaseAIProvider, ParsedResponse
+from ..models.requests import ChatMessage, ToolCallRequest
+from ..models.responses import TokenUsage
 
 # Default model from environment or fallback
 DEFAULT_GOOGLE_MODEL = os.getenv("GOOGLE_DEFAULT_MODEL", "gemini-2.5-flash-lite")
 
+# Stands in for a model turn that came back with no parts (for example a malformed
+# function call), so the conversation still alternates between user and model.
+EMPTY_TURN_PLACEHOLDER = "(empty response)"
+
 
 class GoogleProvider(BaseAIProvider):
-    """Google Gemini provider with proper tool schema conversion."""
-
-    # Type mapping from JSON Schema to Google Schema
-    TYPE_MAP = {
-        "string": "STRING",
-        "integer": "INTEGER",
-        "number": "NUMBER",
-        "boolean": "BOOLEAN",
-        "array": "ARRAY",
-        "object": "OBJECT",
-    }
-
-    # Fields not supported by Google Schema
-    UNSUPPORTED_FIELDS = {"minimum", "maximum", "default", "examples", "enum", "format", "pattern"}
+    """Google Gemini provider (google-genai SDK) with native function-call turns."""
 
     def __init__(self, api_key: str, model: str = None, **kwargs):
         model = model or DEFAULT_GOOGLE_MODEL
         super().__init__(api_key, model, **kwargs)
-        if api_key:
-            genai.configure(api_key=api_key)
-        # Initialize client without any tools to avoid conflicts
-        self.client = genai.GenerativeModel(model_name=model)
+        # Retries are handled (and logged) by BaseAIProvider._call_model
+        self.client = genai.Client(
+            api_key=api_key,
+            http_options=types.HttpOptions(
+                timeout=int(self.request_timeout_seconds * 1000),
+                retry_options=types.HttpRetryOptions(attempts=1),
+            ),
+        )
 
-    def _convert_schema_to_google(self, schema: Dict[str, Any]) -> Dict[str, Any]:
-        """Recursively convert JSON Schema to Google Schema format."""
-        if not isinstance(schema, dict):
-            return schema
+    def _serialise_messages(self, messages: List[ChatMessage]) -> Tuple[Optional[str], List[types.Content]]:
+        """Convert the neutral conversation to Gemini contents with native function turns."""
+        system_instruction = None
+        contents: List[types.Content] = []
 
-        result = {}
-
-        # Convert type to uppercase
-        if "type" in schema:
-            type_val = schema["type"]
-            if isinstance(type_val, str):
-                result["type"] = self.TYPE_MAP.get(type_val.lower(), "STRING")
-            else:
-                result["type"] = "STRING"  # Fallback
-
-        # Copy description
-        if "description" in schema:
-            result["description"] = str(schema["description"])
-
-        # Handle properties (for object types)
-        if "properties" in schema:
-            result["properties"] = {}
-            for prop_name, prop_def in schema["properties"].items():
-                result["properties"][prop_name] = self._convert_schema_to_google(prop_def)
-
-        # Handle required fields
-        if "required" in schema:
-            result["required"] = schema["required"]
-
-        # Handle array items
-        if "items" in schema:
-            result["items"] = self._convert_schema_to_google(schema["items"])
-
-        return result
-    
-    async def _make_api_call(self, messages: List[ChatMessage], temperature: float = 0.7,
-                           max_tokens: int = 1000, tools: Optional[List[Dict[str, Any]]] = None, **kwargs) -> Any:
-        # Convert messages to Gemini format
-        conversation_parts = []
-        
         for msg in messages:
             if msg.role == "system":
-                # Gemini doesn't have system role, prepend to first user message
-                if conversation_parts and conversation_parts[0].get("role") == "user":
-                    conversation_parts[0]["parts"][0] = f"{msg.content}\n\n{conversation_parts[0]['parts'][0]}"
-                else:
-                    conversation_parts.insert(0, {
-                        "role": "user",
-                        "parts": [msg.content]
-                    })
+                system_instruction = msg.content
+            elif msg.role == "assistant":
+                if msg.native is not None:
+                    # Echo the model's own turn exactly as it was returned
+                    contents.append(msg.native)
+                    continue
+                parts = []
+                if msg.content:
+                    parts.append(types.Part(text=msg.content))
+                for tc in msg.tool_calls or []:
+                    parts.append(types.Part(function_call=types.FunctionCall(name=tc.name, args=tc.arguments)))
+                if not parts:
+                    parts.append(types.Part(text=EMPTY_TURN_PLACEHOLDER))
+                contents.append(types.Content(role="model", parts=parts))
+            elif msg.role == "tool":
+                contents.append(types.Content(
+                    role="user",
+                    parts=[
+                        types.Part.from_function_response(
+                            name=tr.name,
+                            response={"error": tr.content} if tr.is_error else {"output": tr.content},
+                        )
+                        for tr in msg.tool_results or []
+                    ],
+                ))
             else:
-                role = "model" if msg.role == "assistant" else msg.role
-                conversation_parts.append({
-                    "role": role,
-                    "parts": [msg.content]
-                })
-        
-        generation_config = {
-            "temperature": temperature,
-        }
-        generation_config["max_output_tokens"] = max_tokens
-        
-        # Prepare tools if provided - use proper schema conversion
-        tool_dicts = None
-        if tools:
-            try:
-                # Convert each tool to Google's format using recursive conversion
-                function_declarations = []
-                for tool in tools:
-                    google_params = self._convert_schema_to_google(tool["parameters"])
-                    function_declarations.append({
-                        "name": tool["name"],
-                        "description": tool["description"],
-                        "parameters": google_params
-                    })
-
-                tool_dicts = {
-                    "function_declarations": function_declarations
-                }
-            except Exception as e:
-                print(f"Google tool conversion failed: {str(e)}")
-                tool_dicts = None
-        
-        # Google Generative AI doesn't have native async support yet
-        # We'll use the sync method but wrap it
-        import asyncio
-        
-        def _generate_with_tools():
-            try:
-                if tool_dicts:
-                    # Create client with tools in constructor
-                    try:
-                        client_with_tools = genai.GenerativeModel(
-                            model_name=self.model,
-                            tools=[tool_dicts]
-                        )
-                        return client_with_tools.generate_content(
-                            conversation_parts,
-                            generation_config=generation_config
-                        )
-                    except Exception as init_error:
-                        print(f"[GOOGLE ERROR] Tool initialization failed: {str(init_error)}")
-                        print(f"[GOOGLE ERROR] Falling back to NO TOOLS - this will hurt performance!")
-                        return self.client.generate_content(
-                            conversation_parts,
-                            generation_config=generation_config
-                        )
+                text_part = types.Part(text=msg.content)
+                previous = contents[-1] if contents else None
+                if previous is not None and previous.role == "user" and any(p.function_response for p in previous.parts):
+                    # A user message right after function responses joins the same user turn
+                    previous.parts.append(text_part)
                 else:
-                    return self.client.generate_content(
-                        conversation_parts,
-                        generation_config=generation_config
-                    )
-            except Exception as e:
-                print(f"Google API call failed: {str(e)}")
-                raise
-        
-        response = await asyncio.get_event_loop().run_in_executor(None, _generate_with_tools)
-        return response
-    
-    def _parse_response(self, raw_response: Any) -> tuple[str, Optional[TokenUsage], Optional[List[Dict[str, Any]]]]:
-        # Debug: Log what attributes the response has
-        response_attrs = [attr for attr in dir(raw_response) if not attr.startswith('_')]
-        # print(f"[Google DEBUG] Response attributes: {response_attrs}")
-        # Extract text content and tool calls
+                    contents.append(types.Content(role="user", parts=[text_part]))
+
+        return system_instruction, contents
+
+    async def _make_api_call(self, messages: List[ChatMessage], temperature: float = 0.7,
+                           max_tokens: int = 1000, tools: Optional[List[Dict[str, Any]]] = None,
+                           tool_choice: str = "auto", **kwargs) -> Any:
+        system_instruction, contents = self._serialise_messages(messages)
+
+        config_args: Dict[str, Any] = {
+            "temperature": temperature,
+            "max_output_tokens": max_tokens,
+            # The agent loop executes tools itself
+            "automatic_function_calling": types.AutomaticFunctionCallingConfig(disable=True),
+        }
+        if system_instruction:
+            config_args["system_instruction"] = system_instruction
+
+        # On answer-only calls (tool_choice "none") the tools are not declared at all. With the
+        # tools declared and function calling set to NONE, Gemini still attempts a call in a
+        # share of responses and the API returns an empty UNEXPECTED_TOOL_CALL instead of text.
+        # The history keeps its native function-call turns either way.
+        if tools and tool_choice != "none":
+            config_args["tools"] = [types.Tool(function_declarations=[
+                types.FunctionDeclaration(
+                    name=tool["name"],
+                    description=tool["description"],
+                    parameters_json_schema=tool["parameters"],
+                )
+                for tool in tools
+            ])]
+
+        return await self.client.aio.models.generate_content(
+            model=self.model,
+            contents=contents,
+            config=types.GenerateContentConfig(**config_args),
+        )
+
+    def _parse_response(self, raw_response: Any) -> ParsedResponse:
         text_content = ""
-        tool_calls = []
-        
-        if hasattr(raw_response, 'candidates') and raw_response.candidates:
-            candidate = raw_response.candidates[0]
-            if hasattr(candidate, 'content') and candidate.content:
-                for part in candidate.content.parts:
-                    if hasattr(part, 'text') and part.text:
-                        text_content += part.text
-                    elif hasattr(part, 'function_call'):
-                        # Google tool call format - convert protobuf to JSON-serializable dict
+        tool_calls: List[ToolCallRequest] = []
+        native = None
+        stop_reason = None
+
+        candidates = raw_response.candidates or []
+        if candidates:
+            candidate = candidates[0]
+            if candidate.finish_reason is not None:
+                stop_reason = getattr(candidate.finish_reason, "name", None) or str(candidate.finish_reason)
+            content = candidate.content
+            if content is not None and content.parts:
+                native = content
+                for part in content.parts:
+                    if part.function_call is not None:
                         function_call = part.function_call
-                        # Convert MapComposite/RepeatedComposite to regular Python types
-                        params = {}
-                        if function_call.args:
-                            for key, value in function_call.args.items():
-                                # Handle different protobuf value types
-                                if hasattr(value, 'items'):  # It's a dict-like
-                                    params[key] = dict(value)
-                                elif hasattr(value, '__iter__') and not isinstance(value, str):
-                                    params[key] = list(value)
-                                else:
-                                    params[key] = value
-                        tool_calls.append({
-                            "name": function_call.name,
-                            "parameters": params
-                        })
-        
-        # Fallback to direct text access if the above doesn't work
-        # Only try this if there are no tool calls, as .text fails with function_call parts
-        if not text_content and not tool_calls and hasattr(raw_response, 'text'):
-            try:
-                text_content = raw_response.text
-            except ValueError:
-                # Can happen if response contains non-text parts
-                pass
-        
-        # Google's usage information - check actual fields
+                        tool_calls.append(ToolCallRequest(
+                            # Gemini does not always assign call ids
+                            id=function_call.id or f"call_{uuid.uuid4().hex[:16]}",
+                            name=function_call.name or "",
+                            arguments=dict(function_call.args or {}),
+                        ))
+                    elif part.text and not part.thought:
+                        text_content += part.text
+
         usage = None
-        if hasattr(raw_response, 'usage_metadata') and raw_response.usage_metadata is not None:
-            usage_data = raw_response.usage_metadata
-
-            # Try multiple attribute names (API versions vary)
-            prompt_tokens = (
-                getattr(usage_data, 'prompt_token_count', None) or
-                getattr(usage_data, 'input_tokens', None) or
-                getattr(usage_data, 'promptTokenCount', None)
-            )
-            completion_tokens = (
-                getattr(usage_data, 'candidates_token_count', None) or
-                getattr(usage_data, 'output_tokens', None) or
-                getattr(usage_data, 'candidatesTokenCount', None)
-            )
-            total_tokens = (
-                getattr(usage_data, 'total_token_count', None) or
-                getattr(usage_data, 'totalTokenCount', None)
-            )
-
-            # Debug: log all available attributes if we can't find tokens
-            if prompt_tokens is None and completion_tokens is None:
-                available_attrs = [attr for attr in dir(usage_data) if not attr.startswith('_')]
-                print(f"[Google] Warning: Cannot find token counts. Available attrs: {available_attrs}")
-                # Try to get raw dict representation
-                if hasattr(usage_data, '__dict__'):
-                    print(f"[Google] usage_data.__dict__: {usage_data.__dict__}")
-
+        raw_usage = None
+        cached_tokens = 0
+        usage_data = raw_response.usage_metadata
+        if usage_data is not None:
+            # Gemini 2.5 caches implicitly; cached tokens are part of prompt_token_count
+            cached_tokens = usage_data.cached_content_token_count or 0
+            raw_usage = usage_data.model_dump(exclude_none=True)
+            prompt_tokens = usage_data.prompt_token_count or 0
+            # Thinking tokens are billed as output
+            completion_tokens = (usage_data.candidates_token_count or 0) + (usage_data.thoughts_token_count or 0)
             usage = TokenUsage(
-                prompt_tokens=prompt_tokens or 0,
-                completion_tokens=completion_tokens or 0,
-                total_tokens=total_tokens or (prompt_tokens or 0) + (completion_tokens or 0)
+                prompt_tokens=prompt_tokens,
+                completion_tokens=completion_tokens,
+                total_tokens=prompt_tokens + completion_tokens,
             )
-
-            # Log successful token capture for debugging
-            if prompt_tokens or completion_tokens:
-                print(f"[Google] Token usage: prompt={prompt_tokens}, completion={completion_tokens}, total={total_tokens}")
         else:
-            # Log when usage_metadata is missing
-            print(f"[Google] Warning: No usage_metadata in response. Has attr: {hasattr(raw_response, 'usage_metadata')}")
-        
-        return text_content, usage, tool_calls if tool_calls else None
-    
+            print("[Google] Warning: No usage_metadata in response")
+
+        return ParsedResponse(
+            text=text_content,
+            tool_calls=tool_calls,
+            usage=usage,
+            stop_reason=stop_reason,
+            api_model_id=raw_response.model_version,
+            response_id=raw_response.response_id,
+            raw_usage=raw_usage,
+            cached_tokens=cached_tokens,
+            native=native,
+        )
+
+    def _is_retryable(self, exc: Exception) -> bool:
+        if isinstance(exc, errors.ServerError):
+            return True
+        if isinstance(exc, errors.ClientError):
+            return exc.code in (408, 429)
+        return super()._is_retryable(exc)
+
     @property
     def provider_name(self) -> str:
         return "google"
-    
+
     def _validate_api_key(self) -> None:
         if not self.api_key:
             raise ValueError("Google API key is required")

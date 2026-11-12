@@ -1,0 +1,17 @@
+diff --git a/sympy/simplify/cse_main.py b/sympy/simplify/cse_main.py
+index d649dd02a9..ebf1fae77f 100644
+--- a/sympy/simplify/cse_main.py
++++ b/sympy/simplify/cse_main.py
+@@ -610,6 +610,12 @@ def _find_repeated(expr):
+ 
+             args = expr.args
+ 
++        # Don't recurse into MatrixExpr arguments to avoid treating
++        # MatrixSymbols as common subexpressions when they're only used
++        # as the base of indexing operations
++        if isinstance(expr, MatrixExpr):
++            return
++
+         list(map(_find_repeated, args))
+ 
+     for e in exprs:

@@ -1,0 +1,51 @@
+{
+  "job": "rerun-2026-10__google__self_reflect__rep1__full",
+  "kind": "initial",
+  "subset": "full",
+  "run_id": "rerun-2026-10__google__self_reflect__rep1__full__initial",
+  "counts": {
+    "tests_failed": 5
+  },
+  "verdicts": {
+    "django__django-10924": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 1,
+      "p2p_total": 1
+    },
+    "django__django-12589": {
+      "status": "tests_failed",
+      "kind": "both",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 27,
+      "p2p_total": 66
+    },
+    "django__django-13757": {
+      "status": "tests_failed",
+      "kind": "both",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 66,
+      "p2p_total": 76
+    },
+    "matplotlib__matplotlib-26020": {
+      "status": "tests_failed",
+      "kind": "p2p_regression",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 47,
+      "p2p_total": 48
+    },
+    "sympy__sympy-21614": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 6,
+      "p2p_total": 6
+    }
+  }
+}

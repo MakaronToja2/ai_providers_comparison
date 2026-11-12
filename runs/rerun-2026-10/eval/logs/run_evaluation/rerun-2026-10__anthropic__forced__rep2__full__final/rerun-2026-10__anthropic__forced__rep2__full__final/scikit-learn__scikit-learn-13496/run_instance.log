@@ -1,0 +1,149 @@
+2026-10-10 18:04:47,908 - INFO - Creating container for scikit-learn__scikit-learn-13496...
+2026-10-10 18:04:57,799 - INFO - Container for scikit-learn__scikit-learn-13496 created: 323df248bc6c5db50e41a70a3b14ef2dd1d6cc5e5820114712003772e470c1a5
+2026-10-10 18:05:08,327 - INFO - Container for scikit-learn__scikit-learn-13496 started: 323df248bc6c5db50e41a70a3b14ef2dd1d6cc5e5820114712003772e470c1a5
+2026-10-10 18:05:08,327 - INFO - Intermediate patch for scikit-learn__scikit-learn-13496 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep2__full__final/rerun-2026-10__anthropic__forced__rep2__full__final/scikit-learn__scikit-learn-13496/patch.diff, now applying to container...
+2026-10-10 18:05:08,419 - INFO - >>>>> Applied Patch:
+/tmp/patch.diff:52: trailing whitespace.
+    
+/tmp/patch.diff:57: trailing whitespace.
+    
+/tmp/patch.diff:61: trailing whitespace.
+    
+/tmp/patch.diff:64: trailing whitespace.
+    
+/tmp/patch.diff:69: trailing whitespace.
+    
+Checking patch sklearn/ensemble/iforest.py...
+warning: sklearn/ensemble/iforest.py has type 100755, expected 100644
+Checking patch sklearn/ensemble/tests/test_iforest.py...
+warning: sklearn/ensemble/tests/test_iforest.py has type 100755, expected 100644
+Applied patch sklearn/ensemble/iforest.py cleanly.
+Applied patch sklearn/ensemble/tests/test_iforest.py cleanly.
+warning: squelched 1 whitespace error
+warning: 6 lines add whitespace errors.
+
+2026-10-10 18:05:08,589 - INFO - Git diff before:
+diff --git a/sklearn/ensemble/iforest.py b/sklearn/ensemble/iforest.py
+index 8a1bd3625..f42c80532 100755
+--- a/sklearn/ensemble/iforest.py
++++ b/sklearn/ensemble/iforest.py
+@@ -120,6 +120,11 @@ class IsolationForest(BaseBagging, OutlierMixin):
+     verbose : int, optional (default=0)
+         Controls the verbosity of the tree building process.
+ 
++    warm_start : bool, optional (default=False)
++        When set to ``True``, reuse the solution of the previous call to fit
++        and add more estimators to the ensemble, otherwise, just fit a whole
++        new forest. See :term:`the Glossary <warm_start>`.
++
+ 
+     Attributes
+     ----------
+@@ -173,7 +178,8 @@ class IsolationForest(BaseBagging, OutlierMixin):
+                  n_jobs=None,
+                  behaviour='old',
+                  random_state=None,
+-                 verbose=0):
++                 verbose=0,
++                 warm_start=False):
+         super().__init__(
+             base_estimator=ExtraTreeRegressor(
+                 max_features=1,
+@@ -187,7 +193,8 @@ class IsolationForest(BaseBagging, OutlierMixin):
+             max_features=max_features,
+             n_jobs=n_jobs,
+             random_state=random_state,
+-            verbose=verbose)
++            verbose=verbose,
++            warm_start=warm_start)
+ 
+         self.behaviour = behaviour
+         self.contamination = contamination
+diff --git a/sklearn/ensemble/tests/test_iforest.py b/sklearn/ensemble/tests/test_iforest.py
+index 67ba2d7f9..90c514b8e 100755
+--- a/sklearn/ensemble/tests/test_iforest.py
++++ b/sklearn/ensemble/tests/test_iforest.py
+@@ -359,3 +359,36 @@ def test_iforest_chunks_works2(
+ ):
+     test_iforest_works(contamination)
+     assert mocked_get_chunk.call_count == n_predict_calls
++
++
++@pytest.mark.filterwarnings('ignore:default contamination')
++@pytest.mark.filterwarnings('ignore:behaviour="old"')
++def test_iforest_warm_start():
++    """Test warm_start parameter in IsolationForest."""
++    X = iris.data
++    
++    # Test that warm_start works correctly
++    clf = IsolationForest(n_estimators=5, random_state=0, warm_start=False)
++    clf.fit(X)
++    pred1 = clf.predict(X)
++    
++    # Fit again without warm_start - should reset estimators
++    clf.fit(X)
++    pred2 = clf.predict(X)
++    
++    # With warm_start=False, predictions should be the same (same random seed)
++    assert_array_equal(pred1, pred2)
++    
++    # Test with warm_start=True
++    clf_warm = IsolationForest(n_estimators=5, random_state=0, warm_start=True)
++    clf_warm.fit(X)
++    n_estimators_first = len(clf_warm.estimators_)
++    
++    # Increase n_estimators and fit again
++    clf_warm.set_params(n_estimators=10)
++    clf_warm.fit(X)
++    n_estimators_second = len(clf_warm.estimators_)
++    
++    # Should have more estimators after warm_start fit
++    assert n_estimators_second == 10
++    assert n_estimators_first == 5
+2026-10-10 18:05:08,589 - INFO - Eval script for scikit-learn__scikit-learn-13496 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep2__full__final/rerun-2026-10__anthropic__forced__rep2__full__final/scikit-learn__scikit-learn-13496/eval.sh; copying to container...
+2026-10-10 18:05:17,295 - INFO - Test runtime: 8.66 seconds
+2026-10-10 18:05:17,296 - INFO - Test output for scikit-learn__scikit-learn-13496 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep2__full__final/rerun-2026-10__anthropic__forced__rep2__full__final/scikit-learn__scikit-learn-13496/test_output.txt
+2026-10-10 18:05:17,339 - INFO - Git diff after:
+diff --git a/sklearn/ensemble/iforest.py b/sklearn/ensemble/iforest.py
+index 8a1bd3625..f42c80532 100755
+--- a/sklearn/ensemble/iforest.py
++++ b/sklearn/ensemble/iforest.py
+@@ -120,6 +120,11 @@ class IsolationForest(BaseBagging, OutlierMixin):
+     verbose : int, optional (default=0)
+         Controls the verbosity of the tree building process.
+ 
++    warm_start : bool, optional (default=False)
++        When set to ``True``, reuse the solution of the previous call to fit
++        and add more estimators to the ensemble, otherwise, just fit a whole
++        new forest. See :term:`the Glossary <warm_start>`.
++
+ 
+     Attributes
+     ----------
+@@ -173,7 +178,8 @@ class IsolationForest(BaseBagging, OutlierMixin):
+                  n_jobs=None,
+                  behaviour='old',
+                  random_state=None,
+-                 verbose=0):
++                 verbose=0,
++                 warm_start=False):
+         super().__init__(
+             base_estimator=ExtraTreeRegressor(
+                 max_features=1,
+@@ -187,7 +193,8 @@ class IsolationForest(BaseBagging, OutlierMixin):
+             max_features=max_features,
+             n_jobs=n_jobs,
+             random_state=random_state,
+-            verbose=verbose)
++            verbose=verbose,
++            warm_start=warm_start)
+ 
+         self.behaviour = behaviour
+         self.contamination = contamination
+2026-10-10 18:05:17,339 - INFO - Git diff changed after running eval script
+2026-10-10 18:05:17,339 - INFO - Grading answer for scikit-learn__scikit-learn-13496...
+2026-10-10 18:05:17,340 - INFO - report: {'scikit-learn__scikit-learn-13496': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['sklearn/ensemble/tests/test_iforest.py::test_iforest_warm_start'], 'failure': []}, 'PASS_TO_PASS': {'success': ['sklearn/ensemble/tests/test_iforest.py::test_iforest', 'sklearn/ensemble/tests/test_iforest.py::test_iforest_sparse', 'sklearn/ensemble/tests/test_iforest.py::test_iforest_error', 'sklearn/ensemble/tests/test_iforest.py::test_recalculate_max_depth', 'sklearn/ensemble/tests/test_iforest.py::test_max_samples_attribute', 'sklearn/ensemble/tests/test_iforest.py::test_iforest_parallel_regression', 'sklearn/ensemble/tests/test_iforest.py::test_iforest_performance', 'sklearn/ensemble/tests/test_iforest.py::test_iforest_works[0.25]', 'sklearn/ensemble/tests/test_iforest.py::test_iforest_works[auto]', 'sklearn/ensemble/tests/test_iforest.py::test_max_samples_consistency', 'sklearn/ensemble/tests/test_iforest.py::test_iforest_subsampled_features', 'sklearn/ensemble/tests/test_iforest.py::test_iforest_average_path_length', 'sklearn/ensemble/tests/test_iforest.py::test_score_samples', 'sklearn/ensemble/tests/test_iforest.py::test_deprecation', 'sklearn/ensemble/tests/test_iforest.py::test_behaviour_param', 'sklearn/ensemble/tests/test_iforest.py::test_iforest_chunks_works1[0.25-3]', 'sklearn/ensemble/tests/test_iforest.py::test_iforest_chunks_works1[auto-2]', 'sklearn/ensemble/tests/test_iforest.py::test_iforest_chunks_works2[0.25-3]', 'sklearn/ensemble/tests/test_iforest.py::test_iforest_chunks_works2[auto-2]'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for scikit-learn__scikit-learn-13496: resolved: True
+2026-10-10 18:05:17,341 - INFO - Attempting to stop container sweb.eval.scikit-learn__scikit-learn-13496.rerun-2026-10__anthropic__forced__rep2__full__final...
+2026-10-10 18:05:39,457 - INFO - Attempting to remove container sweb.eval.scikit-learn__scikit-learn-13496.rerun-2026-10__anthropic__forced__rep2__full__final...
+2026-10-10 18:05:43,618 - INFO - Container sweb.eval.scikit-learn__scikit-learn-13496.rerun-2026-10__anthropic__forced__rep2__full__final removed.

@@ -1,0 +1,25 @@
+diff --git a/django/db/backends/sqlite3/schema.py b/django/db/backends/sqlite3/schema.py
+index f0c81c123b..cb3e9bad5d 100644
+--- a/django/db/backends/sqlite3/schema.py
++++ b/django/db/backends/sqlite3/schema.py
+@@ -419,14 +419,19 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         self.delete_model(old_field.remote_field.through)
+ 
+     def add_constraint(self, model, constraint):
+-        if isinstance(constraint, UniqueConstraint) and (
++        if isinstance(constraint, UniqueConstraint) and not (
+             constraint.condition or
+             constraint.contains_expressions or
+             constraint.include or
+             constraint.deferrable
+         ):
++            # This is the case for simple unique constraints without expressions, conditions etc.
++            # For these, we can directly add the constraint.
+             super().add_constraint(model, constraint)
+         else:
++            # For UniqueConstraints with expressions, conditions, includes, or deferrable,
++            # we need to remake the table. This is because SQLite has limitations
++            # with complex index expressions.
+             self._remake_table(model)
+ 
+     def remove_constraint(self, model, constraint):

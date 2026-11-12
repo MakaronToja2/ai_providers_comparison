@@ -1,0 +1,84 @@
+2026-10-10 19:09:40,304 - INFO - Creating container for sympy__sympy-17630...
+2026-10-10 19:09:44,195 - INFO - Container for sympy__sympy-17630 created: 685e186c3215d2deac9e8d6e4fde5a1387445065579f5a5bb620507bf186cc0c
+2026-10-10 19:09:45,540 - INFO - Container for sympy__sympy-17630 started: 685e186c3215d2deac9e8d6e4fde5a1387445065579f5a5bb620507bf186cc0c
+2026-10-10 19:09:45,541 - INFO - Intermediate patch for sympy__sympy-17630 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep1__full__final/rerun-2026-10__google__self_reflect__rep1__full__final/sympy__sympy-17630/patch.diff, now applying to container...
+2026-10-10 19:09:45,696 - INFO - >>>>> Applied Patch:
+Checking patch sympy/matrices/expressions/blockmatrix.py...
+warning: sympy/matrices/expressions/blockmatrix.py has type 100755, expected 100644
+Applied patch sympy/matrices/expressions/blockmatrix.py cleanly.
+
+2026-10-10 19:09:46,095 - INFO - Git diff before:
+diff --git a/sympy/matrices/expressions/blockmatrix.py b/sympy/matrices/expressions/blockmatrix.py
+index 95302a05ca..e0c83788cd 100755
+--- a/sympy/matrices/expressions/blockmatrix.py
++++ b/sympy/matrices/expressions/blockmatrix.py
+@@ -148,11 +148,25 @@ def blocks(self):
+ 
+     @property
+     def rowblocksizes(self):
+-        return [self.blocks[i, 0].rows for i in range(self.blockshape[0])]
++        sizes = []
++        for i in range(self.blockshape[0]):
++            block = self.blocks[i, 0]
++            if block.is_Zero:
++                sizes.append(0)
++            else:
++                sizes.append(block.rows)
++        return sizes
+ 
+     @property
+     def colblocksizes(self):
+-        return [self.blocks[0, i].cols for i in range(self.blockshape[1])]
++        sizes = []
++        for i in range(self.blockshape[1]):
++            block = self.blocks[0, i]
++            if block.is_Zero:
++                sizes.append(0)
++            else:
++                sizes.append(block.cols)
++        return sizes
+ 
+     def structurally_equal(self, other):
+         return (isinstance(other, BlockMatrix)
+2026-10-10 19:09:46,095 - INFO - Eval script for sympy__sympy-17630 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep1__full__final/rerun-2026-10__google__self_reflect__rep1__full__final/sympy__sympy-17630/eval.sh; copying to container...
+2026-10-10 19:09:50,609 - INFO - Test runtime: 4.44 seconds
+2026-10-10 19:09:50,609 - INFO - Test output for sympy__sympy-17630 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep1__full__final/rerun-2026-10__google__self_reflect__rep1__full__final/sympy__sympy-17630/test_output.txt
+2026-10-10 19:09:50,674 - INFO - Git diff after:
+diff --git a/sympy/matrices/expressions/blockmatrix.py b/sympy/matrices/expressions/blockmatrix.py
+index 95302a05ca..e0c83788cd 100755
+--- a/sympy/matrices/expressions/blockmatrix.py
++++ b/sympy/matrices/expressions/blockmatrix.py
+@@ -148,11 +148,25 @@ def blocks(self):
+ 
+     @property
+     def rowblocksizes(self):
+-        return [self.blocks[i, 0].rows for i in range(self.blockshape[0])]
++        sizes = []
++        for i in range(self.blockshape[0]):
++            block = self.blocks[i, 0]
++            if block.is_Zero:
++                sizes.append(0)
++            else:
++                sizes.append(block.rows)
++        return sizes
+ 
+     @property
+     def colblocksizes(self):
+-        return [self.blocks[0, i].cols for i in range(self.blockshape[1])]
++        sizes = []
++        for i in range(self.blockshape[1]):
++            block = self.blocks[0, i]
++            if block.is_Zero:
++                sizes.append(0)
++            else:
++                sizes.append(block.cols)
++        return sizes
+ 
+     def structurally_equal(self, other):
+         return (isinstance(other, BlockMatrix)
+2026-10-10 19:09:50,674 - INFO - Grading answer for sympy__sympy-17630...
+2026-10-10 19:09:50,676 - INFO - report: {'sympy__sympy-17630': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_issue_17624', 'test_zero_matrix_add']}, 'PASS_TO_PASS': {'success': ['test_bc_transpose', 'test_bc_dist_diag', 'test_block_collapse_explicit_matrices', 'test_BlockMatrix_Determinant', 'test_BlockDiagMatrix', 'test_deblock', 'test_sort_key', 'test_matadd_sympify', 'test_matadd_of_matrices', 'test_doit_args', 'test_generic_identity'], 'failure': ['test_bc_matmul', 'test_bc_matadd', 'test_block_plus_ident', 'test_BlockMatrix', 'test_BlockMatrix_trace', 'test_squareBlockMatrix', 'test_blockcut', 'test_reblock_2x2']}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-17630: resolved: False
+2026-10-10 19:09:50,676 - INFO - Attempting to stop container sweb.eval.sympy__sympy-17630.rerun-2026-10__google__self_reflect__rep1__full__final...
+2026-10-10 19:10:08,199 - INFO - Attempting to remove container sweb.eval.sympy__sympy-17630.rerun-2026-10__google__self_reflect__rep1__full__final...
+2026-10-10 19:10:08,727 - INFO - Container sweb.eval.sympy__sympy-17630.rerun-2026-10__google__self_reflect__rep1__full__final removed.

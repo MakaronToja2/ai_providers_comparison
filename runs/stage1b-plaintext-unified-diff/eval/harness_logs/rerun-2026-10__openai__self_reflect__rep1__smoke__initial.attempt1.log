@@ -1,0 +1,37 @@
+<frozen runpy>:128: RuntimeWarning: 'swebench.harness.run_evaluation' found in sys.modules after import of package 'swebench.harness', but prior to execution of 'swebench.harness.run_evaluation'; this may result in unpredictable behaviour
+Found 4 existing instance images. Will reuse them.
+Running 4 instances...
+Evaluation:   0%|          | 0/4 [00:00<?, ?it/s, error=0, ✓=0, ✖=0]Evaluation:   0%|          | 0/4 [00:19<?, ?it/s, ✓=0, ✖=0, error=1]Evaluation:  25%|██▌       | 1/4 [00:19<00:58, 19.39s/it, ✓=0, ✖=0, error=1]Evaluation:  25%|██▌       | 1/4 [00:19<00:58, 19.39s/it, ✓=0, ✖=0, error=2]Evaluation:  50%|█████     | 2/4 [00:19<00:16,  8.10s/it, ✓=0, ✖=0, error=2]Evaluation:  50%|█████     | 2/4 [00:19<00:16,  8.10s/it, ✓=0, ✖=0, error=3]Evaluation:  75%|███████▌  | 3/4 [00:19<00:04,  4.50s/it, ✓=0, ✖=0, error=3]Evaluation:  75%|███████▌  | 3/4 [00:22<00:04,  4.50s/it, ✓=0, ✖=1, error=3]Evaluation: 100%|██████████| 4/4 [00:22<00:00,  3.89s/it, ✓=0, ✖=1, error=3]Evaluation: 100%|██████████| 4/4 [00:22<00:00,  5.69s/it, ✓=0, ✖=1, error=3]
+matplotlib__matplotlib-26011: >>>>> Patch Apply Failed:
+patching file lib/matplotlib/axes/_base.py
+Hunk #1 FAILED at 3569.
+1 out of 1 hunk FAILED -- saving rejects to file lib/matplotlib/axes/_base.py.rej
+
+Check (logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep1__smoke__initial/rerun-2026-10__openai__self_reflect__rep1__smoke__initial/matplotlib__matplotlib-26011/run_instance.log) for more information.
+sphinx-doc__sphinx-7975: >>>>> Patch Apply Failed:
+patching file sphinx/environment/collectors/indexentries.py
+Hunk #1 FAILED at 141.
+Hunk #2 FAILED at 150.
+2 out of 2 hunks FAILED -- saving rejects to file sphinx/environment/collectors/indexentries.py.rej
+
+Check (logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep1__smoke__initial/rerun-2026-10__openai__self_reflect__rep1__smoke__initial/sphinx-doc__sphinx-7975/run_instance.log) for more information.
+pytest-dev__pytest-5692: >>>>> Patch Apply Failed:
+patching file src/_pytest/junitxml.py
+Hunk #1 FAILED at 655.
+1 out of 1 hunk FAILED -- saving rejects to file src/_pytest/junitxml.py.rej
+
+Check (logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep1__smoke__initial/rerun-2026-10__openai__self_reflect__rep1__smoke__initial/pytest-dev__pytest-5692/run_instance.log) for more information.
+All instances run.
+Cleaning cached images...
+Removed 0 images.
+Total instances: 4
+Instances submitted: 4
+Instances completed: 1
+Instances incomplete: 0
+Instances resolved: 0
+Instances unresolved: 1
+Instances with empty patches: 0
+Instances with errors: 3
+Unstopped containers: 0
+Unremoved images: 4
+Report written to rerun-2026-10__openai__self_reflect__rep1__smoke__initial.rerun-2026-10__openai__self_reflect__rep1__smoke__initial.json

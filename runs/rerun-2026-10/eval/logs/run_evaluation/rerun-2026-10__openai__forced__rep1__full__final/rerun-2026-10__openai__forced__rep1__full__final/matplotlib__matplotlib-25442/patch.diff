@@ -1,0 +1,31 @@
+diff --git a/lib/matplotlib/offsetbox.py b/lib/matplotlib/offsetbox.py
+index 77768e7383..cb302b8b80 100644
+--- a/lib/matplotlib/offsetbox.py
++++ b/lib/matplotlib/offsetbox.py
+@@ -1508,7 +1508,15 @@ class DraggableBase:
+         ]
+ 
+     # A property, not an attribute, to maintain picklability.
+-    canvas = property(lambda self: self.ref_artist.figure.canvas)
++    @property
++    def canvas(self):
++        # Protect against ref_artist or figure being None to avoid AttributeError
++        if self.ref_artist is None:
++            return None
++        fig = getattr(self.ref_artist, "figure", None)
++        if fig is None:
++            return None
++        return fig.canvas
+ 
+     def on_motion(self, evt):
+         if self._check_still_parented() and self.got_artist:
+@@ -1550,7 +1558,8 @@ class DraggableBase:
+                 self.ref_artist.set_animated(False)
+ 
+     def _check_still_parented(self):
+-        if self.ref_artist.figure is None:
++        # Check if ref_artist and its figure still exist to avoid AttributeError
++        if self.ref_artist is None or self.ref_artist.figure is None:
+             self.disconnect()
+             return False
+         else:

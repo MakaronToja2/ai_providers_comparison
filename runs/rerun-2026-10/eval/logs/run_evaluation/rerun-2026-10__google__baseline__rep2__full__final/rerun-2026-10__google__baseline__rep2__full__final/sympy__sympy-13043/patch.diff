@@ -1,0 +1,13 @@
+diff --git a/sympy/integrals/intpoly.py b/sympy/integrals/intpoly.py
+index fc72bd206f..ed51cc775d 100644
+--- a/sympy/integrals/intpoly.py
++++ b/sympy/integrals/intpoly.py
+@@ -568,6 +568,8 @@ def decompose(expr, separate=False):
+             symbols = expr.atoms(Symbol)
+             degrees = [(sum(degree_list(monom, *symbols)), monom)
+                        for monom in expr.args]
++            # Sort degrees by degree to ensure consistent order
++            degrees.sort(key=lambda x: x[0])
+             if separate:
+                 return [monom[1] for monom in degrees]
+             else:

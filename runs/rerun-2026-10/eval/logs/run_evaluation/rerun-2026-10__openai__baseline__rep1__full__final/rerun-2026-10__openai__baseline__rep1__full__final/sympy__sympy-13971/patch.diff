@@ -1,0 +1,32 @@
+diff --git a/sympy/series/sequences.py b/sympy/series/sequences.py
+index 08f36df061..6c3c48bf54 100644
+--- a/sympy/series/sequences.py
++++ b/sympy/series/sequences.py
+@@ -639,6 +639,27 @@ class SeqFormula(SeqExpr):
+     sympy.series.sequences.SeqPer
+     """
+ 
++    def _latex(self, printer):
++        # Render sequence as a list without escaping square brackets
++        # to avoid backslash escaping in LaTeX output.
++        # We render as \left[ ... \right] but with literal brackets.
++        # The elements are rendered using the printer._print method.
++        start = self.limits[1]
++        stop = self.limits[2]
++        var = self.limits[0]
++        # If stop is infinity, show \ldots at the end
++        if stop is S.Infinity:
++            # Render first few elements (e.g., 5) then \ldots
++            n = 5
++            elems = [self.coeff(i) for i in range(n)]
++            elems_latex = [printer._print(e) for e in elems]
++            content = ", ".join(elems_latex) + ", \\ldots"
++        else:
++            elems = [self.coeff(i) for i in range(int(stop - start) + 1)]
++            elems_latex = [printer._print(e) for e in elems]
++            content = ", ".join(elems_latex)
++        return r"\left[" + content + r"\right]"
++
+     def __new__(cls, formula, limits=None):
+         formula = sympify(formula)
+ 

@@ -1,0 +1,60 @@
+2026-10-10 13:10:40,639 - INFO - Creating container for django__django-15400...
+2026-10-10 13:10:40,825 - INFO - Container for django__django-15400 created: b008ccd5e059894b3c0f44cffdde573ee7f03fb6b4cbe874262450bd8a9c7025
+2026-10-10 13:10:41,134 - INFO - Container for django__django-15400 started: b008ccd5e059894b3c0f44cffdde573ee7f03fb6b4cbe874262450bd8a9c7025
+2026-10-10 13:10:41,135 - INFO - Intermediate patch for django__django-15400 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep1__full__final/rerun-2026-10__anthropic__baseline__rep1__full__final/django__django-15400/patch.diff, now applying to container...
+2026-10-10 13:10:41,277 - INFO - >>>>> Applied Patch:
+Checking patch django/utils/functional.py...
+warning: django/utils/functional.py has type 100755, expected 100644
+Applied patch django/utils/functional.py cleanly.
+
+2026-10-10 13:10:41,924 - INFO - Git diff before:
+diff --git a/django/utils/functional.py b/django/utils/functional.py
+index 9e1be0fe0f..ba5ad1552d 100755
+--- a/django/utils/functional.py
++++ b/django/utils/functional.py
+@@ -373,6 +373,15 @@ class LazyObject:
+     __len__ = new_method_proxy(len)
+     __contains__ = new_method_proxy(operator.contains)
+ 
++    # Reverse arithmetic operations
++    __radd__ = new_method_proxy(lambda wrapped, other: other + wrapped)
++    __rsub__ = new_method_proxy(lambda wrapped, other: other - wrapped)
++    __rmul__ = new_method_proxy(lambda wrapped, other: other * wrapped)
++    __rtruediv__ = new_method_proxy(lambda wrapped, other: other / wrapped)
++    __rfloordiv__ = new_method_proxy(lambda wrapped, other: other // wrapped)
++    __rmod__ = new_method_proxy(lambda wrapped, other: other % wrapped)
++    __rpow__ = new_method_proxy(lambda wrapped, other: other ** wrapped)
++
+ 
+ def unpickle_lazyobject(wrapped):
+     """
+2026-10-10 13:10:41,924 - INFO - Eval script for django__django-15400 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep1__full__final/rerun-2026-10__anthropic__baseline__rep1__full__final/django__django-15400/eval.sh; copying to container...
+2026-10-10 13:10:48,754 - INFO - Test runtime: 6.76 seconds
+2026-10-10 13:10:48,756 - INFO - Test output for django__django-15400 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep1__full__final/rerun-2026-10__anthropic__baseline__rep1__full__final/django__django-15400/test_output.txt
+2026-10-10 13:10:48,831 - INFO - Git diff after:
+diff --git a/django/utils/functional.py b/django/utils/functional.py
+index 9e1be0fe0f..ba5ad1552d 100755
+--- a/django/utils/functional.py
++++ b/django/utils/functional.py
+@@ -373,6 +373,15 @@ class LazyObject:
+     __len__ = new_method_proxy(len)
+     __contains__ = new_method_proxy(operator.contains)
+ 
++    # Reverse arithmetic operations
++    __radd__ = new_method_proxy(lambda wrapped, other: other + wrapped)
++    __rsub__ = new_method_proxy(lambda wrapped, other: other - wrapped)
++    __rmul__ = new_method_proxy(lambda wrapped, other: other * wrapped)
++    __rtruediv__ = new_method_proxy(lambda wrapped, other: other / wrapped)
++    __rfloordiv__ = new_method_proxy(lambda wrapped, other: other // wrapped)
++    __rmod__ = new_method_proxy(lambda wrapped, other: other % wrapped)
++    __rpow__ = new_method_proxy(lambda wrapped, other: other ** wrapped)
++
+ 
+ def unpickle_lazyobject(wrapped):
+     """
+2026-10-10 13:10:48,831 - INFO - Grading answer for django__django-15400...
+2026-10-10 13:10:48,837 - INFO - report: {'django__django-15400': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_radd (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)'], 'failure': ['test_add (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)']}, 'PASS_TO_PASS': {'success': ['test_bool (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_bytes (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_class (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_cmp (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_contains (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_copy_class (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_copy_class_no_evaluation (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_copy_list (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_copy_list_no_evaluation (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_deepcopy_class (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_deepcopy_class_no_evaluation (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_deepcopy_list (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_deepcopy_list_no_evaluation (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_delattr (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_delitem (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_dir (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_getattr (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_getitem (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_gt (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_hash (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_iter (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_len (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_lt (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_pickle (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_setattr (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_setattr2 (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_setitem (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_text (utils_tests.test_lazyobject.LazyObjectTestCase)', 'test_bool (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_bytes (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_class (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_cmp (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_contains (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_copy_class (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_copy_class_no_evaluation (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_copy_list (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_copy_list_no_evaluation (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_deepcopy_class (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_deepcopy_class_no_evaluation (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_deepcopy_list (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_deepcopy_list_no_evaluation (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_delattr (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_delitem (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_dict (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_dir (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_getattr (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_getitem (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_gt (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_hash (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_iter (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_len (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_list_set (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_lt (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_none (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_pickle (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_repr (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_setattr (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_setattr2 (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_setitem (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_text (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'test_trace (utils_tests.test_lazyobject.SimpleLazyObjectTestCase)', 'Test in a fairly synthetic setting.'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-15400: resolved: False
+2026-10-10 13:10:48,838 - INFO - Attempting to stop container sweb.eval.django__django-15400.rerun-2026-10__anthropic__baseline__rep1__full__final...
+2026-10-10 13:11:07,163 - INFO - Attempting to remove container sweb.eval.django__django-15400.rerun-2026-10__anthropic__baseline__rep1__full__final...
+2026-10-10 13:11:07,211 - INFO - Container sweb.eval.django__django-15400.rerun-2026-10__anthropic__baseline__rep1__full__final removed.

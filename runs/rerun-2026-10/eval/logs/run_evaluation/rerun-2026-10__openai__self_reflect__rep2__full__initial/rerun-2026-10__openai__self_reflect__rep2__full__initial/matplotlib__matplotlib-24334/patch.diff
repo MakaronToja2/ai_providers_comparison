@@ -1,0 +1,24 @@
+diff --git a/lib/matplotlib/axis.py b/lib/matplotlib/axis.py
+index af0815d41d..cbad434603 100644
+--- a/lib/matplotlib/axis.py
++++ b/lib/matplotlib/axis.py
+@@ -2022,8 +2022,19 @@ class Axis(martist.Artist):
+         ticks.
+         """
+         result = self._set_tick_locations(ticks, minor=minor)
++        # Validate kwargs even if labels is None
++        if kwargs:
++            # Validate kwargs as Text properties by creating a dummy Text object
++            from matplotlib.text import Text
++            dummy_text = Text()
++            for key in kwargs:
++                if not hasattr(dummy_text, key):
++                    raise TypeError(f"Invalid property '{key}' for Text")
+         if labels is not None:
+             self.set_ticklabels(labels, minor=minor, **kwargs)
++        elif kwargs:
++            # If labels is None but kwargs are passed, warn or raise error
++            raise TypeError("Text properties kwargs only take effect if 'labels' is passed")
+         return result
+ 
+     def _get_tick_boxes_siblings(self, renderer):

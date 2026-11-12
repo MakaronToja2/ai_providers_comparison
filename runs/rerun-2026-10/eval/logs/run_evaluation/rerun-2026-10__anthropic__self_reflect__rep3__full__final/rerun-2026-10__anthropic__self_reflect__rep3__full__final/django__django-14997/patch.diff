@@ -1,0 +1,46 @@
+diff --git a/django/db/backends/sqlite3/schema.py b/django/db/backends/sqlite3/schema.py
+index f0c81c123b..43961c8fd0 100644
+--- a/django/db/backends/sqlite3/schema.py
++++ b/django/db/backends/sqlite3/schema.py
+@@ -237,6 +237,22 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+             ]
+ 
+         constraints = list(model._meta.constraints)
++        # Separate constraints that need special handling (expressions, conditions, etc.)
++        # These will be added back after the table is properly set up.
++        constraints_to_defer = [
++            constraint for constraint in constraints
++            if isinstance(constraint, UniqueConstraint) and (
++                constraint.condition or
++                constraint.contains_expressions or
++                constraint.include or
++                constraint.deferrable
++            )
++        ]
++        # Only use constraints that can be created inline during table creation
++        constraints_for_create = [
++            constraint for constraint in constraints
++            if constraint not in constraints_to_defer
++        ]
+ 
+         # Provide isolated instances of the fields to the new model body so
+         # that the existing model's internals aren't interfered with when
+@@ -270,7 +286,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+             'unique_together': unique_together,
+             'index_together': index_together,
+             'indexes': indexes,
+-            'constraints': constraints,
++            'constraints': constraints_for_create,
+             'apps': apps,
+         }
+         meta = type("Meta", (), meta_contents)
+@@ -305,6 +321,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         # Fix any PK-removed field
+         if restore_pk_field:
+             restore_pk_field.primary_key = True
++        # Add back any deferred constraints that couldn't be created inline
++        for constraint in constraints_to_defer:
++            self.add_constraint(model, constraint)
+ 
+     def delete_model(self, model, handle_autom2m=True):
+         if handle_autom2m:

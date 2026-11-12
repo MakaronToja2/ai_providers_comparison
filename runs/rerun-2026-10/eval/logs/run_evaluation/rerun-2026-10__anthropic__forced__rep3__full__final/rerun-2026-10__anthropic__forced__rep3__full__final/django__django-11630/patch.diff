@@ -1,0 +1,38 @@
+diff --git a/django/core/checks/model_checks.py b/django/core/checks/model_checks.py
+index 5c2266ca1d..8bdbb7af29 100644
+--- a/django/core/checks/model_checks.py
++++ b/django/core/checks/model_checks.py
+@@ -36,15 +36,25 @@ def check_all_models(app_configs=None, **kwargs):
+         for model_constraint in model._meta.constraints:
+             constraints[model_constraint.name].append(model._meta.label)
+     for db_table, model_labels in db_table_models.items():
+-        if len(model_labels) != 1:
+-            errors.append(
+-                Error(
+-                    "db_table '%s' is used by multiple models: %s."
+-                    % (db_table, ', '.join(db_table_models[db_table])),
+-                    obj=db_table,
+-                    id='models.E028',
++        if len(model_labels) > 1:
++            # Check if models with the same db_table are actually using the same database.
++            # If they're using different databases (via routers), it's not an error.
++            from django.db import router
++            model_objs = [apps.get_model(label.split('.')[0], label.split('.')[1]) for label in model_labels]
++            # Get the database for each model
++            databases = set()
++            for model in model_objs:
++                databases.add(router.db_for_write(model))
++            # Only report an error if all models use the same database
++            if len(databases) == 1:
++                errors.append(
++                    Error(
++                        "db_table '%s' is used by multiple models: %s."
++                        % (db_table, ', '.join(model_labels)),
++                        obj=db_table,
++                        id='models.E028',
++                    )
+                 )
+-            )
+     for index_name, model_labels in indexes.items():
+         if len(model_labels) > 1:
+             model_labels = set(model_labels)

@@ -1,0 +1,97 @@
+diff --git a/xarray/core/concat.py b/xarray/core/concat.py
+index ecae2566c..3f96f7d64 100644
+--- a/xarray/core/concat.py
++++ b/xarray/core/concat.py
+@@ -1,3 +1,4 @@
++import numpy as np
+ import pandas as pd
+ 
+ from . import dtypes, utils
+@@ -314,10 +315,33 @@ def _dataset_concat(
+         for ds in datasets:
+             absent_merge_vars = variables_to_merge - set(ds.variables)
+             if absent_merge_vars:
+-                raise ValueError(
+-                    "variables %r are present in some datasets but not others. "
+-                    % absent_merge_vars
+-                )
++                if join == "outer":
++                    # Fill in missing variables with NaN
++                    for var in absent_merge_vars:
++                        # Get the variable from another dataset to determine its type/shape
++                        for other_ds in datasets:
++                            if var in other_ds.variables:
++                                other_var = other_ds.variables[var]
++                                # Create a NaN-filled variable with the same shape/dims
++                                # but with the concat dimension length from this dataset
++                                new_shape = tuple(
++                                    concat_dim_lengths[datasets.index(ds)]
++                                    if d == dim
++                                    else other_var.sizes.get(d, 1)
++                                    for d in other_var.dims
++                                )
++                                new_var = Variable(
++                                    other_var.dims,
++                                    np.full(new_shape, fill_value, dtype=other_var.dtype),
++                                    other_var.attrs,
++                                )
++                                ds.variables[var] = new_var
++                                break
++                else:
++                    raise ValueError(
++                        "variables %r are present in some datasets but not others. "
++                        % absent_merge_vars
++                    )
+ 
+             for var in variables_to_merge:
+                 to_merge[var].append(ds.variables[var])
+@@ -361,7 +385,32 @@ def _dataset_concat(
+             try:
+                 vars = ensure_common_dims([ds.variables[k] for ds in datasets])
+             except KeyError:
+-                raise ValueError("%r is not present in all datasets." % k)
++                if join == "outer":
++                    # Fill in missing variables with NaN
++                    vars_list = []
++                    for ds, dim_len in zip(datasets, concat_dim_lengths):
++                        if k in ds.variables:
++                            vars_list.append(ds.variables[k])
++                        else:
++                            # Get the variable from another dataset to determine its type
++                            for other_ds in datasets:
++                                if k in other_ds.variables:
++                                    other_var = other_ds.variables[k]
++                                    # Create a NaN-filled variable
++                                    new_shape = tuple(
++                                        dim_len if d == dim else other_var.sizes.get(d, 1)
++                                        for d in other_var.dims
++                                    )
++                                    new_var = Variable(
++                                        other_var.dims,
++                                        np.full(new_shape, fill_value, dtype=other_var.dtype),
++                                        other_var.attrs,
++                                    )
++                                    vars_list.append(new_var)
++                                    break
++                    vars = ensure_common_dims(vars_list)
++                else:
++                    raise ValueError("%r is not present in all datasets." % k)
+             combined = concat_vars(vars, dim, positions)
+             assert isinstance(combined, Variable)
+             result_vars[k] = combined
+@@ -369,10 +418,11 @@ def _dataset_concat(
+     result = Dataset(result_vars, attrs=result_attrs)
+     absent_coord_names = coord_names - set(result.variables)
+     if absent_coord_names:
+-        raise ValueError(
+-            "Variables %r are coordinates in some datasets but not others."
+-            % absent_coord_names
+-        )
++        if join != "outer":
++            raise ValueError(
++                "Variables %r are coordinates in some datasets but not others."
++                % absent_coord_names
++            )
+     result = result.set_coords(coord_names)
+     result.encoding = result_encoding
+ 

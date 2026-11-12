@@ -1,0 +1,41 @@
+diff --git a/django/core/exceptions.py b/django/core/exceptions.py
+index dc084b8692..75d3a31a3e 100644
+--- a/django/core/exceptions.py
++++ b/django/core/exceptions.py
+@@ -182,6 +182,36 @@ class ValidationError(Exception):
+     def __repr__(self):
+         return 'ValidationError(%s)' % self
+ 
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++        
++        # Compare error_dict if both have it
++        if hasattr(self, 'error_dict') and hasattr(other, 'error_dict'):
++            if self.error_dict.keys() != other.error_dict.keys():
++                return False
++            for field in self.error_dict:
++                # Compare sorted error lists for order-independence
++                if sorted(self.error_dict[field], key=str) != sorted(other.error_dict[field], key=str):
++                    return False
++            return True
++        
++        # If one has error_dict and the other doesn't, they're not equal
++        if hasattr(self, 'error_dict') != hasattr(other, 'error_dict'):
++            return False
++        
++        # Both don't have error_dict, compare error_list
++        if hasattr(self, 'error_list') and hasattr(other, 'error_list'):
++            # Compare sorted error lists for order-independence
++            return sorted(self.error_list, key=str) == sorted(other.error_list, key=str)
++        
++        return False
++
++    def __hash__(self):
++        # Since we implement __eq__, we need to implement __hash__ as well
++        # However, ValidationError is mutable, so we should not make it hashable
++        raise TypeError("unhashable type: 'ValidationError'")
++
+ 
+ class EmptyResultSet(Exception):
+     """A database query predicate is impossible."""

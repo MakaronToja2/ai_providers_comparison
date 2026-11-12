@@ -1,0 +1,16 @@
+diff --git a/requests/utils.py b/requests/utils.py
+index 8d17b6b2..c1bbcba2 100644
+--- a/requests/utils.py
++++ b/requests/utils.py
+@@ -366,7 +366,10 @@ def stream_decode_response_unicode(iterator, r):
+ 
+     decoder = codecs.getincrementaldecoder(r.encoding)(errors='replace')
+     for chunk in iterator:
+-        rv = decoder.decode(chunk)
++        if isinstance(chunk, bytes):
++            rv = decoder.decode(chunk)
++        else:
++            rv = chunk
+         if rv:
+             yield rv
+     rv = decoder.decode(b'', final=True)

@@ -1,0 +1,18 @@
+diff --git a/django/forms/formsets.py b/django/forms/formsets.py
+index a89c35599f..05501446b9 100644
+--- a/django/forms/formsets.py
++++ b/django/forms/formsets.py
+@@ -362,6 +362,13 @@ class BaseFormSet:
+             if self.can_delete and self._should_delete_form(form):
+                 continue
+             self._errors.append(form_errors)
++
++        # If self.error_class is the default ErrorList, add the 'nonform' class.
++        # Otherwise, assume the custom error_class handles it.
++        if self.error_class is ErrorList:
++            self._non_form_errors = self.error_class(self._non_form_errors, error_class='nonform')
++        else:
++            self._non_form_errors = self.error_class(self._non_form_errors)
+         try:
+             if (self.validate_max and
+                     self.total_form_count() - len(self.deleted_forms) > self.max_num) or \

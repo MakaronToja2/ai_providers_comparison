@@ -1,0 +1,29 @@
+diff --git a/sympy/geometry/point.py b/sympy/geometry/point.py
+index 73c20334d0..f3d54c5d8f 100644
+--- a/sympy/geometry/point.py
++++ b/sympy/geometry/point.py
+@@ -909,6 +909,24 @@ class Point2D(Point):
+ 
+     _ambient_dimension = 2
+ 
++    def __new__(cls, *args, **kwargs):
++        evaluate = kwargs.pop('evaluate', True)
++        # If evaluate is False, do not convert floats to Rational or check for imaginary parts
++        if not evaluate:
++            # Create instance without evaluation
++            from sympy.core.numbers import Float
++            # Accept args as is without conversion
++            if len(args) == 1 and hasattr(args[0], '__iter__'):
++                coords = tuple(args[0])
++            else:
++                coords = tuple(args)
++            obj = Point.__new__(cls, *coords, evaluate=False)
++            return obj
++
++        # Normal behavior: call Point.__new__ with evaluation
++        obj = Point.__new__(cls, *args, **kwargs)
++        return obj
++
+     def __new__(cls, *args, _nocheck=False, **kwargs):
+         if not _nocheck:
+             kwargs['dim'] = 2

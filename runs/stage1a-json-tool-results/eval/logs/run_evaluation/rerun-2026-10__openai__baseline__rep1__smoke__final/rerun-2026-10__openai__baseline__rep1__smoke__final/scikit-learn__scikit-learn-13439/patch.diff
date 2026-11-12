@@ -1,0 +1,10 @@
+--- a/sklearn/pipeline.py
++++ b/sklearn/pipeline.py
+@@ -20,1 +20,6 @@
+-class Pipeline(_BaseComposition):
++class Pipeline(_BaseComposition):
++    def __len__(self):
++        """Return the number of steps in the pipeline."""
++        return len(self.steps)
++
++    # Existing code continues below...

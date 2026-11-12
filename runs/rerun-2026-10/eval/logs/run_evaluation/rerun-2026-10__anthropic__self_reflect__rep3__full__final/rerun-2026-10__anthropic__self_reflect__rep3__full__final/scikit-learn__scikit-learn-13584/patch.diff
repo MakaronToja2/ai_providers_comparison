@@ -1,0 +1,36 @@
+diff --git a/sklearn/utils/_pprint.py b/sklearn/utils/_pprint.py
+index b8686dba5b0..237f5476d19 100644
+--- a/sklearn/utils/_pprint.py
++++ b/sklearn/utils/_pprint.py
+@@ -67,6 +67,8 @@ from inspect import signature
+ import pprint
+ from collections import OrderedDict
+ 
++import numpy as np
++
+ from ..base import BaseEstimator
+ from .._config import get_config
+ from . import is_scalar_nan
+@@ -95,8 +97,20 @@ def _changed_params(estimator):
+     init_params = signature(init_func).parameters
+     init_params = {name: param.default for name, param in init_params.items()}
+     for k, v in params.items():
+-        if (v != init_params[k] and
+-                not (is_scalar_nan(init_params[k]) and is_scalar_nan(v))):
++        # Handle array comparisons properly to avoid "ambiguous truth value" error
++        # when comparing numpy arrays
++        try:
++            if isinstance(v, np.ndarray) or isinstance(init_params[k], np.ndarray):
++                # If either is an array, use np.array_equal for comparison
++                if not np.array_equal(v, init_params[k]):
++                    filtered_params[k] = v
++            else:
++                # For non-array types, use regular comparison
++                if (v != init_params[k] and
++                        not (is_scalar_nan(init_params[k]) and is_scalar_nan(v))):
++                    filtered_params[k] = v
++        except (ValueError, TypeError):
++            # If comparison fails for any reason, include the parameter
+             filtered_params[k] = v
+     return filtered_params
+ 

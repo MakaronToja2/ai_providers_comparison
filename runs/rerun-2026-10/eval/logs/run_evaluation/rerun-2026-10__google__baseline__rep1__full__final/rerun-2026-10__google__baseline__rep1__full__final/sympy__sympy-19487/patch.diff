@@ -1,0 +1,16 @@
+diff --git a/sympy/functions/elementary/complexes.py b/sympy/functions/elementary/complexes.py
+index 7fda45982b..62101b2dc7 100644
+--- a/sympy/functions/elementary/complexes.py
++++ b/sympy/functions/elementary/complexes.py
+@@ -290,7 +290,10 @@ class sign(Function):
+     def doit(self, **hints):
+         if self.args[0].is_zero is False:
+             return self.args[0] / Abs(self.args[0])
+-        return self
++        # Handle the case where the argument is zero.
++        # The bug report suggests that sign(0) should be nan,
++        # as 0 / Abs(0) results in nan.
++        return S.NaN
+ 
+     @classmethod
+     def eval(cls, arg):

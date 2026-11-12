@@ -1,0 +1,16 @@
+diff --git a/sympy/printing/pretty/pretty.py b/sympy/printing/pretty/pretty.py
+index 0545797d5f..511badde57 100644
+--- a/sympy/printing/pretty/pretty.py
++++ b/sympy/printing/pretty/pretty.py
+@@ -825,9 +825,9 @@ def _print_MatAdd(self, expr):
+             if s is None:
+                 s = pform     # First element
+             else:
+-                if S(item.args[0]).is_negative:
++                # Check if the printed form starts with a minus sign
++                if pform.s.startswith('-'):
+                     s = prettyForm(*stringPict.next(s, ' '))
+-                    pform = self._print(item)
+                 else:
+                     s = prettyForm(*stringPict.next(s, ' + '))
+                 s = prettyForm(*stringPict.next(s, pform))

@@ -1,0 +1,4 @@
+model,runs,answers_with_edits,patches,markers_runs,divider_runs,path_resolved_runs,revision_on_first_patch_runs,any_runs,markers_patches,divider_patches,path_resolved_patches,revision_on_first_patch_patches,any_patches
+Claude Haiku 4.5,900,783,716,0,138,15,0,153,0,120,12,0,132
+GPT-4.1-mini,900,840,699,60,1,0,30,90,54,1,0,30,84
+Gemini 2.5 Flash-Lite,900,636,367,0,3,327,0,330,0,0,288,0,288

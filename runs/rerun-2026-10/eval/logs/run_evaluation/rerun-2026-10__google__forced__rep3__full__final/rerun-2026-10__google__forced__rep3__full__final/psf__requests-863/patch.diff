@@ -1,0 +1,15 @@
+diff --git a/requests/models.py b/requests/models.py
+index d8456375..f2e33ca0 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -148,6 +148,10 @@ class Request(object):
+ 
+         hooks = hooks or {}
+ 
++        # Register hooks passed as an argument.
++        for event, hook in list(hooks.items()):
++            self.register_hook(event, hook)
++
+         for (k, v) in list(hooks.items()):
+             self.register_hook(event=k, hook=v)
+ 

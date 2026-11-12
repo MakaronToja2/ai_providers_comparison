@@ -1,0 +1,63 @@
+diff --git a/sympy/matrices/expressions/blockmatrix.py b/sympy/matrices/expressions/blockmatrix.py
+index 95302a05ca..ffcd270806 100644
+--- a/sympy/matrices/expressions/blockmatrix.py
++++ b/sympy/matrices/expressions/blockmatrix.py
+@@ -154,6 +154,29 @@ def rowblocksizes(self):
+     def colblocksizes(self):
+         return [self.blocks[0, i].cols for i in range(self.blockshape[1])]
+ 
++    def _validate_blocks(self):
++        """Ensure all blocks are MatrixExpr objects, converting scalars to ZeroMatrix if needed."""
++        from sympy.core.numbers import Zero
++        blocks = self.blocks
++        for i in range(blocks.rows):
++            for j in range(blocks.cols):
++                block = blocks[i, j]
++                if isinstance(block, Zero):
++                    # Replace Zero scalars with ZeroMatrix
++                    # We need to infer dimensions from neighboring blocks
++                    rows = self.rowblocksizes[i] if i < len(self.rowblocksizes) else None
++                    cols = self.colblocksizes[j] if j < len(self.colblocksizes) else None
++                    if rows is not None and cols is not None:
++                        blocks[i, j] = ZeroMatrix(rows, cols)
++=======
++    @property
++    def rowblocksizes(self):
++        return [self.blocks[i, 0].rows for i in range(self.blockshape[0])]
++
++    @property
++    def colblocksizes(self):
++        return [self.blocks[0, i].cols for i in range(self.blockshape[1])]
++
+     def structurally_equal(self, other):
+         return (isinstance(other, BlockMatrix)
+             and self.shape == other.shape
+@@ -164,7 +187,27 @@ def structurally_equal(self, other):
+     def _blockmul(self, other):
+         if (isinstance(other, BlockMatrix) and
+                 self.colblocksizes == other.rowblocksizes):
+-            return BlockMatrix(self.blocks*other.blocks)
++            from sympy.core.numbers import Zero
++            from sympy.matrices.immutable import ImmutableDenseMatrix
++            
++            result_blocks = self.blocks * other.blocks
++            
++            # Convert any Zero scalars to ZeroMatrix objects
++            new_blocks = []
++            for i in range(result_blocks.rows):
++                row = []
++                for j in range(result_blocks.cols):
++                    block = result_blocks[i, j]
++                    if isinstance(block, Zero):
++                        # Infer dimensions from row and column block sizes
++                        rows = self.rowblocksizes[i]
++                        cols = other.colblocksizes[j]
++                        block = ZeroMatrix(rows, cols)
++                    row.append(block)
++                new_blocks.append(row)
++            
++            result_blocks = ImmutableDenseMatrix(new_blocks)
++            return BlockMatrix(result_blocks)
+ 
+         return self * other
+ 

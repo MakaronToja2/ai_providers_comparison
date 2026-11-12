@@ -1,0 +1,19 @@
+--- a/django/contrib/messages/storage/cookie.py
++++ b/django/contrib/messages/storage/cookie.py
+@@ class MessageEncoder(json.JSONEncoder):
+-        if isinstance(obj, Message):
+-            # Using 0/1 here instead of False/True to produce more compact json
+-            is_safedata = 1 if isinstance(obj.message, SafeData) else 0
+-            message = [self.message_key, is_safedata, obj.level, obj.message]
+-            if obj.extra_tags:
+-                message.append(obj.extra_tags)
+-            return message
++        if isinstance(obj, Message):
++            # Using 0/1 here instead of False/True to produce more compact json
++            is_safedata = 1 if isinstance(obj.message, SafeData) else 0
++            message = [self.message_key, is_safedata, obj.level, obj.message]
++            # Append extra_tags even if empty string, but not if None
++            if obj.extra_tags is not None:
++                message.append(obj.extra_tags)
++            return message
+         return super().default(obj)

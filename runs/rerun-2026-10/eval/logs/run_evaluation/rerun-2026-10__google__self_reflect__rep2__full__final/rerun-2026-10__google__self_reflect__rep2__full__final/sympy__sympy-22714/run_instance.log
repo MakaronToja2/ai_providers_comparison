@@ -1,0 +1,46 @@
+2026-10-10 19:34:13,542 - INFO - Creating container for sympy__sympy-22714...
+2026-10-10 19:34:21,951 - INFO - Container for sympy__sympy-22714 created: 831318bfd42fff18823ab2864620e7e613a8780aaa2c0ad6bd57d734772a89a8
+2026-10-10 19:34:26,627 - INFO - Container for sympy__sympy-22714 started: 831318bfd42fff18823ab2864620e7e613a8780aaa2c0ad6bd57d734772a89a8
+2026-10-10 19:34:26,627 - INFO - Intermediate patch for sympy__sympy-22714 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/sympy__sympy-22714/patch.diff, now applying to container...
+2026-10-10 19:34:26,751 - INFO - >>>>> Applied Patch:
+Checking patch sympy/geometry/point.py...
+warning: sympy/geometry/point.py has type 100755, expected 100644
+Applied patch sympy/geometry/point.py cleanly.
+
+2026-10-10 19:34:27,080 - INFO - Git diff before:
+diff --git a/sympy/geometry/point.py b/sympy/geometry/point.py
+index 73c20334d0..ad06668efe 100755
+--- a/sympy/geometry/point.py
++++ b/sympy/geometry/point.py
+@@ -152,7 +152,7 @@ def __new__(cls, *args, **kwargs):
+                         'warn' or 'ignore'.'''))
+         if any(coords[dim:]):
+             raise ValueError('Nonzero coordinates cannot be removed.')
+-        if any(a.is_number and im(a) for a in coords):
++        if evaluate and any(a.is_number and im(a) for a in coords):
+             raise ValueError('Imaginary coordinates are not permitted.')
+         if not all(isinstance(a, Expr) for a in coords):
+             raise TypeError('Coordinates must be valid SymPy expressions.')
+2026-10-10 19:34:27,080 - INFO - Eval script for sympy__sympy-22714 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/sympy__sympy-22714/eval.sh; copying to container...
+2026-10-10 19:34:33,741 - INFO - Test runtime: 6.60 seconds
+2026-10-10 19:34:33,742 - INFO - Test output for sympy__sympy-22714 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/sympy__sympy-22714/test_output.txt
+2026-10-10 19:34:33,783 - INFO - Git diff after:
+diff --git a/sympy/geometry/point.py b/sympy/geometry/point.py
+index 73c20334d0..ad06668efe 100755
+--- a/sympy/geometry/point.py
++++ b/sympy/geometry/point.py
+@@ -152,7 +152,7 @@ def __new__(cls, *args, **kwargs):
+                         'warn' or 'ignore'.'''))
+         if any(coords[dim:]):
+             raise ValueError('Nonzero coordinates cannot be removed.')
+-        if any(a.is_number and im(a) for a in coords):
++        if evaluate and any(a.is_number and im(a) for a in coords):
+             raise ValueError('Imaginary coordinates are not permitted.')
+         if not all(isinstance(a, Expr) for a in coords):
+             raise TypeError('Coordinates must be valid SymPy expressions.')
+2026-10-10 19:34:33,784 - INFO - Grading answer for sympy__sympy-22714...
+2026-10-10 19:34:33,785 - INFO - report: {'sympy__sympy-22714': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_issue_22684'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_point', 'test_point3D', 'test_Point2D', 'test_issue_9214', 'test_issue_11617', 'test_transform', 'test_concyclic_doctest_bug', 'test_arguments', 'test_unit', 'test_dot', 'test__normalize_dimension'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-22714: resolved: True
+2026-10-10 19:34:33,785 - INFO - Attempting to stop container sweb.eval.sympy__sympy-22714.rerun-2026-10__google__self_reflect__rep2__full__final...
+2026-10-10 19:34:52,140 - INFO - Attempting to remove container sweb.eval.sympy__sympy-22714.rerun-2026-10__google__self_reflect__rep2__full__final...
+2026-10-10 19:34:52,758 - INFO - Container sweb.eval.sympy__sympy-22714.rerun-2026-10__google__self_reflect__rep2__full__final removed.

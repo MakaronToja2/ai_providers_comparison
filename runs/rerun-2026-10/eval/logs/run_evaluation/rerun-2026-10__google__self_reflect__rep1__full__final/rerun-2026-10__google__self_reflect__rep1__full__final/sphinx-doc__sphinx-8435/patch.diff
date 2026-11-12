@@ -1,0 +1,53 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 171a3e7b0d..d10427da77 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -791,11 +791,12 @@ class Documenter:
+         self.env.temp_data['autodoc:module'] = self.modname
+         if self.objpath:
+             self.env.temp_data['autodoc:class'] = self.objpath[0]
+-
++        
++        # Note: autodoc_type_aliases are applied in importer.get_object_members
+         want_all = all_members or self.options.inherited_members or \
+-            self.options.members is ALL
++                   self.options.members is ALL
+         # find out which members are documentable
+-        members_check_module, members = self.get_object_members(want_all)
++        members_check_module, members = self.get_object_members(want_all, self.config.autodoc_type_aliases)
+ 
+         # document non-skipped members
+         memberdocumenters = []  # type: List[Tuple[Documenter, bool]]
+diff --git a/sphinx/ext/autodoc/importer.py b/sphinx/ext/autodoc/importer.py
+index adfa6d05dc..06aecd2f25 100644
+--- a/sphinx/ext/autodoc/importer.py
++++ b/sphinx/ext/autodoc/importer.py
+@@ -17,6 +17,7 @@ from sphinx.deprecation import RemovedInSphinx40Warning, deprecated_alias
+ from sphinx.pycode import ModuleAnalyzer
+ from sphinx.util import logging
+ from sphinx.util.inspect import getslots, isclass, isenumclass, safe_getattr
++from sphinx.util.typing import stringify_typehint
+ 
+ if False:
+     # For type annotation
+@@ -181,7 +182,7 @@ def _getannotations(obj: Any) -> Mapping[str, Any]:
+ 
+ 
+ def get_object_members(subject: Any, objpath: List[str], attrgetter: Callable,
+-                       analyzer: ModuleAnalyzer = None) -> Dict[str, Attribute]:
++                       analyzer: ModuleAnalyzer = None, type_aliases: Dict[str, str] = None) -> Dict[str, Attribute]:
+     """Get members and attributes of target object."""
+     from sphinx.ext.autodoc import INSTANCEATTR
+ 
+@@ -228,8 +229,10 @@ def get_object_members(subject: Any, objpath: List[str], attrgetter: Callable,
+     for i, cls in enumerate(_getmro(subject)):
+         for name in _getannotations(cls):
+             name = unmangle(cls, name)
++            # Apply type aliases to annotations
+             if name and name not in members:
+-                members[name] = Attribute(name, i == 0, INSTANCEATTR)
++                annotation = stringify_typehint(name, _getannotations(cls)[name], type_aliases)
++                members[name] = Attribute(name, i == 0, annotation)
+ 
+     if analyzer:
+         # append instance attributes (cf. self.attr1) if analyzer knows

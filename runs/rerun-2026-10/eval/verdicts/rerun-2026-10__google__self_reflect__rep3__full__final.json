@@ -1,0 +1,293 @@
+{
+  "job": "rerun-2026-10__google__self_reflect__rep3__full",
+  "kind": "final",
+  "subset": "full",
+  "run_id": "rerun-2026-10__google__self_reflect__rep3__full__final",
+  "counts": {
+    "tests_failed": 22,
+    "resolved": 15
+  },
+  "verdicts": {
+    "django__django-10924": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 1,
+      "p2p_total": 1
+    },
+    "django__django-12308": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 2,
+      "p2p_passed": 20,
+      "p2p_total": 20
+    },
+    "django__django-12453": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 5,
+      "p2p_total": 5
+    },
+    "django__django-13447": {
+      "status": "tests_failed",
+      "kind": "both",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 3,
+      "p2p_total": 5
+    },
+    "django__django-13757": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 76,
+      "p2p_total": 76
+    },
+    "django__django-14608": {
+      "status": "resolved",
+      "f2p_passed": 4,
+      "f2p_total": 4,
+      "p2p_passed": 394,
+      "p2p_total": 394
+    },
+    "django__django-14730": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 119,
+      "p2p_total": 119
+    },
+    "django__django-14752": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 15,
+      "p2p_total": 15
+    },
+    "django__django-14915": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 23,
+      "p2p_total": 23
+    },
+    "django__django-15252": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 2,
+      "p2p_passed": 34,
+      "p2p_total": 34
+    },
+    "django__django-15400": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 1,
+      "f2p_total": 2,
+      "p2p_passed": 62,
+      "p2p_total": 62
+    },
+    "django__django-15790": {
+      "status": "tests_failed",
+      "kind": "p2p_regression",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 10,
+      "p2p_total": 12
+    },
+    "django__django-15819": {
+      "status": "tests_failed",
+      "kind": "both",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 0,
+      "p2p_total": 18
+    },
+    "django__django-16527": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 6,
+      "p2p_total": 6
+    },
+    "matplotlib__matplotlib-24149": {
+      "status": "tests_failed",
+      "kind": "both",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 739,
+      "p2p_total": 767
+    },
+    "matplotlib__matplotlib-24265": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 16,
+      "p2p_total": 16
+    },
+    "matplotlib__matplotlib-25442": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 275,
+      "p2p_total": 275
+    },
+    "mwaskom__seaborn-3407": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 120,
+      "p2p_total": 120
+    },
+    "psf__requests-3362": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 75,
+      "p2p_total": 75
+    },
+    "psf__requests-863": {
+      "status": "resolved",
+      "f2p_passed": 4,
+      "f2p_total": 4,
+      "p2p_passed": 60,
+      "p2p_total": 60
+    },
+    "pytest-dev__pytest-5227": {
+      "status": "resolved",
+      "f2p_passed": 3,
+      "f2p_total": 3,
+      "p2p_passed": 34,
+      "p2p_total": 34
+    },
+    "scikit-learn__scikit-learn-10508": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 2,
+      "p2p_passed": 18,
+      "p2p_total": 18
+    },
+    "scikit-learn__scikit-learn-13142": {
+      "status": "resolved",
+      "f2p_passed": 2,
+      "f2p_total": 2,
+      "p2p_passed": 54,
+      "p2p_total": 54
+    },
+    "scikit-learn__scikit-learn-13241": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 54,
+      "p2p_total": 54
+    },
+    "scikit-learn__scikit-learn-13779": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 2,
+      "p2p_passed": 18,
+      "p2p_total": 18
+    },
+    "scikit-learn__scikit-learn-14894": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 85,
+      "p2p_total": 85
+    },
+    "sphinx-doc__sphinx-10325": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 5,
+      "p2p_total": 5
+    },
+    "sphinx-doc__sphinx-8435": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 16,
+      "p2p_total": 16
+    },
+    "sympy__sympy-13177": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 75,
+      "p2p_total": 75
+    },
+    "sympy__sympy-14774": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 114,
+      "p2p_total": 114
+    },
+    "sympy__sympy-16792": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 54,
+      "p2p_total": 54
+    },
+    "sympy__sympy-17139": {
+      "status": "resolved",
+      "f2p_passed": 2,
+      "f2p_total": 2,
+      "p2p_passed": 67,
+      "p2p_total": 67
+    },
+    "sympy__sympy-17630": {
+      "status": "tests_failed",
+      "kind": "both",
+      "f2p_passed": 0,
+      "f2p_total": 2,
+      "p2p_passed": 11,
+      "p2p_total": 19
+    },
+    "sympy__sympy-19487": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 90,
+      "p2p_total": 90
+    },
+    "sympy__sympy-21055": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 13,
+      "p2p_total": 13
+    },
+    "sympy__sympy-21847": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 9,
+      "p2p_total": 9
+    },
+    "sympy__sympy-24152": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 6,
+      "p2p_total": 6
+    }
+  }
+}

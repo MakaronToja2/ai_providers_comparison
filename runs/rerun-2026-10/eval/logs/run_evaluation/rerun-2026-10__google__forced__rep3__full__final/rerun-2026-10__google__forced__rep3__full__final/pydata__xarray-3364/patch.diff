@@ -1,0 +1,84 @@
+diff --git a/xarray/core/concat.py b/xarray/core/concat.py
+index ecae2566c..3654b772b 100644
+--- a/xarray/core/concat.py
++++ b/xarray/core/concat.py
+@@ -186,34 +186,55 @@ def _calc_concat_over(datasets, dim, dim_names, data_vars, coords, compat):
+                         "Cannot specify both %s='different' and compat='override'."
+                         % subset
+                     )
+-                # all nonindexes that are not the same in each dataset
+-                for k in getattr(datasets[0], subset):
+-                    if k not in concat_over:
+-                        # Compare the variable of all datasets vs. the one
+-                        # of the first dataset. Perform the minimum amount of
+-                        # loads in order to avoid multiple loads from disk
+-                        # while keeping the RAM footprint low.
+-                        v_lhs = datasets[0].variables[k].load()
+-                        # We'll need to know later on if variables are equal.
+-                        computed = []
+-                        for ds_rhs in datasets[1:]:
+-                            v_rhs = ds_rhs.variables[k].compute()
+-                            computed.append(v_rhs)
+-                            if not getattr(v_lhs, compat)(v_rhs):
+-                                concat_over.add(k)
+-                                equals[k] = False
+-                                # computed variables are not to be re-computed
+-                                # again in the future
+-                                for ds, v in zip(datasets[1:], computed):
+-                                    ds.variables[k].data = v.data
++
++                # Get all unique variable names across all datasets
++                all_vars = set()
++                for ds in datasets:
++                    all_vars.update(getattr(ds, subset))
++
++                for k in all_vars:
++                    if k not in concat_over:  # Avoid re-processing if already added
++                        is_present_in_all = True
++                        for ds in datasets:
++                            if k not in getattr(ds, subset):
++                                is_present_in_all = False
+                                 break
++
++                        if not is_present_in_all:
++                            # Variable is missing in at least one dataset, include it
++                            concat_over.add(k)
++                            equals[k] = False  # Mark as not equal since it's missing
+                         else:
+-                            equals[k] = True
++                            # Variable is present in all, perform the original comparison
++                            try:
++                                v_lhs = datasets[0].variables[k].load()
++                                computed = []
++                                for ds_rhs in datasets[1:]:
++                                    v_rhs = ds_rhs.variables[k].compute()
++                                    computed.append(v_rhs)
++                                    if not getattr(v_lhs, compat)(v_rhs):
++                                        concat_over.add(k)
++                                        equals[k] = False
++                                        # computed variables are not to be re-computed
++                                        # again in the future
++                                        for ds, v in zip(datasets[1:], computed):
++                                            ds.variables[k].data = v.data
++                                        break
++                                else:
++                                    equals[k] = True
++                            except KeyError:
++                                # This should not happen if is_present_in_all is True,
++                                # but as a safeguard, treat as not equal.
++                                concat_over.add(k)
++                                equals[k] = False
+ 
+             elif opt == "all":
+-                concat_over.update(
+-                    set(getattr(datasets[0], subset)) - set(datasets[0].dims)
+-                )
++                # Consider all variables from all datasets
++                all_vars = set()
++                for ds in datasets:
++                    all_vars.update(getattr(ds, subset))
++                # Exclude dimensions themselves if they are listed as coords/data_vars
++                concat_over.update(all_vars - set(datasets[0].dims))
+             elif opt == "minimal":
+                 pass
+             else:

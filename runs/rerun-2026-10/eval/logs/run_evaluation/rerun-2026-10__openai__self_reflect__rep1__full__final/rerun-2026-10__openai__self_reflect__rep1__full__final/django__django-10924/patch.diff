@@ -1,0 +1,31 @@
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 0c64748ccd..219fee30ea 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1708,8 +1708,10 @@ class FilePathField(Field):
+         return str(value)
+ 
+     def formfield(self, **kwargs):
++        # If path is a callable, call it to get the actual path string
++        path = self.path() if callable(self.path) else self.path
+         return super().formfield(**{
+-            'path': self.path,
++            'path': path,
+             'match': self.match,
+             'recursive': self.recursive,
+             'form_class': forms.FilePathField,
+diff --git a/django/forms/fields.py b/django/forms/fields.py
+index a977256525..0b1a25d4a6 100644
+--- a/django/forms/fields.py
++++ b/django/forms/fields.py
+@@ -1078,7 +1078,9 @@ class MultiValueField(Field):
+ class FilePathField(ChoiceField):
+     def __init__(self, path, *, match=None, recursive=False, allow_files=True,
+                  allow_folders=False, **kwargs):
+-        self.path, self.match, self.recursive = path, match, recursive
++        # If path is a callable, call it to get the actual path string
++        self.path = path() if callable(path) else path
++        self.match, self.recursive = match, recursive
+         self.allow_files, self.allow_folders = allow_files, allow_folders
+         super().__init__(choices=(), **kwargs)
+ 

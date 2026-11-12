@@ -1,0 +1,13 @@
+diff --git a/sympy/polys/polytools.py b/sympy/polys/polytools.py
+index d5ac051f63..9a6db2fef5 100644
+--- a/sympy/polys/polytools.py
++++ b/sympy/polys/polytools.py
+@@ -51,7 +51,7 @@
+ import mpmath
+ from mpmath.libmp.libhyper import NoConvergence
+ 
+-from sympy.polys.domains import FF, QQ, ZZ
++from sympy.polys.domains import FF, QQ, ZZ, RR, PolynomialRing
+ from sympy.polys.constructor import construct_domain
+ 
+ from sympy.polys import polyoptions as options

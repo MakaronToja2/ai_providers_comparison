@@ -1,0 +1,23 @@
+diff --git a/sympy/core/mod.py b/sympy/core/mod.py
+index 11c800704b..59d07791d8 100644
+--- a/sympy/core/mod.py
++++ b/sympy/core/mod.py
+@@ -40,8 +40,17 @@ def doit(p, q):
+                 return nan
+             if (p == q or p == -q or
+                     p.is_Pow and p.exp.is_Integer and p.base == q or
+-                    p.is_integer and q == 1):
++                    (p.is_integer and q == 1)):
+                 return S.Zero
++            # Additional check: if p is a power with integer exponent and base equals q and base is integer
++            if p.is_Pow and p.exp.is_Integer and p.base == q and p.base.is_integer:
++                return S.Zero
++            # If p is a Mul of integer powers of q, then Mod is zero
++            if p.is_Mul:
++                # Check if all factors are integer powers of q
++                factors = p.args
++                if all((f.is_Pow and f.exp.is_Integer and f.base == q and f.base.is_integer) or (f == q and q.is_integer) for f in factors):
++                    return S.Zero
+ 
+             if q.is_Number:
+                 if p.is_Number:

@@ -1,0 +1,45 @@
+diff --git a/sklearn/mixture/base.py b/sklearn/mixture/base.py
+index bd34333c063..292bfc1a67b 100644
+--- a/sklearn/mixture/base.py
++++ b/sklearn/mixture/base.py
+@@ -228,6 +228,40 @@ class BaseMixture(DensityMixin, BaseEstimator, metaclass=ABCMeta):
+ 
+         n_samples, _ = X.shape
+         for init in range(n_init):
++            if self.verbose:
++                print("Initialization", init + 1)
++
++            if do_init:
++                self._initialize_parameters(X, random_state=random_state)
++
++            lower_bound = -np.infty
++            self.converged_ = False
++
++            for n_iter in range(self.max_iter):
++                prev_lower_bound = lower_bound
++
++                log_prob_norm, log_resp = self._e_step(X)
++                self._m_step(X, log_resp)
++                lower_bound = self._compute_lower_bound(log_resp, log_prob_norm)
++
++                change = lower_bound - prev_lower_bound
++                if self.verbose:
++                    print("Iteration %d, log-likelihood: %.6f, change: %.6f"
++                          % (n_iter, lower_bound, change))
++
++                if abs(change) < self.tol:
++                    self.converged_ = True
++                    break
++
++            if lower_bound > max_lower_bound:
++                max_lower_bound = lower_bound
++                best_params = self._get_parameters()
++
++        self._set_parameters(best_params)
++        self.n_iter_ = n_iter + 1
++        self.lower_bound_ = max_lower_bound
++
++        return self.predict(X)
+             self._print_verbose_msg_init_beg(init)
+ 
+             if do_init:

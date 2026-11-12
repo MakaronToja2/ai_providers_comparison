@@ -1,0 +1,32 @@
+diff --git a/xarray/core/concat.py b/xarray/core/concat.py
+index ecae2566c..467870035 100644
+--- a/xarray/core/concat.py
++++ b/xarray/core/concat.py
+@@ -313,14 +313,25 @@ def _dataset_concat(
+ 
+         for ds in datasets:
+             absent_merge_vars = variables_to_merge - set(ds.variables)
+-            if absent_merge_vars:
++            if absent_merge_vars and join == "outer":
++                # If join is 'outer', we can allow variables to be missing in some datasets.
++                # They will be filled with NaN by the alignment step.
++                for var in absent_merge_vars:
++                    # Add a placeholder for the missing variable, which will be filled with NaN
++                    # by the alignment step if it's not already present.
++                    # This is a simplification; a more robust solution might involve
++                    # explicitly creating a Variable with NaN values.
++                    pass
++            elif absent_merge_vars:
+                 raise ValueError(
+                     "variables %r are present in some datasets but not others. "
+                     % absent_merge_vars
+                 )
+ 
+             for var in variables_to_merge:
+-                to_merge[var].append(ds.variables[var])
++                # Only append if the variable is present in the current dataset
++                if var in ds.variables:
++                    to_merge[var].append(ds.variables[var])
+ 
+         for var in variables_to_merge:
+             result_vars[var] = unique_variable(

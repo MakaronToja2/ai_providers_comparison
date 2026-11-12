@@ -1,0 +1,25 @@
+diff --git a/sympy/core/expr.py b/sympy/core/expr.py
+index 24d89897f7..b9aca85eef 100644
+--- a/sympy/core/expr.py
++++ b/sympy/core/expr.py
+@@ -120,8 +120,19 @@ def _hashable_content(self):
+         return self._args
+ 
+     def __eq__(self, other):
++        # Avoid sympify on strings or objects that might produce unsafe repr
++        # Only sympify if other is already an Expr or a safe type (int, float, etc.)
++        from sympy.core.expr import Expr
++        from sympy.core.numbers import Number
++        from sympy.core.sympify import SympifyError
++        from sympy.core.sympify import sympify
++
++        if isinstance(other, str):
++            # Do not sympify strings in __eq__, just return False
++            return False
+         try:
+-            other = sympify(other)
++            if not isinstance(other, (Expr, Number, int, float)):
++                other = sympify(other)
+             if not isinstance(other, Expr):
+                 return False
+         except (SympifyError, SyntaxError):

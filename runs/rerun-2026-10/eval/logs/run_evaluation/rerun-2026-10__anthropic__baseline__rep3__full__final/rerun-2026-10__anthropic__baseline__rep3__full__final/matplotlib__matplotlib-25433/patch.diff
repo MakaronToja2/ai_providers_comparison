@@ -1,0 +1,21 @@
+diff --git a/lib/matplotlib/widgets.py b/lib/matplotlib/widgets.py
+index ebe5da43e2..62e32622b5 100644
+--- a/lib/matplotlib/widgets.py
++++ b/lib/matplotlib/widgets.py
+@@ -905,6 +905,16 @@ class RangeSlider(SliderBase):
+         else:
+             self._update_val_from_pos(event.xdata)
+ 
++        # Release mouse grab before processing the callback to allow the
++        # callback to modify the figure without blocking input to new widgets
++        if self._changed_canvas():
++            self.drag_active = False
++            try:
++                event.canvas.release_mouse(self.ax)
++            except Exception:
++                pass
++            self._active_handle = None
++
+     def _format(self, val):
+         """Pretty-print *val*."""
+         if self.valfmt is not None:

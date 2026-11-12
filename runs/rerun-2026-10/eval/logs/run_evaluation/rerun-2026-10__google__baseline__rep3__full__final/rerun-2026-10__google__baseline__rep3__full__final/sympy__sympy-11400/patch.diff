@@ -1,0 +1,13 @@
+diff --git a/sympy/printing/ccode.py b/sympy/printing/ccode.py
+index 30a07a7b59..6018ca9d46 100644
+--- a/sympy/printing/ccode.py
++++ b/sympy/printing/ccode.py
+@@ -43,6 +43,8 @@
+     "atanh": "atanh",
+     "floor": "floor",
+     "ceiling": "ceil",
++    # Add sinc function
++    "sinc": lambda self, x: "sin(%s)/%s" % (self._print(x[0]), self._print(x[0])),
+ }
+ 
+ # These are the core reserved words in the C language. Taken from:

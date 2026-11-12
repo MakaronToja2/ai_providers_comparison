@@ -1,0 +1,13 @@
+diff --git a/sympy/vector/scalar.py b/sympy/vector/scalar.py
+index 42742b021e..a1c994d6ed 100644
+--- a/sympy/vector/scalar.py
++++ b/sympy/vector/scalar.py
+@@ -57,6 +57,8 @@ def _latex(self, printer=None):
+         return self._latex_form
+ 
+     def _pretty(self, printer=None):
++        # Return a prettyForm with a single string, to avoid insertion of unit vectors in the middle
++        # This fixes the jumbling of output in terminal pretty printing of vector expressions
+         return prettyForm(self._pretty_form)
+ 
+     precedence = PRECEDENCE['Atom']

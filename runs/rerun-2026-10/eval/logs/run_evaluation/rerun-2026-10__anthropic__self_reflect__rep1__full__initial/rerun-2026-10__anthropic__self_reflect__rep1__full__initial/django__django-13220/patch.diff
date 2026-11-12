@@ -1,0 +1,101 @@
+diff --git a/django/core/exceptions.py b/django/core/exceptions.py
+index dc084b8692..f4b5d117b9 100644
+--- a/django/core/exceptions.py
++++ b/django/core/exceptions.py
+@@ -179,6 +179,96 @@ class ValidationError(Exception):
+             return repr(dict(self))
+         return repr(list(self))
+ 
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++        
++        # Both have error_dict
++        if hasattr(self, 'error_dict') and hasattr(other, 'error_dict'):
++            if set(self.error_dict.keys()) != set(other.error_dict.keys()):
++                return False
++            for field in self.error_dict:
++                # Sort error lists for comparison to make order-independent
++                self_errors = sorted(
++                    [self._error_to_comparable(e) for e in self.error_dict[field]]
++                )
++                other_errors = sorted(
++                    [other._error_to_comparable(e) for e in other.error_dict[field]]
++                )
++                if self_errors != other_errors:
++                    return False
++            return True
++        
++        # Both have error_list (but not error_dict)
++        if hasattr(self, 'error_list') and hasattr(other, 'error_list') and \
++           not hasattr(self, 'error_dict') and not hasattr(other, 'error_dict'):
++            # Sort error lists for comparison to make order-independent
++            self_errors = sorted(
++                [self._error_to_comparable(e) for e in self.error_list]
++            )
++            other_errors = sorted(
++                [other._error_to_comparable(e) for e in other.error_list]
++            )
++            return self_errors == other_errors
++        
++        return False
++
++    def _error_to_comparable(self, error):
++        """Convert an error to a comparable form."""
++        if isinstance(error, ValidationError):
++            if hasattr(error, 'message'):
++                # Single message error
++                message = error.message
++                if error.params:
++                    message = message % error.params
++                return (str(message), error.code)
++            else:
++                # This shouldn't happen in normal cases
++                return str(error)
++        else:
++            return str(error)
++
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++        
++        # Both have error_dict
++        if hasattr(self, 'error_dict') and hasattr(other, 'error_dict'):
++            if set(self.error_dict.keys()) != set(other.error_dict.keys()):
++                return False
++            for field in self.error_dict:
++                # Sort error lists for comparison to make order-independent
++                self_errors = sorted(
++                    [self._error_to_comparable(e) for e in self.error_dict[field]]
++                )
++                other_errors = sorted(
++                    [other._error_to_comparable(e) for e in other.error_dict[field]]
++                )
++                if self_errors != other_errors:
++                    return False
++            return True
++        
++        # Both have error_list (but not error_dict)
++        if hasattr(self, 'error_list') and hasattr(other, 'error_list') and \
++           not hasattr(self, 'error_dict') and not hasattr(other, 'error_dict'):
++            # Sort error lists for comparison to make order-independent
++            self_errors = sorted(
++                [self._error_to_comparable(e) for e in self.error_list]
++            )
++            other_errors = sorted(
++                [other._error_to_comparable(e) for e in other.error_list]
++            )
++            return self_errors == other_errors
++        
++        return False
++
++    def _error_to_comparable(self, error):
++        """Convert an error to a comparable form."""
++        message = error.message
++        if error.params:
++            message = message % error.params
++        return (str(message), error.code)
++
+     def __repr__(self):
+         return 'ValidationError(%s)' % self
+ 

@@ -1,0 +1,52 @@
+2026-10-10 14:53:45,828 - INFO - Creating container for django__django-12113...
+2026-10-10 14:53:54,731 - INFO - Container for django__django-12113 created: bd393577dd31dfe70c0cc81a34f4c3b898f7fe5daed129932b18f9d29af011b7
+2026-10-10 14:54:00,240 - INFO - Container for django__django-12113 started: bd393577dd31dfe70c0cc81a34f4c3b898f7fe5daed129932b18f9d29af011b7
+2026-10-10 14:54:00,241 - INFO - Intermediate patch for django__django-12113 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/django__django-12113/patch.diff, now applying to container...
+2026-10-10 14:54:00,416 - INFO - >>>>> Applied Patch:
+Checking patch tests/admin_views/test_multidb.py...
+warning: tests/admin_views/test_multidb.py has type 100755, expected 100644
+Applied patch tests/admin_views/test_multidb.py cleanly.
+
+2026-10-10 14:54:01,381 - INFO - Git diff before:
+diff --git a/tests/admin_views/test_multidb.py b/tests/admin_views/test_multidb.py
+index a02b637d34..bb57105e2b 100755
+--- a/tests/admin_views/test_multidb.py
++++ b/tests/admin_views/test_multidb.py
+@@ -36,7 +36,10 @@ class MultiDatabaseTests(TestCase):
+         cls.test_book_ids = {}
+         for db in connections:
+             Router.target_db = db
+-            cls.superusers[db] = User.objects.create_superuser(
++            # Ensure that User.objects.using(db) is used to explicitly set the database
++            # for the manager, which is then used by create_superuser.
++            user_manager = User.objects.using(db)
++            cls.superusers[db] = user_manager.create_superuser(
+                 username='admin', password='something', email='test@test.org',
+             )
+             b = Book(name='Test Book')
+2026-10-10 14:54:01,381 - INFO - Eval script for django__django-12113 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/django__django-12113/eval.sh; copying to container...
+2026-10-10 14:54:13,615 - INFO - Test runtime: 12.12 seconds
+2026-10-10 14:54:13,618 - INFO - Test output for django__django-12113 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/django__django-12113/test_output.txt
+2026-10-10 14:54:13,713 - INFO - Git diff after:
+diff --git a/tests/admin_views/test_multidb.py b/tests/admin_views/test_multidb.py
+index a02b637d34..bb57105e2b 100755
+--- a/tests/admin_views/test_multidb.py
++++ b/tests/admin_views/test_multidb.py
+@@ -36,7 +36,10 @@ class MultiDatabaseTests(TestCase):
+         cls.test_book_ids = {}
+         for db in connections:
+             Router.target_db = db
+-            cls.superusers[db] = User.objects.create_superuser(
++            # Ensure that User.objects.using(db) is used to explicitly set the database
++            # for the manager, which is then used by create_superuser.
++            user_manager = User.objects.using(db)
++            cls.superusers[db] = user_manager.create_superuser(
+                 username='admin', password='something', email='test@test.org',
+             )
+             b = Book(name='Test Book')
+2026-10-10 14:54:13,713 - INFO - Grading answer for django__django-12113...
+2026-10-10 14:54:13,720 - INFO - report: {'django__django-12113': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_custom_test_name (backends.sqlite.test_creation.TestDbSignatureTests)']}, 'PASS_TO_PASS': {'success': [], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-12113: resolved: False
+2026-10-10 14:54:13,720 - INFO - Attempting to stop container sweb.eval.django__django-12113.rerun-2026-10__google__self_reflect__rep2__full__final...
+2026-10-10 14:54:32,006 - INFO - Attempting to remove container sweb.eval.django__django-12113.rerun-2026-10__google__self_reflect__rep2__full__final...
+2026-10-10 14:54:33,215 - INFO - Container sweb.eval.django__django-12113.rerun-2026-10__google__self_reflect__rep2__full__final removed.

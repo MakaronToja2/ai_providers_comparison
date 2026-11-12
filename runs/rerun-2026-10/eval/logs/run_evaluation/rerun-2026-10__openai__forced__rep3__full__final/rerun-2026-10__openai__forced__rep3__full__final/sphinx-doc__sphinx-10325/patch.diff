@@ -1,0 +1,34 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 62631f7ff9..0e7d56e603 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1710,7 +1710,28 @@ class ClassDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # type:
+                                    (name, self.fullname), type='autodoc')
+             return False, selected
+         elif self.options.inherited_members:
+-            return False, list(members.values())
++            # Support multiple inherited-members classes separated by commas
++            ignore_bases = []
++            if isinstance(self.options.inherited_members, str):
++                ignore_bases = [cls.strip() for cls in self.options.inherited_members.split(',')]
++            elif isinstance(self.options.inherited_members, (list, tuple)):
++                ignore_bases = list(self.options.inherited_members)
++            else:
++                ignore_bases = []
++
++            def should_include(member):
++                # Include member if its class is not in ignore_bases
++                cls = member.class_
++                if cls is None:
++                    return True
++                # Check if any base class name matches ignore_bases
++                for base in cls.__mro__:
++                    if base.__name__ in ignore_bases:
++                        return False
++                return True
++
++            filtered_members = [m for m in members.values() if should_include(m)]
++            return False, filtered_members
+         else:
+             return False, [m for m in members.values() if m.class_ == self.object]
+ 

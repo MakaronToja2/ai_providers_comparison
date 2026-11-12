@@ -1,0 +1,38 @@
+<frozen runpy>:128: RuntimeWarning: 'swebench.harness.run_evaluation' found in sys.modules after import of package 'swebench.harness', but prior to execution of 'swebench.harness.run_evaluation'; this may result in unpredictable behaviour
+Found 8 existing instance images. Will reuse them.
+Running 8 instances...
+Evaluation:   0%|          | 0/8 [00:00<?, ?it/s, error=0, ✓=0, ✖=0]Evaluation:   0%|          | 0/8 [00:19<?, ?it/s, ✓=0, ✖=0, error=1]Evaluation:  12%|█▎        | 1/8 [00:19<02:15, 19.37s/it, ✓=0, ✖=0, error=1]Evaluation:  12%|█▎        | 1/8 [00:19<02:15, 19.37s/it, ✓=0, ✖=0, error=2]Evaluation:  25%|██▌       | 2/8 [00:19<00:48,  8.04s/it, ✓=0, ✖=0, error=2]Evaluation:  25%|██▌       | 2/8 [00:24<00:48,  8.04s/it, ✓=0, ✖=1, error=2]Evaluation:  38%|███▊      | 3/8 [00:24<00:33,  6.66s/it, ✓=0, ✖=1, error=2]Evaluation:  38%|███▊      | 3/8 [00:24<00:33,  6.66s/it, ✓=1, ✖=1, error=2]Evaluation:  50%|█████     | 4/8 [00:24<00:16,  4.07s/it, ✓=1, ✖=1, error=2]Evaluation:  50%|█████     | 4/8 [00:38<00:16,  4.07s/it, ✓=1, ✖=1, error=3]Evaluation:  62%|██████▎   | 5/8 [00:38<00:22,  7.66s/it, ✓=1, ✖=1, error=3]Evaluation:  62%|██████▎   | 5/8 [00:41<00:22,  7.66s/it, ✓=1, ✖=2, error=3]Evaluation:  75%|███████▌  | 6/8 [00:41<00:11,  5.87s/it, ✓=1, ✖=2, error=3]Evaluation:  75%|███████▌  | 6/8 [00:47<00:11,  5.87s/it, ✓=1, ✖=3, error=3]Evaluation:  88%|████████▊ | 7/8 [00:47<00:05,  5.93s/it, ✓=1, ✖=3, error=3]Evaluation:  88%|████████▊ | 7/8 [00:49<00:05,  5.93s/it, ✓=2, ✖=3, error=3]Evaluation: 100%|██████████| 8/8 [00:49<00:00,  4.69s/it, ✓=2, ✖=3, error=3]Evaluation: 100%|██████████| 8/8 [00:49<00:00,  6.14s/it, ✓=2, ✖=3, error=3]
+pytest-dev__pytest-5692: >>>>> Patch Apply Failed:
+patching file src/_pytest/junitxml.py
+misordered hunks! output would be garbled
+Hunk #2 FAILED at 92.
+1 out of 2 hunks FAILED -- saving rejects to file src/_pytest/junitxml.py.rej
+
+Check (logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__smoke__final/rerun-2026-10__openai__baseline__rep1__smoke__final/pytest-dev__pytest-5692/run_instance.log) for more information.
+matplotlib__matplotlib-26011: >>>>> Patch Apply Failed:
+patching file lib/matplotlib/axes/_base.py
+Hunk #1 FAILED at 1017.
+1 out of 1 hunk FAILED -- saving rejects to file lib/matplotlib/axes/_base.py.rej
+
+Check (logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__smoke__final/rerun-2026-10__openai__baseline__rep1__smoke__final/matplotlib__matplotlib-26011/run_instance.log) for more information.
+scikit-learn__scikit-learn-13439: >>>>> Patch Apply Failed:
+patching file sklearn/pipeline.py
+Hunk #1 succeeded at 29 with fuzz 2 (offset 28 lines).
+patch: **** malformed patch at line 32:          return est
+
+
+Check (logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__smoke__final/rerun-2026-10__openai__baseline__rep1__smoke__final/scikit-learn__scikit-learn-13439/run_instance.log) for more information.
+All instances run.
+Cleaning cached images...
+Removed 0 images.
+Total instances: 8
+Instances submitted: 8
+Instances completed: 5
+Instances incomplete: 0
+Instances resolved: 2
+Instances unresolved: 3
+Instances with empty patches: 0
+Instances with errors: 3
+Unstopped containers: 0
+Unremoved images: 8
+Report written to rerun-2026-10__openai__baseline__rep1__smoke__final.rerun-2026-10__openai__baseline__rep1__smoke__final.json

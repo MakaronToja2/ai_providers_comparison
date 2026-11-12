@@ -1,0 +1,71 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 62631f7ff9..763bd855fc 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1449,6 +1449,66 @@ class ClassDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # type:
+         'class-doc-from': class_doc_from_option,
+     }
+ 
++    def get_inherited_members_to_skip(self) -> List[str]:
++        """
++        Return a list of base class names from which members should be skipped,
++        based on the 'inherited-members' option which can now be a comma-separated list.
++        """
++        inherited_option = self.options.get('inherited-members')
++        if not inherited_option:
++            return []
++        if isinstance(inherited_option, str):
++            # Split by comma and strip spaces
++            return [name.strip() for name in inherited_option.split(',')]
++        if isinstance(inherited_option, (list, tuple)):
++            return list(inherited_option)
++        return []
++    
++    def filter_inherited_members(self, members: List[str]) -> List[str]:
++        """
++        Filter out members inherited from base classes specified in the inherited-members option.
++        """
++        skip_bases = self.get_inherited_members_to_skip()
++        if not skip_bases:
++            return members
++
++        # Collect all base classes to skip
++        bases_to_skip = set()
++        for base in self.object.__mro__[1:]:
++            if base.__name__ in skip_bases:
++                bases_to_skip.add(base)
++
++        filtered_members = []
++        for member in members:
++            # Check if the member is defined in any of the bases to skip
++            skip = False
++            for base in bases_to_skip:
++                if hasattr(base, member):
++                    skip = True
++                    break
++            if not skip:
++                filtered_members.append(member)
++        return filtered_members
++
++    def get_object_members(self, want_all: bool) -> Tuple[bool, ObjectMembers]:
++        members = self.get_class_members()
++        if want_all:
++            # Filter members inherited from specified base classes
++            members = [m for m in members if m.__name__ in self.filter_inherited_members([m.__name__])]
++            return False, members
++        else:
++            memberlist = self.options.members or []
++            ret = []
++            for name in memberlist:
++                if name in [m.__name__ for m in members]:
++                    ret.append(next(m for m in members if m.__name__ == name))
++                else:
++                    logger.warning(__('missing attribute mentioned in :members: option: '
++                                      'class %s, attribute %s') %
++                                   (safe_getattr(self.object, '__name__', '???'), name),
++                                   type='autodoc')
++            return False, ret
++
+     _signature_class: Any = None
+     _signature_method_name: str = None
+ 

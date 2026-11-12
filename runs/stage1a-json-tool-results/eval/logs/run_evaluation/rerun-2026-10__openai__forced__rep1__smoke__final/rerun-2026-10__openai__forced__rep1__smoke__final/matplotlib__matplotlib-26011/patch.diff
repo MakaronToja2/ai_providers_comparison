@@ -1,0 +1,29 @@
+--- a/lib/matplotlib/axes/_base.py
++++ b/lib/matplotlib/axes/_base.py
+@@ -1200,2 +1200,12 @@
+-        x0, x1 = other.get_xlim()
+-        self.set_xlim(x0, x1, emit=False, auto=other.get_autoscalex_on())
++        x0, x1 = other.get_xlim()
++        # We call set_xlim with emit=True here to ensure that callbacks are triggered,
++        # but to avoid recursion, we temporarily disconnect the callbacks on the other axes.
++        # This ensures that all shared axes have their callbacks called exactly once.
++        def _safe_set_xlim(ax, left, right, auto):
++            # Temporarily disconnect callbacks to prevent recursion
++            cb_backup = ax.callbacks.callbacks.get('xlim_changed', {}).copy()
++            ax.callbacks.callbacks['xlim_changed'] = {}
++            ax.set_xlim(left, right, emit=True, auto=auto)
++            ax.callbacks.callbacks['xlim_changed'] = cb_backup
++
++        _safe_set_xlim(self, x0, x1, auto=other.get_autoscalex_on())
+@@ -1250,2 +1257,9 @@
+-        y0, y1 = other.get_ylim()
+-        self.set_ylim(y0, y1, emit=False, auto=other.get_autoscaley_on())
++        y0, y1 = other.get_ylim()
++        # Same logic as for x-axis: call set_ylim with emit=True but prevent recursion
++        def _safe_set_ylim(ax, bottom, top, auto):
++            cb_backup = ax.callbacks.callbacks.get('ylim_changed', {}).copy()
++            ax.callbacks.callbacks['ylim_changed'] = {}
++            ax.set_ylim(bottom, top, emit=True, auto=auto)
++            ax.callbacks.callbacks['ylim_changed'] = cb_backup
++
++        _safe_set_ylim(self, y0, y1, auto=other.get_autoscaley_on())

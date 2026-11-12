@@ -1,0 +1,52 @@
+diff --git a/django/db/models/query_utils.py b/django/db/models/query_utils.py
+index c2623f099f..e20b9084b6 100644
+--- a/django/db/models/query_utils.py
++++ b/django/db/models/query_utils.py
+@@ -38,7 +38,14 @@ class Q(tree.Node):
+     conditional = True
+ 
+     def __init__(self, *args, _connector=None, _negated=False, **kwargs):
+-        super().__init__(children=[*args, *sorted(kwargs.items())], connector=_connector, negated=_negated)
++        # Convert dict views and other non-pickleable iterables to lists
++        processed_kwargs = {}
++        for key, value in kwargs.items():
++            # Convert dict_keys, dict_values, dict_items to list
++            if type(value).__name__ in ('dict_keys', 'dict_values', 'dict_items'):
++                value = list(value)
++            processed_kwargs[key] = value
++        super().__init__(children=[*args, *sorted(processed_kwargs.items())], connector=_connector, negated=_negated)
+ 
+     def _combine(self, other, conn):
+         if not isinstance(other, Q):
+diff --git a/django/utils/tree.py b/django/utils/tree.py
+index 302cd37d5f..1aa1b01371 100644
+--- a/django/utils/tree.py
++++ b/django/utils/tree.py
+@@ -50,7 +50,26 @@ class Node:
+     def __deepcopy__(self, memodict):
+         obj = Node(connector=self.connector, negated=self.negated)
+         obj.__class__ = self.__class__
+-        obj.children = copy.deepcopy(self.children, memodict)
++        # Deepcopy children, converting non-pickleable iterables to lists
++        obj.children = []
++        for child in self.children:
++            if isinstance(child, tuple) and len(child) == 2:
++                # Handle (key, value) tuples from Q object children
++                key, value = child
++                # Convert non-pickleable iterables to lists
++                if hasattr(value, '__iter__') and not isinstance(value, (str, bytes, dict)):
++                    try:
++                        # Try to pickle to check if it's pickleable
++                        import pickle
++                        pickle.dumps(value)
++                        obj.children.append(copy.deepcopy(child, memodict))
++                    except (TypeError, pickle.PicklingError):
++                        # Convert to list if not pickleable
++                        obj.children.append((key, list(value)))
++                else:
++                    obj.children.append(copy.deepcopy(child, memodict))
++            else:
++                obj.children.append(copy.deepcopy(child, memodict))
+         return obj
+ 
+     def __len__(self):

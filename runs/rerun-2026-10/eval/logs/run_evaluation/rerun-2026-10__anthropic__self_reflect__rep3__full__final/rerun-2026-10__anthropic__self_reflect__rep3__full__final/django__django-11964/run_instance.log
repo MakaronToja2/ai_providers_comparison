@@ -1,0 +1,62 @@
+2026-10-10 19:48:55,187 - INFO - Creating container for django__django-11964...
+2026-10-10 19:49:01,516 - INFO - Container for django__django-11964 created: 39024078cacb8c2d3258a55ee6d80f6d5eddf59b2b3b23dd4c3b89ede66c69cf
+2026-10-10 19:49:04,678 - INFO - Container for django__django-11964 started: 39024078cacb8c2d3258a55ee6d80f6d5eddf59b2b3b23dd4c3b89ede66c69cf
+2026-10-10 19:49:04,678 - INFO - Intermediate patch for django__django-11964 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep3__full__final/rerun-2026-10__anthropic__self_reflect__rep3__full__final/django__django-11964/patch.diff, now applying to container...
+2026-10-10 19:49:04,788 - INFO - >>>>> Applied Patch:
+Checking patch django/db/models/fields/__init__.py...
+warning: django/db/models/fields/__init__.py has type 100755, expected 100644
+Applied patch django/db/models/fields/__init__.py cleanly.
+
+2026-10-10 19:49:05,359 - INFO - Git diff before:
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index d610dc86f0..fb2bed9f19 100755
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -2,6 +2,7 @@ import collections.abc
+ import copy
+ import datetime
+ import decimal
++import enum
+ import operator
+ import uuid
+ import warnings
+@@ -792,6 +793,8 @@ class Field(RegisterLookupMixin):
+         """Perform preliminary non-db specific value checks and conversions."""
+         if isinstance(value, Promise):
+             value = value._proxy____cast()
++        if isinstance(value, enum.Enum):
++            value = value.value
+         return value
+ 
+     def get_db_prep_value(self, value, connection, prepared=False):
+2026-10-10 19:49:05,359 - INFO - Eval script for django__django-11964 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep3__full__final/rerun-2026-10__anthropic__self_reflect__rep3__full__final/django__django-11964/eval.sh; copying to container...
+2026-10-10 19:49:10,857 - INFO - Test runtime: 5.43 seconds
+2026-10-10 19:49:10,858 - INFO - Test output for django__django-11964 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep3__full__final/rerun-2026-10__anthropic__self_reflect__rep3__full__final/django__django-11964/test_output.txt
+2026-10-10 19:49:10,915 - INFO - Git diff after:
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index d610dc86f0..fb2bed9f19 100755
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -2,6 +2,7 @@ import collections.abc
+ import copy
+ import datetime
+ import decimal
++import enum
+ import operator
+ import uuid
+ import warnings
+@@ -792,6 +793,8 @@ class Field(RegisterLookupMixin):
+         """Perform preliminary non-db specific value checks and conversions."""
+         if isinstance(value, Promise):
+             value = value._proxy____cast()
++        if isinstance(value, enum.Enum):
++            value = value.value
+         return value
+ 
+     def get_db_prep_value(self, value, connection, prepared=False):
+2026-10-10 19:49:10,915 - INFO - Grading answer for django__django-11964...
+2026-10-10 19:49:10,919 - INFO - report: {'django__django-11964': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_str (model_enums.tests.ChoicesTests)', 'test_textchoices (model_enums.tests.ChoicesTests)']}, 'PASS_TO_PASS': {'success': ['test_integerchoices (model_enums.tests.ChoicesTests)', 'test_integerchoices_auto_label (model_enums.tests.ChoicesTests)', 'test_integerchoices_containment (model_enums.tests.ChoicesTests)', 'test_integerchoices_empty_label (model_enums.tests.ChoicesTests)', 'test_integerchoices_functional_api (model_enums.tests.ChoicesTests)', 'test_invalid_definition (model_enums.tests.ChoicesTests)', 'test_textchoices_auto_label (model_enums.tests.ChoicesTests)', 'test_textchoices_blank_value (model_enums.tests.ChoicesTests)', 'test_textchoices_containment (model_enums.tests.ChoicesTests)', 'test_textchoices_empty_label (model_enums.tests.ChoicesTests)', 'test_textchoices_functional_api (model_enums.tests.ChoicesTests)', 'test_bool_unsupported (model_enums.tests.CustomChoicesTests)', 'test_labels_valid (model_enums.tests.CustomChoicesTests)', 'test_timezone_unsupported (model_enums.tests.CustomChoicesTests)', 'test_uuid_unsupported (model_enums.tests.CustomChoicesTests)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-11964: resolved: False
+2026-10-10 19:49:10,920 - INFO - Attempting to stop container sweb.eval.django__django-11964.rerun-2026-10__anthropic__self_reflect__rep3__full__final...
+2026-10-10 19:49:29,739 - INFO - Attempting to remove container sweb.eval.django__django-11964.rerun-2026-10__anthropic__self_reflect__rep3__full__final...
+2026-10-10 19:49:30,976 - INFO - Container sweb.eval.django__django-11964.rerun-2026-10__anthropic__self_reflect__rep3__full__final removed.

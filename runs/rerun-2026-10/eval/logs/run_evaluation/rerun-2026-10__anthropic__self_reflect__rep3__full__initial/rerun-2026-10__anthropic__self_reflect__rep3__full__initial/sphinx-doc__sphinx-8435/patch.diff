@@ -1,0 +1,28 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 171a3e7b0d..a3f99f6e15 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1716,7 +1716,10 @@ class DataDocumenter(ModuleLevelDocumenter):
+                 annotations = {}
+ 
+             if self.objpath[-1] in annotations:
+-                objrepr = stringify_typehint(annotations.get(self.objpath[-1]))
++                annotation = annotations.get(self.objpath[-1])
++                annotation = evaluate_signature(annotation, None,
++                                                self.config.autodoc_type_aliases)
++                objrepr = stringify_typehint(annotation)
+                 self.add_line('   :type: ' + objrepr, sourcename)
+             else:
+                 key = ('.'.join(self.objpath[:-1]), self.objpath[-1])
+@@ -2107,7 +2110,10 @@ class AttributeDocumenter(DocstringStripSignatureMixin, ClassLevelDocumenter):
+                 annotations = {}
+ 
+             if self.objpath[-1] in annotations:
+-                objrepr = stringify_typehint(annotations.get(self.objpath[-1]))
++                annotation = annotations.get(self.objpath[-1])
++                annotation = evaluate_signature(annotation, None,
++                                                self.config.autodoc_type_aliases)
++                objrepr = stringify_typehint(annotation)
+                 self.add_line('   :type: ' + objrepr, sourcename)
+             else:
+                 key = ('.'.join(self.objpath[:-1]), self.objpath[-1])

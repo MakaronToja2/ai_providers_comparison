@@ -1,0 +1,32 @@
+diff --git a/sympy/assumptions/refine.py b/sympy/assumptions/refine.py
+index e1f97190c0..83d5913444 100644
+--- a/sympy/assumptions/refine.py
++++ b/sympy/assumptions/refine.py
+@@ -272,6 +272,13 @@ def refine_re(expr, assumptions):
+         return arg
+     if ask(Q.imaginary(arg), assumptions):
+         return S.Zero
++    # Try to refine argument recursively if possible
++    from sympy.functions.elementary.complexes import arg as arg_func
++    if arg.func == arg_func:
++        refined_arg = refine(arg.args[0], assumptions)
++        if refined_arg != arg.args[0]:
++            from sympy import re
++            return re(refined_arg)
+     return _refine_reim(expr, assumptions)
+ 
+ 
+@@ -295,6 +302,13 @@ def refine_im(expr, assumptions):
+         return S.Zero
+     if ask(Q.imaginary(arg), assumptions):
+         return - S.ImaginaryUnit * arg
++    # Try to refine argument recursively if possible
++    from sympy.functions.elementary.complexes import arg as arg_func
++    if arg.func == arg_func:
++        refined_arg = refine(arg.args[0], assumptions)
++        if refined_arg != arg.args[0]:
++            from sympy import im
++            return im(refined_arg)
+     return _refine_reim(expr, assumptions)
+ 
+ 

@@ -1,0 +1,18 @@
+diff --git a/sklearn/decomposition/kernel_pca.py b/sklearn/decomposition/kernel_pca.py
+index bb91d0cbbad..dec5ff7c673 100644
+--- a/sklearn/decomposition/kernel_pca.py
++++ b/sklearn/decomposition/kernel_pca.py
+@@ -190,7 +190,12 @@ class KernelPCA(BaseEstimator, TransformerMixin, _UnstableOn32BitMixin):
+ 
+         # compute eigenvectors
+         if self.eigen_solver == 'auto':
+-            if K.shape[0] > 200 and n_components < 10:
++            # If n_components is specified and less than n_samples,
++            # prefer arpack for determinism with random_state.
++            if self.n_components is not None and self.n_components < K.shape[0]:
++                eigen_solver = 'arpack'
++            # Original condition for arpack, kept for backward compatibility/heuristics
++            elif K.shape[0] > 200 and self.n_components is not None and self.n_components < 10:
+                 eigen_solver = 'arpack'
+             else:
+                 eigen_solver = 'dense'

@@ -1,0 +1,14 @@
+diff --git a/sklearn/pipeline.py b/sklearn/pipeline.py
+index 7eaf9a46f09..7a689a15447 100644
+--- a/sklearn/pipeline.py
++++ b/sklearn/pipeline.py
+@@ -235,6 +235,9 @@ class Pipeline(_BaseComposition):
+ 
+     # Estimator interface
+ 
++    def __len__(self):
++        return len(self.steps)
++
+     def _fit(self, X, y=None, **fit_params):
+         # shallow copy of steps - this should really be steps_
+         self.steps = list(self.steps)

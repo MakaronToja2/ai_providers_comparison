@@ -1,0 +1,18 @@
+diff --git a/sympy/simplify/cse_main.py b/sympy/simplify/cse_main.py
+index d649dd02a9..f775538f06 100644
+--- a/sympy/simplify/cse_main.py
++++ b/sympy/simplify/cse_main.py
+@@ -672,8 +672,11 @@ def _rebuild(expr):
+                 raise ValueError("Symbols iterator ran out of symbols.")
+ 
+             if isinstance(orig_expr, MatrixExpr):
+-                sym = MatrixSymbol(sym.name, orig_expr.rows,
+-                    orig_expr.cols)
++                # Instead of creating a MatrixSymbol, create a Symbol for each element
++                # This prevents the strange behavior of indexing MatrixSymbols in CSE
++                # We return the Symbol itself here, and the matrix elements are handled
++                # in the preprocessing step that converts matrices to tuples of elements.
++                sym = Symbol(sym.name)
+ 
+             subs[orig_expr] = sym
+             replacements.append((sym, new_expr))

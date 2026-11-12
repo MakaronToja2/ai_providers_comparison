@@ -1,0 +1,27 @@
+diff --git a/astropy/modeling/separable.py b/astropy/modeling/separable.py
+index a308e27297..4e0cbd30ce 100644
+--- a/astropy/modeling/separable.py
++++ b/astropy/modeling/separable.py
+@@ -262,14 +262,20 @@ def _cdot(left, right):
+         Result from this operation.
+     """
+ 
++    # Swap left and right to keep consistent with operator order
+     left, right = right, left
+ 
+     def _n_inputs_outputs(input, position):
+         """
+-        Return ``n_inputs``, ``n_outputs`` for a model or coord_matrix.
++        Return the coordinate matrix for the input model or array.
+         """
+         if isinstance(input, Model):
+-            coords = _coord_matrix(input, position, input.n_outputs)
++            # If input is a compound model, recursively handle nested compound models
++            if isinstance(input, CompoundModel):
++                # Recursively get the coordinate matrix for the compound model
++                return separability_matrix(input)
++            else:
++                coords = _coord_matrix(input, position, input.n_outputs)
+         else:
+             coords = input
+         return coords

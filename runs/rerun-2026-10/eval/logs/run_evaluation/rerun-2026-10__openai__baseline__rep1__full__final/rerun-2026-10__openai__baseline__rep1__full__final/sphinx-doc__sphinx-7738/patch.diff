@@ -1,0 +1,23 @@
+diff --git a/sphinx/ext/napoleon/docstring.py b/sphinx/ext/napoleon/docstring.py
+index 11409e6f6b..df20a05a78 100644
+--- a/sphinx/ext/napoleon/docstring.py
++++ b/sphinx/ext/napoleon/docstring.py
+@@ -318,15 +318,9 @@ class GoogleDocstring:
+             return [line[min_indent:] for line in lines]
+ 
+     def _escape_args_and_kwargs(self, name: str) -> str:
+-        if name.endswith('_'):
+-            name = name[:-1] + r'\_'
+-
+-        if name[:2] == '**':
+-            return r'\*\*' + name[2:]
+-        elif name[:1] == '*':
+-            return r'\*' + name[1:]
+-        else:
+-            return name
++        # Only escape trailing underscore for argument names, not attribute names
++        # We disable escaping for attribute names to avoid overescaping trailing underscores
++        return name
+ 
+     def _fix_field_desc(self, desc: List[str]) -> List[str]:
+         if self._is_list(desc):

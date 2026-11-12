@@ -1,0 +1,35 @@
+diff --git a/django/core/checks/model_checks.py b/django/core/checks/model_checks.py
+index 5c2266ca1d..31d8297711 100644
+--- a/django/core/checks/model_checks.py
++++ b/django/core/checks/model_checks.py
+@@ -19,7 +19,14 @@ def check_all_models(app_configs=None, **kwargs):
+         models = chain.from_iterable(app_config.get_models() for app_config in app_configs)
+     for model in models:
+         if model._meta.managed and not model._meta.proxy:
+-            db_table_models[model._meta.db_table].append(model._meta.label)
++            # Use a key that includes the database alias to allow same table names on different databases
++            # The db_alias attribute is not standard on _meta, so fallback to 'default'
++            db_alias = getattr(model._meta, 'db_alias', None)
++            if db_alias is None:
++                # Try to get the database alias from the router for this model, fallback to 'default'
++                from django.db import router
++                db_alias = router.db_for_read(model, **kwargs) or 'default'
++            db_table_models[(db_alias, model._meta.db_table)].append(model._meta.label)
+         if not inspect.ismethod(model.check):
+             errors.append(
+                 Error(
+@@ -35,12 +42,12 @@ def check_all_models(app_configs=None, **kwargs):
+             indexes[model_index.name].append(model._meta.label)
+         for model_constraint in model._meta.constraints:
+             constraints[model_constraint.name].append(model._meta.label)
+-    for db_table, model_labels in db_table_models.items():
++    for (db_alias, db_table), model_labels in db_table_models.items():
+         if len(model_labels) != 1:
+             errors.append(
+                 Error(
+                     "db_table '%s' is used by multiple models: %s."
+-                    % (db_table, ', '.join(db_table_models[db_table])),
++                    % (db_table, ', '.join(model_labels)),
+                     obj=db_table,
+                     id='models.E028',
+                 )

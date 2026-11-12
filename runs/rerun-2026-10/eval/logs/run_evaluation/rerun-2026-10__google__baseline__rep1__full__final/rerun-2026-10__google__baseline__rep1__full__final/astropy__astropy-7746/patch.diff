@@ -1,0 +1,15 @@
+diff --git a/astropy/wcs/wcs.py b/astropy/wcs/wcs.py
+index d3a06f2b31..2592f8ba41 100644
+--- a/astropy/wcs/wcs.py
++++ b/astropy/wcs/wcs.py
+@@ -1212,6 +1212,10 @@ reduce these to 2 dimensions using the naxis kwarg.
+         """
+ 
+         def _return_list_of_arrays(axes, origin):
++            # Check if any of the input axes are empty. If so, return empty arrays.
++            if axes and all(isinstance(ax, (list, np.ndarray)) and len(ax) == 0 for ax in axes):
++                return [[] for _ in axes]
++
+             try:
+                 axes = np.broadcast_arrays(*axes)
+             except ValueError:

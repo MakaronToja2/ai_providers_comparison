@@ -1,0 +1,17 @@
+diff --git a/lib/matplotlib/style/core.py b/lib/matplotlib/style/core.py
+index fb0a5426e6..b0d8877628 100644
+--- a/lib/matplotlib/style/core.py
++++ b/lib/matplotlib/style/core.py
+@@ -137,7 +137,11 @@ def use(style):
+                     "correspond to the styles shipped by seaborn. However, "
+                     "they will remain available as 'seaborn-v0_8-<style>'. "
+                     "Alternatively, directly use the seaborn API instead.")
+-                s = s.replace("seaborn", "seaborn-v0_8")
++                # Fix to allow access to old seaborn style keys for compatibility
++                if s == "seaborn-colorblind":
++                    s = "seaborn-v0_8-colorblind"
++                else:
++                    s = s.replace("seaborn", "seaborn-v0_8")
+         return s
+ 
+     for style in map(fix_style, styles):

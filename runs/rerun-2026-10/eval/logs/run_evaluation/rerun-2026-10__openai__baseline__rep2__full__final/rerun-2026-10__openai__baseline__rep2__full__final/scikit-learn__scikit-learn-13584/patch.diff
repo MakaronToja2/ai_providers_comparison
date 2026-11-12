@@ -1,0 +1,20 @@
+diff --git a/sklearn/utils/_pprint.py b/sklearn/utils/_pprint.py
+index b8686dba5b0..0934cb0bfe0 100644
+--- a/sklearn/utils/_pprint.py
++++ b/sklearn/utils/_pprint.py
+@@ -177,6 +177,15 @@ class _EstimatorPrettyPrinter(pprint.PrettyPrinter):
+ 
+         if self._changed_only:
+             params = _changed_params(object)
++            # Fix for vector values in print_changed_only mode:
++            # Convert numpy arrays to lists to avoid ambiguous truth value error
++            for key, val in params.items():
++                try:
++                    import numpy as np
++                    if isinstance(val, np.ndarray):
++                        params[key] = val.tolist()
++                except ImportError:
++                    pass
+         else:
+             params = object.get_params(deep=False)
+ 

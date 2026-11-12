@@ -1,0 +1,34 @@
+diff --git a/src/_pytest/pathlib.py b/src/_pytest/pathlib.py
+index e43310ef0..6c1606f76 100644
+--- a/src/_pytest/pathlib.py
++++ b/src/_pytest/pathlib.py
+@@ -638,19 +638,16 @@ def insert_missing_modules(modules: Dict[str, ModuleType], module_name: str) ->
+     child_name: str = ""
+     while module_name:
+         if module_name not in modules:
+-            try:
+-                # If sys.meta_path is empty, calling import_module will issue
+-                # a warning and raise ModuleNotFoundError. To avoid the
+-                # warning, we check sys.meta_path explicitly and raise the error
+-                # ourselves to fall back to creating a dummy module.
+-                if not sys.meta_path:
+-                    raise ModuleNotFoundError
+-                module = importlib.import_module(module_name)
+-            except ModuleNotFoundError:
+-                module = ModuleType(
+-                    module_name,
+-                    doc="Empty module created by pytest's importmode=importlib.",
+-                )
++            # Always create a new empty module for intermediate packages.
++            # This ensures we don't accidentally use a module with the same name
++            # from a different location, which would cause the module to be
++            # imported twice (once from the intended location and once from
++            # sys.modules).
++            module = ModuleType(
++                module_name,
++                doc="Empty module created by pytest's importmode=importlib.",
++            )
++            modules[module_name] = module
+         else:
+             module = modules[module_name]
+         if child_module:

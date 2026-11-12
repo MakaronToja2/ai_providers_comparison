@@ -1,0 +1,22 @@
+diff --git a/seaborn/axisgrid.py b/seaborn/axisgrid.py
+index 75349099..920c2178 100644
+--- a/seaborn/axisgrid.py
++++ b/seaborn/axisgrid.py
+@@ -1657,14 +1657,14 @@ class PairGrid(Grid):
+     def _add_axis_labels(self):
+         """Add labels to the left and bottom Axes."""
+         for ax, label in zip(self.axes[-1, :], self.x_vars):
+-            ax.set_xlabel(label)
++            ax.set_xlabel(str(label))
+         for ax, label in zip(self.axes[:, 0], self.y_vars):
+-            ax.set_ylabel(label)
++            ax.set_ylabel(str(label))
+ 
+     def _find_numeric_cols(self, data):
+         """Find which variables in a DataFrame are numeric."""
+         numeric_cols = []
+-        for col in data:
++        for col in data.columns:
+             if variable_type(data[col]) == "numeric":
+                 numeric_cols.append(col)
+         return numeric_cols

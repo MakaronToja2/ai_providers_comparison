@@ -1,0 +1,33 @@
+diff --git a/django/db/models/query.py b/django/db/models/query.py
+index 5ac2407ea3..1623f01a65 100644
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -1847,13 +1847,21 @@ class QuerySet(AltersData):
+                     )
+                 )
+             else:
+-                self._insert(
+-                    item,
+-                    fields=fields,
+-                    using=self.db,
+-                    on_conflict=on_conflict,
+-                    update_fields=update_fields,
+-                    unique_fields=unique_fields,
++                # For update_conflicts, we can return the IDs since the row is updated.
++                # For ignore_conflicts, we cannot return IDs since the row might be ignored.
++                returning_fields = None
++                if on_conflict == OnConflict.UPDATE:
++                    returning_fields = self.model._meta.db_returning_fields
++                inserted_rows.extend(
++                    self._insert(
++                        item,
++                        fields=fields,
++                        using=self.db,
++                        on_conflict=on_conflict,
++                        update_fields=update_fields,
++                        unique_fields=unique_fields,
++                        returning_fields=returning_fields,
++                    )
+                 )
+         return inserted_rows
+ 

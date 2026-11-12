@@ -1,0 +1,38 @@
+diff --git a/django/db/models/query_utils.py b/django/db/models/query_utils.py
+index c2623f099f..0828d9157e 100644
+--- a/django/db/models/query_utils.py
++++ b/django/db/models/query_utils.py
+@@ -46,10 +46,10 @@ class Q(tree.Node):
+ 
+         # If the other Q() is empty, ignore it and just use `self`.
+         if not other:
+-            return copy.deepcopy(self)
++            return self._clone()
+         # Or if this Q is empty, ignore it and just use `other`.
+         elif not self:
+-            return copy.deepcopy(other)
++            return other._clone()
+ 
+         obj = type(self)()
+         obj.connector = conn
+@@ -57,6 +57,20 @@ class Q(tree.Node):
+         obj.add(other, conn)
+         return obj
+ 
++    def _clone(self):
++        """
++        Create a deep copy of this Q object without using copy.deepcopy().
++        This avoids issues with non-pickleable objects in the children.
++        """
++        obj = type(self)()
++        obj.connector = self.connector
++        obj.negated = self.negated
++        obj.children = [
++            child._clone() if isinstance(child, Q) else child
++            for child in self.children
++        ]
++        return obj
++
+     def __or__(self, other):
+         return self._combine(other, self.OR)
+ 

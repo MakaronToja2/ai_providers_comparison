@@ -1,0 +1,28 @@
+diff --git a/django/test/testcases.py b/django/test/testcases.py
+index 23459f22cd..8bfcc42b22 100644
+--- a/django/test/testcases.py
++++ b/django/test/testcases.py
+@@ -1059,7 +1059,22 @@ def connections_support_transactions(aliases=None):
+     transactions.
+     """
+     conns = connections.all() if aliases is None else (connections[alias] for alias in aliases)
+-    return all(conn.features.supports_transactions for conn in conns)
++    conns = list(conns)
++    if not all(conn.features.supports_transactions for conn in conns):
++        return False
++    
++    # SQLite with persistent databases (TEST['NAME'] is set) doesn't handle
++    # concurrent transactions well, so we should not use atomic blocks
++    for conn in conns:
++        if conn.vendor == 'sqlite':
++            # Check if this is a persistent database (not in-memory)
++            test_settings = conn.settings_dict.get('TEST', {})
++            test_name = test_settings.get('NAME')
++            if test_name:
++                # Persistent database - don't use transactions
++                return False
++    
++    return True
+ 
+ 
+ class TestCase(TransactionTestCase):

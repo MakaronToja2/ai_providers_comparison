@@ -1,0 +1,13 @@
+diff --git a/lib/matplotlib/style/core.py b/lib/matplotlib/style/core.py
+index fb0a5426e6..b9f752d422 100644
+--- a/lib/matplotlib/style/core.py
++++ b/lib/matplotlib/style/core.py
+@@ -137,6 +137,8 @@ def use(style):
+                     "correspond to the styles shipped by seaborn. However, "
+                     "they will remain available as 'seaborn-v0_8-<style>'. "
+                     "Alternatively, directly use the seaborn API instead.")
++                # The following line is a temporary workaround for the deprecation.
++                # The styles will be removed in a future version.
+                 s = s.replace("seaborn", "seaborn-v0_8")
+         return s
+ 

@@ -1,0 +1,42 @@
+diff --git a/lib/matplotlib/offsetbox.py b/lib/matplotlib/offsetbox.py
+index 77768e7383..466f689262 100644
+--- a/lib/matplotlib/offsetbox.py
++++ b/lib/matplotlib/offsetbox.py
+@@ -1508,7 +1508,15 @@ class DraggableBase:
+         ]
+ 
+     # A property, not an attribute, to maintain picklability.
+-    canvas = property(lambda self: self.ref_artist.figure.canvas)
++    @property
++    def canvas(self):
++        # Defensive check: ref_artist or figure might be None
++        if self.ref_artist is None:
++            return None
++        fig = getattr(self.ref_artist, "figure", None)
++        if fig is None:
++            return None
++        return fig.canvas
+ 
+     def on_motion(self, evt):
+         if self._check_still_parented() and self.got_artist:
+@@ -1558,14 +1566,18 @@ class DraggableBase:
+ 
+     def disconnect(self):
+         """Disconnect the callbacks."""
++        # Defensive: check if canvas is None before disconnecting
++        canvas = self.canvas
++        if canvas is None:
++            return
+         for cid in self.cids:
+-            self.canvas.mpl_disconnect(cid)
++            canvas.mpl_disconnect(cid)
+         try:
+             c1 = self._c1
+         except AttributeError:
+             pass
+         else:
+-            self.canvas.mpl_disconnect(c1)
++            canvas.mpl_disconnect(c1)
+ 
+     def save_offset(self):
+         pass

@@ -1,0 +1,44 @@
+2026-10-10 18:25:04,982 - INFO - Creating container for sympy__sympy-13043...
+2026-10-10 18:25:13,080 - INFO - Container for sympy__sympy-13043 created: 29b0130db410c0d97e3fbef2fafedc34e19b650cd5e1afe6d7f2646c938ee590
+2026-10-10 18:25:22,060 - INFO - Container for sympy__sympy-13043 started: 29b0130db410c0d97e3fbef2fafedc34e19b650cd5e1afe6d7f2646c938ee590
+2026-10-10 18:25:22,061 - INFO - Intermediate patch for sympy__sympy-13043 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep1__full__final/rerun-2026-10__openai__forced__rep1__full__final/sympy__sympy-13043/patch.diff, now applying to container...
+2026-10-10 18:25:22,160 - INFO - >>>>> Applied Patch:
+Checking patch sympy/integrals/intpoly.py...
+warning: sympy/integrals/intpoly.py has type 100755, expected 100644
+Applied patch sympy/integrals/intpoly.py cleanly.
+
+2026-10-10 18:25:22,339 - INFO - Git diff before:
+diff --git a/sympy/integrals/intpoly.py b/sympy/integrals/intpoly.py
+index fc72bd206..948e522c7 100755
+--- a/sympy/integrals/intpoly.py
++++ b/sympy/integrals/intpoly.py
+@@ -593,7 +593,8 @@ def decompose(expr, separate=False):
+         poly_dict[0] = expr
+ 
+     if separate:
+-        return list(poly_dict.values())
++        # Return values sorted by their degree keys for consistent order
++        return [poly_dict[k] for k in sorted(poly_dict.keys())]
+     return poly_dict
+2026-10-10 18:25:22,339 - INFO - Eval script for sympy__sympy-13043 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep1__full__final/rerun-2026-10__openai__forced__rep1__full__final/sympy__sympy-13043/eval.sh; copying to container...
+2026-10-10 18:25:26,270 - INFO - Test runtime: 3.88 seconds
+2026-10-10 18:25:26,271 - INFO - Test output for sympy__sympy-13043 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep1__full__final/rerun-2026-10__openai__forced__rep1__full__final/sympy__sympy-13043/test_output.txt
+2026-10-10 18:25:26,340 - INFO - Git diff after:
+diff --git a/sympy/integrals/intpoly.py b/sympy/integrals/intpoly.py
+index fc72bd206..948e522c7 100755
+--- a/sympy/integrals/intpoly.py
++++ b/sympy/integrals/intpoly.py
+@@ -593,7 +593,8 @@ def decompose(expr, separate=False):
+         poly_dict[0] = expr
+ 
+     if separate:
+-        return list(poly_dict.values())
++        # Return values sorted by their degree keys for consistent order
++        return [poly_dict[k] for k in sorted(poly_dict.keys())]
+     return poly_dict
+2026-10-10 18:25:26,341 - INFO - Grading answer for sympy__sympy-13043...
+2026-10-10 18:25:26,348 - INFO - report: {'sympy__sympy-13043': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_decompose']}, 'PASS_TO_PASS': {'success': ['test_best_origin'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-13043: resolved: False
+2026-10-10 18:25:26,349 - INFO - Attempting to stop container sweb.eval.sympy__sympy-13043.rerun-2026-10__openai__forced__rep1__full__final...
+2026-10-10 18:25:48,441 - INFO - Attempting to remove container sweb.eval.sympy__sympy-13043.rerun-2026-10__openai__forced__rep1__full__final...
+2026-10-10 18:25:56,636 - INFO - Container sweb.eval.sympy__sympy-13043.rerun-2026-10__openai__forced__rep1__full__final removed.

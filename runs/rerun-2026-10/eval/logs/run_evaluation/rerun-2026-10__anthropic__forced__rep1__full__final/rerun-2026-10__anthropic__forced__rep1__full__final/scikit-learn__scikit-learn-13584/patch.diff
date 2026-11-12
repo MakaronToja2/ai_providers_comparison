@@ -1,0 +1,37 @@
+diff --git a/sklearn/utils/_pprint.py b/sklearn/utils/_pprint.py
+index b8686dba5b0..cf1816aa180 100644
+--- a/sklearn/utils/_pprint.py
++++ b/sklearn/utils/_pprint.py
+@@ -67,6 +67,8 @@ from inspect import signature
+ import pprint
+ from collections import OrderedDict
+ 
++import numpy as np
++
+ from ..base import BaseEstimator
+ from .._config import get_config
+ from . import is_scalar_nan
+@@ -95,8 +97,21 @@ def _changed_params(estimator):
+     init_params = signature(init_func).parameters
+     init_params = {name: param.default for name, param in init_params.items()}
+     for k, v in params.items():
+-        if (v != init_params[k] and
+-                not (is_scalar_nan(init_params[k]) and is_scalar_nan(v))):
++        # Use a safe comparison that handles numpy arrays
++        init_value = init_params[k]
++        # Check if values are equal, handling numpy arrays
++        try:
++            # Try numpy array comparison first
++            if isinstance(v, np.ndarray) or isinstance(init_value, np.ndarray):
++                values_equal = np.array_equal(v, init_value)
++            else:
++                values_equal = v == init_value
++        except (ValueError, TypeError):
++            # Fallback for cases where comparison fails
++            values_equal = False
++        
++        if (not values_equal and
++                not (is_scalar_nan(init_value) and is_scalar_nan(v))):
+             filtered_params[k] = v
+     return filtered_params
+ 

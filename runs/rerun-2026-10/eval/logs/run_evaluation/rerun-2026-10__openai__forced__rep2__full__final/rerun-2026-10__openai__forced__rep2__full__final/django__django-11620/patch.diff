@@ -1,0 +1,43 @@
+diff --git a/django/urls/converters.py b/django/urls/converters.py
+index bb8478e32f..fe705919e1 100644
+--- a/django/urls/converters.py
++++ b/django/urls/converters.py
+@@ -6,7 +6,12 @@ class IntConverter:
+     regex = '[0-9]+'
+ 
+     def to_python(self, value):
+-        return int(value)
++        try:
++            return int(value)
++        except ValueError:
++            from django.http import Http404
++            # Raise Http404 to indicate no match for this converter
++            raise Http404(f"Value {value} is not a valid integer")
+ 
+     def to_url(self, value):
+         return str(value)
+@@ -16,6 +21,10 @@ class StringConverter:
+     regex = '[^/]+'
+ 
+     def to_python(self, value):
++        # Accept Http404 to indicate no match for this converter
++        from django.http import Http404
++        if isinstance(value, Http404):
++            raise value
+         return value
+ 
+     def to_url(self, value):
+@@ -26,7 +35,12 @@ class UUIDConverter:
+     regex = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+ 
+     def to_python(self, value):
+-        return uuid.UUID(value)
++        try:
++            return uuid.UUID(value)
++        except ValueError:
++            from django.http import Http404
++            # Raise Http404 to indicate no match for this converter
++            raise Http404(f"Value {value} is not a valid UUID")
+ 
+     def to_url(self, value):
+         return str(value)

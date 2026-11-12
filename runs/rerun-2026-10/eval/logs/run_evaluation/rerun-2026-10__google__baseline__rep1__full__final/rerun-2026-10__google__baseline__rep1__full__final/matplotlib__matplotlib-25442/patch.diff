@@ -1,0 +1,30 @@
+diff --git a/lib/matplotlib/offsetbox.py b/lib/matplotlib/offsetbox.py
+index 77768e7383..e0e313a1cd 100644
+--- a/lib/matplotlib/offsetbox.py
++++ b/lib/matplotlib/offsetbox.py
+@@ -1558,14 +1558,17 @@ class DraggableBase:
+ 
+     def disconnect(self):
+         """Disconnect the callbacks."""
+-        for cid in self.cids:
+-            self.canvas.mpl_disconnect(cid)
+-        try:
+-            c1 = self._c1
+-        except AttributeError:
+-            pass
+-        else:
+-            self.canvas.mpl_disconnect(c1)
++        # Check if ref_artist and its figure still exist before accessing canvas
++        if self.ref_artist and self.ref_artist.figure:
++            for cid in self.cids:
++                self.canvas.mpl_disconnect(cid)
++            try:
++                c1 = self._c1
++            except AttributeError:
++                pass
++            else:
++                self.canvas.mpl_disconnect(c1)
++        # else: the artist or figure has already been removed, so no need to disconnect
+ 
+     def save_offset(self):
+         pass

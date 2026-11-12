@@ -1,0 +1,17 @@
+diff --git a/sklearn/mixture/base.py b/sklearn/mixture/base.py
+index bd34333c063..cc765b0912d 100644
+--- a/sklearn/mixture/base.py
++++ b/sklearn/mixture/base.py
+@@ -269,6 +269,12 @@ class BaseMixture(DensityMixin, BaseEstimator, metaclass=ABCMeta):
+                           'or check for degenerate data.'
+                           % (init + 1), ConvergenceWarning)
+ 
++        # Set the best found parameters
++        self._set_parameters(best_params)
++        self.n_iter_ = best_n_iter
++
++        return log_resp.argmax(axis=1)
++
+         self._set_parameters(best_params)
+         self.n_iter_ = best_n_iter
+         self.lower_bound_ = max_lower_bound

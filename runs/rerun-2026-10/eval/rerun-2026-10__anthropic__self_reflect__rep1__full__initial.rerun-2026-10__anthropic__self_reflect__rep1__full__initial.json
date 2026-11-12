@@ -1,0 +1,55 @@
+{
+    "total_instances": 3,
+    "submitted_instances": 28,
+    "completed_instances": 3,
+    "resolved_instances": 2,
+    "unresolved_instances": 1,
+    "empty_patch_instances": 0,
+    "error_instances": 0,
+    "completed_ids": [
+        "sympy__sympy-21055",
+        "sympy__sympy-22714",
+        "sympy__sympy-22840"
+    ],
+    "incomplete_ids": [],
+    "empty_patch_ids": [],
+    "submitted_ids": [
+        "astropy__astropy-7746",
+        "django__django-10924",
+        "django__django-12113",
+        "django__django-13220",
+        "django__django-14016",
+        "django__django-14997",
+        "django__django-15252",
+        "matplotlib__matplotlib-23476",
+        "matplotlib__matplotlib-24149",
+        "matplotlib__matplotlib-24265",
+        "matplotlib__matplotlib-25433",
+        "matplotlib__matplotlib-26020",
+        "mwaskom__seaborn-3407",
+        "pallets__flask-5063",
+        "pylint-dev__pylint-7114",
+        "pylint-dev__pylint-7993",
+        "pytest-dev__pytest-11148",
+        "pytest-dev__pytest-7373",
+        "scikit-learn__scikit-learn-13496",
+        "scikit-learn__scikit-learn-14894",
+        "sphinx-doc__sphinx-10325",
+        "sphinx-doc__sphinx-7738",
+        "sympy__sympy-11400",
+        "sympy__sympy-14396",
+        "sympy__sympy-17630",
+        "sympy__sympy-21055",
+        "sympy__sympy-22714",
+        "sympy__sympy-22840"
+    ],
+    "resolved_ids": [
+        "sympy__sympy-21055",
+        "sympy__sympy-22714"
+    ],
+    "unresolved_ids": [
+        "sympy__sympy-22840"
+    ],
+    "error_ids": [],
+    "schema_version": 2
+}

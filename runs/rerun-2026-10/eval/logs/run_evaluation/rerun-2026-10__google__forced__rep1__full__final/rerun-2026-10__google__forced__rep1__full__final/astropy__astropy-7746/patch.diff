@@ -1,0 +1,17 @@
+diff --git a/astropy/wcs/wcs.py b/astropy/wcs/wcs.py
+index d3a06f2b31..ecdf34824d 100644
+--- a/astropy/wcs/wcs.py
++++ b/astropy/wcs/wcs.py
+@@ -1227,6 +1227,12 @@ reduce these to 2 dimensions using the naxis kwarg.
+                 output = self._normalize_sky(output)
+                 return (output[:, 0].reshape(axes[0].shape),
+                         output[:, 1].reshape(axes[0].shape))
++            if xy.size == 0:
++                # If input is empty, return empty arrays with the correct shape
++                # The shape of the output arrays should match the shape of the input arrays
++                # which are broadcasted to axes[0].shape. The number of output arrays
++                # should match the number of axes (self.naxis).
++                return [np.empty(axes[0].shape, dtype=axes[0].dtype) for _ in range(self.naxis)]
+             return [output[:, i].reshape(axes[0].shape)
+                     for i in range(output.shape[1])]
+ 

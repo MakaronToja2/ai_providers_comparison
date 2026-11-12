@@ -1,0 +1,54 @@
+2026-10-10 12:58:05,549 - INFO - Creating container for django__django-13933...
+2026-10-10 12:58:05,925 - INFO - Container for django__django-13933 created: 19d64510b3575e63f2d5cf0d2aa412da74e41fc2283990e88f9a95cb509eda46
+2026-10-10 12:58:06,194 - INFO - Container for django__django-13933 started: 19d64510b3575e63f2d5cf0d2aa412da74e41fc2283990e88f9a95cb509eda46
+2026-10-10 12:58:06,195 - INFO - Intermediate patch for django__django-13933 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep2__full__final/rerun-2026-10__openai__self_reflect__rep2__full__final/django__django-13933/patch.diff, now applying to container...
+2026-10-10 12:58:06,356 - INFO - >>>>> Applied Patch:
+Checking patch django/forms/models.py...
+warning: django/forms/models.py has type 100755, expected 100644
+Applied patch django/forms/models.py cleanly.
+
+2026-10-10 12:58:07,116 - INFO - Git diff before:
+diff --git a/django/forms/models.py b/django/forms/models.py
+index 422bc5d178..a88c384841 100755
+--- a/django/forms/models.py
++++ b/django/forms/models.py
+@@ -1284,7 +1284,11 @@ class ModelChoiceField(ChoiceField):
+                 value = getattr(value, key)
+             value = self.queryset.get(**{key: value})
+         except (ValueError, TypeError, self.queryset.model.DoesNotExist):
+-            raise ValidationError(self.error_messages['invalid_choice'], code='invalid_choice')
++            raise ValidationError(
++                self.error_messages['invalid_choice'],
++                code='invalid_choice',
++                params={'value': value},
++            )
+         return value
+ 
+     def validate(self, value):
+2026-10-10 12:58:07,116 - INFO - Eval script for django__django-13933 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep2__full__final/rerun-2026-10__openai__self_reflect__rep2__full__final/django__django-13933/eval.sh; copying to container...
+2026-10-10 12:58:12,093 - INFO - Test runtime: 4.89 seconds
+2026-10-10 12:58:12,096 - INFO - Test output for django__django-13933 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep2__full__final/rerun-2026-10__openai__self_reflect__rep2__full__final/django__django-13933/test_output.txt
+2026-10-10 12:58:12,195 - INFO - Git diff after:
+diff --git a/django/forms/models.py b/django/forms/models.py
+index 422bc5d178..a88c384841 100755
+--- a/django/forms/models.py
++++ b/django/forms/models.py
+@@ -1284,7 +1284,11 @@ class ModelChoiceField(ChoiceField):
+                 value = getattr(value, key)
+             value = self.queryset.get(**{key: value})
+         except (ValueError, TypeError, self.queryset.model.DoesNotExist):
+-            raise ValidationError(self.error_messages['invalid_choice'], code='invalid_choice')
++            raise ValidationError(
++                self.error_messages['invalid_choice'],
++                code='invalid_choice',
++                params={'value': value},
++            )
+         return value
+ 
+     def validate(self, value):
+2026-10-10 12:58:12,195 - INFO - Grading answer for django__django-13933...
+2026-10-10 12:58:12,204 - INFO - report: {'django__django-13933': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_modelchoicefield_value_placeholder (forms_tests.tests.test_error_messages.ModelChoiceFieldErrorMessagesTestCase)'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_modelchoicefield (forms_tests.tests.test_error_messages.ModelChoiceFieldErrorMessagesTestCase)', 'test_booleanfield (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)', 'test_charfield (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)', 'test_choicefield (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)', 'test_datefield (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)', 'test_datetimefield (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)', 'test_decimalfield (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)', 'test_emailfield (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)', 'test_error_messages_escaping (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)', 'test_filefield (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)', 'test_floatfield (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)', 'test_generic_ipaddressfield (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)', 'test_integerfield (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)', 'test_multiplechoicefield (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)', 'test_regexfield (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)', 'test_splitdatetimefield (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)', 'test_subclassing_errorlist (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)', 'test_timefield (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)', 'test_urlfield (forms_tests.tests.test_error_messages.FormsErrorMessagesTestCase)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-13933: resolved: True
+2026-10-10 12:58:12,204 - INFO - Attempting to stop container sweb.eval.django__django-13933.rerun-2026-10__openai__self_reflect__rep2__full__final...
+2026-10-10 12:58:30,500 - INFO - Attempting to remove container sweb.eval.django__django-13933.rerun-2026-10__openai__self_reflect__rep2__full__final...
+2026-10-10 12:58:30,558 - INFO - Container sweb.eval.django__django-13933.rerun-2026-10__openai__self_reflect__rep2__full__final removed.

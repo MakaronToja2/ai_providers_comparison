@@ -1,0 +1,53 @@
+diff --git a/django/db/backends/sqlite3/schema.py b/django/db/backends/sqlite3/schema.py
+index f0c81c123b..82e8d434a9 100644
+--- a/django/db/backends/sqlite3/schema.py
++++ b/django/db/backends/sqlite3/schema.py
+@@ -427,7 +427,23 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         ):
+             super().add_constraint(model, constraint)
+         else:
+-            self._remake_table(model)
++            # SQLite does not support unique constraints with expressions in index
++            # expressions during table remaking, so remove expressions from constraint
++            # temporarily to avoid the "." operator error.
++            if constraint.contains_expressions:
++                # Create a copy of the model meta with constraints excluding the problematic UniqueConstraint
++                original_constraints = model._meta.constraints
++                filtered_constraints = [
++                    c for c in original_constraints
++                    if not (isinstance(c, UniqueConstraint) and c.name == constraint.name)
++                ]
++                model._meta.constraints = filtered_constraints
++                try:
++                    self._remake_table(model)
++                finally:
++                    model._meta.constraints = original_constraints
++            else:
++                self._remake_table(model)
+ 
+     def remove_constraint(self, model, constraint):
+         if isinstance(constraint, UniqueConstraint) and (
+@@ -438,7 +454,22 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         ):
+             super().remove_constraint(model, constraint)
+         else:
+-            self._remake_table(model)
++            # SQLite does not support unique constraints with expressions in index
++            # expressions during table remaking, so remove expressions from constraint
++            # temporarily to avoid the "." operator error.
++            if constraint.contains_expressions:
++                original_constraints = model._meta.constraints
++                filtered_constraints = [
++                    c for c in original_constraints
++                    if not (isinstance(c, UniqueConstraint) and c.name == constraint.name)
++                ]
++                model._meta.constraints = filtered_constraints
++                try:
++                    self._remake_table(model)
++                finally:
++                    model._meta.constraints = original_constraints
++            else:
++                self._remake_table(model)
+ 
+     def _collate_sql(self, collation):
+         return 'COLLATE ' + collation

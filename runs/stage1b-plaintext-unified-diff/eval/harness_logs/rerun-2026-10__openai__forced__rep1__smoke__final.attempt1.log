@@ -1,0 +1,49 @@
+<frozen runpy>:128: RuntimeWarning: 'swebench.harness.run_evaluation' found in sys.modules after import of package 'swebench.harness', but prior to execution of 'swebench.harness.run_evaluation'; this may result in unpredictable behaviour
+Found 8 existing instance images. Will reuse them.
+Running 8 instances...
+Evaluation:   0%|          | 0/8 [00:00<?, ?it/s, error=0, ✓=0, ✖=0]Evaluation:   0%|          | 0/8 [00:19<?, ?it/s, ✓=0, ✖=0, error=1]Evaluation:  12%|█▎        | 1/8 [00:19<02:15, 19.29s/it, ✓=0, ✖=0, error=1]Evaluation:  12%|█▎        | 1/8 [00:19<02:15, 19.29s/it, ✓=0, ✖=0, error=2]Evaluation:  25%|██▌       | 2/8 [00:19<00:48,  8.05s/it, ✓=0, ✖=0, error=2]Evaluation:  25%|██▌       | 2/8 [00:19<00:48,  8.05s/it, ✓=0, ✖=0, error=3]Evaluation:  38%|███▊      | 3/8 [00:25<00:40,  8.05s/it, ✓=0, ✖=1, error=3]Evaluation:  50%|█████     | 4/8 [00:25<00:19,  4.79s/it, ✓=0, ✖=1, error=3]Evaluation:  50%|█████     | 4/8 [00:35<00:19,  4.79s/it, ✓=0, ✖=1, error=4]Evaluation:  62%|██████▎   | 5/8 [00:35<00:19,  6.41s/it, ✓=0, ✖=1, error=4]Evaluation:  62%|██████▎   | 5/8 [00:35<00:19,  6.41s/it, ✓=0, ✖=1, error=5]Evaluation:  75%|███████▌  | 6/8 [00:35<00:09,  4.54s/it, ✓=0, ✖=1, error=5]Evaluation:  75%|███████▌  | 6/8 [00:40<00:09,  4.54s/it, ✓=1, ✖=1, error=5]Evaluation:  88%|████████▊ | 7/8 [00:40<00:04,  4.74s/it, ✓=1, ✖=1, error=5]Evaluation:  88%|████████▊ | 7/8 [00:40<00:04,  4.74s/it, ✓=1, ✖=1, error=6]Evaluation: 100%|██████████| 8/8 [00:40<00:00,  3.38s/it, ✓=1, ✖=1, error=6]Evaluation: 100%|██████████| 8/8 [00:40<00:00,  5.12s/it, ✓=1, ✖=1, error=6]
+django__django-13448: >>>>> Patch Apply Failed:
+patch: **** Only garbage was found in the patch input.
+
+Check (logs/run_evaluation/rerun-2026-10__openai__forced__rep1__smoke__final/rerun-2026-10__openai__forced__rep1__smoke__final/django__django-13448/run_instance.log) for more information.
+matplotlib__matplotlib-26011: >>>>> Patch Apply Failed:
+patching file lib/matplotlib/axes/_base.py
+Hunk #1 FAILED at 3568.
+1 out of 1 hunk FAILED -- saving rejects to file lib/matplotlib/axes/_base.py.rej
+
+Check (logs/run_evaluation/rerun-2026-10__openai__forced__rep1__smoke__final/rerun-2026-10__openai__forced__rep1__smoke__final/matplotlib__matplotlib-26011/run_instance.log) for more information.
+django__django-15347: >>>>> Patch Apply Failed:
+patch: **** Only garbage was found in the patch input.
+
+Check (logs/run_evaluation/rerun-2026-10__openai__forced__rep1__smoke__final/rerun-2026-10__openai__forced__rep1__smoke__final/django__django-15347/run_instance.log) for more information.
+scikit-learn__scikit-learn-13439: >>>>> Patch Apply Failed:
+patching file sklearn/pipeline.py
+Hunk #1 FAILED at 230.
+1 out of 1 hunk FAILED -- saving rejects to file sklearn/pipeline.py.rej
+
+Check (logs/run_evaluation/rerun-2026-10__openai__forced__rep1__smoke__final/rerun-2026-10__openai__forced__rep1__smoke__final/scikit-learn__scikit-learn-13439/run_instance.log) for more information.
+sphinx-doc__sphinx-7975: >>>>> Patch Apply Failed:
+patching file sphinx/writers/html.py
+Hunk #1 FAILED at 1200.
+Hunk #2 FAILED at 1215.
+2 out of 2 hunks FAILED -- saving rejects to file sphinx/writers/html.py.rej
+
+Check (logs/run_evaluation/rerun-2026-10__openai__forced__rep1__smoke__final/rerun-2026-10__openai__forced__rep1__smoke__final/sphinx-doc__sphinx-7975/run_instance.log) for more information.
+sympy__sympy-19007: >>>>> Patch Apply Failed:
+patch: **** Only garbage was found in the patch input.
+
+Check (logs/run_evaluation/rerun-2026-10__openai__forced__rep1__smoke__final/rerun-2026-10__openai__forced__rep1__smoke__final/sympy__sympy-19007/run_instance.log) for more information.
+All instances run.
+Cleaning cached images...
+Removed 0 images.
+Total instances: 8
+Instances submitted: 8
+Instances completed: 2
+Instances incomplete: 0
+Instances resolved: 1
+Instances unresolved: 1
+Instances with empty patches: 0
+Instances with errors: 6
+Unstopped containers: 0
+Unremoved images: 8
+Report written to rerun-2026-10__openai__forced__rep1__smoke__final.rerun-2026-10__openai__forced__rep1__smoke__final.json

@@ -1,0 +1,35 @@
+diff --git a/django/db/models/fields/related.py b/django/db/models/fields/related.py
+index febaadbb5b..4eb6565364 100644
+--- a/django/db/models/fields/related.py
++++ b/django/db/models/fields/related.py
+@@ -1208,7 +1208,7 @@ class ManyToManyField(RelatedField):
+         self.swappable = swappable
+ 
+     def check(self, **kwargs):
+-        return [
++        errors = [
+             *super().check(**kwargs),
+             *self._check_unique(**kwargs),
+             *self._check_relationship_model(**kwargs),
+@@ -1216,6 +1216,21 @@ class ManyToManyField(RelatedField):
+             *self._check_table_uniqueness(**kwargs),
+         ]
+ 
++        # Prevent developers from defining a related_name on symmetrical ManyToManyFields
++        # If symmetrical is True or it's a self-referential ManyToManyField,
++        # no related field is created on the target model.
++        # Raise an error if related_name is set in this case to avoid confusion.
++        if self.remote_field.symmetrical and self.remote_field.related_name is not None:
++            errors.append(
++                checks.Error(
++                    "Cannot specify a related_name on a symmetrical ManyToManyField.",
++                    obj=self,
++                    id='fields.E338',
++                )
++            )
++
++        return errors
++
+     def _check_unique(self, **kwargs):
+         if self.unique:
+             return [

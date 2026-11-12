@@ -1,0 +1,18 @@
+diff --git a/pylint/lint/expand_modules.py b/pylint/lint/expand_modules.py
+index 289e1afce..50a6ae664 100644
+--- a/pylint/lint/expand_modules.py
++++ b/pylint/lint/expand_modules.py
+@@ -32,6 +32,13 @@ def get_python_path(filepath: str) -> str:
+     dirname = os.path.realpath(os.path.expanduser(filepath))
+     if not os.path.isdir(dirname):
+         dirname = os.path.dirname(dirname)
++    # Fix for issue where a directory and a module have the same name.
++    # If the filepath is a python file and its basename matches the last directory name,
++    # we should consider the parent directory as the python path to avoid looking for __init__.py in the directory.
++    base = os.path.basename(filepath)
++    dirbase = os.path.basename(dirname)
++    if base == dirbase + ".py":
++        dirname = os.path.dirname(dirname)
+     while True:
+         if not os.path.exists(os.path.join(dirname, "__init__.py")):
+             return dirname

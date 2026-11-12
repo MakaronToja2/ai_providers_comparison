@@ -1,0 +1,18 @@
+diff --git a/lib/matplotlib/colors.py b/lib/matplotlib/colors.py
+index 2d3072da04..40f2610703 100644
+--- a/lib/matplotlib/colors.py
++++ b/lib/matplotlib/colors.py
+@@ -727,9 +727,10 @@ class Colormap:
+                 xa = xa.astype(int)
+         # Set the over-range indices before the under-range;
+         # otherwise the under-range values get converted to over-range.
+-        xa[xa > self.N - 1] = self._i_over
+-        xa[xa < 0] = self._i_under
+-        xa[mask_bad] = self._i_bad
++        # Use np.asarray(..., dtype=int) to avoid numpy 1.24 deprecation warning
++        xa[xa > self.N - 1] = int(self._i_over)
++        xa[xa < 0] = int(self._i_under)
++        xa[mask_bad] = int(self._i_bad)
+ 
+         lut = self._lut
+         if bytes:

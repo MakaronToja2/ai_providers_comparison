@@ -1,0 +1,29 @@
+diff --git a/astropy/wcs/wcs.py b/astropy/wcs/wcs.py
+index d3a06f2b31..c156ad5f64 100644
+--- a/astropy/wcs/wcs.py
++++ b/astropy/wcs/wcs.py
+@@ -1212,6 +1212,24 @@ reduce these to 2 dimensions using the naxis kwarg.
+         """
+ 
+         def _return_list_of_arrays(axes, origin):
++            # Check if any of the input arrays are empty. If so, return empty arrays
++            # with the correct shape. This prevents errors with np.hstack and reshape.
++            if any(a.size == 0 for a in axes):
++                # Determine the shape of the output arrays. If axes[0] is empty,
++                # we can't infer the shape, so we'll return empty arrays of shape (0,).
++                # Otherwise, we use the shape of the first axis.
++                if axes and axes[0].shape:
++                    output_shape = axes[0].shape
++                else:
++                    output_shape = (0,)
++
++                # If ra_dec_order is True and sky is 'output', we need to return
++                # two arrays. Otherwise, return a list of arrays.
++                if ra_dec_order and sky == 'output':
++                    return (np.empty(output_shape), np.empty(output_shape))
++                else:
++                    return [np.empty(output_shape) for _ in axes]
++
+             try:
+                 axes = np.broadcast_arrays(*axes)
+             except ValueError:

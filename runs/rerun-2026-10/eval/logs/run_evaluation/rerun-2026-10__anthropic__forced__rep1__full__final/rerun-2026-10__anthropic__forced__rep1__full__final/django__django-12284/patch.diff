@@ -1,0 +1,33 @@
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 1a55d3d417..be66b13f2f 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -764,12 +764,26 @@ class Field(RegisterLookupMixin):
+             if not getattr(cls, self.attname, None):
+                 setattr(cls, self.attname, self.descriptor_class(self))
+         if self.choices is not None:
+-            if not hasattr(cls, 'get_%s_display' % self.name):
++            method_name = 'get_%s_display' % self.name
++            # Check if we need to create or update the display method.
++            # We should create a new method if:
++            # 1. The method doesn't exist yet, or
++            # 2. The method exists but is bound to a different field (e.g., from parent class)
++            existing_method = getattr(cls, method_name, None)
++            if existing_method is None:
+                 setattr(
+                     cls,
+-                    'get_%s_display' % self.name,
++                    method_name,
+                     partialmethod(cls._get_FIELD_display, field=self),
+                 )
++            elif isinstance(existing_method, partialmethod):
++                # If it's a partialmethod, check if it's bound to a different field
++                if existing_method.keywords.get('field') is not self:
++                    setattr(
++                        cls,
++                        method_name,
++                        partialmethod(cls._get_FIELD_display, field=self),
++                    )
+ 
+     def get_filter_kwargs_for_object(self, obj):
+         """

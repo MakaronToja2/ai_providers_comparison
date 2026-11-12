@@ -1,0 +1,19 @@
+--- a/sympy/printing/latex.py
++++ b/sympy/printing/latex.py
+@@ -1437,3 +1437,13 @@
+-    def _print_MatrixElement(self, expr):
+-        return self.parenthesize(expr.parent, PRECEDENCE["Atom"], strict=True) \
+-            + '_{%s, %s}' % (expr.i, expr.j)
++    def _print_MatrixElement(self, expr):
++        # Convert indices to LaTeX strings
++        def latex_index(idx):
++            # If idx is a Symbol, print as is, else print normally
++            s = self._print(idx)
++            # Remove spaces to avoid double underscores in subscripts
++            s = s.replace(' ', '')
++            return s
++
++        i_str = latex_index(expr.i)
++        j_str = latex_index(expr.j)
++
++        return self.parenthesize(expr.parent, PRECEDENCE["Atom"], strict=True) + '_{%s, %s}' % (i_str, j_str)

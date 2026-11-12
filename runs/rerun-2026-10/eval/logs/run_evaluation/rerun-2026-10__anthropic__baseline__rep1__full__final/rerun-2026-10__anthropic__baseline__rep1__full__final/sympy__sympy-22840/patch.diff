@@ -1,0 +1,17 @@
+diff --git a/sympy/simplify/cse_main.py b/sympy/simplify/cse_main.py
+index d649dd02a9..873ebb053d 100644
+--- a/sympy/simplify/cse_main.py
++++ b/sympy/simplify/cse_main.py
+@@ -591,6 +591,12 @@ def _find_repeated(expr):
+                 excluded_symbols.add(expr)
+             return
+ 
++        if isinstance(expr, MatrixSymbol):
++            # MatrixSymbol should not be extracted as a common subexpression
++            if expr.is_Symbol:
++                excluded_symbols.add(expr)
++            return
++
+         if iterable(expr):
+             args = expr
+ 

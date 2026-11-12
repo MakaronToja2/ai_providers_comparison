@@ -1,0 +1,12 @@
+--- a/sympy/printing/latex.py
++++ b/sympy/printing/latex.py
+@@ -1437,3 +1437,6 @@
+-    def _print_MatrixElement(self, expr):
+-        return self.parenthesize(expr.parent, PRECEDENCE["Atom"], strict=True) \
+-            + '_{%s, %s}' % (expr.i, expr.j)
++    def _print_MatrixElement(self, expr):
++        # Fix for double underscore in subscripts by ensuring indices are printed correctly
++        # Use _print on indices to get proper LaTeX representation and avoid underscores in variable names
++        i_str = self._print(expr.i)
++        j_str = self._print(expr.j)
++        return self.parenthesize(expr.parent, PRECEDENCE["Atom"], strict=True) + '_{%s, %s}' % (i_str, j_str)

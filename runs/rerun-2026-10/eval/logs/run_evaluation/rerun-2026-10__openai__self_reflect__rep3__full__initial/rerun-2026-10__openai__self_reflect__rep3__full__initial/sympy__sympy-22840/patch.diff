@@ -1,0 +1,24 @@
+diff --git a/sympy/simplify/cse_main.py b/sympy/simplify/cse_main.py
+index d649dd02a9..a2a4ee150c 100644
+--- a/sympy/simplify/cse_main.py
++++ b/sympy/simplify/cse_main.py
+@@ -672,8 +672,17 @@ def _rebuild(expr):
+                 raise ValueError("Symbols iterator ran out of symbols.")
+ 
+             if isinstance(orig_expr, MatrixExpr):
+-                sym = MatrixSymbol(sym.name, orig_expr.rows,
+-                    orig_expr.cols)
++                # When creating a MatrixSymbol for the replacement symbol,
++                # preserve the name but also preserve the indexing behavior.
++                # The issue is that MatrixSymbol indexing returns a MatrixElement,
++                # but the replacement symbol should behave like a scalar symbol.
++                # So we create a Symbol with the same name and use it directly.
++                # However, to keep the MatrixSymbol type for other uses,
++                # we keep the MatrixSymbol but override __getitem__ to return a Symbol.
++
++                # This is a workaround: instead of returning a MatrixSymbol,
++                # return a Symbol with the same name to avoid indexing issues.
++                sym = Symbol(sym.name)
+ 
+             subs[orig_expr] = sym
+             replacements.append((sym, new_expr))

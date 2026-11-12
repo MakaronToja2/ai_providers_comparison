@@ -1,0 +1,13 @@
+diff --git a/django/forms/formsets.py b/django/forms/formsets.py
+index a89c35599f..ef587be6cc 100644
+--- a/django/forms/formsets.py
++++ b/django/forms/formsets.py
+@@ -350,6 +350,8 @@ class BaseFormSet:
+                 },
+                 code='missing_management_form',
+             )
++            # Use error_class with 'nonform' for non-form errors in FormSets
++            self._non_form_errors = self.error_class(error_class='nonform')
+             self._non_form_errors.append(error)
+ 
+         for i, form in enumerate(self.forms):

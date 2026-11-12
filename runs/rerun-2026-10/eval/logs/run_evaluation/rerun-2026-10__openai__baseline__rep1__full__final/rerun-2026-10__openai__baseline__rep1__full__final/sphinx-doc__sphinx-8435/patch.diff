@@ -1,0 +1,69 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 171a3e7b0d..db471278b2 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1273,7 +1273,63 @@ class FunctionDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # typ
+         return args
+ 
+     def document_members(self, all_members: bool = False) -> None:
+-        pass
++        # Document variables and attributes with type aliases applied
++        from sphinx.util.inspect import stringify_annotation
++
++        def document_variable(name: str, annotation: Any, value: Any, docstring: str) -> None:
++            # Format the annotation with type aliases
++            if annotation is not None:
++                annotation_str = stringify_annotation(annotation, self.config.autodoc_type_aliases)
++            else:
++                annotation_str = None
++
++            # Compose the directive line for the variable/attribute
++            line = f".. attribute:: {name}"
++            if annotation_str:
++                line += f" :annotation: {annotation_str}"
++            self.add_line(line, self.get_sourcename())
++
++            # Add the docstring if present
++            if docstring:
++                for doc_line in docstring.splitlines():
++                    self.add_line(f"   {doc_line}", self.get_sourcename())
++
++        # Document variables and attributes for module-level variables
++        if hasattr(self.object, '__annotations__'):
++            annotations = self.object.__annotations__
++        else:
++            annotations = {}
++
++        # For module-level variables
++        if isinstance(self.object, type(None)) and hasattr(self.env, 'get_domain'):
++            # This is a hacky check to see if this is a module documenter
++            # We try to get the module object from the env
++            try:
++                mod = self.env.get_domain('py').get_module(self.modname)
++            except Exception:
++                mod = None
++            if mod:
++                for name, annotation in annotations.items():
++                    value = getattr(mod, name, None)
++                    docstring = None
++                    # No direct way to get variable docstring at module level, skip
++                    document_variable(name, annotation, value, docstring)
++                return
++
++        # For class attributes
++        if hasattr(self.object, '__annotations__'):
++            annotations = self.object.__annotations__
++            for name, annotation in annotations.items():
++                value = getattr(self.object, name, None)
++                docstring = None
++                # Try to get attribute docstring from __doc__ of the attribute if possible
++                attr = getattr(self.object, name, None)
++                if attr and hasattr(attr, '__doc__'):
++                    docstring = attr.__doc__
++                document_variable(name, annotation, value, docstring)
++        else:
++            # fallback to super if no annotations
++            super().document_members(all_members)
+ 
+     def add_directive_header(self, sig: str) -> None:
+         sourcename = self.get_sourcename()

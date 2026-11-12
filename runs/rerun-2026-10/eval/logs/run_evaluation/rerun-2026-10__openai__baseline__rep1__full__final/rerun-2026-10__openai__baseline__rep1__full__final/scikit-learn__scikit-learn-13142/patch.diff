@@ -1,0 +1,30 @@
+diff --git a/sklearn/mixture/gaussian_mixture.py b/sklearn/mixture/gaussian_mixture.py
+index 9e3bf3cb4c3..bfc28ecd42c 100644
+--- a/sklearn/mixture/gaussian_mixture.py
++++ b/sklearn/mixture/gaussian_mixture.py
+@@ -601,6 +601,25 @@ class GaussianMixture(BaseMixture):
+         self.means_init = means_init
+         self.precisions_init = precisions_init
+ 
++    def fit_predict(self, X, y=None):
++        """Fit the Gaussian mixture model to the data and predict the labels for X.
++
++        Parameters
++        ----------
++        X : array-like of shape (n_samples, n_features)
++            The input data.
++
++        y : Ignored
++            Not used, present here for API consistency by convention.
++
++        Returns
++        -------
++        labels : ndarray of shape (n_samples,)
++            Component labels.
++        """
++        self.fit(X)
++        return self.predict(X)
++
+     def _check_parameters(self, X):
+         """Check the Gaussian mixture parameters are well defined."""
+         _, n_features = X.shape

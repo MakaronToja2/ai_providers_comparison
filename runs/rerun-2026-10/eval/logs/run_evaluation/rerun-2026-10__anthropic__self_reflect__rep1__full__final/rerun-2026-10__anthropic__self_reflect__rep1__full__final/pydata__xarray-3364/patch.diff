@@ -1,0 +1,51 @@
+diff --git a/xarray/core/concat.py b/xarray/core/concat.py
+index ecae2566c..edd5dbb1b 100644
+--- a/xarray/core/concat.py
++++ b/xarray/core/concat.py
+@@ -356,12 +356,40 @@ def _dataset_concat(
+ 
+     # stack up each variable to fill-out the dataset (in order)
+     # n.b. this loop preserves variable order, needed for groupby.
+-    for k in datasets[0].variables:
+-        if k in concat_over:
+-            try:
+-                vars = ensure_common_dims([ds.variables[k] for ds in datasets])
+-            except KeyError:
+-                raise ValueError("%r is not present in all datasets." % k)
++    
++    # Collect all variables that need to be concatenated across all datasets
++    all_vars_to_concat = set()
++    for ds in datasets:
++        all_vars_to_concat.update(k for k in ds.variables if k in concat_over)
++    
++    for k in all_vars_to_concat:
++        # Collect variables from all datasets, filling missing with fill_value
++        vars_list = []
++        first_var = None
++        for ds in datasets:
++            if k in ds.variables:
++                vars_list.append(ds.variables[k])
++                if first_var is None:
++                    first_var = ds.variables[k]
++            else:
++                # Create a variable filled with fill_value
++                if first_var is None:
++                    # Find the first variable from another dataset
++                    for ds2 in datasets:
++                        if k in ds2.variables:
++                            first_var = ds2.variables[k]
++                            break
++                
++                if first_var is not None:
++                    # Create a filled variable with the same dimensions and shape
++                    # The shape is inferred from dims_sizes which was computed from aligned datasets
++                    filled_shape = tuple(dims_sizes.get(d, 1) for d in first_var.dims)
++                    filled_data = np.full(filled_shape, fill_value, dtype=first_var.dtype)
++                    filled_var = Variable(first_var.dims, filled_data, first_var.attrs)
++                    vars_list.append(filled_var)
++        
++        if vars_list:
++            vars = ensure_common_dims(vars_list)
+             combined = concat_vars(vars, dim, positions)
+             assert isinstance(combined, Variable)
+             result_vars[k] = combined

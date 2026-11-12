@@ -1,0 +1,68 @@
+2026-10-10 12:44:51,216 - INFO - Creating container for django__django-13220...
+2026-10-10 12:44:51,495 - INFO - Container for django__django-13220 created: 50823d338acec6b1181fa5998069d7418401e7f1cfc50ca76f3514d2109dcdd1
+2026-10-10 12:44:51,986 - INFO - Container for django__django-13220 started: 50823d338acec6b1181fa5998069d7418401e7f1cfc50ca76f3514d2109dcdd1
+2026-10-10 12:44:51,987 - INFO - Intermediate patch for django__django-13220 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep1__full__final/rerun-2026-10__anthropic__baseline__rep1__full__final/django__django-13220/patch.diff, now applying to container...
+2026-10-10 12:44:52,177 - INFO - >>>>> Applied Patch:
+Checking patch django/core/exceptions.py...
+warning: django/core/exceptions.py has type 100755, expected 100644
+Applied patch django/core/exceptions.py cleanly.
+
+2026-10-10 12:44:52,964 - INFO - Git diff before:
+diff --git a/django/core/exceptions.py b/django/core/exceptions.py
+index dc084b8692..6ad04da143 100755
+--- a/django/core/exceptions.py
++++ b/django/core/exceptions.py
+@@ -179,6 +179,20 @@ class ValidationError(Exception):
+             return repr(dict(self))
+         return repr(list(self))
+ 
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++        if hasattr(self, 'error_dict') and hasattr(other, 'error_dict'):
++            return self.error_dict == other.error_dict
++        if hasattr(self, 'error_dict') or hasattr(other, 'error_dict'):
++            return False
++        return self.error_list == other.error_list
++
++    def __hash__(self):
++        if hasattr(self, 'error_dict'):
++            return hash(tuple(sorted(self.error_dict.items())))
++        return hash(tuple(self.error_list))
++
+     def __repr__(self):
+         return 'ValidationError(%s)' % self
+2026-10-10 12:44:52,964 - INFO - Eval script for django__django-13220 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep1__full__final/rerun-2026-10__anthropic__baseline__rep1__full__final/django__django-13220/eval.sh; copying to container...
+2026-10-10 12:45:01,497 - INFO - Test runtime: 8.45 seconds
+2026-10-10 12:45:01,498 - INFO - Test output for django__django-13220 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep1__full__final/rerun-2026-10__anthropic__baseline__rep1__full__final/django__django-13220/test_output.txt
+2026-10-10 12:45:01,571 - INFO - Git diff after:
+diff --git a/django/core/exceptions.py b/django/core/exceptions.py
+index dc084b8692..6ad04da143 100755
+--- a/django/core/exceptions.py
++++ b/django/core/exceptions.py
+@@ -179,6 +179,20 @@ class ValidationError(Exception):
+             return repr(dict(self))
+         return repr(list(self))
+ 
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++        if hasattr(self, 'error_dict') and hasattr(other, 'error_dict'):
++            return self.error_dict == other.error_dict
++        if hasattr(self, 'error_dict') or hasattr(other, 'error_dict'):
++            return False
++        return self.error_list == other.error_list
++
++    def __hash__(self):
++        if hasattr(self, 'error_dict'):
++            return hash(tuple(sorted(self.error_dict.items())))
++        return hash(tuple(self.error_list))
++
+     def __repr__(self):
+         return 'ValidationError(%s)' % self
+2026-10-10 12:45:01,571 - INFO - Grading answer for django__django-13220...
+2026-10-10 12:45:01,576 - INFO - report: {'django__django-13220': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_eq (test_exceptions.test_validation_error.TestValidationError)', 'test_eq_nested (test_exceptions.test_validation_error.TestValidationError)', 'test_hash (test_exceptions.test_validation_error.TestValidationError)', 'test_hash_nested (test_exceptions.test_validation_error.TestValidationError)']}, 'PASS_TO_PASS': {'success': ['test_messages_concatenates_error_dict_values (test_exceptions.test_validation_error.TestValidationError)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-13220: resolved: False
+2026-10-10 12:45:01,577 - INFO - Attempting to stop container sweb.eval.django__django-13220.rerun-2026-10__anthropic__baseline__rep1__full__final...
+2026-10-10 12:45:26,138 - INFO - Attempting to remove container sweb.eval.django__django-13220.rerun-2026-10__anthropic__baseline__rep1__full__final...
+2026-10-10 12:45:26,419 - INFO - Container sweb.eval.django__django-13220.rerun-2026-10__anthropic__baseline__rep1__full__final removed.

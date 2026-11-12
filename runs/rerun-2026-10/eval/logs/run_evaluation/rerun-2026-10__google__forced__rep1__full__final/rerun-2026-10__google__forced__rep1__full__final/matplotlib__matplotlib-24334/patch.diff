@@ -1,0 +1,17 @@
+diff --git a/lib/matplotlib/axes/_axes.py b/lib/matplotlib/axes/_axes.py
+index bc0642323b..de4f175325 100644
+--- a/lib/matplotlib/axes/_axes.py
++++ b/lib/matplotlib/axes/_axes.py
+@@ -2503,6 +2503,12 @@ class Axes(_AxesBase):
+             tick_labels = np.broadcast_to(tick_labels, len(patches))
+             tick_label_axis.set_ticks(tick_label_position)
+             tick_label_axis.set_ticklabels(tick_labels)
++        else:
++            # If tick_labels is None, we still want to validate the kwargs
++            # that would have been passed to set_ticklabels.
++            # This is done by calling set_ticklabels with an empty list
++            # and passing the kwargs.
++            tick_label_axis.set_ticklabels([], **kwargs)
+ 
+         return bar_container
+ 

@@ -1,0 +1,34 @@
+diff --git a/lib/mpl_toolkits/axes_grid1/axes_grid.py b/lib/mpl_toolkits/axes_grid1/axes_grid.py
+index 2b1b1d3200..51a3f7c0ef 100644
+--- a/lib/mpl_toolkits/axes_grid1/axes_grid.py
++++ b/lib/mpl_toolkits/axes_grid1/axes_grid.py
+@@ -13,8 +13,27 @@ from .mpl_axes import Axes
+ def _tick_only(ax, bottom_on, left_on):
+     bottom_off = not bottom_on
+     left_off = not left_on
+-    ax.axis["bottom"].toggle(ticklabels=bottom_off, label=bottom_off)
+-    ax.axis["left"].toggle(ticklabels=left_off, label=left_off)
++
++    axis_container = ax.axis
++    if callable(axis_container):
++        # If ax.axis is a method, call it to get the actual axis object/container
++        axis_container = axis_container()
++
++    # Now, try to access "bottom" and "left" from the container
++    # We assume that if it's not callable, it's already a dict-like object
++    # If it's callable and we got a new object, we assume it's also dict-like
++    # or has the necessary structure.
++    try:
++        if bottom_on:
++            axis_container["bottom"].toggle(ticklabels=bottom_off, label=bottom_off)
++        if left_on:
++            axis_container["left"].toggle(ticklabels=left_off, label=left_off)
++    except (TypeError, KeyError, AttributeError):
++        # If any of the above fails (e.g., not subscriptable, key not found,
++        # or toggle method missing), we can't control tick labels for this axis.
++        # This might happen with custom axes like GeoAxes.
++        # We can log a warning or simply pass. For now, pass.
++        pass
+ 
+ 
+ class CbarAxesBase:

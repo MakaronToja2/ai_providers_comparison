@@ -1,0 +1,23 @@
+diff --git a/sympy/simplify/fu.py b/sympy/simplify/fu.py
+index ad1130ef96..bde015e8e0 100644
+--- a/sympy/simplify/fu.py
++++ b/sympy/simplify/fu.py
+@@ -501,10 +501,15 @@ def _f(rv):
+         if not (rv.is_Pow and rv.base.func == f):
+             return rv
+ 
+-        if (rv.exp < 0) == True:
+-            return rv
+-        if (rv.exp > max) == True:
++        # Avoid invalid comparison if exponent is complex (like I)
++        try:
++            if (rv.exp < 0) == True:
++                return rv
++            if (rv.exp > max) == True:
++                return rv
++        except TypeError:
+             return rv
++
+         if rv.exp == 2:
+             return h(g(rv.base.args[0])**2)
+         else:

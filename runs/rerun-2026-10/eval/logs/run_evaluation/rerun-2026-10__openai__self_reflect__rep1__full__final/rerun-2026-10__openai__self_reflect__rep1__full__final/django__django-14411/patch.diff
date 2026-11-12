@@ -1,0 +1,19 @@
+diff --git a/django/contrib/admin/helpers.py b/django/contrib/admin/helpers.py
+index 6f0be6b148..0028193752 100644
+--- a/django/contrib/admin/helpers.py
++++ b/django/contrib/admin/helpers.py
+@@ -134,6 +134,14 @@ class AdminField:
+         if self.is_checkbox:
+             classes.append('vCheckboxLabel')
+ 
++        # If the widget is ReadOnlyPasswordHashWidget, it renders non-labelable content,
++        # so omit the 'for' attribute by passing label_suffix='' to label_tag.
++        if self.field.field.widget.__class__.__name__ == 'ReadOnlyPasswordHashWidget':
++            return self.field.label_tag(
++                contents=mark_safe(contents), attrs={'class': ' '.join(classes)} if classes else {},
++                label_suffix='',
++            )
++
+         if self.field.field.required:
+             classes.append('required')
+         if not self.is_first:

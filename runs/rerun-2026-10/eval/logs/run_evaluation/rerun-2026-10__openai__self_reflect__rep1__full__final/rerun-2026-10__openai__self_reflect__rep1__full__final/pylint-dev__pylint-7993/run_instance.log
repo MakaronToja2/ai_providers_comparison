@@ -1,0 +1,58 @@
+2026-10-10 17:26:41,920 - INFO - Creating container for pylint-dev__pylint-7993...
+2026-10-10 17:26:56,996 - INFO - Container for pylint-dev__pylint-7993 created: 73ddfa6134c60853acbfc2e15596862f003aa2fd5e15f1fc0337e0fb0efbbef2
+2026-10-10 17:27:08,442 - INFO - Container for pylint-dev__pylint-7993 started: 73ddfa6134c60853acbfc2e15596862f003aa2fd5e15f1fc0337e0fb0efbbef2
+2026-10-10 17:27:08,443 - INFO - Intermediate patch for pylint-dev__pylint-7993 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep1__full__final/rerun-2026-10__openai__self_reflect__rep1__full__final/pylint-dev__pylint-7993/patch.diff, now applying to container...
+2026-10-10 17:27:08,580 - INFO - >>>>> Applied Patch:
+Checking patch pylint/reporters/text.py...
+warning: pylint/reporters/text.py has type 100755, expected 100644
+Applied patch pylint/reporters/text.py cleanly.
+
+2026-10-10 17:27:08,779 - INFO - Git diff before:
+diff --git a/pylint/reporters/text.py b/pylint/reporters/text.py
+index 29bd46798..b3f96b761 100755
+--- a/pylint/reporters/text.py
++++ b/pylint/reporters/text.py
+@@ -175,7 +175,13 @@ class TextReporter(BaseReporter):
+         self._template = template
+ 
+         # Check to see if all parameters in the template are attributes of the Message
+-        arguments = re.findall(r"\{(.+?)(:.*)?\}", template)
++        # We will skip checking arguments that are inside double braces {{...}} to allow literal braces in templates
++        # A simple approach is to temporarily replace double braces with a placeholder before searching
++        placeholder = "__DOUBLE_BRACE__"
++        temp_template = template.replace("{{", placeholder).replace("}}", placeholder)
++
++        # Find all single-brace arguments that are not inside double braces
++        arguments = re.findall(r"\{(.+?)(:.*)?\}", temp_template)
+         for argument in arguments:
+             if argument[0] not in MESSAGE_FIELDS:
+                 warnings.warn(
+2026-10-10 17:27:08,779 - INFO - Eval script for pylint-dev__pylint-7993 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep1__full__final/rerun-2026-10__openai__self_reflect__rep1__full__final/pylint-dev__pylint-7993/eval.sh; copying to container...
+2026-10-10 17:27:18,514 - INFO - Test runtime: 9.66 seconds
+2026-10-10 17:27:18,515 - INFO - Test output for pylint-dev__pylint-7993 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep1__full__final/rerun-2026-10__openai__self_reflect__rep1__full__final/pylint-dev__pylint-7993/test_output.txt
+2026-10-10 17:27:18,559 - INFO - Git diff after:
+diff --git a/pylint/reporters/text.py b/pylint/reporters/text.py
+index 29bd46798..b3f96b761 100755
+--- a/pylint/reporters/text.py
++++ b/pylint/reporters/text.py
+@@ -175,7 +175,13 @@ class TextReporter(BaseReporter):
+         self._template = template
+ 
+         # Check to see if all parameters in the template are attributes of the Message
+-        arguments = re.findall(r"\{(.+?)(:.*)?\}", template)
++        # We will skip checking arguments that are inside double braces {{...}} to allow literal braces in templates
++        # A simple approach is to temporarily replace double braces with a placeholder before searching
++        placeholder = "__DOUBLE_BRACE__"
++        temp_template = template.replace("{{", placeholder).replace("}}", placeholder)
++
++        # Find all single-brace arguments that are not inside double braces
++        arguments = re.findall(r"\{(.+?)(:.*)?\}", temp_template)
+         for argument in arguments:
+             if argument[0] not in MESSAGE_FIELDS:
+                 warnings.warn(
+2026-10-10 17:27:18,559 - INFO - Grading answer for pylint-dev__pylint-7993...
+2026-10-10 17:27:18,562 - INFO - report: {'pylint-dev__pylint-7993': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['tests/reporters/unittest_reporting.py::test_template_option_with_header'], 'failure': []}, 'PASS_TO_PASS': {'success': ['tests/reporters/unittest_reporting.py::test_template_option', 'tests/reporters/unittest_reporting.py::test_template_option_default', 'tests/reporters/unittest_reporting.py::test_template_option_end_line', 'tests/reporters/unittest_reporting.py::test_template_option_non_existing', 'tests/reporters/unittest_reporting.py::test_deprecation_set_output', 'tests/reporters/unittest_reporting.py::test_parseable_output_deprecated', 'tests/reporters/unittest_reporting.py::test_parseable_output_regression', 'tests/reporters/unittest_reporting.py::test_multi_format_output', 'tests/reporters/unittest_reporting.py::test_multi_reporter_independant_messages', 'tests/reporters/unittest_reporting.py::test_display_results_is_renamed'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for pylint-dev__pylint-7993: resolved: True
+2026-10-10 17:27:18,562 - INFO - Attempting to stop container sweb.eval.pylint-dev__pylint-7993.rerun-2026-10__openai__self_reflect__rep1__full__final...
+2026-10-10 17:27:40,402 - INFO - Attempting to remove container sweb.eval.pylint-dev__pylint-7993.rerun-2026-10__openai__self_reflect__rep1__full__final...
+2026-10-10 17:27:44,186 - INFO - Container sweb.eval.pylint-dev__pylint-7993.rerun-2026-10__openai__self_reflect__rep1__full__final removed.

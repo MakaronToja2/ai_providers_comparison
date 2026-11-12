@@ -1,0 +1,103 @@
+2026-10-10 18:05:29,704 - INFO - Creating container for scikit-learn__scikit-learn-13584...
+2026-10-10 18:05:36,375 - INFO - Container for scikit-learn__scikit-learn-13584 created: 57e367024b4dbd3c2beb28be4ced7501d203ccdb356f8c447d0cd4516df3cc30
+2026-10-10 18:05:43,808 - INFO - Container for scikit-learn__scikit-learn-13584 started: 57e367024b4dbd3c2beb28be4ced7501d203ccdb356f8c447d0cd4516df3cc30
+2026-10-10 18:05:43,808 - INFO - Intermediate patch for scikit-learn__scikit-learn-13584 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep3__full__final/rerun-2026-10__anthropic__forced__rep3__full__final/scikit-learn__scikit-learn-13584/patch.diff, now applying to container...
+2026-10-10 18:05:43,897 - INFO - >>>>> Applied Patch:
+/tmp/patch.diff:21: trailing whitespace.
+        
+/tmp/patch.diff:32: trailing whitespace.
+        
+/tmp/patch.diff:35: trailing whitespace.
+        
+Checking patch sklearn/utils/_pprint.py...
+warning: sklearn/utils/_pprint.py has type 100755, expected 100644
+Applied patch sklearn/utils/_pprint.py cleanly.
+warning: 3 lines add whitespace errors.
+
+2026-10-10 18:05:44,065 - INFO - Git diff before:
+diff --git a/sklearn/utils/_pprint.py b/sklearn/utils/_pprint.py
+index b8686dba5..fa58a46e7 100755
+--- a/sklearn/utils/_pprint.py
++++ b/sklearn/utils/_pprint.py
+@@ -66,6 +66,7 @@ BaseEstimator.__repr__ for pretty-printing estimators"""
+ from inspect import signature
+ import pprint
+ from collections import OrderedDict
++import numpy as np
+ 
+ from ..base import BaseEstimator
+ from .._config import get_config
+@@ -95,8 +96,24 @@ def _changed_params(estimator):
+     init_params = signature(init_func).parameters
+     init_params = {name: param.default for name, param in init_params.items()}
+     for k, v in params.items():
+-        if (v != init_params[k] and
+-                not (is_scalar_nan(init_params[k]) and is_scalar_nan(v))):
++        # Handle numpy arrays and other types that may not support direct comparison
++        init_val = init_params[k]
++        
++        # Check if values are equal, handling numpy arrays
++        try:
++            # Try numpy array comparison first
++            if isinstance(v, np.ndarray) or isinstance(init_val, np.ndarray):
++                values_equal = np.array_equal(v, init_val)
++            else:
++                values_equal = v == init_val
++        except (ValueError, TypeError):
++            # If comparison fails, assume they're not equal
++            values_equal = False
++        
++        # Check if both are NaN
++        both_nan = is_scalar_nan(init_val) and is_scalar_nan(v)
++        
++        if not values_equal and not both_nan:
+             filtered_params[k] = v
+     return filtered_params
+2026-10-10 18:05:44,066 - INFO - Eval script for scikit-learn__scikit-learn-13584 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep3__full__final/rerun-2026-10__anthropic__forced__rep3__full__final/scikit-learn__scikit-learn-13584/eval.sh; copying to container...
+2026-10-10 18:05:48,862 - INFO - Test runtime: 4.75 seconds
+2026-10-10 18:05:48,863 - INFO - Test output for scikit-learn__scikit-learn-13584 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep3__full__final/rerun-2026-10__anthropic__forced__rep3__full__final/scikit-learn__scikit-learn-13584/test_output.txt
+2026-10-10 18:05:48,910 - INFO - Git diff after:
+diff --git a/sklearn/utils/_pprint.py b/sklearn/utils/_pprint.py
+index b8686dba5..fa58a46e7 100755
+--- a/sklearn/utils/_pprint.py
++++ b/sklearn/utils/_pprint.py
+@@ -66,6 +66,7 @@ BaseEstimator.__repr__ for pretty-printing estimators"""
+ from inspect import signature
+ import pprint
+ from collections import OrderedDict
++import numpy as np
+ 
+ from ..base import BaseEstimator
+ from .._config import get_config
+@@ -95,8 +96,24 @@ def _changed_params(estimator):
+     init_params = signature(init_func).parameters
+     init_params = {name: param.default for name, param in init_params.items()}
+     for k, v in params.items():
+-        if (v != init_params[k] and
+-                not (is_scalar_nan(init_params[k]) and is_scalar_nan(v))):
++        # Handle numpy arrays and other types that may not support direct comparison
++        init_val = init_params[k]
++        
++        # Check if values are equal, handling numpy arrays
++        try:
++            # Try numpy array comparison first
++            if isinstance(v, np.ndarray) or isinstance(init_val, np.ndarray):
++                values_equal = np.array_equal(v, init_val)
++            else:
++                values_equal = v == init_val
++        except (ValueError, TypeError):
++            # If comparison fails, assume they're not equal
++            values_equal = False
++        
++        # Check if both are NaN
++        both_nan = is_scalar_nan(init_val) and is_scalar_nan(v)
++        
++        if not values_equal and not both_nan:
+             filtered_params[k] = v
+     return filtered_params
+2026-10-10 18:05:48,910 - INFO - Grading answer for scikit-learn__scikit-learn-13584...
+2026-10-10 18:05:48,911 - INFO - report: {'scikit-learn__scikit-learn-13584': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['sklearn/utils/tests/test_pprint.py::test_changed_only', 'sklearn/utils/tests/test_pprint.py::test_pipeline', 'sklearn/utils/tests/test_pprint.py::test_deeply_nested', 'sklearn/utils/tests/test_pprint.py::test_gridsearch', 'sklearn/utils/tests/test_pprint.py::test_gridsearch_pipeline', 'sklearn/utils/tests/test_pprint.py::test_n_max_elements_to_show'], 'failure': []}, 'PASS_TO_PASS': {'success': ['sklearn/utils/tests/test_pprint.py::test_basic', 'sklearn/utils/tests/test_pprint.py::test_length_constraint', 'sklearn/utils/tests/test_pprint.py::test_builtin_prettyprinter'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for scikit-learn__scikit-learn-13584: resolved: True
+2026-10-10 18:05:48,911 - INFO - Attempting to stop container sweb.eval.scikit-learn__scikit-learn-13584.rerun-2026-10__anthropic__forced__rep3__full__final...
+2026-10-10 18:06:12,642 - INFO - Attempting to remove container sweb.eval.scikit-learn__scikit-learn-13584.rerun-2026-10__anthropic__forced__rep3__full__final...
+2026-10-10 18:06:14,069 - INFO - Container sweb.eval.scikit-learn__scikit-learn-13584.rerun-2026-10__anthropic__forced__rep3__full__final removed.

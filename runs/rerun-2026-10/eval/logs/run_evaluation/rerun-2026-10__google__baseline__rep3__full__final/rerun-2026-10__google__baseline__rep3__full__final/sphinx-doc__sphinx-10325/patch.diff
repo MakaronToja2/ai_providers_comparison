@@ -1,0 +1,26 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 62631f7ff9..48fda2a110 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1710,7 +1710,20 @@ class ClassDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # type:
+                                    (name, self.fullname), type='autodoc')
+             return False, selected
+         elif self.options.inherited_members:
+-            return False, list(members.values())
++            inherited_option = self.options.inherited_members
++            if inherited_option is True:
++                # If it's just True, include all inherited members
++                return False, list(members.values())
++            else:
++                # It's a string of class names, e.g., "ClassA, ClassB"
++                specified_classes = {name.strip() for name in inherited_option.split(',')}
++                # Filter members: include only those defined in the specified base classes
++                # and not defined directly in the current class.
++                filtered_members = [
++                    m for m in members.values()
++                    if m.class_ is not self.object and m.class_.__name__ in specified_classes
++                ]
++                return False, filtered_members
+         else:
+             return False, [m for m in members.values() if m.class_ == self.object]
+ 

@@ -1,0 +1,29 @@
+diff --git a/astropy/modeling/core.py b/astropy/modeling/core.py
+index da4352cb0c..887a4488ff 100644
+--- a/astropy/modeling/core.py
++++ b/astropy/modeling/core.py
+@@ -3019,6 +3019,24 @@ class CompoundModel(Model):
+         self.n_left_params = len(self.left.parameters)
+         self._map_parameters()
+ 
++    @property
++    def _separable(self):
++        """
++        Determine if the compound model is separable.
++
++        A compound model is separable if all its submodels are separable.
++        """
++        if self.op == '&':
++            # For concatenation, separability depends on both submodels being separable.
++            return self.left._separable and self.right._separable
++        elif self.op == '|':
++            # For sequential composition, separability also depends on both submodels.
++            return self.left._separable and self.right._separable
++        else:
++            # For other operators, assume not separable by default, or handle as needed.
++            # This might need refinement based on specific operator behaviors.
++            return False
++
+     def _get_left_inputs_from_args(self, args):
+         return args[:self.left.n_inputs]
+ 

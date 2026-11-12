@@ -1,0 +1,19 @@
+diff --git a/sympy/simplify/cse_main.py b/sympy/simplify/cse_main.py
+index d649dd02a9..0a80de6edb 100644
+--- a/sympy/simplify/cse_main.py
++++ b/sympy/simplify/cse_main.py
+@@ -790,10 +790,14 @@ def cse(exprs, symbols=None, optimizations=None, postprocess=None,
+     copy = exprs
+     temp = []
+     for e in exprs:
++        from sympy.matrices.expressions.matexpr import MatrixSymbol
+         if isinstance(e, (Matrix, ImmutableMatrix)):
+             temp.append(Tuple(*e.flat()))
+         elif isinstance(e, (SparseMatrix, ImmutableSparseMatrix)):
+             temp.append(Tuple(*e.todok().items()))
++        elif isinstance(e, MatrixSymbol):
++            # Convert MatrixSymbol to a flat Tuple of its elements accessed by indices
++            temp.append(Tuple(*[e[i, j] for i in range(e.shape[0]) for j in range(e.shape[1])]))
+         else:
+             temp.append(e)
+     exprs = temp

@@ -1,0 +1,36 @@
+diff --git a/sympy/printing/pycode.py b/sympy/printing/pycode.py
+index 6ec7bd891c..7331651685 100644
+--- a/sympy/printing/pycode.py
++++ b/sympy/printing/pycode.py
+@@ -283,6 +283,11 @@ def _print_Sum(self, expr):
+     def _print_ImaginaryUnit(self, expr):
+         return '1j'
+ 
++    def _print_Identity(self, expr):
++        raise NotImplementedError(
++            "Identity matrices are not supported by the default code printer. "
++            "Use a more specific printer like 'numpy', 'scipy', or 'sympy'.")
++
+     def _print_MatrixBase(self, expr):
+         name = expr.__class__.__name__
+         func = self.known_functions.get(name, name)
+@@ -602,6 +607,9 @@ def _print_re(self, expr):
+     def _print_sinc(self, expr):
+         return "%s(%s)" % (self._module_format('numpy.sinc'), self._print(expr.args[0]/S.Pi))
+ 
++    def _print_Identity(self, expr):
++        return "{0}({1})".format(self._module_format('numpy.eye'), self._print(expr.shape[0]))
++
+     def _print_MatrixBase(self, expr):
+         func = self.known_functions.get(expr.__class__.__name__, None)
+         if func is None:
+@@ -750,6 +758,9 @@ class SymPyPrinter(PythonCodePrinter):
+         _known_functions_math.items()
+     )}
+ 
++    def _print_Identity(self, expr):
++        return "{0}({1})".format(self._module_format('sympy.eye'), self._print(expr.shape[0]))
++
+     def _print_Function(self, expr):
+         mod = expr.func.__module__ or ''
+         return '%s(%s)' % (self._module_format(mod + ('.' if mod else '') + expr.func.__name__),

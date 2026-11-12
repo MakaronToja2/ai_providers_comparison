@@ -1,0 +1,52 @@
+2026-10-10 11:41:23,846 - INFO - Creating container for django__django-12908...
+2026-10-10 11:41:24,012 - INFO - Container for django__django-12908 created: 6e6dfc485daa3e7469d5f5db76e1c16f830c9a1b7de60033f1f61432c4f9e25b
+2026-10-10 11:41:24,323 - INFO - Container for django__django-12908 started: 6e6dfc485daa3e7469d5f5db76e1c16f830c9a1b7de60033f1f61432c4f9e25b
+2026-10-10 11:41:24,323 - INFO - Intermediate patch for django__django-12908 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__full__final/rerun-2026-10__openai__baseline__rep1__full__final/django__django-12908/patch.diff, now applying to container...
+2026-10-10 11:41:24,447 - INFO - >>>>> Applied Patch:
+Checking patch django/db/models/query.py...
+warning: django/db/models/query.py has type 100755, expected 100644
+Applied patch django/db/models/query.py cleanly.
+
+2026-10-10 11:41:25,000 - INFO - Git diff before:
+diff --git a/django/db/models/query.py b/django/db/models/query.py
+index e0eeccefa6..ab2dbcb6c0 100755
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -1140,6 +1140,11 @@ class QuerySet:
+         """
+         assert not self.query.is_sliced, \
+             "Cannot create distinct fields once a slice has been taken."
++        # Raise if this queryset is a union and distinct is called with fields
++        if self.query.combinator and field_names:
++            raise NotImplementedError(
++                "distinct(fields) is not supported on a queryset with a union."
++            )
+         obj = self._chain()
+         obj.query.add_distinct_fields(*field_names)
+         return obj
+2026-10-10 11:41:25,000 - INFO - Eval script for django__django-12908 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__full__final/rerun-2026-10__openai__baseline__rep1__full__final/django__django-12908/eval.sh; copying to container...
+2026-10-10 11:41:33,389 - INFO - Test runtime: 8.33 seconds
+2026-10-10 11:41:33,390 - INFO - Test output for django__django-12908 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__full__final/rerun-2026-10__openai__baseline__rep1__full__final/django__django-12908/test_output.txt
+2026-10-10 11:41:33,451 - INFO - Git diff after:
+diff --git a/django/db/models/query.py b/django/db/models/query.py
+index e0eeccefa6..ab2dbcb6c0 100755
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -1140,6 +1140,11 @@ class QuerySet:
+         """
+         assert not self.query.is_sliced, \
+             "Cannot create distinct fields once a slice has been taken."
++        # Raise if this queryset is a union and distinct is called with fields
++        if self.query.combinator and field_names:
++            raise NotImplementedError(
++                "distinct(fields) is not supported on a queryset with a union."
++            )
+         obj = self._chain()
+         obj.query.add_distinct_fields(*field_names)
+         return obj
+2026-10-10 11:41:33,452 - INFO - Grading answer for django__django-12908...
+2026-10-10 11:41:33,457 - INFO - report: {'django__django-12908': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_unsupported_operations_on_combined_qs (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_unsupported_ordering_slicing_raises_db_error (queries.test_qs_combinators.QuerySetSetOperationTests)']}, 'PASS_TO_PASS': {'success': ['test_combining_multiple_models (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_count_difference (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_count_intersection (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_count_union (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_count_union_empty_result (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_difference_with_empty_qs (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_difference_with_values (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_intersection_with_empty_qs (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_intersection_with_values (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_limits (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_order_by_same_type (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_order_raises_on_non_selected_column (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_ordering (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_ordering_by_f_expression (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_qs_with_subcompound_qs (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_simple_difference (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_simple_intersection (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_simple_union (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_union_distinct (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_union_with_empty_qs (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_union_with_extra_and_values_list (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_union_with_two_annotated_values_list (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_union_with_values (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_union_with_values_list_and_order (queries.test_qs_combinators.QuerySetSetOperationTests)', 'test_union_with_values_list_on_annotated_and_unannotated (queries.test_qs_combinators.QuerySetSetOperationTests)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-12908: resolved: False
+2026-10-10 11:41:33,458 - INFO - Attempting to stop container sweb.eval.django__django-12908.rerun-2026-10__openai__baseline__rep1__full__final...
+2026-10-10 11:41:49,001 - INFO - Attempting to remove container sweb.eval.django__django-12908.rerun-2026-10__openai__baseline__rep1__full__final...
+2026-10-10 11:41:49,061 - INFO - Container sweb.eval.django__django-12908.rerun-2026-10__openai__baseline__rep1__full__final removed.

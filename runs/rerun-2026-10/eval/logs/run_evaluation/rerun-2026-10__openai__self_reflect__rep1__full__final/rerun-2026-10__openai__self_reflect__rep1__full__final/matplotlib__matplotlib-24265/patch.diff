@@ -1,0 +1,12 @@
+diff --git a/lib/matplotlib/style/core.py b/lib/matplotlib/style/core.py
+index fb0a5426e6..dadd3d7ee0 100644
+--- a/lib/matplotlib/style/core.py
++++ b/lib/matplotlib/style/core.py
+@@ -140,6 +140,7 @@ def use(style):
+                 s = s.replace("seaborn", "seaborn-v0_8")
+         return s
+ 
++
+     for style in map(fix_style, styles):
+         if not isinstance(style, (str, Path)):
+             _apply_style(style)

@@ -1,0 +1,26 @@
+diff --git a/sympy/simplify/simplify.py b/sympy/simplify/simplify.py
+index f1609aa908..79615000c2 100644
+--- a/sympy/simplify/simplify.py
++++ b/sympy/simplify/simplify.py
+@@ -580,6 +580,21 @@ def shorter(*choices):
+     if expr.has(Product):
+         expr = product_simplify(expr)
+ 
++    # To handle cases like x**2.5 and x**(5/2) being recognized as equal,
++    # convert float exponents that are equivalent to Rational to Rational
++    def convert_float_powers(expr):
++        if expr.is_Pow and expr.exp.is_Float:
++            try:
++                rat_exp = Rational(expr.exp)
++                # Only convert if exact conversion possible
++                if float(rat_exp) == float(expr.exp):
++                    return Pow(expr.base, rat_exp)
++            except Exception:
++                pass
++        return expr
++
++    expr = expr.replace(lambda e: e.is_Pow and e.exp.is_Float, convert_float_powers)
++
+     short = shorter(powsimp(expr, combine='exp', deep=True), powsimp(expr), expr)
+     short = shorter(short, factor_terms(short), expand_power_exp(expand_mul(short)))
+     if short.has(TrigonometricFunction, HyperbolicFunction, ExpBase):

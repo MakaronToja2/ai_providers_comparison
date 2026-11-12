@@ -1,0 +1,20 @@
+diff --git a/pylint/reporters/text.py b/pylint/reporters/text.py
+index 29bd46798..90b269daa 100644
+--- a/pylint/reporters/text.py
++++ b/pylint/reporters/text.py
+@@ -174,8 +174,14 @@ class TextReporter(BaseReporter):
+         # Set template to the currently selected template
+         self._template = template
+ 
++        # Temporarily replace escaped braces with placeholders to avoid matching them
++        # in the regex. In Python format strings, {{ and }} are escape sequences for
++        # literal { and } characters.
++        template_escaped = template.replace("{{", "\x00ESCAPED_OPEN_BRACE\x00")
++        template_escaped = template_escaped.replace("}}", "\x00ESCAPED_CLOSE_BRACE\x00")
++
+         # Check to see if all parameters in the template are attributes of the Message
+-        arguments = re.findall(r"\{(.+?)(:.*)?\}", template)
++        arguments = re.findall(r"\{(.+?)(:.*)?\}", template_escaped)
+         for argument in arguments:
+             if argument[0] not in MESSAGE_FIELDS:
+                 warnings.warn(

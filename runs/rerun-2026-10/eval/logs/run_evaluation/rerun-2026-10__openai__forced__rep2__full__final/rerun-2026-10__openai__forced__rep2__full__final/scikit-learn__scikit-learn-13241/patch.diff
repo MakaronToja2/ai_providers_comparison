@@ -1,0 +1,18 @@
+diff --git a/sklearn/decomposition/kernel_pca.py b/sklearn/decomposition/kernel_pca.py
+index bb91d0cbbad..7fdef4a2922 100644
+--- a/sklearn/decomposition/kernel_pca.py
++++ b/sklearn/decomposition/kernel_pca.py
+@@ -277,6 +277,13 @@ class KernelPCA(BaseEstimator, TransformerMixin, _UnstableOn32BitMixin):
+ 
+         X_transformed = self.alphas_ * np.sqrt(self.lambdas_)
+ 
++        # Fix sign ambiguity by enforcing deterministic sign for each component
++        max_abs_cols = np.argmax(np.abs(X_transformed), axis=0)
++        signs = np.sign(X_transformed[max_abs_cols, range(X_transformed.shape[1])])
++        signs[signs == 0] = 1  # treat zeros as positive sign
++        X_transformed *= signs
++        self.alphas_ *= signs
++
+         if self.fit_inverse_transform:
+             self._fit_inverse_transform(X_transformed, X)
+ 

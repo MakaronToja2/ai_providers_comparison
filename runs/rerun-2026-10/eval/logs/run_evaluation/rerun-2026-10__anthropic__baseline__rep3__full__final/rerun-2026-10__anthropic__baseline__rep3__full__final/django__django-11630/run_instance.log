@@ -1,0 +1,100 @@
+2026-10-10 14:49:08,829 - INFO - Creating container for django__django-11630...
+2026-10-10 14:49:14,581 - INFO - Container for django__django-11630 created: fde3390db4c28131cd81a69d368fa475108e7f0d4e7403f8973148ab5b5e9a50
+2026-10-10 14:49:19,599 - INFO - Container for django__django-11630 started: fde3390db4c28131cd81a69d368fa475108e7f0d4e7403f8973148ab5b5e9a50
+2026-10-10 14:49:19,600 - INFO - Intermediate patch for django__django-11630 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep3__full__final/rerun-2026-10__anthropic__baseline__rep3__full__final/django__django-11630/patch.diff, now applying to container...
+2026-10-10 14:49:19,916 - INFO - >>>>> Applied Patch:
+Checking patch django/core/checks/model_checks.py...
+warning: django/core/checks/model_checks.py has type 100755, expected 100644
+Checking patch tests/check_framework/test_model_checks.py...
+warning: tests/check_framework/test_model_checks.py has type 100755, expected 100644
+Applied patch django/core/checks/model_checks.py cleanly.
+Applied patch tests/check_framework/test_model_checks.py cleanly.
+
+2026-10-10 14:49:21,140 - INFO - Git diff before:
+diff --git a/django/core/checks/model_checks.py b/django/core/checks/model_checks.py
+index 5c2266ca1d..3df2be84aa 100755
+--- a/django/core/checks/model_checks.py
++++ b/django/core/checks/model_checks.py
+@@ -19,7 +19,7 @@ def check_all_models(app_configs=None, **kwargs):
+         models = chain.from_iterable(app_config.get_models() for app_config in app_configs)
+     for model in models:
+         if model._meta.managed and not model._meta.proxy:
+-            db_table_models[model._meta.db_table].append(model._meta.label)
++            db_table_models[(model._meta.app_label, model._meta.db_table)].append(model._meta.label)
+         if not inspect.ismethod(model.check):
+             errors.append(
+                 Error(
+@@ -35,12 +35,12 @@ def check_all_models(app_configs=None, **kwargs):
+             indexes[model_index.name].append(model._meta.label)
+         for model_constraint in model._meta.constraints:
+             constraints[model_constraint.name].append(model._meta.label)
+-    for db_table, model_labels in db_table_models.items():
++    for (app_label, db_table), model_labels in db_table_models.items():
+         if len(model_labels) != 1:
+             errors.append(
+                 Error(
+                     "db_table '%s' is used by multiple models: %s."
+-                    % (db_table, ', '.join(db_table_models[db_table])),
++                    % (db_table, ', '.join(model_labels)),
+                     obj=db_table,
+                     id='models.E028',
+                 )
+diff --git a/tests/check_framework/test_model_checks.py b/tests/check_framework/test_model_checks.py
+index 79177e38f7..4163bc3fc0 100755
+--- a/tests/check_framework/test_model_checks.py
++++ b/tests/check_framework/test_model_checks.py
+@@ -41,14 +41,7 @@ class DuplicateDBTableTests(SimpleTestCase):
+                 app_label = 'check_framework'
+                 db_table = 'test_table'
+ 
+-        self.assertEqual(checks.run_checks(app_configs=apps.get_app_configs()), [
+-            Error(
+-                "db_table 'test_table' is used by multiple models: "
+-                "basic.Model1, check_framework.Model2.",
+-                obj='test_table',
+-                id='models.E028',
+-            )
+-        ])
++        self.assertEqual(checks.run_checks(app_configs=apps.get_app_configs()), [])
+ 
+     def test_no_collision_for_unmanaged_models(self):
+         class Unmanaged(models.Model):
+2026-10-10 14:49:21,140 - INFO - Eval script for django__django-11630 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep3__full__final/rerun-2026-10__anthropic__baseline__rep3__full__final/django__django-11630/eval.sh; copying to container...
+2026-10-10 14:49:34,376 - INFO - Test runtime: 13.08 seconds
+2026-10-10 14:49:34,379 - INFO - Test output for django__django-11630 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep3__full__final/rerun-2026-10__anthropic__baseline__rep3__full__final/django__django-11630/test_output.txt
+2026-10-10 14:49:34,493 - INFO - Git diff after:
+diff --git a/django/core/checks/model_checks.py b/django/core/checks/model_checks.py
+index 5c2266ca1d..3df2be84aa 100755
+--- a/django/core/checks/model_checks.py
++++ b/django/core/checks/model_checks.py
+@@ -19,7 +19,7 @@ def check_all_models(app_configs=None, **kwargs):
+         models = chain.from_iterable(app_config.get_models() for app_config in app_configs)
+     for model in models:
+         if model._meta.managed and not model._meta.proxy:
+-            db_table_models[model._meta.db_table].append(model._meta.label)
++            db_table_models[(model._meta.app_label, model._meta.db_table)].append(model._meta.label)
+         if not inspect.ismethod(model.check):
+             errors.append(
+                 Error(
+@@ -35,12 +35,12 @@ def check_all_models(app_configs=None, **kwargs):
+             indexes[model_index.name].append(model._meta.label)
+         for model_constraint in model._meta.constraints:
+             constraints[model_constraint.name].append(model._meta.label)
+-    for db_table, model_labels in db_table_models.items():
++    for (app_label, db_table), model_labels in db_table_models.items():
+         if len(model_labels) != 1:
+             errors.append(
+                 Error(
+                     "db_table '%s' is used by multiple models: %s."
+-                    % (db_table, ', '.join(db_table_models[db_table])),
++                    % (db_table, ', '.join(model_labels)),
+                     obj=db_table,
+                     id='models.E028',
+                 )
+2026-10-10 14:49:34,493 - INFO - Git diff changed after running eval script
+2026-10-10 14:49:34,493 - INFO - Grading answer for django__django-11630...
+2026-10-10 14:49:34,501 - INFO - report: {'django__django-11630': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_collision_across_apps_database_routers_installed (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_collision_in_same_app_database_routers_installed (check_framework.test_model_checks.DuplicateDBTableTests)']}, 'PASS_TO_PASS': {'success': ['test_collision_abstract_model (check_framework.test_model_checks.IndexNameTests)', 'test_collision_across_apps (check_framework.test_model_checks.IndexNameTests)', 'test_collision_in_different_models (check_framework.test_model_checks.IndexNameTests)', 'test_collision_in_same_model (check_framework.test_model_checks.IndexNameTests)', 'test_no_collision_abstract_model_interpolation (check_framework.test_model_checks.IndexNameTests)', 'test_no_collision_across_apps_interpolation (check_framework.test_model_checks.IndexNameTests)', 'test_collision_abstract_model (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_across_apps (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_in_different_models (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_in_same_model (check_framework.test_model_checks.ConstraintNameTests)', 'test_no_collision_abstract_model_interpolation (check_framework.test_model_checks.ConstraintNameTests)', 'test_no_collision_across_apps_interpolation (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_in_same_app (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_no_collision_for_proxy_models (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_no_collision_for_unmanaged_models (check_framework.test_model_checks.DuplicateDBTableTests)'], 'failure': ['test_collision_across_apps (check_framework.test_model_checks.DuplicateDBTableTests)']}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-11630: resolved: False
+2026-10-10 14:49:34,502 - INFO - Attempting to stop container sweb.eval.django__django-11630.rerun-2026-10__anthropic__baseline__rep3__full__final...
+2026-10-10 14:49:54,490 - INFO - Attempting to remove container sweb.eval.django__django-11630.rerun-2026-10__anthropic__baseline__rep3__full__final...
+2026-10-10 14:50:00,246 - INFO - Container sweb.eval.django__django-11630.rerun-2026-10__anthropic__baseline__rep3__full__final removed.

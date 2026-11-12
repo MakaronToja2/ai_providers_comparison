@@ -1,0 +1,35 @@
+diff --git a/django/core/checks/model_checks.py b/django/core/checks/model_checks.py
+index 5c2266ca1d..e9d0316580 100644
+--- a/django/core/checks/model_checks.py
++++ b/django/core/checks/model_checks.py
+@@ -19,7 +19,10 @@ def check_all_models(app_configs=None, **kwargs):
+         models = chain.from_iterable(app_config.get_models() for app_config in app_configs)
+     for model in models:
+         if model._meta.managed and not model._meta.proxy:
+-            db_table_models[model._meta.db_table].append(model._meta.label)
++            # Use a key that includes the app label to allow same table names in different apps/databases
++            # This assumes that models in different databases are separated by app_label
++            key = (model._meta.db_table, model._meta.app_label)
++            db_table_models[key].append(model._meta.label)
+         if not inspect.ismethod(model.check):
+             errors.append(
+                 Error(
+@@ -35,12 +38,14 @@ def check_all_models(app_configs=None, **kwargs):
+             indexes[model_index.name].append(model._meta.label)
+         for model_constraint in model._meta.constraints:
+             constraints[model_constraint.name].append(model._meta.label)
+-    for db_table, model_labels in db_table_models.items():
+-        if len(model_labels) != 1:
++    # Now check for duplicate db_table names only within the same app_label
++    # We want to allow same table names in different apps/databases, so check duplicates only within same app_label
++    for (db_table, app_label), model_labels in db_table_models.items():
++        if len(model_labels) > 1:
+             errors.append(
+                 Error(
+-                    "db_table '%s' is used by multiple models: %s."
+-                    % (db_table, ', '.join(db_table_models[db_table])),
++                    "db_table '%s' is used by multiple models in app '%s': %s."
++                    % (db_table, app_label, ', '.join(model_labels)),
+                     obj=db_table,
+                     id='models.E028',
+                 )

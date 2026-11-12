@@ -1,0 +1,99 @@
+--- a/sphinx/environment/adapters/indexentries.py
++++ b/sphinx/environment/adapters/indexentries.py
+@@ -27,33 +27,63 @@
+-class IndexEntries:
+-    def __init__(self, env: BuildEnvironment) -> None:
+-        self.env = env
+-
+-    def create_index(self, builder: Builder, group_entries: bool = True,
+-                     _fixre: Pattern = re.compile(r'(.*) ([(][^()]*[)])')
+-                     ) -> List[Tuple[str, List[Tuple[str, Any]]]]:
+-        \"\"\"Create the real index from the collected index entries.\"\"\"
+-        new = {}  # type: Dict[str, List]
+-
+-        def add_entry(word: str, subword: str, main: str, link: bool = True,
+-                      dic: Dict = new, key: str = None) -> None:
+-            # Force the word to be unicode if it's a ASCII bytestring.
+-            # This will solve problems with unicode normalization later.
+-            # For instance the RFC role will add bytestrings at the moment
+-            word = str(word)
+-            entry = dic.get(word)
+-            if not entry:
+-                dic[word] = entry = [[], {}, key]
+-            if subword:
+-                add_entry(subword, '', main, link=link, dic=entry[1], key=key)
+-            elif link:
+-                try:
+-                    uri = builder.get_relative_uri('genindex', fn) + '#' + tid
+-                except NoUri:
+-                    pass
+-                else:
+-                    entry[0].append((main, uri))
+-
+-        domain = cast(IndexDomain, self.env.get_domain('index'))
+-        for fn, entries in domain.entries.items():
+-            # new entry types must be listed in directives/other.py!
+-            for type, value, tid, main, index_key in entries:
++import unicodedata
++import re
++from typing import Any, Dict, List, Pattern, Tuple, cast
++
++from sphinx.environment import BuildEnvironment
++from sphinx.environment.adapters.index import IndexDomain
++from sphinx.util import logging
++from sphinx.errors import NoUri
++from sphinx.builders import Builder
++
++logger = logging.getLogger(__name__)
++
++
++class IndexEntries:
++    def __init__(self, env: BuildEnvironment) -> None:
++        self.env = env
++
++    def create_index(self, builder: Builder, group_entries: bool = True,
++                     _fixre: Pattern = re.compile(r'(.*) ([(][^()]*[)])')
++                     ) -> List[Tuple[str, List[Tuple[str, Any]]]]:
++        """Create the real index from the collected index entries."""
++        new = {}  # type: Dict[str, List]
++
++        def add_entry(word: str, subword: str, main: str, link: bool = True,
++                      dic: Dict = new, key: str = None) -> None:
++            # Force the word to be unicode if it's a ASCII bytestring.
++            # This will solve problems with unicode normalization later.
++            # For instance the RFC role will add bytestrings at the moment
++            word = str(word)
++            entry = dic.get(word)
++            if not entry:
++                dic[word] = entry = [[], {}, key]
++            if subword:
++                add_entry(subword, '', main, link=link, dic=entry[1], key=key)
++            elif link:
++                try:
++                    uri = builder.get_relative_uri('genindex', fn) + '#' + tid
++                except NoUri:
++                    pass
++                else:
++                    entry[0].append((main, uri))
++
++        def get_group_key(word: str) -> str:
++            # Normalize the word to NFD form to separate accents from base characters
++            normalized = unicodedata.normalize('NFD', word)
++            first_char = normalized[0]
++            # Group all symbols under one key "Symbols"
++            if first_char.isalpha():
++                return first_char.upper()
++            else:
++                return "Symbols"
++
++        domain = cast(IndexDomain, self.env.get_domain('index'))
++        for fn, entries in domain.entries.items():
++            # new entry types must be listed in directives/other.py!
++            for type, value, tid, main, index_key in entries:
++                # Determine group key for the entry
++                key = get_group_key(value)
++                add_entry(value, '', main, dic=new, key=key)
++
++        # Convert dict to sorted list of tuples
++        result = sorted(new.items(), key=lambda x: (x[1][2] != "Symbols", x[0]))
++        return result

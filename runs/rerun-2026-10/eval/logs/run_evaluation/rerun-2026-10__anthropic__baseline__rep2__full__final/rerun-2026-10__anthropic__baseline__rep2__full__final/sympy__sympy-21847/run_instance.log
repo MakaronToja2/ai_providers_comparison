@@ -1,0 +1,68 @@
+2026-10-10 19:26:20,515 - INFO - Creating container for sympy__sympy-21847...
+2026-10-10 19:26:30,406 - INFO - Container for sympy__sympy-21847 created: 026e4ca4aca6ac54483659dfb3e9c8900a3b5e62568ba54254c7ec0d82e4d34a
+2026-10-10 19:26:37,715 - INFO - Container for sympy__sympy-21847 started: 026e4ca4aca6ac54483659dfb3e9c8900a3b5e62568ba54254c7ec0d82e4d34a
+2026-10-10 19:26:37,715 - INFO - Intermediate patch for sympy__sympy-21847 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep2__full__final/rerun-2026-10__anthropic__baseline__rep2__full__final/sympy__sympy-21847/patch.diff, now applying to container...
+2026-10-10 19:26:37,842 - INFO - >>>>> Applied Patch:
+Checking patch sympy/polys/monomials.py...
+warning: sympy/polys/monomials.py has type 100755, expected 100644
+Applied patch sympy/polys/monomials.py cleanly.
+
+2026-10-10 19:26:38,142 - INFO - Git diff before:
+diff --git a/sympy/polys/monomials.py b/sympy/polys/monomials.py
+index 0e84403307..e0aae34beb 100755
+--- a/sympy/polys/monomials.py
++++ b/sympy/polys/monomials.py
+@@ -127,7 +127,8 @@ def itermonomials(variables, max_degrees, min_degrees=None):
+                 for variable in item:
+                     if variable != 1:
+                         powers[variable] += 1
+-                if max(powers.values()) >= min_degree:
++                total_degree = sum(powers.values())
++                if min_degree <= total_degree <= max_degree:
+                     monomials_list_comm.append(Mul(*item))
+             yield from set(monomials_list_comm)
+         else:
+@@ -139,7 +140,8 @@ def itermonomials(variables, max_degrees, min_degrees=None):
+                 for variable in item:
+                     if variable != 1:
+                         powers[variable] += 1
+-                if max(powers.values()) >= min_degree:
++                total_degree = sum(powers.values())
++                if min_degree <= total_degree <= max_degree:
+                     monomials_list_non_comm.append(Mul(*item))
+             yield from set(monomials_list_non_comm)
+     else:
+2026-10-10 19:26:38,143 - INFO - Eval script for sympy__sympy-21847 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep2__full__final/rerun-2026-10__anthropic__baseline__rep2__full__final/sympy__sympy-21847/eval.sh; copying to container...
+2026-10-10 19:26:43,890 - INFO - Test runtime: 5.70 seconds
+2026-10-10 19:26:43,891 - INFO - Test output for sympy__sympy-21847 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep2__full__final/rerun-2026-10__anthropic__baseline__rep2__full__final/sympy__sympy-21847/test_output.txt
+2026-10-10 19:26:43,941 - INFO - Git diff after:
+diff --git a/sympy/polys/monomials.py b/sympy/polys/monomials.py
+index 0e84403307..e0aae34beb 100755
+--- a/sympy/polys/monomials.py
++++ b/sympy/polys/monomials.py
+@@ -127,7 +127,8 @@ def itermonomials(variables, max_degrees, min_degrees=None):
+                 for variable in item:
+                     if variable != 1:
+                         powers[variable] += 1
+-                if max(powers.values()) >= min_degree:
++                total_degree = sum(powers.values())
++                if min_degree <= total_degree <= max_degree:
+                     monomials_list_comm.append(Mul(*item))
+             yield from set(monomials_list_comm)
+         else:
+@@ -139,7 +140,8 @@ def itermonomials(variables, max_degrees, min_degrees=None):
+                 for variable in item:
+                     if variable != 1:
+                         powers[variable] += 1
+-                if max(powers.values()) >= min_degree:
++                total_degree = sum(powers.values())
++                if min_degree <= total_degree <= max_degree:
+                     monomials_list_non_comm.append(Mul(*item))
+             yield from set(monomials_list_non_comm)
+     else:
+2026-10-10 19:26:43,941 - INFO - Grading answer for sympy__sympy-21847...
+2026-10-10 19:26:43,942 - INFO - report: {'sympy__sympy-21847': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_monomials'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_monomial_count', 'test_monomial_mul', 'test_monomial_div', 'test_monomial_gcd', 'test_monomial_lcm', 'test_monomial_max', 'test_monomial_pow', 'test_monomial_min', 'test_monomial_divides'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-21847: resolved: True
+2026-10-10 19:26:43,943 - INFO - Attempting to stop container sweb.eval.sympy__sympy-21847.rerun-2026-10__anthropic__baseline__rep2__full__final...
+2026-10-10 19:27:04,617 - INFO - Attempting to remove container sweb.eval.sympy__sympy-21847.rerun-2026-10__anthropic__baseline__rep2__full__final...
+2026-10-10 19:27:06,369 - INFO - Container sweb.eval.sympy__sympy-21847.rerun-2026-10__anthropic__baseline__rep2__full__final removed.

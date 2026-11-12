@@ -1,0 +1,19 @@
+diff --git a/sympy/core/expr.py b/sympy/core/expr.py
+index 24d89897f7..cb0eebe751 100644
+--- a/sympy/core/expr.py
++++ b/sympy/core/expr.py
+@@ -120,8 +120,13 @@ def _hashable_content(self):
+         return self._args
+ 
+     def __eq__(self, other):
++        # Avoid sympify(eval(repr(other))) for unknown objects which is unsafe
++        # and can cause errors as well as security issues.
++        from sympy.core.sympify import _sympify
++
++        # Use _sympify which is a safer version of sympify for __eq__ and __add__
+         try:
+-            other = sympify(other)
++            other = _sympify(other)
+             if not isinstance(other, Expr):
+                 return False
+         except (SympifyError, SyntaxError):

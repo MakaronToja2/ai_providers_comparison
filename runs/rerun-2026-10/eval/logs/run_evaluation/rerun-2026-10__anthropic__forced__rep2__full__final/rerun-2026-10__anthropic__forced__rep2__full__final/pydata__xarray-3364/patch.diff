@@ -1,0 +1,75 @@
+diff --git a/xarray/core/concat.py b/xarray/core/concat.py
+index ecae2566c..a6ec0cd8e 100644
+--- a/xarray/core/concat.py
++++ b/xarray/core/concat.py
+@@ -1,3 +1,4 @@
++import numpy as np
+ import pandas as pd
+ 
+ from . import dtypes, utils
+@@ -314,13 +315,30 @@ def _dataset_concat(
+         for ds in datasets:
+             absent_merge_vars = variables_to_merge - set(ds.variables)
+             if absent_merge_vars:
+-                raise ValueError(
+-                    "variables %r are present in some datasets but not others. "
+-                    % absent_merge_vars
+-                )
++                if join != "outer":
++                    raise ValueError(
++                        "variables %r are present in some datasets but not others. "
++                        % absent_merge_vars
++                    )
+ 
+             for var in variables_to_merge:
+-                to_merge[var].append(ds.variables[var])
++                if var in ds.variables:
++                    to_merge[var].append(ds.variables[var])
++                else:
++                    # For outer join, create a variable filled with fill_value
++                    if join == "outer":
++                        # Get the variable from another dataset to determine shape/dims
++                        for other_ds in datasets:
++                            if var in other_ds.variables:
++                                other_var = other_ds.variables[var]
++                                # Create a variable with the same dims but filled with fill_value
++                                filled_var = Variable(
++                                    other_var.dims,
++                                    fill_value * np.ones(other_var.shape, dtype=other_var.dtype),
++                                    attrs=other_var.attrs
++                                )
++                                to_merge[var].append(filled_var)
++                                break
+ 
+         for var in variables_to_merge:
+             result_vars[var] = unique_variable(
+@@ -359,7 +377,28 @@ def _dataset_concat(
+     for k in datasets[0].variables:
+         if k in concat_over:
+             try:
+-                vars = ensure_common_dims([ds.variables[k] for ds in datasets])
++                vars_list = []
++                for ds in datasets:
++                    if k in ds.variables:
++                        vars_list.append(ds.variables[k])
++                    else:
++                        # For outer join, create a variable filled with fill_value
++                        if join == "outer":
++                            # Get the variable from another dataset to determine shape/dims
++                            for other_ds in datasets:
++                                if k in other_ds.variables:
++                                    other_var = other_ds.variables[k]
++                                    # Create a variable with the same dims but filled with fill_value
++                                    filled_var = Variable(
++                                        other_var.dims,
++                                        fill_value * np.ones(other_var.shape, dtype=other_var.dtype),
++                                        attrs=other_var.attrs
++                                    )
++                                    vars_list.append(filled_var)
++                                    break
++                        else:
++                            raise ValueError("%r is not present in all datasets." % k)
++                vars = ensure_common_dims(vars_list)
+             except KeyError:
+                 raise ValueError("%r is not present in all datasets." % k)
+             combined = concat_vars(vars, dim, positions)

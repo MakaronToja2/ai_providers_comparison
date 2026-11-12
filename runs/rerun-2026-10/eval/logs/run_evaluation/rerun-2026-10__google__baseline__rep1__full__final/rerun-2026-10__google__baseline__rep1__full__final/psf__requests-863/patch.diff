@@ -1,0 +1,19 @@
+diff --git a/requests/models.py b/requests/models.py
+index d8456375..9673c966 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -148,8 +148,12 @@ class Request(object):
+ 
+         hooks = hooks or {}
+ 
+-        for (k, v) in list(hooks.items()):
+-            self.register_hook(event=k, hook=v)
++        for event, hook_list in list(hooks.items()):
++            if isinstance(hook_list, list):
++                for hook in hook_list:
++                    self.register_hook(event=event, hook=hook)
++            else:
++                self.register_hook(event=event, hook=hook_list)
+ 
+         #: Session.
+         self.session = session

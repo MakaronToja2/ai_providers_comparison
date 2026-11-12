@@ -1,0 +1,35 @@
+diff --git a/sphinx/ext/autodoc/importer.py b/sphinx/ext/autodoc/importer.py
+index adfa6d05dc..bf1e61efbc 100644
+--- a/sphinx/ext/autodoc/importer.py
++++ b/sphinx/ext/autodoc/importer.py
+@@ -229,18 +229,29 @@ def get_object_members(subject: Any, objpath: List[str], attrgetter: Callable,
+         for name in _getannotations(cls):
+             name = unmangle(cls, name)
+             if name and name not in members:
+-                members[name] = Attribute(name, i == 0, INSTANCEATTR)
++                # Resolve type aliases for annotated attributes
++                type_hint = _getannotations(cls)[name]
++                resolved_type = resolve_type_hint(type_hint, subject, type_aliases=analyzer.config.autodoc_type_aliases)
++                members[name] = Attribute(name, i == 0, resolved_type)
+ 
+     if analyzer:
+         # append instance attributes (cf. self.attr1) if analyzer knows
+         namespace = '.'.join(objpath)
+         for (ns, name) in analyzer.find_attr_docs():
+             if namespace == ns and name not in members:
++                # For instance attributes found via analyzer, we don't have direct type info here.
++                # A more robust solution might involve deeper introspection or relying on
++                # ModuleAnalyzer to provide type information if possible.
++                # For now, we'll use INSTANCEATTR as a placeholder, but ideally,
++                # we'd try to resolve the type if available.
++                # A potential improvement would be to pass type_aliases to ModuleAnalyzer
++                # or have it return type information.
+                 members[name] = Attribute(name, True, INSTANCEATTR)
+ 
+     return members
+ 
+ 
++from sphinx.util.typing import resolve_type_hint
+ from sphinx.ext.autodoc.mock import (MockFinder, MockLoader, _MockModule, _MockObject,  # NOQA
+                                      mock)
+ 

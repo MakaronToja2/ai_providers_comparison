@@ -1,0 +1,12 @@
+diff --git a/django/contrib/auth/forms.py b/django/contrib/auth/forms.py
+index 20d8922799..dd595ae38a 100644
+--- a/django/contrib/auth/forms.py
++++ b/django/contrib/auth/forms.py
+@@ -33,6 +33,7 @@ def _unicode_ci_compare(s1, s2):
+ class ReadOnlyPasswordHashWidget(forms.Widget):
+     template_name = 'auth/widgets/read_only_password_hash.html'
+     read_only = True
++    is_hidden = True
+ 
+     def get_context(self, name, value, attrs):
+         context = super().get_context(name, value, attrs)

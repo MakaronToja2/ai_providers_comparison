@@ -1,0 +1,62 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 171a3e7b0d..7edd61bd00 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1717,11 +1717,14 @@ class DataDocumenter(ModuleLevelDocumenter):
+ 
+             if self.objpath[-1] in annotations:
+                 objrepr = stringify_typehint(annotations.get(self.objpath[-1]))
++                objrepr = self._apply_type_aliases(objrepr)
+                 self.add_line('   :type: ' + objrepr, sourcename)
+             else:
+                 key = ('.'.join(self.objpath[:-1]), self.objpath[-1])
+                 if self.analyzer and key in self.analyzer.annotations:
+-                    self.add_line('   :type: ' + self.analyzer.annotations[key],
++                    annotation = self.analyzer.annotations[key]
++                    annotation = self._apply_type_aliases(annotation)
++                    self.add_line('   :type: ' + annotation,
+                                   sourcename)
+ 
+             try:
+@@ -1745,6 +1748,12 @@ class DataDocumenter(ModuleLevelDocumenter):
+         return self.get_attr(self.parent or self.object, '__module__', None) \
+             or self.modname
+ 
++    def _apply_type_aliases(self, annotation: str) -> str:
++        """Apply type aliases to the annotation string."""
++        for alias, replacement in self.config.autodoc_type_aliases.items():
++            annotation = re.sub(r'\b' + re.escape(alias) + r'\b', replacement, annotation)
++        return annotation
++
+ 
+ class DataDeclarationDocumenter(DataDocumenter):
+     """
+@@ -2087,6 +2096,12 @@ class AttributeDocumenter(DocstringStripSignatureMixin, ClassLevelDocumenter):
+         return self.get_attr(self.parent or self.object, '__module__', None) \
+             or self.modname
+ 
++    def _apply_type_aliases(self, annotation: str) -> str:
++        """Apply type aliases to the annotation string."""
++        for alias, replacement in self.config.autodoc_type_aliases.items():
++            annotation = re.sub(r'\b' + re.escape(alias) + r'\b', replacement, annotation)
++        return annotation
++
+     def add_directive_header(self, sig: str) -> None:
+         super().add_directive_header(sig)
+         sourcename = self.get_sourcename()
+@@ -2108,11 +2123,14 @@ class AttributeDocumenter(DocstringStripSignatureMixin, ClassLevelDocumenter):
+ 
+             if self.objpath[-1] in annotations:
+                 objrepr = stringify_typehint(annotations.get(self.objpath[-1]))
++                objrepr = self._apply_type_aliases(objrepr)
+                 self.add_line('   :type: ' + objrepr, sourcename)
+             else:
+                 key = ('.'.join(self.objpath[:-1]), self.objpath[-1])
+                 if self.analyzer and key in self.analyzer.annotations:
+-                    self.add_line('   :type: ' + self.analyzer.annotations[key],
++                    annotation = self.analyzer.annotations[key]
++                    annotation = self._apply_type_aliases(annotation)
++                    self.add_line('   :type: ' + annotation,
+                                   sourcename)
+ 
+             # data descriptors do not have useful values

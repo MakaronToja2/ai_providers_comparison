@@ -1,0 +1,18 @@
+diff --git a/lib/matplotlib/widgets.py b/lib/matplotlib/widgets.py
+index ebe5da43e2..a8bff76727 100644
+--- a/lib/matplotlib/widgets.py
++++ b/lib/matplotlib/widgets.py
+@@ -880,7 +880,12 @@ class RangeSlider(SliderBase):
+             event.name == "button_press_event" and event.inaxes != self.ax
+         ):
+             self.drag_active = False
+-            event.canvas.release_mouse(self.ax)
++            try:
++                event.canvas.release_mouse(self.ax)
++            except ValueError:
++                # Axes may have been replaced (e.g., by clf()), so release_mouse
++                # might fail. This is safe to ignore.
++                pass
+             self._active_handle = None
+             return
+ 

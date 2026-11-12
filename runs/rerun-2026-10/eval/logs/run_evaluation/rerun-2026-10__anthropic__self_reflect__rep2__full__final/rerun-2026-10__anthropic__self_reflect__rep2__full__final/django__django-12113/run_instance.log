@@ -1,0 +1,81 @@
+2026-10-10 14:52:59,218 - INFO - Creating container for django__django-12113...
+2026-10-10 14:53:05,460 - INFO - Container for django__django-12113 created: 4b621b107dec62f34fa37c6149452bd57450cf8eae6c130bce6fe6f04e9529c2
+2026-10-10 14:53:11,166 - INFO - Container for django__django-12113 started: 4b621b107dec62f34fa37c6149452bd57450cf8eae6c130bce6fe6f04e9529c2
+2026-10-10 14:53:11,166 - INFO - Intermediate patch for django__django-12113 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep2__full__final/rerun-2026-10__anthropic__self_reflect__rep2__full__final/django__django-12113/patch.diff, now applying to container...
+2026-10-10 14:53:11,384 - INFO - >>>>> Applied Patch:
+/tmp/patch.diff:13: trailing whitespace.
+    
+/tmp/patch.diff:24: trailing whitespace.
+    
+Checking patch django/test/testcases.py...
+warning: django/test/testcases.py has type 100755, expected 100644
+Applied patch django/test/testcases.py cleanly.
+warning: 2 lines add whitespace errors.
+
+2026-10-10 14:53:12,348 - INFO - Git diff before:
+diff --git a/django/test/testcases.py b/django/test/testcases.py
+index 23459f22cd..8bfcc42b22 100755
+--- a/django/test/testcases.py
++++ b/django/test/testcases.py
+@@ -1059,7 +1059,22 @@ def connections_support_transactions(aliases=None):
+     transactions.
+     """
+     conns = connections.all() if aliases is None else (connections[alias] for alias in aliases)
+-    return all(conn.features.supports_transactions for conn in conns)
++    conns = list(conns)
++    if not all(conn.features.supports_transactions for conn in conns):
++        return False
++    
++    # SQLite with persistent databases (TEST['NAME'] is set) doesn't handle
++    # concurrent transactions well, so we should not use atomic blocks
++    for conn in conns:
++        if conn.vendor == 'sqlite':
++            # Check if this is a persistent database (not in-memory)
++            test_settings = conn.settings_dict.get('TEST', {})
++            test_name = test_settings.get('NAME')
++            if test_name:
++                # Persistent database - don't use transactions
++                return False
++    
++    return True
+ 
+ 
+ class TestCase(TransactionTestCase):
+2026-10-10 14:53:12,348 - INFO - Eval script for django__django-12113 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep2__full__final/rerun-2026-10__anthropic__self_reflect__rep2__full__final/django__django-12113/eval.sh; copying to container...
+2026-10-10 14:53:23,050 - INFO - Test runtime: 10.45 seconds
+2026-10-10 14:53:23,053 - INFO - Test output for django__django-12113 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep2__full__final/rerun-2026-10__anthropic__self_reflect__rep2__full__final/django__django-12113/test_output.txt
+2026-10-10 14:53:23,156 - INFO - Git diff after:
+diff --git a/django/test/testcases.py b/django/test/testcases.py
+index 23459f22cd..8bfcc42b22 100755
+--- a/django/test/testcases.py
++++ b/django/test/testcases.py
+@@ -1059,7 +1059,22 @@ def connections_support_transactions(aliases=None):
+     transactions.
+     """
+     conns = connections.all() if aliases is None else (connections[alias] for alias in aliases)
+-    return all(conn.features.supports_transactions for conn in conns)
++    conns = list(conns)
++    if not all(conn.features.supports_transactions for conn in conns):
++        return False
++    
++    # SQLite with persistent databases (TEST['NAME'] is set) doesn't handle
++    # concurrent transactions well, so we should not use atomic blocks
++    for conn in conns:
++        if conn.vendor == 'sqlite':
++            # Check if this is a persistent database (not in-memory)
++            test_settings = conn.settings_dict.get('TEST', {})
++            test_name = test_settings.get('NAME')
++            if test_name:
++                # Persistent database - don't use transactions
++                return False
++    
++    return True
+ 
+ 
+ class TestCase(TransactionTestCase):
+2026-10-10 14:53:23,156 - INFO - Grading answer for django__django-12113...
+2026-10-10 14:53:23,163 - INFO - report: {'django__django-12113': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_custom_test_name (backends.sqlite.test_creation.TestDbSignatureTests)']}, 'PASS_TO_PASS': {'success': [], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-12113: resolved: False
+2026-10-10 14:53:23,164 - INFO - Attempting to stop container sweb.eval.django__django-12113.rerun-2026-10__anthropic__self_reflect__rep2__full__final...
+2026-10-10 14:53:42,462 - INFO - Attempting to remove container sweb.eval.django__django-12113.rerun-2026-10__anthropic__self_reflect__rep2__full__final...
+2026-10-10 14:53:46,289 - INFO - Container sweb.eval.django__django-12113.rerun-2026-10__anthropic__self_reflect__rep2__full__final removed.

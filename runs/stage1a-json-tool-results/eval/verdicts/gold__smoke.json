@@ -1,0 +1,67 @@
+{
+  "job": "gold",
+  "kind": "gold",
+  "subset": "smoke",
+  "run_id": "gold__smoke",
+  "counts": {
+    "resolved": 8
+  },
+  "verdicts": {
+    "django__django-13448": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 7,
+      "p2p_total": 7
+    },
+    "django__django-15347": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 29,
+      "p2p_total": 29
+    },
+    "matplotlib__matplotlib-26011": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 817,
+      "p2p_total": 817
+    },
+    "pytest-dev__pytest-5692": {
+      "status": "resolved",
+      "f2p_passed": 2,
+      "f2p_total": 2,
+      "p2p_passed": 68,
+      "p2p_total": 68
+    },
+    "scikit-learn__scikit-learn-13439": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 40,
+      "p2p_total": 40
+    },
+    "sphinx-doc__sphinx-7975": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 7,
+      "p2p_total": 7
+    },
+    "sympy__sympy-15609": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 121,
+      "p2p_total": 121
+    },
+    "sympy__sympy-19007": {
+      "status": "resolved",
+      "f2p_passed": 3,
+      "f2p_total": 3,
+      "p2p_passed": 26,
+      "p2p_total": 26
+    }
+  }
+}

@@ -1,0 +1,34 @@
+diff --git a/lib/matplotlib/offsetbox.py b/lib/matplotlib/offsetbox.py
+index 77768e7383..cf27dc0305 100644
+--- a/lib/matplotlib/offsetbox.py
++++ b/lib/matplotlib/offsetbox.py
+@@ -1558,14 +1558,24 @@ class DraggableBase:
+ 
+     def disconnect(self):
+         """Disconnect the callbacks."""
+-        for cid in self.cids:
+-            self.canvas.mpl_disconnect(cid)
+         try:
+-            c1 = self._c1
++            # Accessing self.canvas might raise AttributeError if self.ref_artist.figure is None
++            canvas = self.canvas
++            for cid in self.cids:
++                canvas.mpl_disconnect(cid)
++            try:
++                c1 = self._c1
++            except AttributeError:
++                pass
++            else:
++                canvas.mpl_disconnect(c1)
+         except AttributeError:
++            # If canvas is not available (e.g., ref_artist.figure is None), do nothing.
+             pass
+-        else:
+-            self.canvas.mpl_disconnect(c1)
++        # Ensure ref_artist.figure is None if canvas is not available
++        # This might be redundant if _check_still_parented is called first
++        if not (self.ref_artist and self.ref_artist.figure):
++            self.ref_artist.figure = None
+ 
+     def save_offset(self):
+         pass

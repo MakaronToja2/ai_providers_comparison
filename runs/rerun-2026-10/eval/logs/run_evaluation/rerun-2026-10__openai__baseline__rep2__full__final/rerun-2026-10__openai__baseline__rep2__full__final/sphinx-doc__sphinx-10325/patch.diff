@@ -1,0 +1,39 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 62631f7ff9..86c6a4a8af 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1697,6 +1697,15 @@ class ClassDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # type:
+ 
+     def get_object_members(self, want_all: bool) -> Tuple[bool, ObjectMembers]:
+         members = get_class_members(self.object, self.objpath, self.get_attr)
++
++        # Support for inherited-members option with a list of class names to ignore
++        inherited_members_option = self.options.inherited_members
++        if isinstance(inherited_members_option, str):
++            # Convert comma-separated string to list
++            inherited_members_option = [name.strip() for name in inherited_members_option.split(',')]
++        elif not inherited_members_option:
++            inherited_members_option = []
++
+         if not want_all:
+             if not self.options.members:
+                 return False, []  # type: ignore
+@@ -1709,6 +1718,18 @@ class ClassDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # type:
+                     logger.warning(__('missing attribute %s in object %s') %
+                                    (name, self.fullname), type='autodoc')
+             return False, selected
++        elif inherited_members_option:
++            # Filter out members inherited from any of the classes in inherited_members_option
++            filtered_members = []
++            for m in members.values():
++                # Check if member's class is a subclass of any ignored base classes
++                if m.class_ is self.object:
++                    filtered_members.append(m)
++                    continue
++                # Check if any base class to ignore is in the MRO of member's class
++                if not any(base.__name__ in inherited_members_option for base in m.class_.__mro__[1:]):
++                    filtered_members.append(m)
++            return False, filtered_members
+         elif self.options.inherited_members:
+             return False, list(members.values())
+         else:

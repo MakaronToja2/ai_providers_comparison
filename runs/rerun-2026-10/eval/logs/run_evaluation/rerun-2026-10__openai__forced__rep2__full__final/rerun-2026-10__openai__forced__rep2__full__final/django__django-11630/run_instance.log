@@ -1,0 +1,108 @@
+2026-10-10 12:28:24,914 - INFO - Creating container for django__django-11630...
+2026-10-10 12:28:25,432 - INFO - Container for django__django-11630 created: 181d463f9452894e1c988873a365cd8cb5f8a1f79a89eea4ad68fffcd5b22ff6
+2026-10-10 12:28:25,958 - INFO - Container for django__django-11630 started: 181d463f9452894e1c988873a365cd8cb5f8a1f79a89eea4ad68fffcd5b22ff6
+2026-10-10 12:28:25,959 - INFO - Intermediate patch for django__django-11630 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep2__full__final/rerun-2026-10__openai__forced__rep2__full__final/django__django-11630/patch.diff, now applying to container...
+2026-10-10 12:28:26,241 - INFO - >>>>> Applied Patch:
+Checking patch django/core/checks/model_checks.py...
+warning: django/core/checks/model_checks.py has type 100755, expected 100644
+Applied patch django/core/checks/model_checks.py cleanly.
+
+2026-10-10 12:28:27,396 - INFO - Git diff before:
+diff --git a/django/core/checks/model_checks.py b/django/core/checks/model_checks.py
+index 5c2266ca1d..609a09291e 100755
+--- a/django/core/checks/model_checks.py
++++ b/django/core/checks/model_checks.py
+@@ -37,14 +37,32 @@ def check_all_models(app_configs=None, **kwargs):
+             constraints[model_constraint.name].append(model._meta.label)
+     for db_table, model_labels in db_table_models.items():
+         if len(model_labels) != 1:
+-            errors.append(
+-                Error(
+-                    "db_table '%s' is used by multiple models: %s."
+-                    % (db_table, ', '.join(db_table_models[db_table])),
+-                    obj=db_table,
+-                    id='models.E028',
++            # Allow same db_table name if models belong to different databases
++            # i.e. different app labels and different database routing
++            # This requires checking the database routing or app config which is not trivial here.
++            # Instead, we relax the check if models belong to different app configs with different databases.
++            # We assume models with same db_table in different apps with different databases are allowed.
++            # We check if all models share the same database alias, if so, error, else allow.
++            from django.db import router
++            # Get the database alias for each model
++            db_aliases = set()
++            for label in model_labels:
++                try:
++                    model = apps.get_model(label)
++                    db_alias = router.db_for_read(model)
++                    db_aliases.add(db_alias)
++                except LookupError:
++                    # If model not found, fallback to error
++                    db_aliases.add(None)
++            if len(db_aliases) == 1:
++                errors.append(
++                    Error(
++                        "db_table '%s' is used by multiple models: %s."
++                        % (db_table, ', '.join(model_labels)),
++                        obj=db_table,
++                        id='models.E028',
++                    )
+                 )
+-            )
+     for index_name, model_labels in indexes.items():
+         if len(model_labels) > 1:
+             model_labels = set(model_labels)
+2026-10-10 12:28:27,396 - INFO - Eval script for django__django-11630 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep2__full__final/rerun-2026-10__openai__forced__rep2__full__final/django__django-11630/eval.sh; copying to container...
+2026-10-10 12:28:41,488 - INFO - Test runtime: 13.95 seconds
+2026-10-10 12:28:41,633 - INFO - Test output for django__django-11630 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep2__full__final/rerun-2026-10__openai__forced__rep2__full__final/django__django-11630/test_output.txt
+2026-10-10 12:28:41,720 - INFO - Git diff after:
+diff --git a/django/core/checks/model_checks.py b/django/core/checks/model_checks.py
+index 5c2266ca1d..609a09291e 100755
+--- a/django/core/checks/model_checks.py
++++ b/django/core/checks/model_checks.py
+@@ -37,14 +37,32 @@ def check_all_models(app_configs=None, **kwargs):
+             constraints[model_constraint.name].append(model._meta.label)
+     for db_table, model_labels in db_table_models.items():
+         if len(model_labels) != 1:
+-            errors.append(
+-                Error(
+-                    "db_table '%s' is used by multiple models: %s."
+-                    % (db_table, ', '.join(db_table_models[db_table])),
+-                    obj=db_table,
+-                    id='models.E028',
++            # Allow same db_table name if models belong to different databases
++            # i.e. different app labels and different database routing
++            # This requires checking the database routing or app config which is not trivial here.
++            # Instead, we relax the check if models belong to different app configs with different databases.
++            # We assume models with same db_table in different apps with different databases are allowed.
++            # We check if all models share the same database alias, if so, error, else allow.
++            from django.db import router
++            # Get the database alias for each model
++            db_aliases = set()
++            for label in model_labels:
++                try:
++                    model = apps.get_model(label)
++                    db_alias = router.db_for_read(model)
++                    db_aliases.add(db_alias)
++                except LookupError:
++                    # If model not found, fallback to error
++                    db_aliases.add(None)
++            if len(db_aliases) == 1:
++                errors.append(
++                    Error(
++                        "db_table '%s' is used by multiple models: %s."
++                        % (db_table, ', '.join(model_labels)),
++                        obj=db_table,
++                        id='models.E028',
++                    )
+                 )
+-            )
+     for index_name, model_labels in indexes.items():
+         if len(model_labels) > 1:
+             model_labels = set(model_labels)
+2026-10-10 12:28:41,720 - INFO - Grading answer for django__django-11630...
+2026-10-10 12:28:41,725 - INFO - report: {'django__django-11630': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_collision_across_apps_database_routers_installed (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_collision_in_same_app_database_routers_installed (check_framework.test_model_checks.DuplicateDBTableTests)']}, 'PASS_TO_PASS': {'success': ['test_collision_abstract_model (check_framework.test_model_checks.IndexNameTests)', 'test_collision_across_apps (check_framework.test_model_checks.IndexNameTests)', 'test_collision_in_different_models (check_framework.test_model_checks.IndexNameTests)', 'test_collision_in_same_model (check_framework.test_model_checks.IndexNameTests)', 'test_no_collision_abstract_model_interpolation (check_framework.test_model_checks.IndexNameTests)', 'test_no_collision_across_apps_interpolation (check_framework.test_model_checks.IndexNameTests)', 'test_collision_abstract_model (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_across_apps (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_in_different_models (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_in_same_model (check_framework.test_model_checks.ConstraintNameTests)', 'test_no_collision_abstract_model_interpolation (check_framework.test_model_checks.ConstraintNameTests)', 'test_no_collision_across_apps_interpolation (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_across_apps (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_collision_in_same_app (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_no_collision_for_proxy_models (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_no_collision_for_unmanaged_models (check_framework.test_model_checks.DuplicateDBTableTests)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-11630: resolved: False
+2026-10-10 12:28:41,726 - INFO - Attempting to stop container sweb.eval.django__django-11630.rerun-2026-10__openai__forced__rep2__full__final...
+2026-10-10 12:29:00,568 - INFO - Attempting to remove container sweb.eval.django__django-11630.rerun-2026-10__openai__forced__rep2__full__final...
+2026-10-10 12:29:00,758 - INFO - Container sweb.eval.django__django-11630.rerun-2026-10__openai__forced__rep2__full__final removed.

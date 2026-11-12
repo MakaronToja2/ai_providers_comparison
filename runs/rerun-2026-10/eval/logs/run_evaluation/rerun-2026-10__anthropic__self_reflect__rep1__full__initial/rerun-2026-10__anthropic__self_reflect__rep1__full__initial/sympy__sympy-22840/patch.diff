@@ -1,0 +1,32 @@
+diff --git a/sympy/simplify/cse_main.py b/sympy/simplify/cse_main.py
+index d649dd02a9..3de4b2706c 100644
+--- a/sympy/simplify/cse_main.py
++++ b/sympy/simplify/cse_main.py
+@@ -578,6 +578,7 @@ def tree_cse(exprs, symbols, opt_subs=None, order='canonical', ignore=()):
+ 
+     seen_subexp = set()
+     excluded_symbols = set()
++    matrix_element_parents = set()
+ 
+     def _find_repeated(expr):
+         if not isinstance(expr, (Basic, Unevaluated)):
+@@ -616,6 +617,19 @@ def _find_repeated(expr):
+         if isinstance(e, Basic):
+             _find_repeated(e)
+ 
++    # Collect MatrixSymbols that are parents of MatrixElements
++    from sympy.matrices.expressions.matexpr import MatrixElement
++    def _collect_matrix_element_parents(expr):
++        if isinstance(expr, MatrixElement):
++            matrix_element_parents.add(expr.parent)
++        if isinstance(expr, Basic):
++            for arg in expr.args:
++                _collect_matrix_element_parents(arg)
++
++    for e in exprs:
++        if isinstance(e, Basic):
++            _collect_matrix_element_parents(e)
++
+     ## Rebuild tree
+ 
+     # Remove symbols from the generator that conflict with names in the expressions.

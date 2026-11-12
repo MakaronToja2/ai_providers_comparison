@@ -1,0 +1,54 @@
+--- a/src/_pytest/junitxml.py
++++ b/src/_pytest/junitxml.py
+@@ -1,10 +1,14 @@
+-"""
+-    report test results in JUnit-XML format,
+-    for use with Jenkins and build integration servers.
+-
+-
+-Based on initial code from Ross Lawley.
+-
+-Output conforms to https://github.com/jenkinsci/xunit-plugin/blob/master/
+-src/main/resources/org/jenkinsci/plugins/xunit/types/model/xsd/junit-10.xsd
+-"""
++"""
++    report test results in JUnit-XML format,
++    for use with Jenkins and build integration servers.
++
++    Based on initial code from Ross Lawley.
++
++    Output conforms to https://github.com/jenkinsci/xunit-plugin/blob/master/
++    src/main/resources/org/jenkinsci/plugins/xunit/types/model/xsd/junit-10.xsd
++"""
++
++import socket
++import datetime
++
++...
+@@ class JunitXML:
+-    def toxml(self):
+-        testsuite = Junit.testsuite(
+-            errors=str(self.stats.get("error", 0)),
+-            failures=str(self.stats.get("failed", 0)),
+-            name=self.name,
+-            skipped=str(self.stats.get("skipped", 0)),
+-            tests=str(self.stats.get("total", 0)),
+-            time="%.3f" % self.duration,
+-        )
++    def toxml(self):
++        # Add hostname and timestamp attributes to the testsuite element
++        timestamp = datetime.datetime.utcnow().isoformat()
++        hostname = socket.gethostname()
++        testsuite = Junit.testsuite(
++            errors=str(self.stats.get("error", 0)),
++            failures=str(self.stats.get("failed", 0)),
++            name=self.name,
++            skipped=str(self.stats.get("skipped", 0)),
++            tests=str(self.stats.get("total", 0)),
++            time="%.3f" % self.duration,
++            timestamp=timestamp,
++            hostname=hostname,
++        )
+@@ class JunitXML:
+-        return testsuite
++        return testsuite

@@ -1,0 +1,21 @@
+diff --git a/sympy/core/power.py b/sympy/core/power.py
+index 82bc545f33..c96f89e3da 100644
+--- a/sympy/core/power.py
++++ b/sympy/core/power.py
+@@ -192,6 +192,16 @@ def __new__(cls, b, e, evaluate=None):
+ 
+         b = _sympify(b)
+         e = _sympify(e)
++
++        # Convert float exponents to Rational if possible
++        if isinstance(e, Float):
++            try:
++                rational_e = sympify(e)
++                if rational_e != e:  # Only replace if it's a different object (i.e., converted)
++                    e = rational_e
++            except (ValueError, TypeError):
++                pass  # Ignore if conversion fails
++
+         if evaluate:
+             if e is S.Zero:
+                 return S.One

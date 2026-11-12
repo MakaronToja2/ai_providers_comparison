@@ -1,0 +1,18 @@
+--- a/sphinx/environment/collectors/indexentries.py
++++ b/sphinx/environment/collectors/indexentries.py
+@@ -141,2 +141,5 @@
+-        if key == 'Symbols':
+-            key = 'Symbols'
++        # Normalize keys that are considered symbols to a single 'Symbols' key
++        if key and key[0] in ('@', '£', '←'):
++            key = 'Symbols'
++        elif key == 'Symbols':
++            key = 'Symbols'
+@@ -150,2 +157,5 @@
+-        if key == 'Symbols':
+-            key = 'Symbols'
++        # Normalize keys that are considered symbols to a single 'Symbols' key
++        if key and key[0] in ('@', '£', '←'):
++            key = 'Symbols'
++        elif key == 'Symbols':
++            key = 'Symbols'

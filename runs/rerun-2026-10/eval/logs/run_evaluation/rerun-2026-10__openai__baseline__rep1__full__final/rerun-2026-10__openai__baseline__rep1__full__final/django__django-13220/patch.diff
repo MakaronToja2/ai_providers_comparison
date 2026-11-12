@@ -1,0 +1,36 @@
+diff --git a/django/core/exceptions.py b/django/core/exceptions.py
+index dc084b8692..13edfeb98e 100644
+--- a/django/core/exceptions.py
++++ b/django/core/exceptions.py
+@@ -182,6 +182,31 @@ class ValidationError(Exception):
+     def __repr__(self):
+         return 'ValidationError(%s)' % self
+ 
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++
++        def normalize_errors(errors):
++            # Normalize errors to a dict of field -> sorted list of messages
++            if hasattr(errors, 'error_dict'):
++                error_dict = errors.error_dict
++            else:
++                error_dict = {NON_FIELD_ERRORS: errors.error_list}
++
++            normalized = {}
++            for field, error_list in error_dict.items():
++                # error_list is a list of ValidationError instances
++                messages = []
++                for error in error_list:
++                    message = error.message
++                    if error.params:
++                        message %= error.params
++                    messages.append(str(message))
++                normalized[field] = sorted(messages)
++            return normalized
++
++        return normalize_errors(self) == normalize_errors(other)
++
+ 
+ class EmptyResultSet(Exception):
+     """A database query predicate is impossible."""

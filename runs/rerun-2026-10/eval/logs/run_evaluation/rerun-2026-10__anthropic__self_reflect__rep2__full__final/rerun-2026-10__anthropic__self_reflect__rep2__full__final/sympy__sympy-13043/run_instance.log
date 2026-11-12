@@ -1,0 +1,60 @@
+2026-10-10 18:31:51,225 - INFO - Creating container for sympy__sympy-13043...
+2026-10-10 18:32:03,430 - INFO - Container for sympy__sympy-13043 created: 84d258734cf7c1d00a068626398c6b4a4e4ec47b0d7e1e91b983f00e021c9c2a
+2026-10-10 18:32:09,407 - INFO - Container for sympy__sympy-13043 started: 84d258734cf7c1d00a068626398c6b4a4e4ec47b0d7e1e91b983f00e021c9c2a
+2026-10-10 18:32:09,408 - INFO - Intermediate patch for sympy__sympy-13043 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep2__full__final/rerun-2026-10__anthropic__self_reflect__rep2__full__final/sympy__sympy-13043/patch.diff, now applying to container...
+2026-10-10 18:32:09,535 - INFO - >>>>> Applied Patch:
+Checking patch sympy/integrals/intpoly.py...
+warning: sympy/integrals/intpoly.py has type 100755, expected 100644
+Applied patch sympy/integrals/intpoly.py cleanly.
+
+2026-10-10 18:32:09,742 - INFO - Git diff before:
+diff --git a/sympy/integrals/intpoly.py b/sympy/integrals/intpoly.py
+index fc72bd206..5332bcb80 100755
+--- a/sympy/integrals/intpoly.py
++++ b/sympy/integrals/intpoly.py
+@@ -569,7 +569,7 @@ def decompose(expr, separate=False):
+             degrees = [(sum(degree_list(monom, *symbols)), monom)
+                        for monom in expr.args]
+             if separate:
+-                return [monom[1] for monom in degrees]
++                return [monom[1] for monom in sorted(degrees, key=lambda x: x[0])]
+             else:
+                 for monom in degrees:
+                     degree, term = monom
+@@ -593,7 +593,7 @@ def decompose(expr, separate=False):
+         poly_dict[0] = expr
+ 
+     if separate:
+-        return list(poly_dict.values())
++        return [poly_dict[key] for key in sorted(poly_dict.keys())]
+     return poly_dict
+2026-10-10 18:32:09,742 - INFO - Eval script for sympy__sympy-13043 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep2__full__final/rerun-2026-10__anthropic__self_reflect__rep2__full__final/sympy__sympy-13043/eval.sh; copying to container...
+2026-10-10 18:32:14,983 - INFO - Test runtime: 5.18 seconds
+2026-10-10 18:32:14,984 - INFO - Test output for sympy__sympy-13043 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep2__full__final/rerun-2026-10__anthropic__self_reflect__rep2__full__final/sympy__sympy-13043/test_output.txt
+2026-10-10 18:32:15,032 - INFO - Git diff after:
+diff --git a/sympy/integrals/intpoly.py b/sympy/integrals/intpoly.py
+index fc72bd206..5332bcb80 100755
+--- a/sympy/integrals/intpoly.py
++++ b/sympy/integrals/intpoly.py
+@@ -569,7 +569,7 @@ def decompose(expr, separate=False):
+             degrees = [(sum(degree_list(monom, *symbols)), monom)
+                        for monom in expr.args]
+             if separate:
+-                return [monom[1] for monom in degrees]
++                return [monom[1] for monom in sorted(degrees, key=lambda x: x[0])]
+             else:
+                 for monom in degrees:
+                     degree, term = monom
+@@ -593,7 +593,7 @@ def decompose(expr, separate=False):
+         poly_dict[0] = expr
+ 
+     if separate:
+-        return list(poly_dict.values())
++        return [poly_dict[key] for key in sorted(poly_dict.keys())]
+     return poly_dict
+2026-10-10 18:32:15,032 - INFO - Grading answer for sympy__sympy-13043...
+2026-10-10 18:32:15,037 - INFO - report: {'sympy__sympy-13043': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_decompose']}, 'PASS_TO_PASS': {'success': ['test_best_origin'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-13043: resolved: False
+2026-10-10 18:32:15,037 - INFO - Attempting to stop container sweb.eval.sympy__sympy-13043.rerun-2026-10__anthropic__self_reflect__rep2__full__final...
+2026-10-10 18:32:36,763 - INFO - Attempting to remove container sweb.eval.sympy__sympy-13043.rerun-2026-10__anthropic__self_reflect__rep2__full__final...
+2026-10-10 18:32:39,347 - INFO - Container sweb.eval.sympy__sympy-13043.rerun-2026-10__anthropic__self_reflect__rep2__full__final removed.

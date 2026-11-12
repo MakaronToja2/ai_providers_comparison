@@ -1,0 +1,4 @@
+model,calls,approved,revised,no_verdict,resolved_before,resolved_after,gained,lost,p,patches_before,patches_after,revised_without_patch
+Claude Haiku 4.5,260,128,119,13,138,144,7,1,0.0703125,235,253,2
+GPT-4.1-mini,282,199,74,9,78,82,4,0,0.125,236,233,18
+Gemini 2.5 Flash-Lite,199,170,24,5,42,43,1,0,1.0,115,116,12

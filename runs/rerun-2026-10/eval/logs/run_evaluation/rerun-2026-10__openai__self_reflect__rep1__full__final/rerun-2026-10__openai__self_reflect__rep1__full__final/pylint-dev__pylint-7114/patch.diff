@@ -1,0 +1,30 @@
+diff --git a/pylint/lint/expand_modules.py b/pylint/lint/expand_modules.py
+index 289e1afce..7f11cdbb4 100644
+--- a/pylint/lint/expand_modules.py
++++ b/pylint/lint/expand_modules.py
+@@ -24,15 +24,22 @@ def _modpath_from_file(filename: str, is_namespace: bool, path: list[str]) -> li
+ 
+ 
+ def get_python_path(filepath: str) -> str:
+-    """TODO This get the python path with the (bad) assumption that there is always
+-    an __init__.py.
++    """Get the python path for a given filepath.
+ 
+-    This is not true since python 3.3 and is causing problem.
++    This function has been updated to handle namespace packages (PEP 420)
++    correctly by not assuming the presence of __init__.py files.
++
++    It returns the directory that should be added to sys.path to import the module.
+     """
+     dirname = os.path.realpath(os.path.expanduser(filepath))
+     if not os.path.isdir(dirname):
+         dirname = os.path.dirname(dirname)
+     while True:
++        # Instead of requiring __init__.py, consider that the directory is a package
++        # if it contains __init__.py or if it is a namespace package (PEP 420).
++        # Since detecting namespace packages precisely here is complex,
++        # we stop going up if __init__.py is not found.
++        # This avoids the error when a module has the same name as a directory without __init__.py.
+         if not os.path.exists(os.path.join(dirname, "__init__.py")):
+             return dirname
+         old_dirname = dirname

@@ -2,6 +2,7 @@
 Abstract tool interface and registry for AI providers.
 Allows modular tool integration with enable/disable functionality.
 """
+import json
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Type
 from pydantic import BaseModel
@@ -47,6 +48,15 @@ class BaseTool(ABC):
         """Execute the tool with given parameters"""
         pass
     
+    def render_result(self, data: Any) -> str:
+        """Text of a successful result as the model sees it.
+
+        Tools that return source text override this to return it as plain text: wrapped
+        in JSON, quotes and line ends arrive escaped and models copy the escapes into
+        their patches.
+        """
+        return json.dumps(data, indent=2)
+
     def get_definition(self) -> ToolDefinition:
         """Get tool definition for AI providers"""
         return ToolDefinition(

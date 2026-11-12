@@ -1,0 +1,12 @@
+diff --git a/sympy/simplify/simplify.py b/sympy/simplify/simplify.py
+index 421bfba0a7..b7e8f21bb9 100644
+--- a/sympy/simplify/simplify.py
++++ b/sympy/simplify/simplify.py
+@@ -34,6 +34,7 @@
+ 
+ from sympy.polys import (together, cancel, factor)
+ 
++from sympy.core.function import expand_trig
+ 
+ import mpmath
+ 

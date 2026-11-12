@@ -1,0 +1,14 @@
+diff --git a/sympy/simplify/trigsimp.py b/sympy/simplify/trigsimp.py
+index 8ba346adbe..704606861b 100644
+--- a/sympy/simplify/trigsimp.py
++++ b/sympy/simplify/trigsimp.py
+@@ -443,6 +443,9 @@ def trigsimp(expr, **opts):
+     collection of trigonometric transformations described by Fu, et al.
+     (see the `fu` docstring).
+ 
++    This function now attempts to evaluate trigonometric functions with rational
++    arguments to their exact values when possible, enabling simplifications like
++    cos(a)*cos(b) + sin(a)*sin(b) for rational a,b.
+ 
+     Examples
+     ========

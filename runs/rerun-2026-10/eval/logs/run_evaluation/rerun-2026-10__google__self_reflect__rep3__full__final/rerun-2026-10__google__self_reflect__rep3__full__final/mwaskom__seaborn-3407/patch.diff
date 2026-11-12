@@ -1,0 +1,17 @@
+diff --git a/seaborn/axisgrid.py b/seaborn/axisgrid.py
+index 75349099..bfaa6697 100644
+--- a/seaborn/axisgrid.py
++++ b/seaborn/axisgrid.py
+@@ -2098,6 +2098,12 @@ def pairplot(
+         raise TypeError(
+             f"'data' must be pandas DataFrame object, not: {type(data)}")
+ 
++    # If the DataFrame has a MultiIndex, flatten the columns to avoid KeyErrors
++    # when accessing columns by single names in subsequent plotting functions.
++    if isinstance(data.columns, pd.MultiIndex):
++        data = data.copy()  # Avoid modifying the original DataFrame
++        data.columns = ["_".join(map(str, col)) for col in data.columns]
++
+     plot_kws = {} if plot_kws is None else plot_kws.copy()
+     diag_kws = {} if diag_kws is None else diag_kws.copy()
+     grid_kws = {} if grid_kws is None else grid_kws.copy()

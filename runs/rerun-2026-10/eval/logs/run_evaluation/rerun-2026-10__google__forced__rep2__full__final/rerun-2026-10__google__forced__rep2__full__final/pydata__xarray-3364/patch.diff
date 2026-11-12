@@ -1,0 +1,83 @@
+diff --git a/xarray/core/concat.py b/xarray/core/concat.py
+index ecae2566c..b689079fd 100644
+--- a/xarray/core/concat.py
++++ b/xarray/core/concat.py
+@@ -163,6 +163,11 @@ def _calc_concat_over(datasets, dim, dim_names, data_vars, coords, compat):
+     concat_over = set()
+     equals = {}
+ 
++    # Collect all unique variable names across all datasets
++    all_vars = set()
++    for ds in datasets:
++        all_vars.update(ds.variables.keys())
++
+     if dim in dim_names:
+         concat_over_existing_dim = True
+         concat_over.add(dim)
+@@ -187,28 +192,36 @@ def _calc_concat_over(datasets, dim, dim_names, data_vars, coords, compat):
+                         % subset
+                     )
+                 # all nonindexes that are not the same in each dataset
+-                for k in getattr(datasets[0], subset):
+-                    if k not in concat_over:
+-                        # Compare the variable of all datasets vs. the one
+-                        # of the first dataset. Perform the minimum amount of
+-                        # loads in order to avoid multiple loads from disk
+-                        # while keeping the RAM footprint low.
+-                        v_lhs = datasets[0].variables[k].load()
+-                        # We'll need to know later on if variables are equal.
+-                        computed = []
+-                        for ds_rhs in datasets[1:]:
+-                            v_rhs = ds_rhs.variables[k].compute()
+-                            computed.append(v_rhs)
+-                            if not getattr(v_lhs, compat)(v_rhs):
+-                                concat_over.add(k)
+-                                equals[k] = False
+-                                # computed variables are not to be re-computed
+-                                # again in the future
+-                                for ds, v in zip(datasets[1:], computed):
+-                                    ds.variables[k].data = v.data
+-                                break
++                # Iterate over all variables found in any dataset
++                for k in all_vars:
++                    if k not in concat_over and k not in dim_names:
++                        present_in_datasets = [k in ds.variables for ds in datasets]
++                        if sum(present_in_datasets) > 0 and sum(present_in_datasets) < len(datasets):
++                            # Variable is present in some but not all datasets
++                            concat_over.add(k)
++                            equals[k] = False # Mark as not equal since it's missing in some
+                         else:
+-                            equals[k] = True
++                            # Variable is present in all datasets, check for equality
++                            # Compare the variable of all datasets vs. the one
++                            # of the first dataset. Perform the minimum amount of
++                            # loads in order to avoid multiple loads from disk
++                            # while keeping the RAM footprint low.
++                            v_lhs = datasets[0].variables[k].load()
++                            # We'll need to know later on if variables are equal.
++                            computed = []
++                            for ds_rhs in datasets[1:]:
++                                v_rhs = ds_rhs.variables[k].compute()
++                                computed.append(v_rhs)
++                                if not getattr(v_lhs, compat)(v_rhs):
++                                    concat_over.add(k)
++                                    equals[k] = False
++                                    # computed variables are not to be re-computed
++                                    # again in the future
++                                    for ds, v in zip(datasets[1:], computed):
++                                        ds.variables[k].data = v.data
++                                    break
++                            else:
++                                equals[k] = True
+ 
+             elif opt == "all":
+                 concat_over.update(
+@@ -219,6 +232,8 @@ def _calc_concat_over(datasets, dim, dim_names, data_vars, coords, compat):
+             else:
+                 raise ValueError("unexpected value for %s: %s" % (subset, opt))
+         else:
++            # If opt is a list of variable names
++            # Check if these variables exist in the first dataset
+             invalid_vars = [k for k in opt if k not in getattr(datasets[0], subset)]
+             if invalid_vars:
+                 if subset == "coords":

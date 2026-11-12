@@ -1,0 +1,20 @@
+diff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py
+index ce18098fd2..3ce7aed658 100644
+--- a/django/db/models/sql/query.py
++++ b/django/db/models/sql/query.py
+@@ -1124,6 +1124,15 @@ class Query(BaseExpression):
+ 
+     def check_filterable(self, expression):
+         """Raise an error if expression cannot be used in a WHERE clause."""
++        # Accept model instances and querysets (which are filterable by nature)
++        from django.db.models.query import QuerySet
++        from django.db.models.base import Model
++
++        if isinstance(expression, Model):
++            return
++        if isinstance(expression, QuerySet):
++            return
++
+         if not getattr(expression, 'filterable', True):
+             raise NotSupportedError(
+                 expression.__class__.__name__ + ' is disallowed in the filter '

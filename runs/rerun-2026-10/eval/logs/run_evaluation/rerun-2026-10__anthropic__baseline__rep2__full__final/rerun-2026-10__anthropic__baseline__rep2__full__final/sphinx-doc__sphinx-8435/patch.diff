@@ -1,0 +1,35 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 171a3e7b0d..e81e884673 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1746,6 +1746,30 @@ class DataDocumenter(ModuleLevelDocumenter):
+             or self.modname
+ 
+ 
++class DataDeclarationDocumenter(DataDocumenter):
++
++            try:
++                if self.object is UNINITIALIZED_ATTR:
++                    pass
++                else:
++                    objrepr = object_description(self.object)
++                    self.add_line('   :value: ' + objrepr, sourcename)
++            except ValueError:
++                pass
++        elif self.options.annotation is SUPPRESS:
++            pass
++        else:
++            self.add_line('   :annotation: %s' % self.options.annotation,
++                          sourcename)
++
++    def document_members(self, all_members: bool = False) -> None:
++        pass
++
++    def get_real_modname(self) -> str:
++        return self.get_attr(self.parent or self.object, '__module__', None) \
++            or self.modname
++
++
+ class DataDeclarationDocumenter(DataDocumenter):
+     """
+     Specialized Documenter subclass for data that cannot be imported

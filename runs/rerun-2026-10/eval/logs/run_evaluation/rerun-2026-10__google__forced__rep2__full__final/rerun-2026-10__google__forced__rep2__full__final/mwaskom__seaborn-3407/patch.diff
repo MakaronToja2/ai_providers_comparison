@@ -1,0 +1,22 @@
+diff --git a/seaborn/axisgrid.py b/seaborn/axisgrid.py
+index 75349099..2ffc7114 100644
+--- a/seaborn/axisgrid.py
++++ b/seaborn/axisgrid.py
+@@ -1664,9 +1664,14 @@ class PairGrid(Grid):
+     def _find_numeric_cols(self, data):
+         """Find which variables in a DataFrame are numeric."""
+         numeric_cols = []
+-        for col in data:
+-            if variable_type(data[col]) == "numeric":
+-                numeric_cols.append(col)
++        if isinstance(data.columns, pd.MultiIndex):
++            for col_tuple in data.columns:
++                if variable_type(data[col_tuple]) == "numeric":
++                    numeric_cols.append(col_tuple)
++        else:
++            for col in data.columns:
++                if variable_type(data[col]) == "numeric":
++                    numeric_cols.append(col)
+         return numeric_cols
+ 
+ 

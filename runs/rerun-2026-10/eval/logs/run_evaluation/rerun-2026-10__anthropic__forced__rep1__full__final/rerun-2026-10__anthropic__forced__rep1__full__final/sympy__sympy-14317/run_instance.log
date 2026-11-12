@@ -1,0 +1,128 @@
+2026-10-10 18:30:55,355 - INFO - Creating container for sympy__sympy-14317...
+2026-10-10 18:31:03,805 - INFO - Container for sympy__sympy-14317 created: 5b74f1152838087f21536bd71a1cf0f5ed4a3b87f9134fed0ce7ccae6a731284
+2026-10-10 18:31:18,129 - INFO - Container for sympy__sympy-14317 started: 5b74f1152838087f21536bd71a1cf0f5ed4a3b87f9134fed0ce7ccae6a731284
+2026-10-10 18:31:18,130 - INFO - Intermediate patch for sympy__sympy-14317 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep1__full__final/rerun-2026-10__anthropic__forced__rep1__full__final/sympy__sympy-14317/patch.diff, now applying to container...
+2026-10-10 18:31:18,233 - INFO - >>>>> Applied Patch:
+/tmp/patch.diff:10: trailing whitespace.
+        
+/tmp/patch.diff:15: trailing whitespace.
+        
+/tmp/patch.diff:18: trailing whitespace.
+            
+/tmp/patch.diff:25: trailing whitespace.
+            
+/tmp/patch.diff:27: trailing whitespace.
+            
+Checking patch sympy/printing/latex.py...
+warning: sympy/printing/latex.py has type 100755, expected 100644
+Applied patch sympy/printing/latex.py cleanly.
+warning: squelched 2 whitespace errors
+warning: 7 lines add whitespace errors.
+
+2026-10-10 18:31:18,477 - INFO - Git diff before:
+diff --git a/sympy/printing/latex.py b/sympy/printing/latex.py
+index 737e16cc7..e5febaa1d 100755
+--- a/sympy/printing/latex.py
++++ b/sympy/printing/latex.py
+@@ -1854,11 +1854,41 @@ def _print_PolynomialRingBase(self, expr):
+ 
+     def _print_Poly(self, poly):
+         cls = poly.__class__.__name__
+-        expr = self._print(poly.as_expr())
++        
++        # Build the polynomial expression using terms in order (highest to lowest degree)
++        # to match the behavior of str and pretty printers
++        terms = []
+         gens = list(map(self._print, poly.gens))
++        
++        for monom, coeff in poly.terms():
++            s_monom = []
++            
++            for i, exp in enumerate(monom):
++                if exp > 0:
++                    if exp == 1:
++                        s_monom.append(gens[i])
++                    else:
++                        s_monom.append(gens[i] + "^{%d}" % exp)
++            
++            s_monom = " ".join(s_monom)
++            
++            if s_monom:
++                if coeff is S.One:
++                    terms.append(s_monom)
++                elif coeff is S.NegativeOne:
++                    terms.append("-" + s_monom)
++                else:
++                    coeff_str = self._print(coeff)
++                    terms.append(coeff_str + " " + s_monom)
++            else:
++                terms.append(self._print(coeff))
++        
++        expr = " + ".join(terms).replace(" + -", " - ")
++        
++        gens_str = list(map(self._print, poly.gens))
+         domain = "domain=%s" % self._print(poly.get_domain())
+ 
+-        args = ", ".join([expr] + gens + [domain])
++        args = ", ".join([expr] + gens_str + [domain])
+         if cls in accepted_latex_functions:
+             tex = r"\%s {\left (%s \right )}" % (cls, args)
+         else:
+2026-10-10 18:31:18,478 - INFO - Eval script for sympy__sympy-14317 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep1__full__final/rerun-2026-10__anthropic__forced__rep1__full__final/sympy__sympy-14317/eval.sh; copying to container...
+2026-10-10 18:31:24,630 - INFO - Test runtime: 6.09 seconds
+2026-10-10 18:31:24,630 - INFO - Test output for sympy__sympy-14317 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep1__full__final/rerun-2026-10__anthropic__forced__rep1__full__final/sympy__sympy-14317/test_output.txt
+2026-10-10 18:31:24,678 - INFO - Git diff after:
+diff --git a/sympy/printing/latex.py b/sympy/printing/latex.py
+index 737e16cc7..e5febaa1d 100755
+--- a/sympy/printing/latex.py
++++ b/sympy/printing/latex.py
+@@ -1854,11 +1854,41 @@ def _print_PolynomialRingBase(self, expr):
+ 
+     def _print_Poly(self, poly):
+         cls = poly.__class__.__name__
+-        expr = self._print(poly.as_expr())
++        
++        # Build the polynomial expression using terms in order (highest to lowest degree)
++        # to match the behavior of str and pretty printers
++        terms = []
+         gens = list(map(self._print, poly.gens))
++        
++        for monom, coeff in poly.terms():
++            s_monom = []
++            
++            for i, exp in enumerate(monom):
++                if exp > 0:
++                    if exp == 1:
++                        s_monom.append(gens[i])
++                    else:
++                        s_monom.append(gens[i] + "^{%d}" % exp)
++            
++            s_monom = " ".join(s_monom)
++            
++            if s_monom:
++                if coeff is S.One:
++                    terms.append(s_monom)
++                elif coeff is S.NegativeOne:
++                    terms.append("-" + s_monom)
++                else:
++                    coeff_str = self._print(coeff)
++                    terms.append(coeff_str + " " + s_monom)
++            else:
++                terms.append(self._print(coeff))
++        
++        expr = " + ".join(terms).replace(" + -", " - ")
++        
++        gens_str = list(map(self._print, poly.gens))
+         domain = "domain=%s" % self._print(poly.get_domain())
+ 
+-        args = ", ".join([expr] + gens + [domain])
++        args = ", ".join([expr] + gens_str + [domain])
+         if cls in accepted_latex_functions:
+             tex = r"\%s {\left (%s \right )}" % (cls, args)
+         else:
+2026-10-10 18:31:24,678 - INFO - Grading answer for sympy__sympy-14317...
+2026-10-10 18:31:24,679 - INFO - report: {'sympy__sympy-14317': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_latex_Poly'], 'failure': ['test_latex_Poly_order']}, 'PASS_TO_PASS': {'success': ['test_printmethod', 'test_latex_basic', 'test_latex_builtins', 'test_latex_SingularityFunction', 'test_latex_cycle', 'test_latex_permutation', 'test_latex_Float', 'test_latex_vector_expressions', 'test_latex_symbols', 'test_latex_functions', 'test_function_subclass_different_name', 'test_hyper_printing', 'test_latex_bessel', 'test_latex_fresnel', 'test_latex_brackets', 'test_latex_indexed', 'test_latex_derivatives', 'test_latex_subs', 'test_latex_integrals', 'test_latex_sets', 'test_latex_SetExpr', 'test_latex_Range', 'test_latex_sequences', 'test_latex_FourierSeries', 'test_latex_FormalPowerSeries', 'test_latex_intervals', 'test_latex_AccumuBounds', 'test_latex_emptyset', 'test_latex_commutator', 'test_latex_union', 'test_latex_symmetric_difference', 'test_latex_Complement', 'test_latex_Complexes', 'test_latex_productset', 'test_latex_Naturals', 'test_latex_Naturals0', 'test_latex_Integers', 'test_latex_ImageSet', 'test_latex_ConditionSet', 'test_latex_ComplexRegion', 'test_latex_Contains', 'test_latex_sum', 'test_latex_product', 'test_latex_limits', 'test_latex_log', 'test_issue_3568', 'test_latex', 'test_latex_dict', 'test_latex_list', 'test_latex_rational', 'test_latex_inverse', 'test_latex_DiracDelta', 'test_latex_Heaviside', 'test_latex_KroneckerDelta', 'test_latex_LeviCivita', 'test_mode', 'test_latex_Piecewise', 'test_latex_Matrix', 'test_latex_matrix_with_functions', 'test_latex_NDimArray', 'test_latex_mul_symbol', 'test_latex_issue_4381', 'test_latex_issue_4576', 'test_latex_pow_fraction', 'test_noncommutative', 'test_latex_order', 'test_latex_Lambda', 'test_latex_PolyElement', 'test_latex_FracElement', 'test_latex_ComplexRootOf', 'test_latex_RootSum', 'test_settings', 'test_latex_numbers', 'test_latex_euler', 'test_lamda', 'test_custom_symbol_names', 'test_matAdd', 'test_matMul', 'test_latex_MatrixSlice', 'test_latex_RandomDomain', 'test_PrettyPoly', 'test_integral_transforms', 'test_PolynomialRingBase', 'test_categories', 'test_Modules', 'test_QuotientRing', 'test_Tr', 'test_Adjoint', 'test_Hadamard', 'test_ZeroMatrix', 'test_boolean_args_order', 'test_imaginary', 'test_builtins_without_args', 'test_latex_greek_functions', 'test_translate', 'test_other_symbols', 'test_modifiers', 'test_greek_symbols', 'test_builtin_no_args', 'test_issue_6853', 'test_Mul', 'test_Pow', 'test_issue_7180', 'test_issue_8409', 'test_issue_7117', 'test_issue_2934', 'test_issue_10489', 'test_issue_12886', 'test_issue_13651', 'test_latex_UnevaluatedExpr', 'test_MatrixElement_printing', 'test_MatrixSymbol_printing', 'test_Quaternion_latex_printing', 'test_TensorProduct_printing', 'test_WedgeProduct_printing', 'test_units'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-14317: resolved: False
+2026-10-10 18:31:24,679 - INFO - Attempting to stop container sweb.eval.sympy__sympy-14317.rerun-2026-10__anthropic__forced__rep1__full__final...
+2026-10-10 18:31:47,167 - INFO - Attempting to remove container sweb.eval.sympy__sympy-14317.rerun-2026-10__anthropic__forced__rep1__full__final...
+2026-10-10 18:31:48,320 - INFO - Container sweb.eval.sympy__sympy-14317.rerun-2026-10__anthropic__forced__rep1__full__final removed.

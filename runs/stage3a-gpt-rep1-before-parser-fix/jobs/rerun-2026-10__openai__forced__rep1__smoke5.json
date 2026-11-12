@@ -1,0 +1,25 @@
+{
+  "job": "rerun-2026-10__openai__forced__rep1__smoke5",
+  "experiment_id": "a57dbeca-7b35-504a-9363-3fe2c90dc71b",
+  "provider": "openai",
+  "model": "gpt-4.1-mini",
+  "mode": "forced",
+  "run_idx": 1,
+  "subset": "smoke5",
+  "instances": 5,
+  "status_counts": {
+    "success_patch_generated": 3,
+    "hallucination_format_error": 1,
+    "edit_not_applicable": 1
+  },
+  "incomplete": 0,
+  "api_model_ids": [
+    "gpt-4.1-mini-2025-04-14"
+  ],
+  "cost_usd_list_price": 0.069858,
+  "last_invocation_started": "2026-10-07T15:14:10+00:00",
+  "last_invocation_finished": "2026-10-07T15:14:39+00:00",
+  "harness_commit": "df830ca3b811f3ce273099cbcc89666d5a22f7c9+dirty.49bdbee3893f",
+  "dataset_revision": "b0dde1093fe417d83b7184254edf8199c1f0dff5",
+  "instances_sha256": "4d38ee52ba38758144edce1e3c7866480dd73d2f5087f9a582d5670e820b9576"
+}

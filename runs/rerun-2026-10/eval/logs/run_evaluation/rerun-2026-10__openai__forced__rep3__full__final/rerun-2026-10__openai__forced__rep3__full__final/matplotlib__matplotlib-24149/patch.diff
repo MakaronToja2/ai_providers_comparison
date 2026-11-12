@@ -1,0 +1,17 @@
+diff --git a/lib/matplotlib/axes/_axes.py b/lib/matplotlib/axes/_axes.py
+index fdac0f3560..c0ecaf9cf2 100644
+--- a/lib/matplotlib/axes/_axes.py
++++ b/lib/matplotlib/axes/_axes.py
+@@ -2370,7 +2370,11 @@ class Axes(_AxesBase):
+         if self.xaxis is not None:
+             x0 = x
+             x = np.asarray(self.convert_xunits(x))
+-            width = self._convert_dx(width, x0, x, self.convert_xunits)
++            # Guard against all-NaN x0 which breaks _safe_first_finite in _convert_dx
++            if np.all(np.isnan(x0)):
++                width = np.asarray(width)
++            else:
++                width = self._convert_dx(width, x0, x, self.convert_xunits)
+             if xerr is not None:
+                 xerr = self._convert_dx(xerr, x0, x, self.convert_xunits)
+         if self.yaxis is not None:

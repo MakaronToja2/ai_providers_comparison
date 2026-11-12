@@ -1,0 +1,46 @@
+2026-10-10 14:50:00,303 - INFO - Creating container for django__django-12113...
+2026-10-10 14:50:08,161 - INFO - Container for django__django-12113 created: 54da0e0ee11715d7dba5c70f1b0a7a7074c63360c6bd2456092becfca43f39c9
+2026-10-10 14:50:14,057 - INFO - Container for django__django-12113 started: 54da0e0ee11715d7dba5c70f1b0a7a7074c63360c6bd2456092becfca43f39c9
+2026-10-10 14:50:14,058 - INFO - Intermediate patch for django__django-12113 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep3__full__final/rerun-2026-10__anthropic__baseline__rep3__full__final/django__django-12113/patch.diff, now applying to container...
+2026-10-10 14:50:14,310 - INFO - >>>>> Applied Patch:
+Checking patch django/test/testcases.py...
+warning: django/test/testcases.py has type 100755, expected 100644
+Applied patch django/test/testcases.py cleanly.
+
+2026-10-10 14:50:15,366 - INFO - Git diff before:
+diff --git a/django/test/testcases.py b/django/test/testcases.py
+index 23459f22cd..dd4b1ad974 100755
+--- a/django/test/testcases.py
++++ b/django/test/testcases.py
+@@ -1059,7 +1059,7 @@ def connections_support_transactions(aliases=None):
+     transactions.
+     """
+     conns = connections.all() if aliases is None else (connections[alias] for alias in aliases)
+-    return all(conn.features.supports_transactions for conn in conns)
++    return all(conn.features.supports_transactions and conn.features.atomic_transactions for conn in conns)
+ 
+ 
+ class TestCase(TransactionTestCase):
+2026-10-10 14:50:15,367 - INFO - Eval script for django__django-12113 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep3__full__final/rerun-2026-10__anthropic__baseline__rep3__full__final/django__django-12113/eval.sh; copying to container...
+2026-10-10 14:50:28,595 - INFO - Test runtime: 13.08 seconds
+2026-10-10 14:50:28,599 - INFO - Test output for django__django-12113 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep3__full__final/rerun-2026-10__anthropic__baseline__rep3__full__final/django__django-12113/test_output.txt
+2026-10-10 14:50:28,699 - INFO - Git diff after:
+diff --git a/django/test/testcases.py b/django/test/testcases.py
+index 23459f22cd..dd4b1ad974 100755
+--- a/django/test/testcases.py
++++ b/django/test/testcases.py
+@@ -1059,7 +1059,7 @@ def connections_support_transactions(aliases=None):
+     transactions.
+     """
+     conns = connections.all() if aliases is None else (connections[alias] for alias in aliases)
+-    return all(conn.features.supports_transactions for conn in conns)
++    return all(conn.features.supports_transactions and conn.features.atomic_transactions for conn in conns)
+ 
+ 
+ class TestCase(TransactionTestCase):
+2026-10-10 14:50:28,699 - INFO - Grading answer for django__django-12113...
+2026-10-10 14:50:28,705 - INFO - report: {'django__django-12113': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_custom_test_name (backends.sqlite.test_creation.TestDbSignatureTests)']}, 'PASS_TO_PASS': {'success': [], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-12113: resolved: False
+2026-10-10 14:50:28,705 - INFO - Attempting to stop container sweb.eval.django__django-12113.rerun-2026-10__anthropic__baseline__rep3__full__final...
+2026-10-10 14:50:49,762 - INFO - Attempting to remove container sweb.eval.django__django-12113.rerun-2026-10__anthropic__baseline__rep3__full__final...
+2026-10-10 14:50:56,511 - INFO - Container sweb.eval.django__django-12113.rerun-2026-10__anthropic__baseline__rep3__full__final removed.

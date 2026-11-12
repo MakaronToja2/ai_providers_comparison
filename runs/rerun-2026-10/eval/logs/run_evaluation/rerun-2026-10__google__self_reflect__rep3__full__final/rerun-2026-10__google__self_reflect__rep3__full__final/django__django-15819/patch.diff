@@ -1,0 +1,17 @@
+diff --git a/django/db/models/fields/related.py b/django/db/models/fields/related.py
+index bb4e065e37..2e6131ff33 100644
+--- a/django/db/models/fields/related.py
++++ b/django/db/models/fields/related.py
+@@ -361,6 +361,12 @@ class RelatedField(FieldCacheMixin, Field):
+                     "app_label": cls._meta.app_label.lower(),
+                 }
+                 self.remote_field.related_name = related_name
++            # If related_name is still None after the above, it means
++            # neither an explicit related_name nor a default_related_name
++            # was found or applicable. In this case, use the field's name.
++            # This is a workaround for inspectdb not setting related_name.
++            if self.remote_field.related_name is None:
++                self.remote_field.related_name = self.name
+ 
+             if self.remote_field.related_query_name:
+                 related_query_name = self.remote_field.related_query_name % {

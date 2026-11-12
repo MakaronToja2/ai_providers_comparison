@@ -1,0 +1,19 @@
+<frozen runpy>:128: RuntimeWarning: 'swebench.harness.run_evaluation' found in sys.modules after import of package 'swebench.harness', but prior to execution of 'swebench.harness.run_evaluation'; this may result in unpredictable behaviour
+Using gold predictions
+Found 8 existing instance images. Will reuse them.
+Running 8 instances...
+Evaluation:   0%|          | 0/8 [00:00<?, ?it/s, error=0, ✓=0, ✖=0]Evaluation:   0%|          | 0/8 [00:28<?, ?it/s, ✓=1, ✖=0, error=0]Evaluation:  12%|█▎        | 1/8 [00:28<03:17, 28.20s/it, ✓=1, ✖=0, error=0]Evaluation:  12%|█▎        | 1/8 [00:31<03:17, 28.20s/it, ✓=2, ✖=0, error=0]Evaluation:  25%|██▌       | 2/8 [00:31<01:20, 13.47s/it, ✓=2, ✖=0, error=0]Evaluation:  25%|██▌       | 2/8 [00:32<01:20, 13.47s/it, ✓=3, ✖=0, error=0]Evaluation:  38%|███▊      | 3/8 [00:32<00:38,  7.63s/it, ✓=3, ✖=0, error=0]Evaluation:  38%|███▊      | 3/8 [00:53<00:38,  7.63s/it, ✓=4, ✖=0, error=0]Evaluation:  50%|█████     | 4/8 [00:53<00:52, 13.20s/it, ✓=4, ✖=0, error=0]Evaluation:  50%|█████     | 4/8 [00:56<00:52, 13.20s/it, ✓=5, ✖=0, error=0]Evaluation:  62%|██████▎   | 5/8 [00:56<00:27,  9.33s/it, ✓=5, ✖=0, error=0]Evaluation:  62%|██████▎   | 5/8 [00:59<00:27,  9.33s/it, ✓=6, ✖=0, error=0]Evaluation:  75%|███████▌  | 6/8 [00:59<00:14,  7.11s/it, ✓=6, ✖=0, error=0]Evaluation:  75%|███████▌  | 6/8 [01:13<00:14,  7.11s/it, ✓=7, ✖=0, error=0]Evaluation:  88%|████████▊ | 7/8 [01:13<00:09,  9.64s/it, ✓=7, ✖=0, error=0]Evaluation:  88%|████████▊ | 7/8 [02:09<00:09,  9.64s/it, ✓=8, ✖=0, error=0]Evaluation: 100%|██████████| 8/8 [02:09<00:00, 24.39s/it, ✓=8, ✖=0, error=0]Evaluation: 100%|██████████| 8/8 [02:09<00:00, 16.23s/it, ✓=8, ✖=0, error=0]
+All instances run.
+Cleaning cached images...
+Removed 0 images.
+Total instances: 8
+Instances submitted: 8
+Instances completed: 8
+Instances incomplete: 0
+Instances resolved: 8
+Instances unresolved: 0
+Instances with empty patches: 0
+Instances with errors: 0
+Unstopped containers: 0
+Unremoved images: 8
+Report written to gold.gold__smoke.json

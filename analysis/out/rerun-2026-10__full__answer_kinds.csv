@@ -1,0 +1,4 @@
+model,empty,truncated,edit_incomplete,no_edit,total,unexpected_tool_call
+Claude Haiku 4.5,0,1,4,112,117,0
+GPT-4.1-mini,0,5,43,0,48,0
+Gemini 2.5 Flash-Lite,79,100,26,14,219,91

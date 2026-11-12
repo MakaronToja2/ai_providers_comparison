@@ -1,0 +1,13 @@
+diff --git a/sympy/utilities/autowrap.py b/sympy/utilities/autowrap.py
+index bd6afb12d1..45310af306 100644
+--- a/sympy/utilities/autowrap.py
++++ b/sympy/utilities/autowrap.py
+@@ -386,7 +386,7 @@ def dump_pyx(self, routines, f, prefix):
+                 declarations = declarations + "\n"
+ 
+             # Function Body
+-            args_c = ", ".join([self._call_arg(a) for a in routine.arguments])
++            args_c = ", ".join([self._call_arg(a) for a in py_args])
+             rets = ", ".join([self._string_var(r.name) for r in py_rets])
+             if routine.results:
+                 body = '    return %s(%s)' % (routine.name, args_c)

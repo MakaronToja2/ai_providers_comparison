@@ -1,0 +1,10 @@
+comparison,within,diff,lo,hi,only_first,only_second,p,family,p_holm
+Baseline vs Forced,Claude Haiku 4.5,0.0,0.0,0.0,0,0,1.0,regimes,1.0
+Baseline vs Self-reflection,Claude Haiku 4.5,0.19999999999999996,0.0,0.6000000000000001,1,0,1.0,regimes,1.0
+Forced vs Self-reflection,Claude Haiku 4.5,0.19999999999999996,0.0,0.6000000000000001,1,0,1.0,regimes,1.0
+Baseline vs Forced,Gemini 2.5 Flash-Lite,0.2,0.0,0.6000000000000001,1,0,1.0,regimes,1.0
+Baseline vs Self-reflection,Gemini 2.5 Flash-Lite,0.0,0.0,0.0,0,0,1.0,regimes,1.0
+Forced vs Self-reflection,Gemini 2.5 Flash-Lite,-0.2,-0.6000000000000001,0.0,0,1,1.0,regimes,1.0
+Claude Haiku 4.5 vs Gemini 2.5 Flash-Lite,Baseline,0.19999999999999996,0.0,0.6000000000000001,1,0,1.0,models,1.0
+Claude Haiku 4.5 vs Gemini 2.5 Flash-Lite,Forced,0.39999999999999997,0.0,0.8,2,0,0.5,models,1.0
+Claude Haiku 4.5 vs Gemini 2.5 Flash-Lite,Self-reflection,0.0,0.0,0.0,0,0,1.0,models,1.0

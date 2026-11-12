@@ -1,0 +1,46 @@
+2026-10-10 18:33:52,231 - INFO - Creating container for sympy__sympy-13043...
+2026-10-10 18:33:59,604 - INFO - Container for sympy__sympy-13043 created: 5503a499cb579e6f5c221b16524579074fc196d52011b6454c3cc57538f67cb7
+2026-10-10 18:34:04,599 - INFO - Container for sympy__sympy-13043 started: 5503a499cb579e6f5c221b16524579074fc196d52011b6454c3cc57538f67cb7
+2026-10-10 18:34:04,599 - INFO - Intermediate patch for sympy__sympy-13043 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep2__full__final/rerun-2026-10__google__baseline__rep2__full__final/sympy__sympy-13043/patch.diff, now applying to container...
+2026-10-10 18:34:04,688 - INFO - >>>>> Applied Patch:
+Checking patch sympy/integrals/intpoly.py...
+warning: sympy/integrals/intpoly.py has type 100755, expected 100644
+Applied patch sympy/integrals/intpoly.py cleanly.
+
+2026-10-10 18:34:04,874 - INFO - Git diff before:
+diff --git a/sympy/integrals/intpoly.py b/sympy/integrals/intpoly.py
+index fc72bd206..ed51cc775 100755
+--- a/sympy/integrals/intpoly.py
++++ b/sympy/integrals/intpoly.py
+@@ -568,6 +568,8 @@ def decompose(expr, separate=False):
+             symbols = expr.atoms(Symbol)
+             degrees = [(sum(degree_list(monom, *symbols)), monom)
+                        for monom in expr.args]
++            # Sort degrees by degree to ensure consistent order
++            degrees.sort(key=lambda x: x[0])
+             if separate:
+                 return [monom[1] for monom in degrees]
+             else:
+2026-10-10 18:34:04,874 - INFO - Eval script for sympy__sympy-13043 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep2__full__final/rerun-2026-10__google__baseline__rep2__full__final/sympy__sympy-13043/eval.sh; copying to container...
+2026-10-10 18:34:08,823 - INFO - Test runtime: 3.90 seconds
+2026-10-10 18:34:08,824 - INFO - Test output for sympy__sympy-13043 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep2__full__final/rerun-2026-10__google__baseline__rep2__full__final/sympy__sympy-13043/test_output.txt
+2026-10-10 18:34:08,872 - INFO - Git diff after:
+diff --git a/sympy/integrals/intpoly.py b/sympy/integrals/intpoly.py
+index fc72bd206..ed51cc775 100755
+--- a/sympy/integrals/intpoly.py
++++ b/sympy/integrals/intpoly.py
+@@ -568,6 +568,8 @@ def decompose(expr, separate=False):
+             symbols = expr.atoms(Symbol)
+             degrees = [(sum(degree_list(monom, *symbols)), monom)
+                        for monom in expr.args]
++            # Sort degrees by degree to ensure consistent order
++            degrees.sort(key=lambda x: x[0])
+             if separate:
+                 return [monom[1] for monom in degrees]
+             else:
+2026-10-10 18:34:08,872 - INFO - Grading answer for sympy__sympy-13043...
+2026-10-10 18:34:08,877 - INFO - report: {'sympy__sympy-13043': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_decompose']}, 'PASS_TO_PASS': {'success': ['test_best_origin'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-13043: resolved: False
+2026-10-10 18:34:08,877 - INFO - Attempting to stop container sweb.eval.sympy__sympy-13043.rerun-2026-10__google__baseline__rep2__full__final...
+2026-10-10 18:34:31,247 - INFO - Attempting to remove container sweb.eval.sympy__sympy-13043.rerun-2026-10__google__baseline__rep2__full__final...
+2026-10-10 18:34:33,088 - INFO - Container sweb.eval.sympy__sympy-13043.rerun-2026-10__google__baseline__rep2__full__final removed.

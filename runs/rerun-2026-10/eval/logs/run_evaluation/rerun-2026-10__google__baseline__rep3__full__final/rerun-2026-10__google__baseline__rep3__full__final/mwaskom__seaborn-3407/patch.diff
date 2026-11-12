@@ -1,0 +1,17 @@
+diff --git a/seaborn/axisgrid.py b/seaborn/axisgrid.py
+index 75349099..4931a29a 100644
+--- a/seaborn/axisgrid.py
++++ b/seaborn/axisgrid.py
+@@ -1355,6 +1355,12 @@ class PairGrid(Grid):
+         self._despine = despine
+         if despine:
+             utils.despine(fig=fig)
++
++        # Check if the columns are a MultiIndex and flatten if necessary
++        if isinstance(self.data.columns, pd.MultiIndex):
++            self.data = self.data.copy()  # Work on a copy to avoid modifying original df
++            self.data.columns = ["".join(col) for col in self.data.columns.values]
++
+         self.tight_layout(pad=layout_pad)
+ 
+     def map(self, func, **kwargs):

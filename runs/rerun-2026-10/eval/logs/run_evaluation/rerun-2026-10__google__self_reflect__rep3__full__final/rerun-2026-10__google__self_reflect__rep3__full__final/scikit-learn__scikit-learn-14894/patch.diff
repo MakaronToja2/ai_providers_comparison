@@ -1,0 +1,35 @@
+diff --git a/sklearn/svm/base.py b/sklearn/svm/base.py
+index 64cebe83751..6fdee44eea0 100644
+--- a/sklearn/svm/base.py
++++ b/sklearn/svm/base.py
+@@ -286,12 +286,24 @@ class BaseLibSVM(BaseEstimator, metaclass=ABCMeta):
+             n_class = 1
+         n_SV = self.support_vectors_.shape[0]
+ 
+-        dual_coef_indices = np.tile(np.arange(n_SV), n_class)
+-        dual_coef_indptr = np.arange(0, dual_coef_indices.size + 1,
+-                                     dual_coef_indices.size / n_class)
+-        self.dual_coef_ = sp.csr_matrix(
+-            (dual_coef_data, dual_coef_indices, dual_coef_indptr),
+-            (n_class, n_SV))
++        if n_SV == 0:
++            # Handle the case where there are no support vectors.
++            # dual_coef_ should be an empty sparse matrix with shape (n_class, 0).
++            self.dual_coef_ = sp.csr_matrix((n_class, 0))
++        else:
++            # Proceed with the original calculation only if there are support vectors.
++            dual_coef_indices = np.tile(np.arange(n_SV), n_class)
++            # The division by n_class can cause ZeroDivisionError if n_class is 0.
++            # This happens in classification with only one class.
++            # If n_class is 0, dual_coef_indices.size will also be 0, leading to 0/0.
++            # If n_class is 1 (regression), and n_SV is 0, then dual_coef_indices.size is 0,
++            # leading to 0/1 = 0 step, which causes ValueError in np.arange.
++            # The check for n_SV == 0 above handles these problematic cases.
++            dual_coef_indptr = np.arange(0, dual_coef_indices.size + 1,
++                                         dual_coef_indices.size / n_class)
++            self.dual_coef_ = sp.csr_matrix(
++                (dual_coef_data, dual_coef_indices, dual_coef_indptr),
++                (n_class, n_SV))
+ 
+     def predict(self, X):
+         """Perform regression on samples in X.

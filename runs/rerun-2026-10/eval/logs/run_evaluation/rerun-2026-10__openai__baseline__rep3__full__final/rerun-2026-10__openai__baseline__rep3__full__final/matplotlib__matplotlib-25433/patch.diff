@@ -1,0 +1,38 @@
+diff --git a/lib/matplotlib/widgets.py b/lib/matplotlib/widgets.py
+index ebe5da43e2..b8e201644f 100644
+--- a/lib/matplotlib/widgets.py
++++ b/lib/matplotlib/widgets.py
+@@ -600,7 +600,15 @@ class Slider(SliderBase):
+         int
+             Connection id (which can be used to disconnect *func*).
+         """
+-        return self._observers.connect('changed', lambda val: func(val))
++        # Wrap the callback to allow GUI event loop to process events properly
++        def wrapped(val):
++            func(val)
++            # Process GUI events to avoid blocking input after redraw
++            canvas = self.ax.figure.canvas
++            if canvas is not None:
++                canvas.flush_events()
++
++        return self._observers.connect('changed', wrapped)
+ 
+ 
+ class RangeSlider(SliderBase):
+@@ -983,7 +991,15 @@ class RangeSlider(SliderBase):
+         int
+             Connection id (which can be used to disconnect *func*).
+         """
+-        return self._observers.connect('changed', lambda val: func(val))
++        # Wrap the callback to allow GUI event loop to process events properly
++        def wrapped(val):
++            func(val)
++            # Process GUI events to avoid blocking input after redraw
++            canvas = self.ax.figure.canvas
++            if canvas is not None:
++                canvas.flush_events()
++
++        return self._observers.connect('changed', wrapped)
+ 
+ 
+ def _expand_text_props(props):

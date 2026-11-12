@@ -1,0 +1,19 @@
+diff --git a/django/db/models/query_utils.py b/django/db/models/query_utils.py
+index c2623f099f..843c3c6d07 100644
+--- a/django/db/models/query_utils.py
++++ b/django/db/models/query_utils.py
+@@ -46,10 +46,12 @@ class Q(tree.Node):
+ 
+         # If the other Q() is empty, ignore it and just use `self`.
+         if not other:
+-            return copy.deepcopy(self)
++            obj = self._new_instance(self.children, self.connector, self.negated)
++            return obj
+         # Or if this Q is empty, ignore it and just use `other`.
+         elif not self:
+-            return copy.deepcopy(other)
++            obj = other._new_instance(other.children, other.connector, other.negated)
++            return obj
+ 
+         obj = type(self)()
+         obj.connector = conn

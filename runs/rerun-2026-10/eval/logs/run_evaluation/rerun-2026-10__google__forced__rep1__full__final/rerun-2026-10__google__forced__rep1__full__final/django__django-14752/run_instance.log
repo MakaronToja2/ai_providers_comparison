@@ -1,0 +1,74 @@
+2026-10-10 12:04:36,398 - INFO - Creating container for django__django-14752...
+2026-10-10 12:04:37,008 - INFO - Container for django__django-14752 created: 41e453345ef3f177ceca9858fc2d29978ff48c076254b0808af7615caa3609e1
+2026-10-10 12:04:37,768 - INFO - Container for django__django-14752 started: 41e453345ef3f177ceca9858fc2d29978ff48c076254b0808af7615caa3609e1
+2026-10-10 12:04:37,769 - INFO - Intermediate patch for django__django-14752 written to logs/run_evaluation/rerun-2026-10__google__forced__rep1__full__final/rerun-2026-10__google__forced__rep1__full__final/django__django-14752/patch.diff, now applying to container...
+2026-10-10 12:04:38,088 - INFO - >>>>> Applied Patch:
+Checking patch django/contrib/admin/views/autocomplete.py...
+warning: django/contrib/admin/views/autocomplete.py has type 100755, expected 100644
+Applied patch django/contrib/admin/views/autocomplete.py cleanly.
+
+2026-10-10 12:04:38,698 - INFO - Git diff before:
+diff --git a/django/contrib/admin/views/autocomplete.py b/django/contrib/admin/views/autocomplete.py
+index 3903e4c98c..2d864a665f 100755
+--- a/django/contrib/admin/views/autocomplete.py
++++ b/django/contrib/admin/views/autocomplete.py
+@@ -25,13 +25,18 @@ class AutocompleteJsonView(BaseListView):
+         self.object_list = self.get_queryset()
+         context = self.get_context_data()
+         return JsonResponse({
+-            'results': [
+-                {'id': str(getattr(obj, to_field_name)), 'text': str(obj)}
+-                for obj in context['object_list']
+-            ],
++            'results': [self.serialize_result(obj, to_field_name) for obj in context['object_list']],
+             'pagination': {'more': context['page_obj'].has_next()},
+         })
+ 
++    def serialize_result(self, obj, to_field_name):
++        """
++        Serialize a single object for the autocomplete response.
++
++        Override this method in a subclass to add extra data to the response.
++        """
++        return {'id': str(getattr(obj, to_field_name)), 'text': str(obj)}
++
+     def get_paginator(self, *args, **kwargs):
+         """Use the ModelAdmin's paginator."""
+         return self.model_admin.get_paginator(self.request, *args, **kwargs)
+2026-10-10 12:04:38,698 - INFO - Eval script for django__django-14752 written to logs/run_evaluation/rerun-2026-10__google__forced__rep1__full__final/rerun-2026-10__google__forced__rep1__full__final/django__django-14752/eval.sh; copying to container...
+2026-10-10 12:04:45,451 - INFO - Test runtime: 6.69 seconds
+2026-10-10 12:04:45,452 - INFO - Test output for django__django-14752 written to logs/run_evaluation/rerun-2026-10__google__forced__rep1__full__final/rerun-2026-10__google__forced__rep1__full__final/django__django-14752/test_output.txt
+2026-10-10 12:04:49,434 - INFO - Git diff after:
+diff --git a/django/contrib/admin/views/autocomplete.py b/django/contrib/admin/views/autocomplete.py
+index 3903e4c98c..2d864a665f 100755
+--- a/django/contrib/admin/views/autocomplete.py
++++ b/django/contrib/admin/views/autocomplete.py
+@@ -25,13 +25,18 @@ class AutocompleteJsonView(BaseListView):
+         self.object_list = self.get_queryset()
+         context = self.get_context_data()
+         return JsonResponse({
+-            'results': [
+-                {'id': str(getattr(obj, to_field_name)), 'text': str(obj)}
+-                for obj in context['object_list']
+-            ],
++            'results': [self.serialize_result(obj, to_field_name) for obj in context['object_list']],
+             'pagination': {'more': context['page_obj'].has_next()},
+         })
+ 
++    def serialize_result(self, obj, to_field_name):
++        """
++        Serialize a single object for the autocomplete response.
++
++        Override this method in a subclass to add extra data to the response.
++        """
++        return {'id': str(getattr(obj, to_field_name)), 'text': str(obj)}
++
+     def get_paginator(self, *args, **kwargs):
+         """Use the ModelAdmin's paginator."""
+         return self.model_admin.get_paginator(self.request, *args, **kwargs)
+2026-10-10 12:04:49,434 - INFO - Grading answer for django__django-14752...
+2026-10-10 12:04:49,439 - INFO - report: {'django__django-14752': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_serialize_result (admin_views.test_autocomplete_view.AutocompleteJsonViewTests)'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_custom_to_field (admin_views.test_autocomplete_view.AutocompleteJsonViewTests)', 'test_custom_to_field_custom_pk (admin_views.test_autocomplete_view.AutocompleteJsonViewTests)', 'test_custom_to_field_permission_denied (admin_views.test_autocomplete_view.AutocompleteJsonViewTests)', 'test_field_does_not_allowed (admin_views.test_autocomplete_view.AutocompleteJsonViewTests)', 'test_field_does_not_exist (admin_views.test_autocomplete_view.AutocompleteJsonViewTests)', 'test_field_no_related_field (admin_views.test_autocomplete_view.AutocompleteJsonViewTests)', 'Search results are paginated.', 'Users require the change permission for the related model to the', 'test_limit_choices_to (admin_views.test_autocomplete_view.AutocompleteJsonViewTests)', 'test_missing_search_fields (admin_views.test_autocomplete_view.AutocompleteJsonViewTests)', 'test_must_be_logged_in (admin_views.test_autocomplete_view.AutocompleteJsonViewTests)', 'Searching across model relations use QuerySet.distinct() to avoid', 'test_success (admin_views.test_autocomplete_view.AutocompleteJsonViewTests)', 'test_to_field_resolution_with_fk_pk (admin_views.test_autocomplete_view.AutocompleteJsonViewTests)', 'to_field resolution should correctly resolve for target models using'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-14752: resolved: True
+2026-10-10 12:04:49,439 - INFO - Attempting to stop container sweb.eval.django__django-14752.rerun-2026-10__google__forced__rep1__full__final...
+2026-10-10 12:05:07,502 - INFO - Attempting to remove container sweb.eval.django__django-14752.rerun-2026-10__google__forced__rep1__full__final...
+2026-10-10 12:05:07,616 - INFO - Container sweb.eval.django__django-14752.rerun-2026-10__google__forced__rep1__full__final removed.

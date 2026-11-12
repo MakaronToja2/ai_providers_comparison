@@ -1,0 +1,7 @@
+--- a/sympy/printing/latex.py
++++ b/sympy/printing/latex.py
+@@ -1438,2 +1438,2 @@
+-        return self.parenthesize(expr.parent, PRECEDENCE["Atom"], strict=True) \
+-            + '_{%s, %s}' % (expr.i, expr.j)
++        return self.parenthesize(expr.parent, PRECEDENCE["Atom"], strict=True) \
++            + '_{%s, %s}' % (self._print(expr.i), self._print(expr.j))

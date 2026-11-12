@@ -1,0 +1,25 @@
+diff --git a/xarray/core/concat.py b/xarray/core/concat.py
+index ecae2566c..4093066a1 100644
+--- a/xarray/core/concat.py
++++ b/xarray/core/concat.py
+@@ -313,11 +313,15 @@ def _dataset_concat(
+ 
+         for ds in datasets:
+             absent_merge_vars = variables_to_merge - set(ds.variables)
+-            if absent_merge_vars:
+-                raise ValueError(
+-                    "variables %r are present in some datasets but not others. "
+-                    % absent_merge_vars
+-                )
++            # Instead of raising error, fill missing variables with NaN arrays
++            for absent_var in absent_merge_vars:
++                # Create a variable full of fill_value with the appropriate dims
++                # Use dims from dims_sizes if available, else 1
++                dims = datasets[0].variables[absent_var].dims
++                shape = tuple(dims_sizes.get(d, 1) for d in dims)
++                from .variable import Variable
++                missing_var = Variable(dims, fill_value * np.ones(shape, dtype=datasets[0].variables[absent_var].dtype))
++                ds.variables[absent_var] = missing_var
+ 
+             for var in variables_to_merge:
+                 to_merge[var].append(ds.variables[var])

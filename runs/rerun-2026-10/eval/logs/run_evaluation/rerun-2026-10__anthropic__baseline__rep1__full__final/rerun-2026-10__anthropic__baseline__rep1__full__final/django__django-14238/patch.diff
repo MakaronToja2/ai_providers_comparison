@@ -1,0 +1,19 @@
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 0f53d9c30b..12f2be77ac 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -2524,7 +2524,13 @@ class AutoFieldMeta(type):
+         return isinstance(instance, self._subclasses) or super().__instancecheck__(instance)
+ 
+     def __subclasscheck__(self, subclass):
+-        return subclass in self._subclasses or super().__subclasscheck__(subclass)
++        if subclass in self._subclasses:
++            return True
++        # Check if any of the _subclasses are in the MRO of subclass
++        for cls in self._subclasses:
++            if cls in subclass.__mro__:
++                return True
++        return super().__subclasscheck__(subclass)
+ 
+ 
+ class AutoField(AutoFieldMixin, IntegerField, metaclass=AutoFieldMeta):

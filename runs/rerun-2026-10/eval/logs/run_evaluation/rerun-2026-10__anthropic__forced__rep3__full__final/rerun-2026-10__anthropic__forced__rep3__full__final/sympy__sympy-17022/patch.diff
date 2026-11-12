@@ -1,0 +1,31 @@
+diff --git a/sympy/printing/lambdarepr.py b/sympy/printing/lambdarepr.py
+index 8f60434e89..b246c7f7f0 100644
+--- a/sympy/printing/lambdarepr.py
++++ b/sympy/printing/lambdarepr.py
+@@ -14,6 +14,10 @@ class LambdaPrinter(PythonCodePrinter):
+     """
+     printmethod = "_lambdacode"
+ 
++    def _print_Identity(self, expr):
++        raise NotImplementedError(
++            "Identity matrix printing is not supported in lambdify. "
++            "Use explicit matrix construction instead.")
+ 
+     def _print_And(self, expr):
+         result = ['(']
+diff --git a/sympy/printing/pycode.py b/sympy/printing/pycode.py
+index 6ec7bd891c..b13ab3f984 100644
+--- a/sympy/printing/pycode.py
++++ b/sympy/printing/pycode.py
+@@ -362,6 +362,11 @@ def _print_Indexed(self, expr):
+         index = expr.args[1:]
+         return "{}[{}]".format(str(base), ", ".join([self._print(ind) for ind in index]))
+ 
++    def _print_Identity(self, expr):
++        raise NotImplementedError(
++            "Identity matrix printing is not supported in lambdify. "
++            "Use explicit matrix construction instead.")
++
+ 
+ for k in PythonCodePrinter._kf:
+     setattr(PythonCodePrinter, '_print_%s' % k, _print_known_func)

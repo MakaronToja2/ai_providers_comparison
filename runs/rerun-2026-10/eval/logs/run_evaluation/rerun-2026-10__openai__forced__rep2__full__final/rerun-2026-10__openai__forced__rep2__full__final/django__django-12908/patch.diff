@@ -1,0 +1,17 @@
+diff --git a/django/db/models/query.py b/django/db/models/query.py
+index e0eeccefa6..c1aec80649 100644
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -1138,6 +1138,12 @@ class QuerySet:
+         """
+         Return a new QuerySet instance that will select only distinct results.
+         """
++        # Raise if distinct is called on a union queryset, because distinct on
++        # union is not supported properly.
++        if getattr(self.query, 'combinator', None) == 'union':
++            raise NotImplementedError(
++                "distinct() is not supported on a QuerySet resulting from a union()"
++            )
+         assert not self.query.is_sliced, \
+             "Cannot create distinct fields once a slice has been taken."
+         obj = self._chain()

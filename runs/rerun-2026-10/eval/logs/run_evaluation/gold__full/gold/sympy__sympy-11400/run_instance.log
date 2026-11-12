@@ -1,0 +1,69 @@
+2026-10-10 18:22:54,309 - INFO - Creating container for sympy__sympy-11400...
+2026-10-10 18:22:59,956 - INFO - Container for sympy__sympy-11400 created: cee6ee1476d18f1a909e923e9cf641791d79c15d0996ebe97c180174fe132785
+2026-10-10 18:23:10,563 - INFO - Container for sympy__sympy-11400 started: cee6ee1476d18f1a909e923e9cf641791d79c15d0996ebe97c180174fe132785
+2026-10-10 18:23:10,564 - INFO - Intermediate patch for sympy__sympy-11400 written to logs/run_evaluation/gold__full/gold/sympy__sympy-11400/patch.diff, now applying to container...
+2026-10-10 18:23:10,679 - INFO - >>>>> Applied Patch:
+Checking patch sympy/printing/ccode.py...
+Applied patch sympy/printing/ccode.py cleanly.
+
+2026-10-10 18:23:10,898 - INFO - Git diff before:
+diff --git a/sympy/printing/ccode.py b/sympy/printing/ccode.py
+index 30a07a7b5..71eda1fec 100755
+--- a/sympy/printing/ccode.py
++++ b/sympy/printing/ccode.py
+@@ -231,6 +231,20 @@ def _print_Symbol(self, expr):
+         else:
+             return name
+ 
++    def _print_Relational(self, expr):
++        lhs_code = self._print(expr.lhs)
++        rhs_code = self._print(expr.rhs)
++        op = expr.rel_op
++        return ("{0} {1} {2}").format(lhs_code, op, rhs_code)
++
++    def _print_sinc(self, expr):
++        from sympy.functions.elementary.trigonometric import sin
++        from sympy.core.relational import Ne
++        from sympy.functions import Piecewise
++        _piecewise = Piecewise(
++            (sin(expr.args[0]) / expr.args[0], Ne(expr.args[0], 0)), (1, True))
++        return self._print(_piecewise)
++
+     def _print_AugmentedAssignment(self, expr):
+         lhs_code = self._print(expr.lhs)
+         op = expr.rel_op
+2026-10-10 18:23:10,898 - INFO - Eval script for sympy__sympy-11400 written to logs/run_evaluation/gold__full/gold/sympy__sympy-11400/eval.sh; copying to container...
+2026-10-10 18:23:14,965 - INFO - Test runtime: 4.02 seconds
+2026-10-10 18:23:14,965 - INFO - Test output for sympy__sympy-11400 written to logs/run_evaluation/gold__full/gold/sympy__sympy-11400/test_output.txt
+2026-10-10 18:23:15,012 - INFO - Git diff after:
+diff --git a/sympy/printing/ccode.py b/sympy/printing/ccode.py
+index 30a07a7b5..71eda1fec 100755
+--- a/sympy/printing/ccode.py
++++ b/sympy/printing/ccode.py
+@@ -231,6 +231,20 @@ def _print_Symbol(self, expr):
+         else:
+             return name
+ 
++    def _print_Relational(self, expr):
++        lhs_code = self._print(expr.lhs)
++        rhs_code = self._print(expr.rhs)
++        op = expr.rel_op
++        return ("{0} {1} {2}").format(lhs_code, op, rhs_code)
++
++    def _print_sinc(self, expr):
++        from sympy.functions.elementary.trigonometric import sin
++        from sympy.core.relational import Ne
++        from sympy.functions import Piecewise
++        _piecewise = Piecewise(
++            (sin(expr.args[0]) / expr.args[0], Ne(expr.args[0], 0)), (1, True))
++        return self._print(_piecewise)
++
+     def _print_AugmentedAssignment(self, expr):
+         lhs_code = self._print(expr.lhs)
+         op = expr.rel_op
+2026-10-10 18:23:15,012 - INFO - Grading answer for sympy__sympy-11400...
+2026-10-10 18:23:15,013 - INFO - report: {'sympy__sympy-11400': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_ccode_Relational', 'test_ccode_sinc'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_printmethod', 'test_ccode_sqrt', 'test_ccode_Pow', 'test_ccode_constants_mathh', 'test_ccode_constants_other', 'test_ccode_Rational', 'test_ccode_Integer', 'test_ccode_functions', 'test_ccode_inline_function', 'test_ccode_exceptions', 'test_ccode_user_functions', 'test_ccode_boolean', 'test_ccode_Piecewise', 'test_ccode_Piecewise_deep', 'test_ccode_ITE', 'test_ccode_settings', 'test_ccode_Indexed', 'test_ccode_Indexed_without_looking_for_contraction', 'test_ccode_loops_matrix_vector', 'test_dummy_loops', 'test_ccode_loops_add', 'test_ccode_loops_multiple_contractions', 'test_ccode_loops_addfactor', 'test_ccode_loops_multiple_terms', 'test_dereference_printing', 'test_Matrix_printing', 'test_ccode_reserved_words', 'test_ccode_sign', 'test_ccode_Assignment'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-11400: resolved: True
+2026-10-10 18:23:15,014 - INFO - Attempting to stop container sweb.eval.sympy__sympy-11400.gold__full...
+2026-10-10 18:23:36,738 - INFO - Attempting to remove container sweb.eval.sympy__sympy-11400.gold__full...
+2026-10-10 18:23:38,243 - INFO - Container sweb.eval.sympy__sympy-11400.gold__full removed.

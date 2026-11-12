@@ -1,0 +1,36 @@
+diff --git a/astropy/wcs/wcs.py b/astropy/wcs/wcs.py
+index d3a06f2b31..320035d282 100644
+--- a/astropy/wcs/wcs.py
++++ b/astropy/wcs/wcs.py
+@@ -1218,6 +1218,17 @@ reduce these to 2 dimensions using the naxis kwarg.
+                 raise ValueError(
+                     "Coordinate arrays are not broadcastable to each other")
+ 
++            # Handle empty input arrays: return empty arrays of correct shape
++            if any(x.size == 0 for x in axes):
++                shapes = [x.shape for x in axes]
++                # If all shapes are equal, use that shape, else use (0,)
++                shape = shapes[0] if all(s == shapes[0] for s in shapes) else (0,)
++                if ra_dec_order and sky == 'output':
++                    # Return tuple of empty arrays for 2D output
++                    return (np.empty(shape), np.empty(shape))
++                else:
++                    return [np.empty(shape) for _ in range(self.naxis)]
++
+             xy = np.hstack([x.reshape((x.size, 1)) for x in axes])
+ 
+             if ra_dec_order and sky == 'input':
+@@ -1253,6 +1264,13 @@ reduce these to 2 dimensions using the naxis kwarg.
+                     "(coords[N][{0}], origin)".format(self.naxis))
+             if self.naxis == 1 and len(xy.shape) == 1:
+                 return _return_list_of_arrays([xy], origin)
++            # Handle empty input array for single array case
++            if xy.size == 0:
++                shape = xy.shape[:-1]
++                if ra_dec_order and sky == 'output':
++                    return np.empty(shape), np.empty(shape)
++                else:
++                    return np.empty(xy.shape)
+             return _return_single_array(xy, origin)
+ 
+         elif len(args) == self.naxis + 1:

@@ -1,0 +1,15 @@
+diff --git a/lib/matplotlib/figure.py b/lib/matplotlib/figure.py
+index c55864243a..bbe58b9f5d 100644
+--- a/lib/matplotlib/figure.py
++++ b/lib/matplotlib/figure.py
+@@ -3044,7 +3044,9 @@ class Figure(FigureBase):
+         self.__dict__ = state
+ 
+         # re-initialise some of the unstored state information
+-        FigureCanvasBase(self)  # Set self.canvas.
++        # The canvas is not stored in the state, so we need to create it.
++        # This will also set self.canvas.
++        FigureCanvasBase(self)
+ 
+         if restore_to_pylab:
+             # lazy import to avoid circularity

@@ -1,0 +1,18 @@
+diff --git a/src/_pytest/_code/code.py b/src/_pytest/_code/code.py
+index c4ed961ac..ad32ddd5c 100644
+--- a/src/_pytest/_code/code.py
++++ b/src/_pytest/_code/code.py
+@@ -444,6 +444,13 @@ class ExceptionInfo:
+     def traceback(self, value):
+         self._traceback = value
+ 
++    def __str__(self):
++        if self._excinfo is None:
++            # This case should ideally not be reached if the context manager
++            # has successfully captured an exception.
++            return "<ExceptionInfo for raises contextmanager>"
++        return self.exconly()
++
+     def __repr__(self):
+         if self._excinfo is None:
+             return "<ExceptionInfo for raises contextmanager>"

@@ -1,0 +1,34 @@
+diff --git a/django/db/models/sql/compiler.py b/django/db/models/sql/compiler.py
+index 63ca817355..abe8e72586 100644
+--- a/django/db/models/sql/compiler.py
++++ b/django/db/models/sql/compiler.py
+@@ -133,11 +133,24 @@ class SQLCompiler:
+         expressions = self.collapse_group_by(expressions, having_group_by)
+ 
+         for expr in expressions:
+-            sql, params = self.compile(expr)
+-            params_hash = make_hashable(params)
+-            if (sql, params_hash) not in seen:
+-                result.append((sql, params))
+-                seen.add((sql, params_hash))
++            # If the expression is a Subquery, compile it directly to ensure
++            # its full SQL is used in the GROUP BY clause, preventing ambiguity.
++            # This is particularly important for PostgreSQL, which requires
++            # explicit grouping for subqueries.
++            if isinstance(expr, Subquery):
++                sql, params = self.compile(expr)
++                # The subquery SQL already includes outer parentheses, so we
++                # don't need to add them again.
++                params_hash = make_hashable(params)
++                if (sql, params_hash) not in seen:
++                    result.append((sql, params))
++                    seen.add((sql, params_hash))
++            else:
++                sql, params = self.compile(expr)
++                params_hash = make_hashable(params)
++                if (sql, params_hash) not in seen:
++                    result.append((sql, params))
++                    seen.add((sql, params_hash))
+         return result
+ 
+     def collapse_group_by(self, expressions, having):

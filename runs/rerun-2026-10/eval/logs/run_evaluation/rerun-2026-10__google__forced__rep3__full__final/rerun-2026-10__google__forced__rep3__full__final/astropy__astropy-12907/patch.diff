@@ -1,0 +1,35 @@
+diff --git a/astropy/modeling/separable.py b/astropy/modeling/separable.py
+index a308e27297..1ef128b335 100644
+--- a/astropy/modeling/separable.py
++++ b/astropy/modeling/separable.py
+@@ -234,17 +234,23 @@ def _cstack(left, right):
+     noutp = _compute_n_outputs(left, right)
+ 
+     if isinstance(left, Model):
+-        cleft = _coord_matrix(left, 'left', noutp)
++        sepleft = _separable(left)
+     else:
+-        cleft = np.zeros((noutp, left.shape[1]))
+-        cleft[: left.shape[0], : left.shape[1]] = left
++        sepleft = left
++
+     if isinstance(right, Model):
+-        cright = _coord_matrix(right, 'right', noutp)
++        sepright = _separable(right)
+     else:
+-        cright = np.zeros((noutp, right.shape[1]))
+-        cright[-right.shape[0]:, -right.shape[1]:] = 1
++        sepright = right
++
++    n_inputs = sepleft.shape[1] + sepright.shape[1]
++    n_outputs = sepleft.shape[0] + sepright.shape[0]
++
++    combined_matrix = np.zeros((n_outputs, n_inputs), dtype=bool)
++    combined_matrix[:sepleft.shape[0], :sepleft.shape[1]] = sepleft
++    combined_matrix[sepleft.shape[0]:, sepleft.shape[1]:] = sepright
+ 
+-    return np.hstack([cleft, cright])
++    return combined_matrix
+ 
+ 
+ def _cdot(left, right):

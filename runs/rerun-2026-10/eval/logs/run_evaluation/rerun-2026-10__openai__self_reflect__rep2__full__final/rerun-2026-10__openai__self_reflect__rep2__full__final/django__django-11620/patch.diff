@@ -1,0 +1,18 @@
+diff --git a/django/urls/converters.py b/django/urls/converters.py
+index bb8478e32f..0520574e6d 100644
+--- a/django/urls/converters.py
++++ b/django/urls/converters.py
+@@ -39,6 +39,13 @@ class SlugConverter(StringConverter):
+ class PathConverter(StringConverter):
+     regex = '.+'
+ 
++    def to_python(self, value):
++        # Allow raising Http404 to signal a valid path but no matching object.
++        # Other exceptions should raise ValueError to signal no match.
++        from django.http import Http404
++        if isinstance(value, str):
++            return value
++        raise ValueError("Invalid value for path converter")
+ 
+ DEFAULT_CONVERTERS = {
+     'int': IntConverter(),

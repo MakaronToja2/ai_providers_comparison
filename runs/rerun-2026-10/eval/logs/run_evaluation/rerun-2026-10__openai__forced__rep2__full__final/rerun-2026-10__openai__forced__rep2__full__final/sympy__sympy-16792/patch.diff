@@ -1,0 +1,23 @@
+diff --git a/sympy/utilities/autowrap.py b/sympy/utilities/autowrap.py
+index bd6afb12d1..b6d7aa19b0 100644
+--- a/sympy/utilities/autowrap.py
++++ b/sympy/utilities/autowrap.py
+@@ -434,6 +434,18 @@ def _partition_args(self, args):
+                 py_inferred[arg] = py_inferred.pop(arg.name)
+         # Filter inferred arguments from py_args
+         py_args = [a for a in py_args if a not in py_inferred]
++
++        # Fix for arguments that do not appear in the expression but are arrays:
++        # They should be passed as pointers (e.g. double *) not as scalars (double).
++        # So if an argument is an array but does not appear in the expression,
++        # ensure it is treated as an array argument.
++        for arg in args:
++            if arg not in py_args and not isinstance(arg, (OutputArgument, InOutArgument)):
++                # If arg is a matrix or array argument (has dimensions) but is not in py_args,
++                # add it to py_args so it is passed correctly.
++                if hasattr(arg, 'dimensions') and arg.dimensions:
++                    py_args.append(arg)
++
+         return py_returns, py_args, py_locals, py_inferred
+ 
+     def _prototype_arg(self, arg):

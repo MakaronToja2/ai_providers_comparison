@@ -1,0 +1,76 @@
+2026-10-10 19:28:47,422 - INFO - Creating container for sympy__sympy-23191...
+2026-10-10 19:28:54,111 - INFO - Container for sympy__sympy-23191 created: 357faae22a453deb1bf9552627b8a58c43d79b67eff709dcbec15868ef68597d
+2026-10-10 19:29:02,917 - INFO - Container for sympy__sympy-23191 started: 357faae22a453deb1bf9552627b8a58c43d79b67eff709dcbec15868ef68597d
+2026-10-10 19:29:02,918 - INFO - Intermediate patch for sympy__sympy-23191 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep2__full__final/rerun-2026-10__anthropic__forced__rep2__full__final/sympy__sympy-23191/patch.diff, now applying to container...
+2026-10-10 19:29:03,069 - INFO - >>>>> Applied Patch:
+Checking patch sympy/printing/pretty/pretty.py...
+warning: sympy/printing/pretty/pretty.py has type 100755, expected 100644
+Applied patch sympy/printing/pretty/pretty.py cleanly.
+
+2026-10-10 19:29:03,377 - INFO - Git diff before:
+diff --git a/sympy/printing/pretty/pretty.py b/sympy/printing/pretty/pretty.py
+index 66461181d0..25422f18eb 100755
+--- a/sympy/printing/pretty/pretty.py
++++ b/sympy/printing/pretty/pretty.py
+@@ -1144,6 +1144,8 @@ def _print_BasisDependent(self, expr):
+             if '\n' in partstr:
+                 tempstr = partstr
+                 tempstr = tempstr.replace(vectstrs[i], '')
++                # Split by newlines to work with the last line
++                lines = tempstr.split('\n')
+                 if '\N{right parenthesis extension}' in tempstr:   # If scalar is a fraction
+                     for paren in range(len(tempstr)):
+                         flag[i] = 1
+@@ -1157,9 +1159,11 @@ def _print_BasisDependent(self, expr):
+                                         '\N{RIGHT PARENTHESIS LOWER HOOK}'
+                                         + ' ' + vectstrs[i])
+                 else:
+-                    tempstr = tempstr.replace('\N{RIGHT PARENTHESIS UPPER HOOK}',
+-                                        '\N{RIGHT PARENTHESIS UPPER HOOK}'
+-                                        + ' ' + vectstrs[i])
++                    # Append basis vector to the last line instead of replacing
++                    lines = tempstr.split('\n')
++                    if lines:
++                        lines[-1] = lines[-1] + ' ' + vectstrs[i]
++                    tempstr = '\n'.join(lines)
+                 o1[i] = tempstr
+ 
+         o1 = [x.split('\n') for x in o1]
+2026-10-10 19:29:03,378 - INFO - Eval script for sympy__sympy-23191 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep2__full__final/rerun-2026-10__anthropic__forced__rep2__full__final/sympy__sympy-23191/eval.sh; copying to container...
+2026-10-10 19:29:09,177 - INFO - Test runtime: 5.76 seconds
+2026-10-10 19:29:09,178 - INFO - Test output for sympy__sympy-23191 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep2__full__final/rerun-2026-10__anthropic__forced__rep2__full__final/sympy__sympy-23191/test_output.txt
+2026-10-10 19:29:09,234 - INFO - Git diff after:
+diff --git a/sympy/printing/pretty/pretty.py b/sympy/printing/pretty/pretty.py
+index 66461181d0..25422f18eb 100755
+--- a/sympy/printing/pretty/pretty.py
++++ b/sympy/printing/pretty/pretty.py
+@@ -1144,6 +1144,8 @@ def _print_BasisDependent(self, expr):
+             if '\n' in partstr:
+                 tempstr = partstr
+                 tempstr = tempstr.replace(vectstrs[i], '')
++                # Split by newlines to work with the last line
++                lines = tempstr.split('\n')
+                 if '\N{right parenthesis extension}' in tempstr:   # If scalar is a fraction
+                     for paren in range(len(tempstr)):
+                         flag[i] = 1
+@@ -1157,9 +1159,11 @@ def _print_BasisDependent(self, expr):
+                                         '\N{RIGHT PARENTHESIS LOWER HOOK}'
+                                         + ' ' + vectstrs[i])
+                 else:
+-                    tempstr = tempstr.replace('\N{RIGHT PARENTHESIS UPPER HOOK}',
+-                                        '\N{RIGHT PARENTHESIS UPPER HOOK}'
+-                                        + ' ' + vectstrs[i])
++                    # Append basis vector to the last line instead of replacing
++                    lines = tempstr.split('\n')
++                    if lines:
++                        lines[-1] = lines[-1] + ' ' + vectstrs[i]
++                    tempstr = '\n'.join(lines)
+                 o1[i] = tempstr
+ 
+         o1 = [x.split('\n') for x in o1]
+2026-10-10 19:29:09,234 - INFO - Grading answer for sympy__sympy-23191...
+2026-10-10 19:29:09,235 - INFO - report: {'sympy__sympy-23191': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_issue_23058']}, 'PASS_TO_PASS': {'success': ['test_str_printing', 'test_pretty_print_unicode_v', 'test_latex_printing'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-23191: resolved: False
+2026-10-10 19:29:09,236 - INFO - Attempting to stop container sweb.eval.sympy__sympy-23191.rerun-2026-10__anthropic__forced__rep2__full__final...
+2026-10-10 19:29:31,714 - INFO - Attempting to remove container sweb.eval.sympy__sympy-23191.rerun-2026-10__anthropic__forced__rep2__full__final...
+2026-10-10 19:29:37,020 - INFO - Container sweb.eval.sympy__sympy-23191.rerun-2026-10__anthropic__forced__rep2__full__final removed.

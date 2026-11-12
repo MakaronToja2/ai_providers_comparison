@@ -1,0 +1,74 @@
+--- a/lib/matplotlib/axes/_base.py
++++ b/lib/matplotlib/axes/_base.py
+@@ -3567,20 +3567,56 @@
+     def set_xlim(self, left=None, right=None, *, emit=True, auto=False,
+                  xmin=None, xmax=None):
+         """
+         Set the x-axis view limits.
+ 
+-        Parameters
+-        ----------
+-        left : float, optional
+-            The left xlim in data coordinates. Passing *None* leaves the
+-            limit unchanged.
+-
+-            The left and right xlims may also be passed as the tuple
+-            (*left*, *right*) as the first positional argument (or as
+-            the *left* keyword argument).
+-
+-            .. ACCEPTS: (bottom: float, top: float)
+-
+-        right : float, optional
+-            The right xlim in data coordinates. Passing *None* leaves the
+-            limit unchanged.
++        Parameters
++        ----------
++        left : float, optional
++            The left xlim in data coordinates. Passing *None* leaves the
++            limit unchanged.
++
++            The left and right xlims may also be passed as the tuple
++            (*left*, *right*) as the first positional argument (or as
++            the *left* keyword argument).
++
++            .. ACCEPTS: (bottom: float, top: float)
++
++        right : float, optional
++            The right xlim in data coordinates. Passing *None* leaves the
++            limit unchanged.
++        """
++        # Normalize input for backward compatibility
++        if xmin is not None or xmax is not None:
++            left = xmin if xmin is not None else left
++            right = xmax if xmax is not None else right
++
++        # Determine new limits
++        if left is None and right is None:
++            return self.viewLim.intervalx
++
++        # Convert and set limits
++        if left is not None:
++            left = self._validate_converted_limits(left, float)
++        if right is not None:
++            right = self._validate_converted_limits(right, float)
++
++        # Set the new limits on the viewLim
++        old_left, old_right = self.viewLim.intervalx
++        new_left = left if left is not None else old_left
++        new_right = right if right is not None else old_right
++        self.viewLim.intervalx = (new_left, new_right)
++
++        # Notify callbacks and update shared axes
++        if emit:
++            self.callbacks.process('xlim_changed', self)
++        # Call all of the other x-axes that are shared with this one
++        for other in self._shared_x_axes.get_siblings(self):
++            if other is not self:
++                other.set_xlim(self.viewLim.intervalx,
++                               emit=False, auto=auto)
++        # Emit xlim_changed on siblings even if emit=False here to ensure callbacks run
++        if not emit:
++            self.callbacks.process('xlim_changed', self)
++
++        self.stale = True
++        return self.viewLim.intervalx

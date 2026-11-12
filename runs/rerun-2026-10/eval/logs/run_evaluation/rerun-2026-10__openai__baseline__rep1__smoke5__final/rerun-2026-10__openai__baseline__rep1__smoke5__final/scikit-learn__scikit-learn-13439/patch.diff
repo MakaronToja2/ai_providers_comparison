@@ -1,0 +1,15 @@
+diff --git a/sklearn/pipeline.py b/sklearn/pipeline.py
+index 7eaf9a46f09..409854a4fcd 100644
+--- a/sklearn/pipeline.py
++++ b/sklearn/pipeline.py
+@@ -338,6 +338,10 @@ class Pipeline(_BaseComposition):
+         -------
+         Xt : array-like, shape = [n_samples, n_transformed_features]
+             Transformed samples
++
++    def __len__(self):
++        """Return the number of steps in the pipeline."""
++        return len(self.steps)
+         """
+         last_step = self._final_estimator
+         Xt, fit_params = self._fit(X, y, **fit_params)

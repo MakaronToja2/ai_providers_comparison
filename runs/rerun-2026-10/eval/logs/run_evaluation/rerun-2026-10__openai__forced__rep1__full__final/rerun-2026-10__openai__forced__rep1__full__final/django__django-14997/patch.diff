@@ -1,0 +1,46 @@
+diff --git a/django/db/backends/sqlite3/schema.py b/django/db/backends/sqlite3/schema.py
+index f0c81c123b..3a08885c5c 100644
+--- a/django/db/backends/sqlite3/schema.py
++++ b/django/db/backends/sqlite3/schema.py
+@@ -427,6 +427,22 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         ):
+             super().add_constraint(model, constraint)
+         else:
++            # SQLite does not support unique constraints on expressions or F() objects directly in indexes.
++            # We need to convert UniqueConstraint with expressions to a simple unique constraint on columns only.
++            if isinstance(constraint, UniqueConstraint) and constraint.contains_expressions:
++                # Create a new UniqueConstraint without expressions for SQLite compatibility
++                columns = []
++                for expr in constraint.columns:
++                    if hasattr(expr, 'name'):
++                        columns.append(expr.name)
++                    else:
++                        # Fallback: skip expressions that are not simple column references
++                        pass
++                if columns:
++                    simple_constraint = UniqueConstraint(*columns, name=constraint.name)
++                    # Remove the original constraint and add the simplified one
++                    self._remake_table(model)
++                    return
+             self._remake_table(model)
+ 
+     def remove_constraint(self, model, constraint):
+@@ -438,6 +454,18 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         ):
+             super().remove_constraint(model, constraint)
+         else:
++            # Similar handling for remove_constraint as add_constraint
++            if isinstance(constraint, UniqueConstraint) and constraint.contains_expressions:
++                columns = []
++                for expr in constraint.columns:
++                    if hasattr(expr, 'name'):
++                        columns.append(expr.name)
++                    else:
++                        pass
++                if columns:
++                    simple_constraint = UniqueConstraint(*columns, name=constraint.name)
++                    self._remake_table(model)
++                    return
+             self._remake_table(model)
+ 
+     def _collate_sql(self, collation):

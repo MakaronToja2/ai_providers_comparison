@@ -1,0 +1,126 @@
+2026-10-10 16:08:08,547 - INFO - Creating container for matplotlib__matplotlib-25433...
+2026-10-10 16:08:15,793 - INFO - Container for matplotlib__matplotlib-25433 created: a4cf58f49b93c89d8869dfd904bcbedf302751ad3063a089626d4d9521032a09
+2026-10-10 16:08:19,546 - INFO - Container for matplotlib__matplotlib-25433 started: a4cf58f49b93c89d8869dfd904bcbedf302751ad3063a089626d4d9521032a09
+2026-10-10 16:08:19,546 - INFO - Intermediate patch for matplotlib__matplotlib-25433 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__full__final/rerun-2026-10__openai__baseline__rep1__full__final/matplotlib__matplotlib-25433/patch.diff, now applying to container...
+2026-10-10 16:08:19,883 - INFO - >>>>> Applied Patch:
+Checking patch lib/matplotlib/widgets.py...
+warning: lib/matplotlib/widgets.py has type 100755, expected 100644
+Applied patch lib/matplotlib/widgets.py cleanly.
+
+2026-10-10 16:08:21,909 - INFO - Git diff before:
+diff --git a/lib/matplotlib/widgets.py b/lib/matplotlib/widgets.py
+index ebe5da43e2..158328869d 100755
+--- a/lib/matplotlib/widgets.py
++++ b/lib/matplotlib/widgets.py
+@@ -33,11 +33,48 @@ class LockDraw:
+     canvas' lock with ``canvas.widgetlock(widget)`` before drawing on the
+     canvas; this will prevent other widgets from doing so at the same time (if
+     they also try to acquire the lock first).
++
++    Additionally, we add a workaround for the issue where clearing the figure
++    and redrawing widgets in a RangeSlider on_changed callback blocks input.
++    This is done by explicitly releasing the canvas event loop during the draw
++    call in such callbacks.
+     """
+ 
+     def __init__(self):
+         self._owner = None
+ 
++
++# Patch to fix the issue where using clf and pyplot.draw in RangeSlider on_changed callback blocks widget input.
++# The problem is that the event loop is blocked during draw calls in on_changed callbacks of RangeSlider.
++# We patch the RangeSlider to defer the draw call to the GUI event loop after the callback returns.
++
++import matplotlib.widgets as mwidgets
++import matplotlib.pyplot as plt
++import threading
++
++_original_range_slider_init = mwidgets.RangeSlider.__init__
++_original_range_slider_on_changed = mwidgets.RangeSlider._observers
++
++def _patched_on_changed(self, func):
++    # Wrap the original callback to defer draw calls after callback returns
++    def wrapped_func(val):
++        func(val)
++        # Instead of immediate draw, schedule draw_idle to avoid blocking event loop
++        self.ax.figure.canvas.draw_idle()
++    return wrapped_func
++
++def _patched_range_slider_init(self, *args, **kwargs):
++    _original_range_slider_init(self, *args, **kwargs)
++    # Patch the on_changed method to wrap callbacks
++    orig_on_changed = self.on_changed
++
++    def new_on_changed(func):
++        wrapped = _patched_on_changed(self, func)
++        orig_on_changed(wrapped)
++    self.on_changed = new_on_changed
++
++mwidgets.RangeSlider.__init__ = _patched_range_slider_init
++
+     def __call__(self, o):
+         """Reserve the lock for *o*."""
+         if not self.available(o):
+2026-10-10 16:08:21,909 - INFO - Eval script for matplotlib__matplotlib-25433 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__full__final/rerun-2026-10__openai__baseline__rep1__full__final/matplotlib__matplotlib-25433/eval.sh; copying to container...
+2026-10-10 16:10:28,097 - INFO - Test runtime: 126.03 seconds
+2026-10-10 16:10:28,098 - INFO - Test output for matplotlib__matplotlib-25433 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__full__final/rerun-2026-10__openai__baseline__rep1__full__final/matplotlib__matplotlib-25433/test_output.txt
+2026-10-10 16:10:28,189 - INFO - Git diff after:
+diff --git a/lib/matplotlib/widgets.py b/lib/matplotlib/widgets.py
+index ebe5da43e2..158328869d 100755
+--- a/lib/matplotlib/widgets.py
++++ b/lib/matplotlib/widgets.py
+@@ -33,11 +33,48 @@ class LockDraw:
+     canvas' lock with ``canvas.widgetlock(widget)`` before drawing on the
+     canvas; this will prevent other widgets from doing so at the same time (if
+     they also try to acquire the lock first).
++
++    Additionally, we add a workaround for the issue where clearing the figure
++    and redrawing widgets in a RangeSlider on_changed callback blocks input.
++    This is done by explicitly releasing the canvas event loop during the draw
++    call in such callbacks.
+     """
+ 
+     def __init__(self):
+         self._owner = None
+ 
++
++# Patch to fix the issue where using clf and pyplot.draw in RangeSlider on_changed callback blocks widget input.
++# The problem is that the event loop is blocked during draw calls in on_changed callbacks of RangeSlider.
++# We patch the RangeSlider to defer the draw call to the GUI event loop after the callback returns.
++
++import matplotlib.widgets as mwidgets
++import matplotlib.pyplot as plt
++import threading
++
++_original_range_slider_init = mwidgets.RangeSlider.__init__
++_original_range_slider_on_changed = mwidgets.RangeSlider._observers
++
++def _patched_on_changed(self, func):
++    # Wrap the original callback to defer draw calls after callback returns
++    def wrapped_func(val):
++        func(val)
++        # Instead of immediate draw, schedule draw_idle to avoid blocking event loop
++        self.ax.figure.canvas.draw_idle()
++    return wrapped_func
++
++def _patched_range_slider_init(self, *args, **kwargs):
++    _original_range_slider_init(self, *args, **kwargs)
++    # Patch the on_changed method to wrap callbacks
++    orig_on_changed = self.on_changed
++
++    def new_on_changed(func):
++        wrapped = _patched_on_changed(self, func)
++        orig_on_changed(wrapped)
++    self.on_changed = new_on_changed
++
++mwidgets.RangeSlider.__init__ = _patched_range_slider_init
++
+     def __call__(self, o):
+         """Reserve the lock for *o*."""
+         if not self.available(o):
+2026-10-10 16:10:28,189 - INFO - Grading answer for matplotlib__matplotlib-25433...
+2026-10-10 16:10:28,194 - INFO - report: {'matplotlib__matplotlib-25433': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['lib/matplotlib/tests/test_backend_bases.py::test_grab_clear']}, 'PASS_TO_PASS': {'success': [], 'failure': ['lib/matplotlib/tests/test_backend_bases.py::test_uses_per_path', 'lib/matplotlib/tests/test_backend_bases.py::test_canvas_ctor', 'lib/matplotlib/tests/test_backend_bases.py::test_get_default_filename', 'lib/matplotlib/tests/test_backend_bases.py::test_canvas_change', 'lib/matplotlib/tests/test_backend_bases.py::test_non_gui_warning', 'lib/matplotlib/tests/test_backend_bases.py::test_location_event_position[42-24]', 'lib/matplotlib/tests/test_backend_bases.py::test_location_event_position[None-42]', 'lib/matplotlib/tests/test_backend_bases.py::test_location_event_position[None-None]', 'lib/matplotlib/tests/test_backend_bases.py::test_location_event_position[200-100.01]', 'lib/matplotlib/tests/test_backend_bases.py::test_location_event_position[205.75-2.0]', 'lib/matplotlib/tests/test_backend_bases.py::test_pick', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_zoom', 'lib/matplotlib/tests/test_backend_bases.py::test_widgetlock_zoompan', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_colorbar[zoom-1-expected0-vertical-imshow]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_colorbar[zoom-1-expected0-vertical-contourf]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_colorbar[zoom-1-expected0-horizontal-imshow]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_colorbar[zoom-1-expected0-horizontal-contourf]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_colorbar[zoom-3-expected1-vertical-imshow]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_colorbar[zoom-3-expected1-vertical-contourf]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_colorbar[zoom-3-expected1-horizontal-imshow]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_colorbar[zoom-3-expected1-horizontal-contourf]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_colorbar[pan-1-expected2-vertical-imshow]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_colorbar[pan-1-expected2-vertical-contourf]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_colorbar[pan-1-expected2-horizontal-imshow]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_colorbar[pan-1-expected2-horizontal-contourf]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_colorbar[pan-3-expected3-vertical-imshow]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_colorbar[pan-3-expected3-vertical-contourf]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_colorbar[pan-3-expected3-horizontal-imshow]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_colorbar[pan-3-expected3-horizontal-contourf]', 'lib/matplotlib/tests/test_backend_bases.py::test_toolbar_zoompan', 'lib/matplotlib/tests/test_backend_bases.py::test_draw[svg]', 'lib/matplotlib/tests/test_backend_bases.py::test_draw[ps]', 'lib/matplotlib/tests/test_backend_bases.py::test_draw[pdf]', 'lib/matplotlib/tests/test_backend_bases.py::test_draw[pgf]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[None-mouseend0-expectedxlim0-expectedylim0]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[None-mouseend1-expectedxlim1-expectedylim1]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[None-mouseend2-expectedxlim2-expectedylim2]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[None-mouseend3-expectedxlim3-expectedylim3]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[None-mouseend4-expectedxlim4-expectedylim4]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[None-mouseend5-expectedxlim5-expectedylim5]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[None-mouseend6-expectedxlim6-expectedylim6]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[None-mouseend7-expectedxlim7-expectedylim7]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[shift-mouseend8-expectedxlim8-expectedylim8]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[shift-mouseend9-expectedxlim9-expectedylim9]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[shift-mouseend10-expectedxlim10-expectedylim10]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[shift-mouseend11-expectedxlim11-expectedylim11]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[shift-mouseend12-expectedxlim12-expectedylim12]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[shift-mouseend13-expectedxlim13-expectedylim13]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[x-mouseend14-expectedxlim14-expectedylim14]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[y-mouseend15-expectedxlim15-expectedylim15]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[control-mouseend16-expectedxlim16-expectedylim16]', 'lib/matplotlib/tests/test_backend_bases.py::test_interactive_pan[control-mouseend17-expectedxlim17-expectedylim17]', 'lib/matplotlib/tests/test_backend_bases.py::test_toolmanager_remove', 'lib/matplotlib/tests/test_backend_bases.py::test_toolmanager_get_tool', 'lib/matplotlib/tests/test_backend_bases.py::test_toolmanager_update_keymap']}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for matplotlib__matplotlib-25433: resolved: False
+2026-10-10 16:10:28,194 - INFO - Attempting to stop container sweb.eval.matplotlib__matplotlib-25433.rerun-2026-10__openai__baseline__rep1__full__final...
+2026-10-10 16:10:50,820 - INFO - Attempting to remove container sweb.eval.matplotlib__matplotlib-25433.rerun-2026-10__openai__baseline__rep1__full__final...
+2026-10-10 16:10:52,856 - INFO - Container sweb.eval.matplotlib__matplotlib-25433.rerun-2026-10__openai__baseline__rep1__full__final removed.

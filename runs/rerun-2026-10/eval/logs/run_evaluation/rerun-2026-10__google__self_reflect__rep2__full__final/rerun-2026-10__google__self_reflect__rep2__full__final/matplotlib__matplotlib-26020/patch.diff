@@ -1,0 +1,31 @@
+diff --git a/lib/mpl_toolkits/axes_grid1/axes_grid.py b/lib/mpl_toolkits/axes_grid1/axes_grid.py
+index 2b1b1d3200..8815ade18a 100644
+--- a/lib/mpl_toolkits/axes_grid1/axes_grid.py
++++ b/lib/mpl_toolkits/axes_grid1/axes_grid.py
+@@ -13,8 +13,24 @@ from .mpl_axes import Axes
+ def _tick_only(ax, bottom_on, left_on):
+     bottom_off = not bottom_on
+     left_off = not left_on
+-    ax.axis["bottom"].toggle(ticklabels=bottom_off, label=bottom_off)
+-    ax.axis["left"].toggle(ticklabels=left_off, label=left_off)
++
++    # Check if ax.axis is a dictionary-like object with 'bottom' and 'left' keys
++    if hasattr(ax, 'axis') and isinstance(ax.axis, dict) and 'bottom' in ax.axis and 'left' in ax.axis:
++        ax.axis["bottom"].toggle(ticklabels=bottom_off, label=bottom_off)
++        ax.axis["left"].toggle(ticklabels=left_off, label=left_off)
++    # Check if ax has xaxis and yaxis attributes and they have set_tick_params
++    elif hasattr(ax, 'xaxis') and hasattr(ax.xaxis, 'set_tick_params') and \
++         hasattr(ax, 'yaxis') and hasattr(ax.yaxis, 'set_tick_params'):
++        ax.xaxis.set_tick_params(labelbottom=bottom_off)
++        ax.yaxis.set_tick_params(labelleft=left_off)
++    else:
++        # Fallback for other axis types if necessary.
++        # For this specific bug, the GeoAxes case is covered by the elif.
++        try:
++            ax.xaxis.set_tick_params(labelbottom=bottom_off)
++            ax.yaxis.set_tick_params(labelleft=left_off)
++        except AttributeError:
++            pass
+ 
+ 
+ class CbarAxesBase:

@@ -1,0 +1,36 @@
+diff --git a/sklearn/utils/_pprint.py b/sklearn/utils/_pprint.py
+index b8686dba5b0..bc942db5f77 100644
+--- a/sklearn/utils/_pprint.py
++++ b/sklearn/utils/_pprint.py
+@@ -95,9 +95,28 @@ def _changed_params(estimator):
+     init_params = signature(init_func).parameters
+     init_params = {name: param.default for name, param in init_params.items()}
+     for k, v in params.items():
+-        if (v != init_params[k] and
+-                not (is_scalar_nan(init_params[k]) and is_scalar_nan(v))):
+-            filtered_params[k] = v
++        # Fix for array-like values to avoid ambiguous truth value error
++        default_value = init_params[k]
++        try:
++            if hasattr(v, '__len__') and hasattr(default_value, '__len__'):
++                # Use array_equal for numpy arrays or fallback to equality
++                import numpy as np
++                if (isinstance(v, np.ndarray) and isinstance(default_value, np.ndarray)):
++                    if not np.array_equal(v, default_value):
++                        filtered_params[k] = v
++                else:
++                    # For other sequences, fallback to normal equality
++                    if v != default_value:
++                        filtered_params[k] = v
++            else:
++                if (v != default_value and
++                        not (is_scalar_nan(default_value) and is_scalar_nan(v))):
++                    filtered_params[k] = v
++        except Exception:
++            # In case of any error, fallback to normal equality check
++            if (v != default_value and
++                    not (is_scalar_nan(default_value) and is_scalar_nan(v))):
++                filtered_params[k] = v
+     return filtered_params
+ 
+ 

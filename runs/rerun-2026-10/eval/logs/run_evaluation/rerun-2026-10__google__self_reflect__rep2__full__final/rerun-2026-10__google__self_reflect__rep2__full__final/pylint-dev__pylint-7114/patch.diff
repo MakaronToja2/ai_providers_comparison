@@ -1,0 +1,20 @@
+diff --git a/pylint/lint/expand_modules.py b/pylint/lint/expand_modules.py
+index 289e1afce..c008a671e 100644
+--- a/pylint/lint/expand_modules.py
++++ b/pylint/lint/expand_modules.py
+@@ -90,8 +90,14 @@ def expand_modules(
+                 )
+             except ImportError:
+                 modname = os.path.splitext(basename)[0]
++            # If 'something' is a directory, check if a file with the same name exists.
++            # If it does, treat the file as the primary target, not the directory as a package.
+             if os.path.isdir(something):
+-                filepath = os.path.join(something, "__init__.py")
++                file_with_same_name = os.path.join(something, basename)
++                if os.path.exists(file_with_same_name) and not os.path.isdir(file_with_same_name):
++                    filepath = file_with_same_name
++                else:
++                    filepath = os.path.join(something, "__init__.py")
+             else:
+                 filepath = something
+         else:

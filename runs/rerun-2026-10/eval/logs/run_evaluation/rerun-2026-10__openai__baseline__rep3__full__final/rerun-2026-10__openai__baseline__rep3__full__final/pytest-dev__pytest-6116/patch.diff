@@ -1,0 +1,18 @@
+diff --git a/src/_pytest/helpconfig.py b/src/_pytest/helpconfig.py
+index 50acc2d7d..4a7354c24 100644
+--- a/src/_pytest/helpconfig.py
++++ b/src/_pytest/helpconfig.py
+@@ -81,6 +81,13 @@ def pytest_addoption(parser):
+         action="append",
+         help='override ini option with "option=value" style, e.g. `-o xfail_strict=True -o cache_dir=cache`.',
+     )
++    group._addoption(
++        "-c",
++        "--collect-only",
++        action="store_true",
++        default=False,
++        help="only collect tests, don't execute them.",
++    )
+ 
+ 
+ @pytest.hookimpl(hookwrapper=True)

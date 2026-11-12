@@ -1,0 +1,25 @@
+diff --git a/django/core/exceptions.py b/django/core/exceptions.py
+index dc084b8692..6ad04da143 100644
+--- a/django/core/exceptions.py
++++ b/django/core/exceptions.py
+@@ -179,6 +179,20 @@ class ValidationError(Exception):
+             return repr(dict(self))
+         return repr(list(self))
+ 
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++        if hasattr(self, 'error_dict') and hasattr(other, 'error_dict'):
++            return self.error_dict == other.error_dict
++        if hasattr(self, 'error_dict') or hasattr(other, 'error_dict'):
++            return False
++        return self.error_list == other.error_list
++
++    def __hash__(self):
++        if hasattr(self, 'error_dict'):
++            return hash(tuple(sorted(self.error_dict.items())))
++        return hash(tuple(self.error_list))
++
+     def __repr__(self):
+         return 'ValidationError(%s)' % self
+ 

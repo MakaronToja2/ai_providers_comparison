@@ -1,0 +1,14 @@
+diff --git a/sympy/simplify/powsimp.py b/sympy/simplify/powsimp.py
+index 3cf646ca4d..4f98ec190d 100644
+--- a/sympy/simplify/powsimp.py
++++ b/sympy/simplify/powsimp.py
+@@ -145,7 +145,8 @@ def recurse(arg, **kwargs):
+                     # don't let smthg like sqrt(x**a) split into x**a, 1/2
+                     # or else it will be joined as x**(a/2) later
+                     b, e = b**e, S.One
+-                c_powers[b].append(e)
++                # Convert exponent to Rational to ensure consistent type
++                c_powers[b].append(sympify(e, rational=True))
+             else:
+                 # This is the logic that combines exponents for equal,
+                 # but non-commutative bases: A**x*A**y == A**(x+y).

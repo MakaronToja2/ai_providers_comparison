@@ -1,0 +1,17 @@
+diff --git a/requests/models.py b/requests/models.py
+index fbb3c7e6..1ff3c5dc 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -665,7 +665,11 @@ class Response(object):
+             # Special case for urllib3.
+             if hasattr(self.raw, 'stream'):
+                 try:
+-                    for chunk in self.raw.stream(chunk_size, decode_content=True):
++                    # decode_content=True is the default in urllib3, so we
++                    # only pass it if decode_unicode is False.
++                    # If decode_unicode is True, we want the raw bytes.
++                    # This is because we will decode it ourselves later.
++                    for chunk in self.raw.stream(chunk_size, decode_content=decode_unicode):
+                         yield chunk
+                 except ProtocolError as e:
+                     raise ChunkedEncodingError(e)

@@ -1,0 +1,58 @@
+2026-10-10 11:28:52,060 - INFO - Creating container for django__django-12113...
+2026-10-10 11:28:52,167 - INFO - Container for django__django-12113 created: 51c7f56871d301b5e3b5199e1445decc3a3bae1c9d491799c3e985bff0382a0f
+2026-10-10 11:28:52,375 - INFO - Container for django__django-12113 started: 51c7f56871d301b5e3b5199e1445decc3a3bae1c9d491799c3e985bff0382a0f
+2026-10-10 11:28:52,376 - INFO - Intermediate patch for django__django-12113 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep1__full__final/rerun-2026-10__openai__self_reflect__rep1__full__final/django__django-12113/patch.diff, now applying to container...
+2026-10-10 11:28:52,495 - INFO - >>>>> Applied Patch:
+Checking patch tests/test_sqlite.py...
+warning: tests/test_sqlite.py has type 100755, expected 100644
+Applied patch tests/test_sqlite.py cleanly.
+
+2026-10-10 11:28:53,105 - INFO - Git diff before:
+diff --git a/tests/test_sqlite.py b/tests/test_sqlite.py
+index f1b65f7d01..aecdd2f4ae 100755
+--- a/tests/test_sqlite.py
++++ b/tests/test_sqlite.py
+@@ -15,9 +15,15 @@
+ DATABASES = {
+     'default': {
+         'ENGINE': 'django.db.backends.sqlite3',
++        'TEST': {
++            'NAME': 'test_default.sqlite3',
++        },
+     },
+     'other': {
+         'ENGINE': 'django.db.backends.sqlite3',
++        'TEST': {
++            'NAME': 'test_other.sqlite3',
++        },
+     }
+ }
+2026-10-10 11:28:53,105 - INFO - Eval script for django__django-12113 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep1__full__final/rerun-2026-10__openai__self_reflect__rep1__full__final/django__django-12113/eval.sh; copying to container...
+2026-10-10 11:28:58,674 - INFO - Test runtime: 5.49 seconds
+2026-10-10 11:28:58,675 - INFO - Test output for django__django-12113 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep1__full__final/rerun-2026-10__openai__self_reflect__rep1__full__final/django__django-12113/test_output.txt
+2026-10-10 11:28:58,732 - INFO - Git diff after:
+diff --git a/tests/test_sqlite.py b/tests/test_sqlite.py
+index f1b65f7d01..aecdd2f4ae 100755
+--- a/tests/test_sqlite.py
++++ b/tests/test_sqlite.py
+@@ -15,9 +15,15 @@
+ DATABASES = {
+     'default': {
+         'ENGINE': 'django.db.backends.sqlite3',
++        'TEST': {
++            'NAME': 'test_default.sqlite3',
++        },
+     },
+     'other': {
+         'ENGINE': 'django.db.backends.sqlite3',
++        'TEST': {
++            'NAME': 'test_other.sqlite3',
++        },
+     }
+ }
+2026-10-10 11:28:58,732 - INFO - Grading answer for django__django-12113...
+2026-10-10 11:28:58,737 - INFO - report: {'django__django-12113': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_custom_test_name (backends.sqlite.test_creation.TestDbSignatureTests)']}, 'PASS_TO_PASS': {'success': [], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-12113: resolved: False
+2026-10-10 11:28:58,737 - INFO - Attempting to stop container sweb.eval.django__django-12113.rerun-2026-10__openai__self_reflect__rep1__full__final...
+2026-10-10 11:29:16,363 - INFO - Attempting to remove container sweb.eval.django__django-12113.rerun-2026-10__openai__self_reflect__rep1__full__final...
+2026-10-10 11:29:16,420 - INFO - Container sweb.eval.django__django-12113.rerun-2026-10__openai__self_reflect__rep1__full__final removed.

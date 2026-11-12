@@ -1,0 +1,21 @@
+diff --git a/sklearn/decomposition/kernel_pca.py b/sklearn/decomposition/kernel_pca.py
+index bb91d0cbbad..9bf0baee4e9 100644
+--- a/sklearn/decomposition/kernel_pca.py
++++ b/sklearn/decomposition/kernel_pca.py
+@@ -201,9 +201,13 @@ class KernelPCA(BaseEstimator, TransformerMixin, _UnstableOn32BitMixin):
+             self.lambdas_, self.alphas_ = linalg.eigh(
+                 K, eigvals=(K.shape[0] - n_components, K.shape[0] - 1))
+         elif eigen_solver == 'arpack':
+-            random_state = check_random_state(self.random_state)
+-            # initialize with [-1,1] as in ARPACK
+-            v0 = random_state.uniform(-1, 1, K.shape[0])
++            # Use a fixed seed for deterministic behavior when no random_state is provided
++            # This ensures that v0 is the same across runs if the user doesn't specify random_state
++            if self.random_state is None:
++                local_random_state = np.random.RandomState(0)
++            else:
++                local_random_state = check_random_state(self.random_state)
++            v0 = local_random_state.uniform(-1, 1, K.shape[0])
+             self.lambdas_, self.alphas_ = eigsh(K, n_components,
+                                                 which="LA",
+                                                 tol=self.tol,

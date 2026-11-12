@@ -1,0 +1,17 @@
+diff --git a/pylint/reporters/text.py b/pylint/reporters/text.py
+index 29bd46798..e83a63b02 100644
+--- a/pylint/reporters/text.py
++++ b/pylint/reporters/text.py
+@@ -175,7 +175,11 @@ class TextReporter(BaseReporter):
+         self._template = template
+ 
+         # Check to see if all parameters in the template are attributes of the Message
+-        arguments = re.findall(r"\{(.+?)(:.*)?\}", template)
++        # We need to ignore double braces (escaped braces) in the template
++        # So we temporarily replace double braces with a placeholder before searching
++        placeholder = "__DOUBLE_BRACE__"
++        temp_template = template.replace("{{", placeholder).replace("}}", placeholder)
++        arguments = re.findall(r"\{(.+?)(:.*)?\}", temp_template)
+         for argument in arguments:
+             if argument[0] not in MESSAGE_FIELDS:
+                 warnings.warn(

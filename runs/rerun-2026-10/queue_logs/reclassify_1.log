@@ -1,0 +1,8 @@
+anthropic: 14 row(s) changed
+    2  anthropic__baseline__rep1__full: hallucination_format_error -> edit_not_applicable
+   12  anthropic__baseline__rep1__full: hallucination_format_error -> success_patch_generated
+openai: 1 row(s) changed
+    1  openai__self_reflect__rep1__full: success_patch_generated -> success_patch_generated
+google: 2 row(s) changed
+    1  google__baseline__rep1__full: hallucination_format_error -> edit_not_applicable
+    1  google__forced__rep1__full: hallucination_format_error -> edit_not_applicable

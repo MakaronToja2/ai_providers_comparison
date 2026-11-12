@@ -1,0 +1,64 @@
+2026-10-10 16:58:39,799 - INFO - Creating container for matplotlib__matplotlib-24265...
+2026-10-10 16:58:48,996 - INFO - Container for matplotlib__matplotlib-24265 created: 97cfa9dbb900b9434b2ac568ede9291bbb49c24ba4966f76dd5c423962c9a588
+2026-10-10 16:58:57,071 - INFO - Container for matplotlib__matplotlib-24265 started: 97cfa9dbb900b9434b2ac568ede9291bbb49c24ba4966f76dd5c423962c9a588
+2026-10-10 16:58:57,071 - INFO - Intermediate patch for matplotlib__matplotlib-24265 written to logs/run_evaluation/rerun-2026-10__google__forced__rep2__full__final/rerun-2026-10__google__forced__rep2__full__final/matplotlib__matplotlib-24265/patch.diff, now applying to container...
+2026-10-10 16:58:57,271 - INFO - >>>>> Applied Patch:
+Checking patch lib/matplotlib/style/core.py...
+warning: lib/matplotlib/style/core.py has type 100755, expected 100644
+Applied patch lib/matplotlib/style/core.py cleanly.
+
+2026-10-10 16:58:58,667 - INFO - Git diff before:
+diff --git a/lib/matplotlib/style/core.py b/lib/matplotlib/style/core.py
+index fb0a5426e6..1db6839a5a 100755
+--- a/lib/matplotlib/style/core.py
++++ b/lib/matplotlib/style/core.py
+@@ -150,6 +150,17 @@ def use(style):
+                 _apply_style(rcParamsDefault, warn=False)
+         elif style in library:
+             _apply_style(library[style])
++        # Handle deprecated seaborn styles that are now prefixed with seaborn-v0_8-
++        elif style.startswith("seaborn-v0_8-"):
++            try:
++                # Try to load the style directly if it's a known seaborn-v0_8 style
++                rc = rc_params_from_file(style, use_default_template=False)
++                _apply_style(rc)
++            except IOError as err:
++                raise IOError(
++                    f"{style!r} not found. Seaborn styles have been moved to the "
++                    f"seaborn package and are available as 'seaborn-v0_8-*'. "
++                    f"Please install seaborn or use a different style.") from err
+         else:
+             try:
+                 rc = rc_params_from_file(style, use_default_template=False)
+2026-10-10 16:58:58,668 - INFO - Eval script for matplotlib__matplotlib-24265 written to logs/run_evaluation/rerun-2026-10__google__forced__rep2__full__final/rerun-2026-10__google__forced__rep2__full__final/matplotlib__matplotlib-24265/eval.sh; copying to container...
+2026-10-10 17:00:38,506 - INFO - Test runtime: 99.72 seconds
+2026-10-10 17:00:38,509 - INFO - Test output for matplotlib__matplotlib-24265 written to logs/run_evaluation/rerun-2026-10__google__forced__rep2__full__final/rerun-2026-10__google__forced__rep2__full__final/matplotlib__matplotlib-24265/test_output.txt
+2026-10-10 17:00:38,630 - INFO - Git diff after:
+diff --git a/lib/matplotlib/style/core.py b/lib/matplotlib/style/core.py
+index fb0a5426e6..1db6839a5a 100755
+--- a/lib/matplotlib/style/core.py
++++ b/lib/matplotlib/style/core.py
+@@ -150,6 +150,17 @@ def use(style):
+                 _apply_style(rcParamsDefault, warn=False)
+         elif style in library:
+             _apply_style(library[style])
++        # Handle deprecated seaborn styles that are now prefixed with seaborn-v0_8-
++        elif style.startswith("seaborn-v0_8-"):
++            try:
++                # Try to load the style directly if it's a known seaborn-v0_8 style
++                rc = rc_params_from_file(style, use_default_template=False)
++                _apply_style(rc)
++            except IOError as err:
++                raise IOError(
++                    f"{style!r} not found. Seaborn styles have been moved to the "
++                    f"seaborn package and are available as 'seaborn-v0_8-*'. "
++                    f"Please install seaborn or use a different style.") from err
+         else:
+             try:
+                 rc = rc_params_from_file(style, use_default_template=False)
+2026-10-10 17:00:38,630 - INFO - Grading answer for matplotlib__matplotlib-24265...
+2026-10-10 17:00:38,637 - INFO - report: {'matplotlib__matplotlib-24265': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['lib/matplotlib/tests/test_style.py::test_deprecated_seaborn_styles']}, 'PASS_TO_PASS': {'success': ['lib/matplotlib/tests/test_style.py::test_invalid_rc_warning_includes_filename', 'lib/matplotlib/tests/test_style.py::test_available', 'lib/matplotlib/tests/test_style.py::test_use', 'lib/matplotlib/tests/test_style.py::test_use_url', 'lib/matplotlib/tests/test_style.py::test_context', 'lib/matplotlib/tests/test_style.py::test_context_with_dict', 'lib/matplotlib/tests/test_style.py::test_context_with_dict_after_namedstyle', 'lib/matplotlib/tests/test_style.py::test_context_with_dict_before_namedstyle', 'lib/matplotlib/tests/test_style.py::test_context_with_union_of_dict_and_namedstyle', 'lib/matplotlib/tests/test_style.py::test_context_with_badparam', 'lib/matplotlib/tests/test_style.py::test_alias[mpl20]', 'lib/matplotlib/tests/test_style.py::test_alias[mpl15]', 'lib/matplotlib/tests/test_style.py::test_xkcd_no_cm', 'lib/matplotlib/tests/test_style.py::test_xkcd_cm', 'lib/matplotlib/tests/test_style.py::test_up_to_date_blacklist'], 'failure': ['lib/matplotlib/tests/test_style.py::test_single_path']}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for matplotlib__matplotlib-24265: resolved: False
+2026-10-10 17:00:38,638 - INFO - Attempting to stop container sweb.eval.matplotlib__matplotlib-24265.rerun-2026-10__google__forced__rep2__full__final...
+2026-10-10 17:00:57,705 - INFO - Attempting to remove container sweb.eval.matplotlib__matplotlib-24265.rerun-2026-10__google__forced__rep2__full__final...
+2026-10-10 17:00:58,245 - INFO - Container sweb.eval.matplotlib__matplotlib-24265.rerun-2026-10__google__forced__rep2__full__final removed.

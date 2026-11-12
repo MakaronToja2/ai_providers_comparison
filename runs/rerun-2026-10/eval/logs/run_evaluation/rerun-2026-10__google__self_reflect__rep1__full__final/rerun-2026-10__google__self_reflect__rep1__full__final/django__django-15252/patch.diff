@@ -1,0 +1,15 @@
+diff --git a/django/db/migrations/executor.py b/django/db/migrations/executor.py
+index aa2fe0883b..fd54116edb 100644
+--- a/django/db/migrations/executor.py
++++ b/django/db/migrations/executor.py
+@@ -97,7 +97,9 @@ class MigrationExecutor:
+         """
+         # The django_migrations table must be present to record applied
+         # migrations.
+-        self.recorder.ensure_schema()
++        db_alias = self.connection.alias
++        if router.allow_migrate(db_alias, self.recorder.Migration):
++            self.recorder.ensure_schema()
+ 
+         if plan is None:
+             plan = self.migration_plan(targets)

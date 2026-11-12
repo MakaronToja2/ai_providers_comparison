@@ -1,0 +1,16 @@
+diff --git a/django/test/testcases.py b/django/test/testcases.py
+index 23459f22cd..5925514224 100644
+--- a/django/test/testcases.py
++++ b/django/test/testcases.py
+@@ -1116,6 +1116,11 @@ class TestCase(TransactionTestCase):
+             cls._rollback_atomics(cls.cls_atomics)
+             cls._remove_databases_failures()
+             raise
++        finally:
++            # Close all connections to avoid database locking issues with
++            # persistent test databases (e.g., SQLite with --keepdb).
++            for conn in connections.all():
++                conn.close()
+ 
+     @classmethod
+     def tearDownClass(cls):

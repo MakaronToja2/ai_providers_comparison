@@ -1,0 +1,86 @@
+2026-10-10 17:59:50,786 - INFO - Creating container for sphinx-doc__sphinx-10325...
+2026-10-10 17:59:57,440 - INFO - Container for sphinx-doc__sphinx-10325 created: 449be7bb2a288b56ebda93f986099a90125f9071feeb81961448e0990ac1c774
+2026-10-10 17:59:59,795 - INFO - Container for sphinx-doc__sphinx-10325 started: 449be7bb2a288b56ebda93f986099a90125f9071feeb81961448e0990ac1c774
+2026-10-10 17:59:59,796 - INFO - Intermediate patch for sphinx-doc__sphinx-10325 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep3__full__final/rerun-2026-10__openai__forced__rep3__full__final/sphinx-doc__sphinx-10325/patch.diff, now applying to container...
+2026-10-10 17:59:59,919 - INFO - >>>>> Applied Patch:
+Checking patch sphinx/ext/autodoc/__init__.py...
+warning: sphinx/ext/autodoc/__init__.py has type 100755, expected 100644
+Applied patch sphinx/ext/autodoc/__init__.py cleanly.
+
+2026-10-10 18:00:00,189 - INFO - Git diff before:
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 62631f7ff..0e7d56e60 100755
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1710,7 +1710,28 @@ class ClassDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # type:
+                                    (name, self.fullname), type='autodoc')
+             return False, selected
+         elif self.options.inherited_members:
+-            return False, list(members.values())
++            # Support multiple inherited-members classes separated by commas
++            ignore_bases = []
++            if isinstance(self.options.inherited_members, str):
++                ignore_bases = [cls.strip() for cls in self.options.inherited_members.split(',')]
++            elif isinstance(self.options.inherited_members, (list, tuple)):
++                ignore_bases = list(self.options.inherited_members)
++            else:
++                ignore_bases = []
++
++            def should_include(member):
++                # Include member if its class is not in ignore_bases
++                cls = member.class_
++                if cls is None:
++                    return True
++                # Check if any base class name matches ignore_bases
++                for base in cls.__mro__:
++                    if base.__name__ in ignore_bases:
++                        return False
++                return True
++
++            filtered_members = [m for m in members.values() if should_include(m)]
++            return False, filtered_members
+         else:
+             return False, [m for m in members.values() if m.class_ == self.object]
+2026-10-10 18:00:00,189 - INFO - Eval script for sphinx-doc__sphinx-10325 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep3__full__final/rerun-2026-10__openai__forced__rep3__full__final/sphinx-doc__sphinx-10325/eval.sh; copying to container...
+2026-10-10 18:00:05,631 - INFO - Test runtime: 5.37 seconds
+2026-10-10 18:00:05,631 - INFO - Test output for sphinx-doc__sphinx-10325 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep3__full__final/rerun-2026-10__openai__forced__rep3__full__final/sphinx-doc__sphinx-10325/test_output.txt
+2026-10-10 18:00:05,683 - INFO - Git diff after:
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 62631f7ff..0e7d56e60 100755
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1710,7 +1710,28 @@ class ClassDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # type:
+                                    (name, self.fullname), type='autodoc')
+             return False, selected
+         elif self.options.inherited_members:
+-            return False, list(members.values())
++            # Support multiple inherited-members classes separated by commas
++            ignore_bases = []
++            if isinstance(self.options.inherited_members, str):
++                ignore_bases = [cls.strip() for cls in self.options.inherited_members.split(',')]
++            elif isinstance(self.options.inherited_members, (list, tuple)):
++                ignore_bases = list(self.options.inherited_members)
++            else:
++                ignore_bases = []
++
++            def should_include(member):
++                # Include member if its class is not in ignore_bases
++                cls = member.class_
++                if cls is None:
++                    return True
++                # Check if any base class name matches ignore_bases
++                for base in cls.__mro__:
++                    if base.__name__ in ignore_bases:
++                        return False
++                return True
++
++            filtered_members = [m for m in members.values() if should_include(m)]
++            return False, filtered_members
+         else:
+             return False, [m for m in members.values() if m.class_ == self.object]
+2026-10-10 18:00:05,684 - INFO - Grading answer for sphinx-doc__sphinx-10325...
+2026-10-10 18:00:05,686 - INFO - report: {'sphinx-doc__sphinx-10325': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['tests/test_ext_autodoc_automodule.py::test_automodule_inherited_members']}, 'PASS_TO_PASS': {'success': ['tests/test_ext_autodoc_automodule.py::test_empty_all', 'tests/test_ext_autodoc_automodule.py::test_automodule', 'tests/test_ext_autodoc_automodule.py::test_automodule_undoc_members', 'tests/test_ext_autodoc_automodule.py::test_automodule_special_members', 'tests/test_ext_autodoc_automodule.py::test_subclass_of_mocked_object'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sphinx-doc__sphinx-10325: resolved: False
+2026-10-10 18:00:05,686 - INFO - Attempting to stop container sweb.eval.sphinx-doc__sphinx-10325.rerun-2026-10__openai__forced__rep3__full__final...
+2026-10-10 18:00:24,159 - INFO - Attempting to remove container sweb.eval.sphinx-doc__sphinx-10325.rerun-2026-10__openai__forced__rep3__full__final...
+2026-10-10 18:00:25,160 - INFO - Container sweb.eval.sphinx-doc__sphinx-10325.rerun-2026-10__openai__forced__rep3__full__final removed.

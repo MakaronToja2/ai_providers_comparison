@@ -1,0 +1,20 @@
+diff --git a/django/utils/functional.py b/django/utils/functional.py
+index 9e1be0fe0f..ba5ad1552d 100644
+--- a/django/utils/functional.py
++++ b/django/utils/functional.py
+@@ -373,6 +373,15 @@ class LazyObject:
+     __len__ = new_method_proxy(len)
+     __contains__ = new_method_proxy(operator.contains)
+ 
++    # Reverse arithmetic operations
++    __radd__ = new_method_proxy(lambda wrapped, other: other + wrapped)
++    __rsub__ = new_method_proxy(lambda wrapped, other: other - wrapped)
++    __rmul__ = new_method_proxy(lambda wrapped, other: other * wrapped)
++    __rtruediv__ = new_method_proxy(lambda wrapped, other: other / wrapped)
++    __rfloordiv__ = new_method_proxy(lambda wrapped, other: other // wrapped)
++    __rmod__ = new_method_proxy(lambda wrapped, other: other % wrapped)
++    __rpow__ = new_method_proxy(lambda wrapped, other: other ** wrapped)
++
+ 
+ def unpickle_lazyobject(wrapped):
+     """

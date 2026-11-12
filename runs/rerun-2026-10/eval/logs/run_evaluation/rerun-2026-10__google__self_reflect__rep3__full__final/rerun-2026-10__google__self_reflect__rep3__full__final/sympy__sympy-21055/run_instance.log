@@ -1,0 +1,84 @@
+2026-10-10 19:34:53,793 - INFO - Creating container for sympy__sympy-21055...
+2026-10-10 19:34:58,012 - INFO - Container for sympy__sympy-21055 created: e979efef668998ca463d87c7890f6ae58143920b043202ee4ffde7984365c87c
+2026-10-10 19:35:01,914 - INFO - Container for sympy__sympy-21055 started: e979efef668998ca463d87c7890f6ae58143920b043202ee4ffde7984365c87c
+2026-10-10 19:35:01,915 - INFO - Intermediate patch for sympy__sympy-21055 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep3__full__final/rerun-2026-10__google__self_reflect__rep3__full__final/sympy__sympy-21055/patch.diff, now applying to container...
+2026-10-10 19:35:02,009 - INFO - >>>>> Applied Patch:
+Checking patch sympy/assumptions/refine.py...
+warning: sympy/assumptions/refine.py has type 100755, expected 100644
+Applied patch sympy/assumptions/refine.py cleanly.
+
+2026-10-10 19:35:02,313 - INFO - Git diff before:
+diff --git a/sympy/assumptions/refine.py b/sympy/assumptions/refine.py
+index e1f97190c0..77775f886a 100755
+--- a/sympy/assumptions/refine.py
++++ b/sympy/assumptions/refine.py
+@@ -373,6 +373,19 @@ def refine_matrixelement(expr, assumptions):
+             return expr
+         return MatrixElement(matrix, j, i)
+ 
++def refine_arg(expr, assumptions):
++    """
++    Handler for the arg function.
++    """
++    arg = expr.args[0]
++    if ask(Q.real(arg), assumptions):
++        if ask(Q.positive(arg), assumptions):
++            return S.Zero
++        # If arg is negative real, arg is pi
++        elif ask(Q.negative(arg), assumptions):
++            return S.Pi
++    return expr
++
+ handlers_dict = {
+     'Abs': refine_abs,
+     'Pow': refine_Pow,
+@@ -380,5 +393,6 @@ def refine_matrixelement(expr, assumptions):
+     're': refine_re,
+     'im': refine_im,
+     'sign': refine_sign,
+-    'MatrixElement': refine_matrixelement
++    'MatrixElement': refine_matrixelement,
++    'arg': refine_arg
+ }  # type: Dict[str, Callable[[Expr, Boolean], Expr]]
+2026-10-10 19:35:02,313 - INFO - Eval script for sympy__sympy-21055 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep3__full__final/rerun-2026-10__google__self_reflect__rep3__full__final/sympy__sympy-21055/eval.sh; copying to container...
+2026-10-10 19:35:08,508 - INFO - Test runtime: 6.15 seconds
+2026-10-10 19:35:08,509 - INFO - Test output for sympy__sympy-21055 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep3__full__final/rerun-2026-10__google__self_reflect__rep3__full__final/sympy__sympy-21055/test_output.txt
+2026-10-10 19:35:08,552 - INFO - Git diff after:
+diff --git a/sympy/assumptions/refine.py b/sympy/assumptions/refine.py
+index e1f97190c0..77775f886a 100755
+--- a/sympy/assumptions/refine.py
++++ b/sympy/assumptions/refine.py
+@@ -373,6 +373,19 @@ def refine_matrixelement(expr, assumptions):
+             return expr
+         return MatrixElement(matrix, j, i)
+ 
++def refine_arg(expr, assumptions):
++    """
++    Handler for the arg function.
++    """
++    arg = expr.args[0]
++    if ask(Q.real(arg), assumptions):
++        if ask(Q.positive(arg), assumptions):
++            return S.Zero
++        # If arg is negative real, arg is pi
++        elif ask(Q.negative(arg), assumptions):
++            return S.Pi
++    return expr
++
+ handlers_dict = {
+     'Abs': refine_abs,
+     'Pow': refine_Pow,
+@@ -380,5 +393,6 @@ def refine_matrixelement(expr, assumptions):
+     're': refine_re,
+     'im': refine_im,
+     'sign': refine_sign,
+-    'MatrixElement': refine_matrixelement
++    'MatrixElement': refine_matrixelement,
++    'arg': refine_arg
+ }  # type: Dict[str, Callable[[Expr, Boolean], Expr]]
+2026-10-10 19:35:08,552 - INFO - Grading answer for sympy__sympy-21055...
+2026-10-10 19:35:08,553 - INFO - report: {'sympy__sympy-21055': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_arg'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_Abs', 'test_pow1', 'test_pow2', 'test_exp', 'test_Piecewise', 'test_atan2', 'test_re', 'test_im', 'test_complex', 'test_sign', 'test_func_args', 'test_eval_refine', 'test_refine_issue_12724'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-21055: resolved: True
+2026-10-10 19:35:08,553 - INFO - Attempting to stop container sweb.eval.sympy__sympy-21055.rerun-2026-10__google__self_reflect__rep3__full__final...
+2026-10-10 19:35:26,372 - INFO - Attempting to remove container sweb.eval.sympy__sympy-21055.rerun-2026-10__google__self_reflect__rep3__full__final...
+2026-10-10 19:35:27,322 - INFO - Container sweb.eval.sympy__sympy-21055.rerun-2026-10__google__self_reflect__rep3__full__final removed.

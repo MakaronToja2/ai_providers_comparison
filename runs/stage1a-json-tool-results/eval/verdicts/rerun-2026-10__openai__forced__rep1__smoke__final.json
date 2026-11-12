@@ -1,0 +1,52 @@
+{
+  "job": "rerun-2026-10__openai__forced__rep1__smoke",
+  "kind": "final",
+  "subset": "smoke",
+  "run_id": "rerun-2026-10__openai__forced__rep1__smoke__final",
+  "counts": {
+    "apply_failed": 6,
+    "tests_failed": 2
+  },
+  "verdicts": {
+    "django__django-13448": {
+      "status": "apply_failed",
+      "kind": "malformed"
+    },
+    "django__django-15347": {
+      "status": "apply_failed",
+      "kind": "malformed"
+    },
+    "matplotlib__matplotlib-26011": {
+      "status": "tests_failed",
+      "kind": "both",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 816,
+      "p2p_total": 817
+    },
+    "pytest-dev__pytest-5692": {
+      "status": "apply_failed",
+      "kind": "hunk_failed"
+    },
+    "scikit-learn__scikit-learn-13439": {
+      "status": "apply_failed",
+      "kind": "malformed"
+    },
+    "sphinx-doc__sphinx-7975": {
+      "status": "apply_failed",
+      "kind": "hunk_failed"
+    },
+    "sympy__sympy-15609": {
+      "status": "apply_failed",
+      "kind": "hunk_failed"
+    },
+    "sympy__sympy-19007": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 3,
+      "p2p_passed": 26,
+      "p2p_total": 26
+    }
+  }
+}

@@ -1,0 +1,18 @@
+diff --git a/sympy/simplify/cse_main.py b/sympy/simplify/cse_main.py
+index d649dd02a9..40f00f1ec6 100644
+--- a/sympy/simplify/cse_main.py
++++ b/sympy/simplify/cse_main.py
+@@ -600,7 +600,12 @@ def _find_repeated(expr):
+                     if ign in expr.free_symbols:
+                         break
+                 else:
+-                    to_eliminate.add(expr)
++                    # Don't eliminate MatrixSymbol indexing operations
++                    # (e.g., A[i, j]) as they should be kept as-is
++                    if not (isinstance(expr, MatrixExpr) and 
++                            len(expr.args) > 0 and 
++                            isinstance(expr.args[0], MatrixSymbol)):
++                        to_eliminate.add(expr)
+                     return
+ 
+             seen_subexp.add(expr)

@@ -1,0 +1,53 @@
+diff --git a/lib/matplotlib/widgets.py b/lib/matplotlib/widgets.py
+index ebe5da43e2..158328869d 100644
+--- a/lib/matplotlib/widgets.py
++++ b/lib/matplotlib/widgets.py
+@@ -33,11 +33,48 @@ class LockDraw:
+     canvas' lock with ``canvas.widgetlock(widget)`` before drawing on the
+     canvas; this will prevent other widgets from doing so at the same time (if
+     they also try to acquire the lock first).
++
++    Additionally, we add a workaround for the issue where clearing the figure
++    and redrawing widgets in a RangeSlider on_changed callback blocks input.
++    This is done by explicitly releasing the canvas event loop during the draw
++    call in such callbacks.
+     """
+ 
+     def __init__(self):
+         self._owner = None
+ 
++
++# Patch to fix the issue where using clf and pyplot.draw in RangeSlider on_changed callback blocks widget input.
++# The problem is that the event loop is blocked during draw calls in on_changed callbacks of RangeSlider.
++# We patch the RangeSlider to defer the draw call to the GUI event loop after the callback returns.
++
++import matplotlib.widgets as mwidgets
++import matplotlib.pyplot as plt
++import threading
++
++_original_range_slider_init = mwidgets.RangeSlider.__init__
++_original_range_slider_on_changed = mwidgets.RangeSlider._observers
++
++def _patched_on_changed(self, func):
++    # Wrap the original callback to defer draw calls after callback returns
++    def wrapped_func(val):
++        func(val)
++        # Instead of immediate draw, schedule draw_idle to avoid blocking event loop
++        self.ax.figure.canvas.draw_idle()
++    return wrapped_func
++
++def _patched_range_slider_init(self, *args, **kwargs):
++    _original_range_slider_init(self, *args, **kwargs)
++    # Patch the on_changed method to wrap callbacks
++    orig_on_changed = self.on_changed
++
++    def new_on_changed(func):
++        wrapped = _patched_on_changed(self, func)
++        orig_on_changed(wrapped)
++    self.on_changed = new_on_changed
++
++mwidgets.RangeSlider.__init__ = _patched_range_slider_init
++
+     def __call__(self, o):
+         """Reserve the lock for *o*."""
+         if not self.available(o):

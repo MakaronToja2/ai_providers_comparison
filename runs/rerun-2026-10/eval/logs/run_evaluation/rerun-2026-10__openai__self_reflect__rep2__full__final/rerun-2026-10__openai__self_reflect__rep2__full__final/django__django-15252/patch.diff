@@ -1,0 +1,29 @@
+diff --git a/django/db/migrations/recorder.py b/django/db/migrations/recorder.py
+index 1a37c6b7d0..135d79a664 100644
+--- a/django/db/migrations/recorder.py
++++ b/django/db/migrations/recorder.py
+@@ -52,12 +52,24 @@ class MigrationRecorder:
+ 
+     def has_table(self):
+         """Return True if the django_migrations table exists."""
++        # Check if migrations table should exist on this connection according to router
++        from django.db import router
++        # Use the Migration model class for the router check
++        migration_model = self.Migration
++        if not router.allow_migrate(self.connection.alias, migration_model):
++            return False
+         with self.connection.cursor() as cursor:
+             tables = self.connection.introspection.table_names(cursor)
+         return self.Migration._meta.db_table in tables
+ 
+     def ensure_schema(self):
+         """Ensure the table exists and has the correct schema."""
++        # Check if migrations table should be created on this connection according to router
++        from django.db import router
++        migration_model = self.Migration
++        if not router.allow_migrate(self.connection.alias, migration_model):
++            # If router disallows migration table on this connection, do not create it
++            return
+         # If the table's there, that's fine - we've never changed its schema
+         # in the codebase.
+         if self.has_table():

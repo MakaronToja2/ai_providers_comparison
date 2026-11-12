@@ -1,0 +1,171 @@
+# Results: rerun-2026-10, full set (100 instances)
+
+## 1. Patches, resolved, success and precision per model and regime
+
+Per repetition counts are out of the instances run; mean ± SD over repetitions. Success = resolved / instances. Precision = resolved / patches. 95% intervals: bootstrap over instances.
+
+| Model | Regime | Reps | Patches | Resolved | Success % [95% CI] | Precision % [95% CI] |
+|---|---|---|---|---|---|---|
+| Claude Haiku 4.5 | Baseline | 3 | 77.3 ± 2.5 | 45.3 ± 0.6 | 45.3 [37.0, 54.0] | 58.6 [49.3, 67.8] |
+| Claude Haiku 4.5 | Forced | 3 | 77.0 ± 1.0 | 43.0 ± 2.6 | 43.0 [33.7, 52.3] | 55.8 [45.6, 65.8] |
+| Claude Haiku 4.5 | Self-reflection | 3 | 84.3 ± 5.5 | 48.0 ± 3.6 | 48.0 [39.0, 57.3] | 56.9 [47.4, 66.5] |
+| GPT-4.1-mini | Baseline | 3 | 77.7 ± 2.5 | 25.7 ± 2.1 | 25.7 [18.3, 33.7] | 33.0 [24.2, 42.4] |
+| GPT-4.1-mini | Forced | 3 | 77.7 ± 2.3 | 27.7 ± 0.6 | 27.7 [20.3, 35.3] | 35.6 [26.7, 45.0] |
+| GPT-4.1-mini | Self-reflection | 3 | 77.7 ± 2.5 | 27.3 ± 1.2 | 27.3 [19.7, 35.7] | 35.2 [25.9, 44.8] |
+| Gemini 2.5 Flash-Lite | Baseline | 3 | 40.3 ± 3.2 | 14.0 ± 3.6 | 14.0 [9.3, 19.3] | 34.7 [25.0, 44.8] |
+| Gemini 2.5 Flash-Lite | Forced | 3 | 43.3 ± 0.6 | 15.3 ± 1.5 | 15.3 [10.3, 21.0] | 35.4 [25.2, 45.7] |
+| Gemini 2.5 Flash-Lite | Self-reflection | 3 | 38.7 ± 3.8 | 14.3 ± 5.0 | 14.3 [9.7, 19.3] | 37.1 [26.6, 47.7] |
+
+## 2. What happened to each instance (mean count per repetition)
+
+| Model | Regime | resolved | tests_failed | apply_failed | edit_not_applicable | no_answer | abstained |
+|---|---|---|---|---|---|---|---|
+| Claude Haiku 4.5 | Baseline | 45.3 | 32.0 | 0.0 | 10.0 | 12.7 | 0.0 |
+| Claude Haiku 4.5 | Forced | 43.0 | 34.0 | 0.0 | 9.7 | 13.3 | 0.0 |
+| Claude Haiku 4.5 | Self-reflection | 48.0 | 36.3 | 0.0 | 2.3 | 13.0 | 0.3 |
+| GPT-4.1-mini | Baseline | 25.7 | 52.0 | 0.0 | 14.7 | 5.7 | 2.0 |
+| GPT-4.1-mini | Forced | 27.7 | 50.0 | 0.0 | 16.0 | 6.3 | 0.0 |
+| GPT-4.1-mini | Self-reflection | 27.3 | 50.3 | 0.0 | 16.3 | 4.0 | 2.0 |
+| Gemini 2.5 Flash-Lite | Baseline | 14.0 | 26.0 | 0.3 | 27.7 | 24.3 | 7.7 |
+| Gemini 2.5 Flash-Lite | Forced | 15.3 | 28.0 | 0.0 | 34.7 | 22.0 | 0.0 |
+| Gemini 2.5 Flash-Lite | Self-reflection | 14.3 | 24.3 | 0.0 | 27.7 | 26.7 | 7.0 |
+
+Patches that applied but failed tests, by kind (all repetitions): f2p_failed = the target tests still fail; p2p_regression = a previously passing test broke; both.
+
+|                                           |   both |   f2p_failed |   p2p_regression |
+|:------------------------------------------|-------:|-------------:|-----------------:|
+| ('Claude Haiku 4.5', 'baseline')          |     25 |           62 |                9 |
+| ('Claude Haiku 4.5', 'forced')            |     21 |           73 |                8 |
+| ('Claude Haiku 4.5', 'self_reflect')      |     25 |           77 |                7 |
+| ('GPT-4.1-mini', 'baseline')              |     41 |          101 |               14 |
+| ('GPT-4.1-mini', 'forced')                |     41 |           98 |               11 |
+| ('GPT-4.1-mini', 'self_reflect')          |     37 |          108 |                6 |
+| ('Gemini 2.5 Flash-Lite', 'baseline')     |     23 |           49 |                6 |
+| ('Gemini 2.5 Flash-Lite', 'forced')       |     28 |           52 |                4 |
+| ('Gemini 2.5 Flash-Lite', 'self_reflect') |     22 |           47 |                4 |
+
+Edits that could not be applied, by reason (final answer; all repetitions):
+
+| model_label           |   empty_search |   file_not_found |   file_not_found,no_file_named |   file_not_found,search_text_not_found |   no_file_named |   no_file_named,search_text_not_found |   search_text_not_found |
+|:----------------------|---------------:|-----------------:|-------------------------------:|---------------------------------------:|----------------:|--------------------------------------:|------------------------:|
+| Claude Haiku 4.5      |              0 |                3 |                              0 |                                      0 |               1 |                                     0 |                      58 |
+| GPT-4.1-mini          |              2 |               13 |                              0 |                                      1 |               0 |                                     0 |                     122 |
+| Gemini 2.5 Flash-Lite |              0 |               45 |                              6 |                                      8 |             112 |                                     4 |                      91 |
+
+## 3. Paired comparisons (same instances)
+
+Difference in success (first minus second) with a bootstrap 95% interval over instances; McNemar's exact test on one value per instance (resolved in the majority of repetitions). 'only first' / 'only second' are the discordant instances.
+
+| Comparison | Within | Δ success, points [95% CI] | only first | only second | McNemar p | Holm p |
+|---|---|---|---|---|---|---|
+| Baseline vs Forced | Claude Haiku 4.5 | +2.3 [-2.3, +7.0] | 5 | 2 | 0.453 | 1.000 |
+| Baseline vs Self-reflection | Claude Haiku 4.5 | -2.7 [-6.7, +1.3] | 2 | 6 | 0.289 | 1.000 |
+| Forced vs Self-reflection | Claude Haiku 4.5 | -5.0 [-9.7, -0.7] | 0 | 7 | 0.016 | 0.141 |
+| Baseline vs Forced | GPT-4.1-mini | -2.0 [-6.7, +2.7] | 4 | 8 | 0.388 | 1.000 |
+| Baseline vs Self-reflection | GPT-4.1-mini | -1.7 [-6.7, +3.0] | 2 | 6 | 0.289 | 1.000 |
+| Forced vs Self-reflection | GPT-4.1-mini | +0.3 [-5.3, +6.0] | 8 | 8 | 1.000 | 1.000 |
+| Baseline vs Forced | Gemini 2.5 Flash-Lite | -1.3 [-6.0, +3.7] | 5 | 8 | 0.581 | 1.000 |
+| Baseline vs Self-reflection | Gemini 2.5 Flash-Lite | -0.3 [-5.3, +4.7] | 6 | 9 | 0.607 | 1.000 |
+| Forced vs Self-reflection | Gemini 2.5 Flash-Lite | +1.0 [-3.3, +5.3] | 7 | 7 | 1.000 | 1.000 |
+| Claude Haiku 4.5 vs GPT-4.1-mini | Baseline | +19.7 [+12.7, +27.0] | 23 | 0 | 0.000 | 0.000 |
+| Claude Haiku 4.5 vs Gemini 2.5 Flash-Lite | Baseline | +31.3 [+24.0, +39.0] | 36 | 0 | 0.000 | 0.000 |
+| GPT-4.1-mini vs Gemini 2.5 Flash-Lite | Baseline | +11.7 [+5.7, +18.0] | 15 | 2 | 0.002 | 0.009 |
+| Claude Haiku 4.5 vs GPT-4.1-mini | Forced | +15.3 [+7.3, +23.7] | 22 | 6 | 0.004 | 0.009 |
+| Claude Haiku 4.5 vs Gemini 2.5 Flash-Lite | Forced | +27.7 [+20.0, +36.0] | 31 | 1 | 0.000 | 0.000 |
+| GPT-4.1-mini vs Gemini 2.5 Flash-Lite | Forced | +12.3 [+5.7, +19.3] | 18 | 4 | 0.004 | 0.009 |
+| Claude Haiku 4.5 vs GPT-4.1-mini | Self-reflection | +20.7 [+13.7, +28.0] | 24 | 1 | 0.000 | 0.000 |
+| Claude Haiku 4.5 vs Gemini 2.5 Flash-Lite | Self-reflection | +33.7 [+26.3, +41.7] | 38 | 1 | 0.000 | 0.000 |
+| GPT-4.1-mini vs Gemini 2.5 Flash-Lite | Self-reflection | +13.0 [+6.7, +20.0] | 17 | 3 | 0.003 | 0.009 |
+
+Holm correction is applied separately to the regime comparisons and to the model comparisons.
+
+Cochran's Q across the three regimes, per model (majority outcome per instance):
+
+- Claude Haiku 4.5: Q = 6.73, df = 2, p = 0.035
+- GPT-4.1-mini: Q = 1.78, df = 2, p = 0.411
+- Gemini 2.5 Flash-Lite: Q = 0.86, df = 2, p = 0.651
+
+## 4. Self-reflection: first patch versus final patch (same runs)
+
+| Model | Reflection calls | approved | revised | no verdict | resolved before | resolved after | gained | lost | McNemar p |
+|---|---|---|---|---|---|---|---|---|---|
+| Claude Haiku 4.5 | 260 | 128 | 119 | 13 | 138 | 144 | 7 | 1 | 0.070 |
+| GPT-4.1-mini | 282 | 199 | 74 | 9 | 78 | 82 | 4 | 0 | 0.125 |
+| Gemini 2.5 Flash-Lite | 199 | 170 | 24 | 5 | 42 | 43 | 1 | 0 | 1.000 |
+
+Counts pool the repetitions. 'gained' = unresolved first patch, resolved final patch; 'lost' = the reverse.
+
+| model_label           |   revised |   revision produced no patch |
+|:----------------------|----------:|-----------------------------:|
+| Claude Haiku 4.5      |       119 |                            2 |
+| GPT-4.1-mini          |        74 |                           18 |
+| Gemini 2.5 Flash-Lite |        24 |                           12 |
+
+## 5. Abstention and forcing
+
+Explicit abstentions (all repetitions together):
+
+| model_label           |   baseline |   forced |   self_reflect |
+|:----------------------|-----------:|---------:|---------------:|
+| Claude Haiku 4.5      |          0 |        0 |              1 |
+| GPT-4.1-mini          |          6 |        0 |              6 |
+| Gemini 2.5 Flash-Lite |         23 |        0 |             21 |
+
+Instances on which a model abstained at least once where abstention was permitted (baseline and self-reflection regimes), and what happened to them elsewhere:
+
+- Claude Haiku 4.5: 1 instance(s), 0 of them abstained on in every permitted run. Under forcing: 0 patches and 0 resolved in 3 runs (0.0%), against 43.4% on its other instances. Its own non-abstaining permitted runs on these instances: 0 resolved of 5. Resolved at least once by another model: 0 of 1 instances.
+- GPT-4.1-mini: 4 instance(s), 1 of them abstained on in every permitted run. Under forcing: 3 patches and 0 resolved in 12 runs (0.0%), against 28.8% on its other instances. Its own non-abstaining permitted runs on these instances: 0 resolved of 12. Resolved at least once by another model: 2 of 4 instances.
+- Gemini 2.5 Flash-Lite: 27 instance(s), 1 of them abstained on in every permitted run. Under forcing: 27 patches and 6 resolved in 81 runs (7.4%), against 18.3% on its other instances. Its own non-abstaining permitted runs on these instances: 7 resolved of 118. Resolved at least once by another model: 15 of 27 instances.
+
+## 6. Tokens and cost per instance
+
+Input and output tokens include the reflection call. Cost at list price ignores cache discounts; 'as billed' prices the input tokens the provider reports as cached at its cached rate.
+
+| Model | Regime | Input tokens median [IQR] | SD | Output median | Cached input % | $/instance list | $/instance billed | $/resolved list | $/resolved billed |
+|---|---|---|---|---|---|---|---|---|---|
+| Claude Haiku 4.5 | Baseline | 64,775 [50,680–85,539] | 28,024 | 2,030 | 0 | 0.0816 | 0.0816 | 0.180 | 0.180 |
+| Claude Haiku 4.5 | Forced | 64,668 [50,607–86,654] | 31,941 | 2,037 | 0 | 0.0815 | 0.0815 | 0.189 | 0.189 |
+| Claude Haiku 4.5 | Self-reflection | 73,817 [58,608–99,502] | 30,642 | 2,976 | 0 | 0.0962 | 0.0962 | 0.200 | 0.200 |
+| GPT-4.1-mini | Baseline | 27,946 [23,652–32,538] | 9,023 | 715 | 59 | 0.0130 | 0.0078 | 0.051 | 0.031 |
+| GPT-4.1-mini | Forced | 27,674 [22,980–32,107] | 9,154 | 724 | 51 | 0.0128 | 0.0085 | 0.046 | 0.031 |
+| GPT-4.1-mini | Self-reflection | 33,338 [28,560–38,304] | 10,229 | 918 | 62 | 0.0154 | 0.0091 | 0.056 | 0.033 |
+| Gemini 2.5 Flash-Lite | Baseline | 39,140 [20,501–69,955] | 35,103 | 2,198 | 47 | 0.0062 | 0.0042 | 0.044 | 0.030 |
+| Gemini 2.5 Flash-Lite | Forced | 37,604 [19,207–71,771] | 49,749 | 2,320 | 50 | 0.0066 | 0.0043 | 0.043 | 0.028 |
+| Gemini 2.5 Flash-Lite | Self-reflection | 45,302 [25,528–78,399] | 37,225 | 2,205 | 45 | 0.0069 | 0.0047 | 0.048 | 0.033 |
+
+Reflection call alone (runs where it happened), mean tokens: Claude Haiku 4.5: 12,723 in / 1,051 out; GPT-4.1-mini: 5,544 in / 258 out; Gemini 2.5 Flash-Lite: 11,581 in / 487 out
+
+Do instances on which the agent uses more tokens get resolved more often? Within each model, baseline regime, one observation per instance (the repetitions of an instance are not independent): Spearman's rank correlation between the mean input tokens of the instance's runs and the number of those runs that were resolved.
+
+- Claude Haiku 4.5: rho = -0.18, p = 0.068, n = 100 instances; median of the per-instance mean: 63,100 where most runs were resolved (n=47), 70,629 elsewhere
+- GPT-4.1-mini: rho = -0.21, p = 0.035, n = 100 instances; median of the per-instance mean: 26,817 where most runs were resolved (n=24), 28,659 elsewhere
+- Gemini 2.5 Flash-Lite: rho = -0.27, p = 0.006, n = 100 instances; median of the per-instance mean: 21,408 where most runs were resolved (n=11), 43,935 elsewhere
+
+## 7. Protocol descriptives
+
+| Model | Regime | Runs | Mean tool calls | Used all 10 iterations % | Forced final-answer call % | Unified-diff answers | Path resolved | Retried API calls |
+|---|---|---|---|---|---|---|---|---|
+| Claude Haiku 4.5 | Baseline | 300 | 10.3 | 61 | 64 | 0 | 4 | 0 |
+| Claude Haiku 4.5 | Forced | 300 | 10.3 | 61 | 62 | 0 | 2 | 0 |
+| Claude Haiku 4.5 | Self-reflection | 300 | 10.2 | 60 | 61 | 0 | 9 | 0 |
+| GPT-4.1-mini | Baseline | 300 | 9.7 | 89 | 90 | 0 | 0 | 0 |
+| GPT-4.1-mini | Forced | 300 | 9.6 | 86 | 90 | 0 | 0 | 0 |
+| GPT-4.1-mini | Self-reflection | 300 | 9.7 | 89 | 90 | 0 | 0 | 0 |
+| Gemini 2.5 Flash-Lite | Baseline | 300 | 6.6 | 33 | 55 | 2 | 105 | 0 |
+| Gemini 2.5 Flash-Lite | Forced | 300 | 6.6 | 34 | 54 | 0 | 120 | 0 |
+| Gemini 2.5 Flash-Lite | Self-reflection | 300 | 6.6 | 31 | 55 | 0 | 102 | 0 |
+
+Iteration counts (all regimes):
+
+| model_label           |   1 |   2 |   3 |   4 |   5 |   6 |   7 |   8 |   9 |   10 |
+|:----------------------|----:|----:|----:|----:|----:|----:|----:|----:|----:|-----:|
+| Claude Haiku 4.5      |   0 |   0 |   0 |   0 |  13 |  21 |  43 |  70 |  99 |  654 |
+| GPT-4.1-mini          |   0 |   0 |   0 |   1 |   6 |  15 |  18 |  22 |  12 |  826 |
+| Gemini 2.5 Flash-Lite |   3 |  72 |  60 |  65 |  74 |  89 |  81 |  62 |  60 |  334 |
+
+API calls were made between 2026-10-10T08:45 and 2026-10-10T13:17 UTC.
+Model ids returned by the APIs: Claude Haiku 4.5: claude-haiku-4-5-20251001; GPT-4.1-mini: gpt-4.1-mini-2025-04-14; Gemini 2.5 Flash-Lite: gemini-2.5-flash-lite
+Harness states: df830ca3b811f3ce273099cbcc89666d5a22f7c9+dirty.036a054efdb9, df830ca3b811f3ce273099cbcc89666d5a22f7c9+dirty.0b641a209c5a, df830ca3b811f3ce273099cbcc89666d5a22f7c9+dirty.10be19572b17, df830ca3b811f3ce273099cbcc89666d5a22f7c9+dirty.3a587d04c851, df830ca3b811f3ce273099cbcc89666d5a22f7c9+dirty.4826822d8bcc
+
+Instances per repository: django__django 38, sympy__sympy 26, matplotlib__matplotlib 8, scikit-learn__scikit-learn 8, pytest-dev__pytest 6, sphinx-doc__sphinx 5, astropy__astropy 2, psf__requests 2, pylint-dev__pylint 2, mwaskom__seaborn 1, pallets__flask 1, pydata__xarray 1
+

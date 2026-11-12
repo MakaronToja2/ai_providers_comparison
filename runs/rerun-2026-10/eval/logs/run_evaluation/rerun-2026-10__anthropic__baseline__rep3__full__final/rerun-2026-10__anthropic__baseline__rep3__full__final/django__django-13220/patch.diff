@@ -1,0 +1,45 @@
+diff --git a/django/core/exceptions.py b/django/core/exceptions.py
+index dc084b8692..01e5fbc2d0 100644
+--- a/django/core/exceptions.py
++++ b/django/core/exceptions.py
+@@ -179,6 +179,40 @@ class ValidationError(Exception):
+             return repr(dict(self))
+         return repr(list(self))
+ 
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++        if hasattr(self, 'error_dict') and hasattr(other, 'error_dict'):
++            return self.error_dict == other.error_dict
++        if hasattr(self, 'error_dict') or hasattr(other, 'error_dict'):
++            return False
++        # Compare error_list - order independent
++        return sorted(self.error_list, key=self._error_key) == sorted(other.error_list, key=self._error_key)
++
++    @staticmethod
++    def _error_key(error):
++        # Create a sortable key for ValidationError instances
++        if hasattr(error, 'message'):
++            return (error.message, error.code, error.params)
++        return (str(error), None, None)
++
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++        if hasattr(self, 'error_dict') and hasattr(other, 'error_dict'):
++            return self.error_dict == other.error_dict
++        if hasattr(self, 'error_dict') or hasattr(other, 'error_dict'):
++            return False
++        # Compare error_list - order independent
++        return sorted(self.error_list, key=self._error_key) == sorted(other.error_list, key=self._error_key)
++
++    @staticmethod
++    def _error_key(error):
++        # Create a sortable key for ValidationError instances
++        if hasattr(error, 'message'):
++            return (error.message, error.code, error.params)
++        return (str(error), None, None)
++
+     def __repr__(self):
+         return 'ValidationError(%s)' % self
+ 

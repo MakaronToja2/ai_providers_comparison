@@ -1,0 +1,65 @@
+diff --git a/sympy/simplify/simplify.py b/sympy/simplify/simplify.py
+index f1609aa908..4eeeac58e4 100644
+--- a/sympy/simplify/simplify.py
++++ b/sympy/simplify/simplify.py
+@@ -37,6 +37,60 @@
+ 
+ import mpmath
+ 
++def simplify(expr, ratio=1.7, measure=None):
++    """
++    Simplify an expression by applying a variety of simplification functions.
++
++    This function attempts to simplify the expression by applying
++    powsimp, trigsimp, radsimp, sqrtdenest, combsimp, and other
++    simplifications in a sequence that often leads to a simpler expression.
++
++    Parameters
++    ==========
++    expr : Expr
++        The expression to simplify.
++    ratio : float, optional
++        The ratio of complexity reduction required to accept a simplification.
++    measure : callable, optional
++        A function to measure the complexity of the expression.
++
++    Returns
++    =======
++    Expr
++        A simplified expression.
++
++    Examples
++    ========
++    >>> from sympy import simplify, symbols
++    >>> x, y = symbols('x y')
++    >>> simplify(x**2 + 2*x + 1)
++    (x + 1)**2
++    """
++    from sympy.core import sympify
++    expr = sympify(expr)
++    if measure is None:
++        from sympy.core.function import count_ops
++        measure = count_ops
++
++    # Apply powsimp to combine powers with rational exponents
++    expr = powsimp(expr, deep=True, combine='all', force=True)
++
++    # Apply trigonometric simplifications
++    expr = trigsimp(expr)
++
++    # Apply radical simplifications
++    expr = radsimp(expr)
++
++    # Apply sqrt denesting
++    expr = sqrtdenest(expr)
++
++    # Apply combinatorial simplifications
++    expr = combsimp(expr)
++
++    # Factor terms to simplify further
++    expr = factor(expr)
++
++    return expr
+ 
+ 
+ def separatevars(expr, symbols=[], dict=False, force=False):

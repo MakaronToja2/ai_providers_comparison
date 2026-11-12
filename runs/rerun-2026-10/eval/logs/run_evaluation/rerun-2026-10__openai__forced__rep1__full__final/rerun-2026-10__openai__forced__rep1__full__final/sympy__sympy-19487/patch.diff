@@ -1,0 +1,24 @@
+diff --git a/sympy/functions/elementary/complexes.py b/sympy/functions/elementary/complexes.py
+index 7fda45982b..a4a5fd5fd3 100644
+--- a/sympy/functions/elementary/complexes.py
++++ b/sympy/functions/elementary/complexes.py
+@@ -397,6 +397,19 @@ def _eval_rewrite_as_Heaviside(self, arg, **kwargs):
+     def _eval_simplify(self, **kwargs):
+         return self.func(self.args[0].factor())  # XXX include doit?
+ 
++    def _eval_rewrite_as_Abs(self, arg, **kwargs):
++        # Rewrite sign(z) as z / Abs(z) if z is not zero
++        # If z can be zero, leave unevaluated to avoid division by zero
++        from sympy.functions.elementary.complexes import Abs
++        z = self.args[0]
++        # If we know z is zero, return zero
++        if z.is_zero:
++            return S.Zero
++        # If we know z is not zero, rewrite as z/Abs(z)
++        if z.is_zero is False:
++            return z / Abs(z)
++        # Otherwise return unevaluated sign
++        return self
+ 
+ class Abs(Function):
+     """

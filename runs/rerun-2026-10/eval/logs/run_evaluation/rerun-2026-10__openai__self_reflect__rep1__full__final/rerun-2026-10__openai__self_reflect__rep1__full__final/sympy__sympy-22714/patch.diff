@@ -1,0 +1,20 @@
+diff --git a/sympy/geometry/point.py b/sympy/geometry/point.py
+index 73c20334d0..daa9ef2fdb 100644
+--- a/sympy/geometry/point.py
++++ b/sympy/geometry/point.py
+@@ -910,9 +910,14 @@ class Point2D(Point):
+     _ambient_dimension = 2
+ 
+     def __new__(cls, *args, _nocheck=False, **kwargs):
++        # When evaluate=False is used, Point2D.__new__ is called with
++        # a string argument from sympify parse_expr eval, so we need to
++        # avoid calling Point.__new__ with a string argument.
+         if not _nocheck:
+             kwargs['dim'] = 2
+-            args = Point(*args, **kwargs)
++            # Only call Point.__new__ if args are not a single string
++            if not (len(args) == 1 and isinstance(args[0], str)):
++                args = Point(*args, **kwargs)
+         return GeometryEntity.__new__(cls, *args)
+ 
+     def __contains__(self, item):

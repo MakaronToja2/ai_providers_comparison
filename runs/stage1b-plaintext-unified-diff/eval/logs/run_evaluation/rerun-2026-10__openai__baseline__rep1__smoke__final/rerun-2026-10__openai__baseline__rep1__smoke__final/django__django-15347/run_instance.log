@@ -1,0 +1,49 @@
+2026-10-07 16:46:13,876 - INFO - Creating container for django__django-15347...
+2026-10-07 16:46:14,090 - INFO - Container for django__django-15347 created: 64f2d75b34ea7d82ba16088449fb2f552486afbd1901ad97f5e01a3c1d942f02
+2026-10-07 16:46:14,393 - INFO - Container for django__django-15347 started: 64f2d75b34ea7d82ba16088449fb2f552486afbd1901ad97f5e01a3c1d942f02
+2026-10-07 16:46:14,393 - INFO - Intermediate patch for django__django-15347 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__smoke__final/rerun-2026-10__openai__baseline__rep1__smoke__final/django__django-15347/patch.diff, now applying to container...
+2026-10-07 16:46:14,527 - INFO - Failed to apply patch to container: git apply --verbose
+2026-10-07 16:46:14,581 - INFO - Failed to apply patch to container: git apply --verbose --reject
+2026-10-07 16:46:14,653 - INFO - >>>>> Applied Patch:
+patching file django/contrib/messages/storage/cookie.py
+Hunk #1 succeeded at 17 (offset 3 lines).
+
+2026-10-07 16:46:18,569 - INFO - Git diff before:
+diff --git a/django/contrib/messages/storage/cookie.py b/django/contrib/messages/storage/cookie.py
+index 1d390c71dd..0925aa3c12 100755
+--- a/django/contrib/messages/storage/cookie.py
++++ b/django/contrib/messages/storage/cookie.py
+@@ -19,7 +19,8 @@ class MessageEncoder(json.JSONEncoder):
+             # Using 0/1 here instead of False/True to produce more compact json
+             is_safedata = 1 if isinstance(obj.message, SafeData) else 0
+             message = [self.message_key, is_safedata, obj.level, obj.message]
+-            if obj.extra_tags:
++            # Append extra_tags if it is not None (allow empty string)
++            if obj.extra_tags is not None:
+                 message.append(obj.extra_tags)
+             return message
+         return super().default(obj)
+2026-10-07 16:46:18,569 - INFO - Eval script for django__django-15347 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__smoke__final/rerun-2026-10__openai__baseline__rep1__smoke__final/django__django-15347/eval.sh; copying to container...
+2026-10-07 16:46:23,105 - INFO - Test runtime: 4.49 seconds
+2026-10-07 16:46:23,106 - INFO - Test output for django__django-15347 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__smoke__final/rerun-2026-10__openai__baseline__rep1__smoke__final/django__django-15347/test_output.txt
+2026-10-07 16:46:23,154 - INFO - Git diff after:
+diff --git a/django/contrib/messages/storage/cookie.py b/django/contrib/messages/storage/cookie.py
+index 1d390c71dd..0925aa3c12 100755
+--- a/django/contrib/messages/storage/cookie.py
++++ b/django/contrib/messages/storage/cookie.py
+@@ -19,7 +19,8 @@ class MessageEncoder(json.JSONEncoder):
+             # Using 0/1 here instead of False/True to produce more compact json
+             is_safedata = 1 if isinstance(obj.message, SafeData) else 0
+             message = [self.message_key, is_safedata, obj.level, obj.message]
+-            if obj.extra_tags:
++            # Append extra_tags if it is not None (allow empty string)
++            if obj.extra_tags is not None:
+                 message.append(obj.extra_tags)
+             return message
+         return super().default(obj)
+2026-10-07 16:46:23,154 - INFO - Grading answer for django__django-15347...
+2026-10-07 16:46:23,158 - INFO - report: {'django__django-15347': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ["A message's extra_tags attribute is correctly preserved when retrieved"], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_add (messages_tests.test_cookie.CookieTests)', 'test_add_lazy_translation (messages_tests.test_cookie.CookieTests)', 'test_add_update (messages_tests.test_cookie.CookieTests)', 'test_context_processor_message_levels (messages_tests.test_cookie.CookieTests)', 'CookieStorage honors SESSION_COOKIE_DOMAIN, SESSION_COOKIE_SECURE, and', 'test_custom_tags (messages_tests.test_cookie.CookieTests)', 'test_default_level (messages_tests.test_cookie.CookieTests)', 'test_existing_add (messages_tests.test_cookie.CookieTests)', 'test_existing_add_read_update (messages_tests.test_cookie.CookieTests)', "Reading the existing storage doesn't cause the data to be lost.", 'test_existing_read_add_update (messages_tests.test_cookie.CookieTests)', 'With the message middleware enabled, messages are properly stored and', 'test_get (messages_tests.test_cookie.CookieTests)', 'test_get_bad_cookie (messages_tests.test_cookie.CookieTests)', 'test_high_level (messages_tests.test_cookie.CookieTests)', 'A complex nested data structure containing Message', 'test_level_tag (messages_tests.test_cookie.CookieTests)', 'test_low_level (messages_tests.test_cookie.CookieTests)', 'If the data exceeds what is allowed in a cookie, older messages are', 'test_message_rfc6265 (messages_tests.test_cookie.CookieTests)', 'When the middleware is disabled, an exception is raised when one', 'When the middleware is disabled, an exception is not raised', 'Messages persist properly when multiple POSTs are made before a GET.', 'test_no_update (messages_tests.test_cookie.CookieTests)', 'test_repr (messages_tests.test_cookie.CookieTests)', 'A message containing SafeData is keeping its safe status when', 'test_settings_level (messages_tests.test_cookie.CookieTests)', 'test_tags (messages_tests.test_cookie.CookieTests)', 'test_with_template_response (messages_tests.test_cookie.CookieTests)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-15347: resolved: True
+2026-10-07 16:46:23,158 - INFO - Attempting to stop container sweb.eval.django__django-15347.rerun-2026-10__openai__baseline__rep1__smoke__final...
+2026-10-07 16:46:38,391 - INFO - Attempting to remove container sweb.eval.django__django-15347.rerun-2026-10__openai__baseline__rep1__smoke__final...
+2026-10-07 16:46:38,443 - INFO - Container sweb.eval.django__django-15347.rerun-2026-10__openai__baseline__rep1__smoke__final removed.

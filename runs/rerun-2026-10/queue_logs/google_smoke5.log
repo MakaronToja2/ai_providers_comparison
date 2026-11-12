@@ -1,0 +1,54 @@
+[Migration] Added experiment_results.split
+[Migration] Added experiment_results.result_status
+[Migration] Added experiment_results.original_patch
+[Migration] Added experiment_results.run_meta
+[job] rerun-2026-10__google__baseline__rep1__smoke5
+[job] model gemini-2.5-flash-lite | 5 instances | db runs/rerun-2026-10/results_google.db
+[google] Forcing final answer: iterations=2, tool_calls=1, cap_hit=False, mode=baseline
+[google] Forcing final answer: iterations=2, tool_calls=1, cap_hit=False, mode=baseline
+[1/5] matplotlib__matplotlib-26011             edit_not_applicable          $0.0007 (job $0.001)
+[2/5] django__django-13448                     hallucination_format_error   $0.0020 (job $0.003)
+[3/5] django__django-15347                     edit_not_applicable          $0.0018 (job $0.004)
+[google] Forcing final answer: iterations=10, tool_calls=9, cap_hit=False, mode=baseline
+[4/5] scikit-learn__scikit-learn-13439         success_patch_generated      $0.0082 (job $0.013)
+[google] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=baseline
+[5/5] pytest-dev__pytest-5692                  hallucination_format_error   $0.0127 (job $0.025)
+[job] outcomes: {'hallucination_format_error': 2, 'success_patch_generated': 1, 'edit_not_applicable': 2}
+[job] model ids returned by the API: ['gemini-2.5-flash-lite']
+[job] cost at list price: $0.025 | as billed (cached input discounted): $0.017
+[job] complete
+[job] rerun-2026-10__google__forced__rep1__smoke5
+[job] model gemini-2.5-flash-lite | 5 instances | db runs/rerun-2026-10/results_google.db
+[google] Forcing final answer: iterations=2, tool_calls=1, cap_hit=False, mode=forced
+[1/5] matplotlib__matplotlib-26011             edit_not_applicable          $0.0006 (job $0.001)
+[2/5] django__django-15347                     edit_not_applicable          $0.0016 (job $0.002)
+[google] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[3/5] scikit-learn__scikit-learn-13439         edit_not_applicable          $0.0079 (job $0.010)
+[4/5] pytest-dev__pytest-5692                  edit_not_applicable          $0.0046 (job $0.015)
+[google] Forcing final answer: iterations=6, tool_calls=5, cap_hit=False, mode=forced
+[5/5] django__django-13448                     hallucination_format_error   $0.0130 (job $0.028)
+[job] outcomes: {'hallucination_format_error': 1, 'edit_not_applicable': 4}
+[job] model ids returned by the API: ['gemini-2.5-flash-lite']
+[job] cost at list price: $0.028 | as billed (cached input discounted): $0.024
+[job] complete
+[job] rerun-2026-10__google__self_reflect__rep1__smoke5
+[job] model gemini-2.5-flash-lite | 5 instances | db runs/rerun-2026-10/results_google.db
+[google] Forcing final answer: iterations=2, tool_calls=1, cap_hit=False, mode=self_reflect
+[google] Forcing final answer: iterations=3, tool_calls=2, cap_hit=False, mode=self_reflect
+[google] Self-reflect: revised
+[1/5] matplotlib__matplotlib-26011             edit_not_applicable          $0.0011 (job $0.001)
+[google] Self-reflect: approved
+[2/5] django__django-15347                     edit_not_applicable          $0.0020 (job $0.003)
+[google] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[google] Forcing final answer: iterations=8, tool_calls=7, cap_hit=False, mode=self_reflect
+[3/5] pytest-dev__pytest-5692                  hallucination_format_error   $0.0065 (job $0.010)
+[google] Self-reflect: approved
+[4/5] scikit-learn__scikit-learn-13439         success_patch_generated      $0.0072 (job $0.017)
+[google] Forcing final answer: iterations=7, tool_calls=6, cap_hit=False, mode=self_reflect
+[google] Self-reflect: approved
+[5/5] django__django-13448                     success_patch_generated      $0.0173 (job $0.034)
+[job] outcomes: {'success_patch_generated': 2, 'hallucination_format_error': 1, 'edit_not_applicable': 2}
+[job] model ids returned by the API: ['gemini-2.5-flash-lite']
+[job] cost at list price: $0.034 | as billed (cached input discounted): $0.021
+[job] complete
+[queue] google: all jobs complete for repetitions: 1

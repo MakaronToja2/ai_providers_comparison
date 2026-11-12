@@ -1,0 +1,86 @@
+2026-10-10 17:39:57,056 - INFO - Creating container for pylint-dev__pylint-7993...
+2026-10-10 17:40:02,990 - INFO - Container for pylint-dev__pylint-7993 created: 4259cefc8d13d8b076baabd2479a7b65ad0b3e909ea1240b4a7fd5956126140a
+2026-10-10 17:40:08,183 - INFO - Container for pylint-dev__pylint-7993 started: 4259cefc8d13d8b076baabd2479a7b65ad0b3e909ea1240b4a7fd5956126140a
+2026-10-10 17:40:08,185 - INFO - Intermediate patch for pylint-dev__pylint-7993 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep3__full__final/rerun-2026-10__google__baseline__rep3__full__final/pylint-dev__pylint-7993/patch.diff, now applying to container...
+2026-10-10 17:40:08,275 - INFO - >>>>> Applied Patch:
+Checking patch pylint/reporters/text.py...
+warning: pylint/reporters/text.py has type 100755, expected 100644
+Applied patch pylint/reporters/text.py cleanly.
+
+2026-10-10 17:40:08,432 - INFO - Git diff before:
+diff --git a/pylint/reporters/text.py b/pylint/reporters/text.py
+index 29bd46798..32357b6b9 100755
+--- a/pylint/reporters/text.py
++++ b/pylint/reporters/text.py
+@@ -175,14 +175,23 @@ class TextReporter(BaseReporter):
+         self._template = template
+ 
+         # Check to see if all parameters in the template are attributes of the Message
+-        arguments = re.findall(r"\{(.+?)(:.*)?\}", template)
+-        for argument in arguments:
+-            if argument[0] not in MESSAGE_FIELDS:
++        # The regex is changed to be more specific and only capture valid field names.
++        # It now matches {FIELD_NAME} or {FIELD_NAME:FORMAT_SPEC}.
++        # It also correctly handles literal double braces {{ and }} by not matching them as placeholders.
++        potential_placeholders = re.findall(r"\{(\w+(?::[^}]+)?)\}", template)
++        for placeholder in potential_placeholders:
++            field_name = placeholder.split(":", 1)[0]  # Extract field name before any format specifier
++            if field_name not in MESSAGE_FIELDS:
+                 warnings.warn(
+-                    f"Don't recognize the argument '{argument[0]}' in the --msg-template. "
++                    f"Don't recognize the argument '{field_name}' in the --msg-template. "
+                     "Are you sure it is supported on the current version of pylint?"
+                 )
+-                template = re.sub(r"\{" + argument[0] + r"(:.*?)?\}", "", template)
++                # Remove the unrecognized placeholder from the template.
++                # We need to remove the entire placeholder, including potential format specifiers.
++                # The original regex was too broad and could incorrectly match parts of JSON.
++                # The new regex ensures we only target valid-looking placeholders.
++                # We use re.escape on the placeholder to handle any special characters if they were to appear.
++                template = re.sub(re.escape(f"{{{placeholder}}}"), "", template)
+         self._fixed_template = template
+ 
+     def write_message(self, msg: Message) -> None:
+2026-10-10 17:40:08,433 - INFO - Eval script for pylint-dev__pylint-7993 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep3__full__final/rerun-2026-10__google__baseline__rep3__full__final/pylint-dev__pylint-7993/eval.sh; copying to container...
+2026-10-10 17:40:16,818 - INFO - Test runtime: 8.33 seconds
+2026-10-10 17:40:16,819 - INFO - Test output for pylint-dev__pylint-7993 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep3__full__final/rerun-2026-10__google__baseline__rep3__full__final/pylint-dev__pylint-7993/test_output.txt
+2026-10-10 17:40:16,863 - INFO - Git diff after:
+diff --git a/pylint/reporters/text.py b/pylint/reporters/text.py
+index 29bd46798..32357b6b9 100755
+--- a/pylint/reporters/text.py
++++ b/pylint/reporters/text.py
+@@ -175,14 +175,23 @@ class TextReporter(BaseReporter):
+         self._template = template
+ 
+         # Check to see if all parameters in the template are attributes of the Message
+-        arguments = re.findall(r"\{(.+?)(:.*)?\}", template)
+-        for argument in arguments:
+-            if argument[0] not in MESSAGE_FIELDS:
++        # The regex is changed to be more specific and only capture valid field names.
++        # It now matches {FIELD_NAME} or {FIELD_NAME:FORMAT_SPEC}.
++        # It also correctly handles literal double braces {{ and }} by not matching them as placeholders.
++        potential_placeholders = re.findall(r"\{(\w+(?::[^}]+)?)\}", template)
++        for placeholder in potential_placeholders:
++            field_name = placeholder.split(":", 1)[0]  # Extract field name before any format specifier
++            if field_name not in MESSAGE_FIELDS:
+                 warnings.warn(
+-                    f"Don't recognize the argument '{argument[0]}' in the --msg-template. "
++                    f"Don't recognize the argument '{field_name}' in the --msg-template. "
+                     "Are you sure it is supported on the current version of pylint?"
+                 )
+-                template = re.sub(r"\{" + argument[0] + r"(:.*?)?\}", "", template)
++                # Remove the unrecognized placeholder from the template.
++                # We need to remove the entire placeholder, including potential format specifiers.
++                # The original regex was too broad and could incorrectly match parts of JSON.
++                # The new regex ensures we only target valid-looking placeholders.
++                # We use re.escape on the placeholder to handle any special characters if they were to appear.
++                template = re.sub(re.escape(f"{{{placeholder}}}"), "", template)
+         self._fixed_template = template
+ 
+     def write_message(self, msg: Message) -> None:
+2026-10-10 17:40:16,863 - INFO - Grading answer for pylint-dev__pylint-7993...
+2026-10-10 17:40:16,866 - INFO - report: {'pylint-dev__pylint-7993': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['tests/reporters/unittest_reporting.py::test_template_option_with_header'], 'failure': []}, 'PASS_TO_PASS': {'success': ['tests/reporters/unittest_reporting.py::test_template_option', 'tests/reporters/unittest_reporting.py::test_template_option_default', 'tests/reporters/unittest_reporting.py::test_template_option_end_line', 'tests/reporters/unittest_reporting.py::test_template_option_non_existing', 'tests/reporters/unittest_reporting.py::test_deprecation_set_output', 'tests/reporters/unittest_reporting.py::test_parseable_output_deprecated', 'tests/reporters/unittest_reporting.py::test_parseable_output_regression', 'tests/reporters/unittest_reporting.py::test_multi_format_output', 'tests/reporters/unittest_reporting.py::test_multi_reporter_independant_messages', 'tests/reporters/unittest_reporting.py::test_display_results_is_renamed'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for pylint-dev__pylint-7993: resolved: True
+2026-10-10 17:40:16,866 - INFO - Attempting to stop container sweb.eval.pylint-dev__pylint-7993.rerun-2026-10__google__baseline__rep3__full__final...
+2026-10-10 17:40:34,371 - INFO - Attempting to remove container sweb.eval.pylint-dev__pylint-7993.rerun-2026-10__google__baseline__rep3__full__final...
+2026-10-10 17:40:34,961 - INFO - Container sweb.eval.pylint-dev__pylint-7993.rerun-2026-10__google__baseline__rep3__full__final removed.

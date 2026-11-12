@@ -1,0 +1,29 @@
+{
+  "job": "rerun-2026-10__anthropic__baseline__rep3__full",
+  "experiment_id": "2942e221-aed5-5699-ad9d-54bc13b7de61",
+  "provider": "anthropic",
+  "model": "claude-haiku-4-5-20251001",
+  "mode": "baseline",
+  "run_idx": 3,
+  "subset": "full",
+  "instances": 100,
+  "status_counts": {
+    "success_patch_generated": 77,
+    "hallucination_format_error": 11,
+    "edit_not_applicable": 12
+  },
+  "incomplete": 0,
+  "api_model_ids": [
+    "claude-haiku-4-5-20251001"
+  ],
+  "input_tokens": 7007875,
+  "output_tokens": 219629,
+  "cached_input_tokens": 0,
+  "cost_usd_list_price": 8.10602,
+  "cost_usd_as_billed_estimate": 8.10602,
+  "last_invocation_started": "2026-10-10T12:38:52+00:00",
+  "last_invocation_finished": "2026-10-10T12:43:48+00:00",
+  "harness_commit": "df830ca3b811f3ce273099cbcc89666d5a22f7c9+dirty.036a054efdb9",
+  "dataset_revision": "b0dde1093fe417d83b7184254edf8199c1f0dff5",
+  "instances_sha256": "4d38ee52ba38758144edce1e3c7866480dd73d2f5087f9a582d5670e820b9576"
+}

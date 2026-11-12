@@ -1,0 +1,21 @@
+diff --git a/sphinx/ext/napoleon/docstring.py b/sphinx/ext/napoleon/docstring.py
+index 11409e6f6b..56b041bbe2 100644
+--- a/sphinx/ext/napoleon/docstring.py
++++ b/sphinx/ext/napoleon/docstring.py
+@@ -238,8 +238,6 @@ class GoogleDocstring:
+                 _name = match.group(1)
+                 _type = match.group(2)
+ 
+-        _name = self._escape_args_and_kwargs(_name)
+-
+         if prefer_type and not _type:
+             _type, _name = _name, _type
+         indent = self._get_indent(line) + 1
+@@ -579,6 +577,7 @@ class GoogleDocstring:
+         lines = []
+         for _name, _type, _desc in self._consume_fields():
+             if self._config.napoleon_use_ivar:
++                _name = self._escape_args_and_kwargs(_name)
+                 _name = self._qualify_name(_name, self._obj)
+                 field = ':ivar %s: ' % _name
+                 lines.extend(self._format_block(field, _desc))

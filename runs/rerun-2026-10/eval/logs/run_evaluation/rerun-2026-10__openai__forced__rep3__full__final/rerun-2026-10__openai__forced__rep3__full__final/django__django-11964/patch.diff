@@ -1,0 +1,26 @@
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index d610dc86f0..a57e9680a8 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -397,6 +397,21 @@ class Field(RegisterLookupMixin):
+         else:
+             return self.cached_col
+ 
++    def from_db_value(self, value, expression, connection):
++        """
++        Convert a value as returned by the database to a Python object.
++        """
++        if value is None:
++            return value
++        # If choices are defined and are an Enum subclass, convert to enum member
++        if self.choices and hasattr(self.choices, '__class__') and issubclass(self.choices.__class__, enum.EnumMeta):
++            try:
++                return self.choices(value)
++            except ValueError:
++                # If value is not a valid enum member, return as is
++                return value
++        return value
++
+     @cached_property
+     def cached_col(self):
+         from django.db.models.expressions import Col

@@ -1,0 +1,38 @@
+--- a/sympy/matrices/expressions/blockmatrix.py
++++ b/sympy/matrices/expressions/blockmatrix.py
+@@ ... @@
+-    def _entry(self, i, j, **kwargs):
+-        # Find row entry
+-        for row_block, numrows in enumerate(self.rowblocksizes):
+-            if (i < numrows) != False:
+-                break
+-            else:
+-                i -= numrows
+-        for col_block, numcols in enumerate(self.colblocksizes):
+-            if (j < numcols) != False:
+-                break
+-            else:
+-                j -= numcols
+-        return self.blocks[row_block, col_block][i, j]
++    def _entry(self, i, j, **kwargs):
++        # If i or j are symbolic, we cannot determine the exact block,
++        # so return unevaluated Indexed element from BlockMatrix
++        from sympy.core.symbol import Symbol
++        from sympy.core.expr import Expr
++        if isinstance(i, (Symbol, Expr)) or isinstance(j, (Symbol, Expr)):
++            # Return unevaluated Indexed element to avoid wrong simplification
++            from sympy.matrices.expressions.matexpr import MatrixElement
++            return MatrixElement(self, i, j)
++
++        # Find row entry
++        for row_block, numrows in enumerate(self.rowblocksizes):
++            if (i < numrows) != False:
++                break
++            else:
++                i -= numrows
++        for col_block, numcols in enumerate(self.colblocksizes):
++            if (j < numcols) != False:
++                break
++            else:
++                j -= numcols
++        return self.blocks[row_block, col_block][i, j]

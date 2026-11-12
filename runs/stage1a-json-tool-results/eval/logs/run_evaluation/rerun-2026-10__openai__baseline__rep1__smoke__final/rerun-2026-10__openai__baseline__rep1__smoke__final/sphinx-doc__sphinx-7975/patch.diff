@@ -1,0 +1,43 @@
+--- a/sphinx/environment/adapters/indexentries.py
++++ b/sphinx/environment/adapters/indexentries.py
+@@ -162,17 +162,18 @@
+-        def keyfunc3(item: Tuple[str, List]) -> str:
+-            # hack: mutating the subitems dicts to a list in the keyfunc
+-            k, v = item
+-            v[1] = sorted(((si, se) for (si, (se, void, void)) in v[1].items()),
+-                          key=keyfunc2)
+-            if v[2] is None:
+-                # now calculate the key
+-                if k.startswith('\\N{RIGHT-TO-LEFT MARK}'):
+-                    k = k[1:]
+-                letter = unicodedata.normalize('NFD', k[0])[0].upper()
+-                if letter.isalpha() or letter == '_':
+-                    return letter
+-                else:
+-                    # get all other symbols under one heading
+-                    return _('Symbols')
+-            else:
+-                return v[2]
++        def keyfunc3(item: Tuple[str, List]) -> str:
++            # hack: mutating the subitems dicts to a list in the keyfunc
++            k, v = item
++            v[1] = sorted(((si, se) for (si, (se, void, void)) in v[1].items()),
++                          key=keyfunc2)
++            if v[2] is None:
++                # now calculate the key
++                if k.startswith('\\N{RIGHT-TO-LEFT MARK}'):
++                    k = k[1:]
++                letter = unicodedata.normalize('NFD', k[0])[0].upper()
++                if letter.isalpha() or letter == '_':
++                    return letter
++                else:
++                    # get all other symbols under one heading
++                    # Use a fixed key for symbols to avoid multiple "Symbols" sections
++                    return '\uFFFF'  # Use a high unicode private use char as key
++            else:
++                return v[2]
+@@ -175,2 +182,2 @@
+-        return [(key_, list(group))
+-                for (key_, group) in groupby(newlist, keyfunc3)]
++        return [(key_, list(group))
++                for (key_, group) in groupby(newlist, keyfunc3)]

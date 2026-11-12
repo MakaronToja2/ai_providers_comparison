@@ -1,0 +1,17 @@
+diff --git a/sympy/utilities/iterables.py b/sympy/utilities/iterables.py
+index d96e76263b..4ad01fa85d 100644
+--- a/sympy/utilities/iterables.py
++++ b/sympy/utilities/iterables.py
+@@ -2109,7 +2109,12 @@ def uniq(seq, result=None):
+     try:
+         seen = set()
+         result = result or []
++        # Record the initial size if the sequence has __len__
++        seq_size = len(seq) if hasattr(seq, '__len__') else None
+         for i, s in enumerate(seq):
++            # Check if the sequence size has changed
++            if seq_size is not None and len(seq) != seq_size:
++                raise RuntimeError("sequence changed size during iteration")
+             if not (s in seen or seen.add(s)):
+                 yield s
+     except TypeError:

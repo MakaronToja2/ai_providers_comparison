@@ -1,0 +1,24 @@
+{
+  "job": "rerun-2026-10__anthropic__self_reflect__rep1__smoke5",
+  "experiment_id": "1db9264d-3bf3-5534-a931-8d724b446da0",
+  "provider": "anthropic",
+  "model": "claude-haiku-4-5-20251001",
+  "mode": "self_reflect",
+  "run_idx": 1,
+  "subset": "smoke5",
+  "instances": 5,
+  "status_counts": {
+    "success_patch_generated": 4,
+    "edit_not_applicable": 1
+  },
+  "incomplete": 0,
+  "api_model_ids": [
+    "claude-haiku-4-5-20251001"
+  ],
+  "cost_usd_list_price": 0.487242,
+  "last_invocation_started": "2026-10-10T08:12:14+00:00",
+  "last_invocation_finished": "2026-10-10T08:13:17+00:00",
+  "harness_commit": "df830ca3b811f3ce273099cbcc89666d5a22f7c9+dirty.42c0b5f1d82f",
+  "dataset_revision": "b0dde1093fe417d83b7184254edf8199c1f0dff5",
+  "instances_sha256": "4d38ee52ba38758144edce1e3c7866480dd73d2f5087f9a582d5670e820b9576"
+}

@@ -1,0 +1,14 @@
+diff --git a/lib/matplotlib/widgets.py b/lib/matplotlib/widgets.py
+index ebe5da43e2..7c846e7ae8 100644
+--- a/lib/matplotlib/widgets.py
++++ b/lib/matplotlib/widgets.py
+@@ -963,7 +963,8 @@ class RangeSlider(SliderBase):
+         self.valtext.set_text(self._format((vmin, vmax)))
+ 
+         if self.drawon:
+-            self.ax.figure.canvas.draw_idle()
++            # Use draw instead of draw_idle to avoid event loop blocking issues
++            self.ax.figure.canvas.draw()
+         self.val = (vmin, vmax)
+         if self.eventson:
+             self._observers.process("changed", (vmin, vmax))

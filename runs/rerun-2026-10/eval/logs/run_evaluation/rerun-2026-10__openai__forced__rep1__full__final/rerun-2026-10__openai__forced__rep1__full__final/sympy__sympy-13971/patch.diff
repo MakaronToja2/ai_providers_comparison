@@ -1,0 +1,29 @@
+diff --git a/sympy/series/sequences.py b/sympy/series/sequences.py
+index 08f36df061..a0c873353c 100644
+--- a/sympy/series/sequences.py
++++ b/sympy/series/sequences.py
+@@ -710,6 +710,24 @@ def coeff_mul(self, coeff):
+         formula = self.formula * coeff
+         return SeqFormula(formula, self.args[1])
+ 
++    def _latex(self, printer):
++        # Custom LaTeX printer for SeqFormula to avoid escaping square brackets
++        from sympy.printing.latex import LatexPrinter
++        # Render the sequence as a list with \ldots for infinity
++        formula = self.formula
++        var, start, stop = self.limits
++        # Generate list of first few terms if finite or partial infinite
++        if stop is S.Infinity:
++            # Show first few terms and then \ldots
++            terms = [formula.subs(var, i) for i in range(5)]
++            terms_latex = ", ".join(printer._print(term) for term in terms)
++            return r"\left[" + terms_latex + r", \ldots \right]"
++        else:
++            # Finite sequence, print all terms
++            terms = [formula.subs(var, i) for i in range(int(stop - start) + 1)]
++            terms_latex = ", ".join(printer._print(term) for term in terms)
++            return r"\left[" + terms_latex + r"\right]"
++
+ 
+ def sequence(seq, limits=None):
+     """Returns appropriate sequence object.

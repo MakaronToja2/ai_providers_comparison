@@ -1,0 +1,81 @@
+2026-10-10 14:50:50,828 - INFO - Creating container for astropy__astropy-7746...
+2026-10-10 14:50:59,108 - INFO - Container for astropy__astropy-7746 created: d2b611c2e6ca50bbaea11b883f142683a4f27dc40a12ab80d953ea6d9d26d664
+2026-10-10 14:51:06,896 - INFO - Container for astropy__astropy-7746 started: d2b611c2e6ca50bbaea11b883f142683a4f27dc40a12ab80d953ea6d9d26d664
+2026-10-10 14:51:06,897 - INFO - Intermediate patch for astropy__astropy-7746 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep1__full__final/rerun-2026-10__anthropic__self_reflect__rep1__full__final/astropy__astropy-7746/patch.diff, now applying to container...
+2026-10-10 14:51:07,075 - INFO - >>>>> Applied Patch:
+/tmp/patch.diff:21: trailing whitespace.
+            
+/tmp/patch.diff:25: trailing whitespace.
+            
+Checking patch astropy/wcs/wcs.py...
+warning: astropy/wcs/wcs.py has type 100755, expected 100644
+Applied patch astropy/wcs/wcs.py cleanly.
+warning: 2 lines add whitespace errors.
+
+2026-10-10 14:51:08,380 - INFO - Git diff before:
+diff --git a/astropy/wcs/wcs.py b/astropy/wcs/wcs.py
+index d3a06f2b3..7e4c4dcac 100755
+--- a/astropy/wcs/wcs.py
++++ b/astropy/wcs/wcs.py
+@@ -1220,6 +1220,11 @@ reduce these to 2 dimensions using the naxis kwarg.
+ 
+             xy = np.hstack([x.reshape((x.size, 1)) for x in axes])
+ 
++            # Handle empty arrays - return empty arrays with appropriate shape
++            if xy.shape[0] == 0:
++                return [np.empty(axes[0].shape, dtype=np.float64)
++                        for i in range(xy.shape[1])]
++
+             if ra_dec_order and sky == 'input':
+                 xy = self._denormalize_sky(xy)
+             output = func(xy, origin)
+@@ -1235,6 +1240,11 @@ reduce these to 2 dimensions using the naxis kwarg.
+                 raise ValueError(
+                     "When providing two arguments, the array must be "
+                     "of shape (N, {0})".format(self.naxis))
++            
++            # Handle empty arrays - return empty array with appropriate shape
++            if xy.shape[0] == 0:
++                return np.empty((0, self.naxis), dtype=np.float64)
++            
+             if ra_dec_order and sky == 'input':
+                 xy = self._denormalize_sky(xy)
+             result = func(xy, origin)
+2026-10-10 14:51:08,381 - INFO - Eval script for astropy__astropy-7746 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep1__full__final/rerun-2026-10__anthropic__self_reflect__rep1__full__final/astropy__astropy-7746/eval.sh; copying to container...
+2026-10-10 14:51:19,307 - INFO - Test runtime: 10.83 seconds
+2026-10-10 14:51:19,308 - INFO - Test output for astropy__astropy-7746 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep1__full__final/rerun-2026-10__anthropic__self_reflect__rep1__full__final/astropy__astropy-7746/test_output.txt
+2026-10-10 14:51:19,394 - INFO - Git diff after:
+diff --git a/astropy/wcs/wcs.py b/astropy/wcs/wcs.py
+index d3a06f2b3..7e4c4dcac 100755
+--- a/astropy/wcs/wcs.py
++++ b/astropy/wcs/wcs.py
+@@ -1220,6 +1220,11 @@ reduce these to 2 dimensions using the naxis kwarg.
+ 
+             xy = np.hstack([x.reshape((x.size, 1)) for x in axes])
+ 
++            # Handle empty arrays - return empty arrays with appropriate shape
++            if xy.shape[0] == 0:
++                return [np.empty(axes[0].shape, dtype=np.float64)
++                        for i in range(xy.shape[1])]
++
+             if ra_dec_order and sky == 'input':
+                 xy = self._denormalize_sky(xy)
+             output = func(xy, origin)
+@@ -1235,6 +1240,11 @@ reduce these to 2 dimensions using the naxis kwarg.
+                 raise ValueError(
+                     "When providing two arguments, the array must be "
+                     "of shape (N, {0})".format(self.naxis))
++            
++            # Handle empty arrays - return empty array with appropriate shape
++            if xy.shape[0] == 0:
++                return np.empty((0, self.naxis), dtype=np.float64)
++            
+             if ra_dec_order and sky == 'input':
+                 xy = self._denormalize_sky(xy)
+             result = func(xy, origin)
+2026-10-10 14:51:19,394 - INFO - Grading answer for astropy__astropy-7746...
+2026-10-10 14:51:19,397 - INFO - report: {'astropy__astropy-7746': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['astropy/wcs/tests/test_wcs.py::test_zero_size_input']}, 'PASS_TO_PASS': {'success': ['astropy/wcs/tests/test_wcs.py::TestMaps::test_consistency', 'astropy/wcs/tests/test_wcs.py::TestMaps::test_maps', 'astropy/wcs/tests/test_wcs.py::TestSpectra::test_consistency', 'astropy/wcs/tests/test_wcs.py::TestSpectra::test_spectra', 'astropy/wcs/tests/test_wcs.py::test_fixes', 'astropy/wcs/tests/test_wcs.py::test_outside_sky', 'astropy/wcs/tests/test_wcs.py::test_pix2world', 'astropy/wcs/tests/test_wcs.py::test_load_fits_path', 'astropy/wcs/tests/test_wcs.py::test_dict_init', 'astropy/wcs/tests/test_wcs.py::test_extra_kwarg', 'astropy/wcs/tests/test_wcs.py::test_3d_shapes', 'astropy/wcs/tests/test_wcs.py::test_preserve_shape', 'astropy/wcs/tests/test_wcs.py::test_broadcasting', 'astropy/wcs/tests/test_wcs.py::test_shape_mismatch', 'astropy/wcs/tests/test_wcs.py::test_invalid_shape', 'astropy/wcs/tests/test_wcs.py::test_warning_about_defunct_keywords', 'astropy/wcs/tests/test_wcs.py::test_warning_about_defunct_keywords_exception', 'astropy/wcs/tests/test_wcs.py::test_to_header_string', 'astropy/wcs/tests/test_wcs.py::test_to_fits', 'astropy/wcs/tests/test_wcs.py::test_to_header_warning', 'astropy/wcs/tests/test_wcs.py::test_no_comments_in_header', 'astropy/wcs/tests/test_wcs.py::test_find_all_wcs_crash', 'astropy/wcs/tests/test_wcs.py::test_validate', 'astropy/wcs/tests/test_wcs.py::test_validate_with_2_wcses', 'astropy/wcs/tests/test_wcs.py::test_crpix_maps_to_crval', 'astropy/wcs/tests/test_wcs.py::test_all_world2pix', 'astropy/wcs/tests/test_wcs.py::test_scamp_sip_distortion_parameters', 'astropy/wcs/tests/test_wcs.py::test_fixes2', 'astropy/wcs/tests/test_wcs.py::test_unit_normalization', 'astropy/wcs/tests/test_wcs.py::test_footprint_to_file', 'astropy/wcs/tests/test_wcs.py::test_validate_faulty_wcs', 'astropy/wcs/tests/test_wcs.py::test_error_message', 'astropy/wcs/tests/test_wcs.py::test_out_of_bounds', 'astropy/wcs/tests/test_wcs.py::test_calc_footprint_1', 'astropy/wcs/tests/test_wcs.py::test_calc_footprint_2', 'astropy/wcs/tests/test_wcs.py::test_calc_footprint_3', 'astropy/wcs/tests/test_wcs.py::test_sip', 'astropy/wcs/tests/test_wcs.py::test_printwcs', 'astropy/wcs/tests/test_wcs.py::test_invalid_spherical', 'astropy/wcs/tests/test_wcs.py::test_no_iteration', 'astropy/wcs/tests/test_wcs.py::test_sip_tpv_agreement', 'astropy/wcs/tests/test_wcs.py::test_tpv_copy', 'astropy/wcs/tests/test_wcs.py::test_hst_wcs', 'astropy/wcs/tests/test_wcs.py::test_list_naxis', 'astropy/wcs/tests/test_wcs.py::test_sip_broken', 'astropy/wcs/tests/test_wcs.py::test_no_truncate_crval', 'astropy/wcs/tests/test_wcs.py::test_no_truncate_crval_try2', 'astropy/wcs/tests/test_wcs.py::test_no_truncate_crval_p17', 'astropy/wcs/tests/test_wcs.py::test_no_truncate_using_compare', 'astropy/wcs/tests/test_wcs.py::test_passing_ImageHDU', 'astropy/wcs/tests/test_wcs.py::test_inconsistent_sip', 'astropy/wcs/tests/test_wcs.py::test_bounds_check', 'astropy/wcs/tests/test_wcs.py::test_naxis', 'astropy/wcs/tests/test_wcs.py::test_sip_with_altkey', 'astropy/wcs/tests/test_wcs.py::test_to_fits_1', 'astropy/wcs/tests/test_wcs.py::test_keyedsip'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for astropy__astropy-7746: resolved: False
+2026-10-10 14:51:19,398 - INFO - Attempting to stop container sweb.eval.astropy__astropy-7746.rerun-2026-10__anthropic__self_reflect__rep1__full__final...
+2026-10-10 14:51:40,422 - INFO - Attempting to remove container sweb.eval.astropy__astropy-7746.rerun-2026-10__anthropic__self_reflect__rep1__full__final...
+2026-10-10 14:51:42,772 - INFO - Container sweb.eval.astropy__astropy-7746.rerun-2026-10__anthropic__self_reflect__rep1__full__final removed.

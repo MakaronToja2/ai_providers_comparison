@@ -1,0 +1,35 @@
+diff --git a/astropy/modeling/separable.py b/astropy/modeling/separable.py
+index a308e27297..2789e152ef 100644
+--- a/astropy/modeling/separable.py
++++ b/astropy/modeling/separable.py
+@@ -304,9 +304,29 @@ def _separable(transform):
+     if (transform_matrix := transform._calculate_separability_matrix()) is not NotImplemented:
+         return transform_matrix
+     elif isinstance(transform, CompoundModel):
++        # Recursively get separability matrices of left and right
+         sepleft = _separable(transform.left)
+         sepright = _separable(transform.right)
+-        return _operators[transform.op](sepleft, sepright)
++        # If left or right is a matrix, use it directly, else convert to coord_matrix
++        if isinstance(sepleft, np.ndarray) and sepleft.ndim == 2:
++            left_mat = sepleft
++        else:
++            left_mat = _coord_matrix(transform.left, 'left', transform.left.n_outputs)
++        if isinstance(sepright, np.ndarray) and sepright.ndim == 2:
++            right_mat = sepright
++        else:
++            right_mat = _coord_matrix(transform.right, 'right', transform.right.n_outputs)
++        # Combine matrices horizontally for '&' and dot for '|'
++        if transform.op == '&':
++            # horizontally stack left and right matrices
++            combined = np.hstack([left_mat, right_mat])
++        elif transform.op == '|':
++            # dot product of left and right matrices
++            combined = np.dot(left_mat, right_mat)
++        else:
++            # fallback to operator function for other ops
++            combined = _operators[transform.op](left_mat, right_mat)
++        return combined
+     elif isinstance(transform, Model):
+         return _coord_matrix(transform, 'left', transform.n_outputs)
+ 

@@ -1,0 +1,16 @@
+diff --git a/django/utils/hashable.py b/django/utils/hashable.py
+index 7d137ccc2f..5f910d9a39 100644
+--- a/django/utils/hashable.py
++++ b/django/utils/hashable.py
+@@ -18,6 +18,11 @@ def make_hashable(value):
+         hash(value)
+     except TypeError:
+         if is_iterable(value):
++            # Convert dict views (dict_keys, dict_values, dict_items) to tuples
++            # before attempting to make them hashable, as they are not directly
++            # hashable but are iterable.
++            if type(value).__name__ in ('dict_keys', 'dict_values', 'dict_items'):
++                value = tuple(value)
+             return tuple(map(make_hashable, value))
+         # Non-hashable, non-iterable.
+         raise

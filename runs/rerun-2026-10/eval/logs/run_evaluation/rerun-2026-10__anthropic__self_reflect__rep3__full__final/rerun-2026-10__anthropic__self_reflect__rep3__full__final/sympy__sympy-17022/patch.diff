@@ -1,0 +1,28 @@
+diff --git a/sympy/printing/lambdarepr.py b/sympy/printing/lambdarepr.py
+index 8f60434e89..199341c400 100644
+--- a/sympy/printing/lambdarepr.py
++++ b/sympy/printing/lambdarepr.py
+@@ -14,6 +14,8 @@ class LambdaPrinter(PythonCodePrinter):
+     """
+     printmethod = "_lambdacode"
+ 
++    def _print_Identity(self, expr):
++        return "Identity({})".format(self._print(expr.args[0]))
+ 
+     def _print_And(self, expr):
+         result = ['(']
+diff --git a/sympy/utilities/lambdify.py b/sympy/utilities/lambdify.py
+index a940509b47..b4d465a1bf 100644
+--- a/sympy/utilities/lambdify.py
++++ b/sympy/utilities/lambdify.py
+@@ -98,8 +98,8 @@
+ MODULES = {
+     "math": (MATH, MATH_DEFAULT, MATH_TRANSLATIONS, ("from math import *",)),
+     "mpmath": (MPMATH, MPMATH_DEFAULT, MPMATH_TRANSLATIONS, ("from mpmath import *",)),
+-    "numpy": (NUMPY, NUMPY_DEFAULT, NUMPY_TRANSLATIONS, ("import numpy; from numpy import *; from numpy.linalg import *",)),
+-    "scipy": (SCIPY, SCIPY_DEFAULT, SCIPY_TRANSLATIONS, ("import numpy; import scipy; from scipy import *; from scipy.special import *",)),
++    "numpy": (NUMPY, NUMPY_DEFAULT, NUMPY_TRANSLATIONS, ("import numpy; from numpy import *; from numpy.linalg import *", "from sympy.matrices import Identity")),
++    "scipy": (SCIPY, SCIPY_DEFAULT, SCIPY_TRANSLATIONS, ("import numpy; import scipy; from scipy import *; from scipy.special import *", "from sympy.matrices import Identity")),
+     "tensorflow": (TENSORFLOW, TENSORFLOW_DEFAULT, TENSORFLOW_TRANSLATIONS, ("import_module('tensorflow')",)),
+     "sympy": (SYMPY, SYMPY_DEFAULT, {}, (
+         "from sympy.functions import *",

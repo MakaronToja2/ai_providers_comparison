@@ -1,0 +1,25 @@
+diff --git a/sympy/polys/polyoptions.py b/sympy/polys/polyoptions.py
+index 6e504a3057..4c82816837 100644
+--- a/sympy/polys/polyoptions.py
++++ b/sympy/polys/polyoptions.py
+@@ -459,6 +459,10 @@ def preprocess(cls, domain):
+ 
+                 if ground in ['Z', 'ZZ']:
+                     return sympy.polys.domains.ZZ.poly_ring(*gens)
++                elif ground == 'RR':
++                    # Support domain='RR[y,z]' as polynomial ring over RealField
++                    from sympy.polys.domains import RR
++                    return RR.poly_ring(*gens)
+                 else:
+                     return sympy.polys.domains.QQ.poly_ring(*gens)
+ 
+@@ -471,6 +475,9 @@ def preprocess(cls, domain):
+ 
+                 if ground in ['Z', 'ZZ']:
+                     return sympy.polys.domains.ZZ.frac_field(*gens)
++                elif ground == 'RR':
++                    from sympy.polys.domains import RR
++                    return RR.frac_field(*gens)
+                 else:
+                     return sympy.polys.domains.QQ.frac_field(*gens)
+ 

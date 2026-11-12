@@ -1,0 +1,19 @@
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 1a55d3d417..0130401ee0 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -764,10 +764,12 @@ class Field(RegisterLookupMixin):
+             if not getattr(cls, self.attname, None):
+                 setattr(cls, self.attname, self.descriptor_class(self))
+         if self.choices is not None:
+-            if not hasattr(cls, 'get_%s_display' % self.name):
++            # Check if the method is defined on this class, not inherited
++            method_name = 'get_%s_display' % self.name
++            if method_name not in cls.__dict__:
+                 setattr(
+                     cls,
+-                    'get_%s_display' % self.name,
++                    method_name,
+                     partialmethod(cls._get_FIELD_display, field=self),
+                 )
+ 

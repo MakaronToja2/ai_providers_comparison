@@ -1,0 +1,46 @@
+2026-10-10 19:33:20,129 - INFO - Creating container for sympy__sympy-21847...
+2026-10-10 19:33:27,956 - INFO - Container for sympy__sympy-21847 created: 7d8546a7b0a0618bcfdece83635ff57990ea327f02b2d0739dddbd63aee0f1ac
+2026-10-10 19:33:40,636 - INFO - Container for sympy__sympy-21847 started: 7d8546a7b0a0618bcfdece83635ff57990ea327f02b2d0739dddbd63aee0f1ac
+2026-10-10 19:33:40,636 - INFO - Intermediate patch for sympy__sympy-21847 written to logs/run_evaluation/rerun-2026-10__google__forced__rep3__full__final/rerun-2026-10__google__forced__rep3__full__final/sympy__sympy-21847/patch.diff, now applying to container...
+2026-10-10 19:33:40,735 - INFO - >>>>> Applied Patch:
+Checking patch sympy/polys/monomials.py...
+warning: sympy/polys/monomials.py has type 100755, expected 100644
+Applied patch sympy/polys/monomials.py cleanly.
+
+2026-10-10 19:33:41,101 - INFO - Git diff before:
+diff --git a/sympy/polys/monomials.py b/sympy/polys/monomials.py
+index 0e84403307..7c6a37933b 100755
+--- a/sympy/polys/monomials.py
++++ b/sympy/polys/monomials.py
+@@ -127,7 +127,7 @@ def itermonomials(variables, max_degrees, min_degrees=None):
+                 for variable in item:
+                     if variable != 1:
+                         powers[variable] += 1
+-                if max(powers.values()) >= min_degree:
++                if sum(powers.values()) >= min_degree:
+                     monomials_list_comm.append(Mul(*item))
+             yield from set(monomials_list_comm)
+         else:
+2026-10-10 19:33:41,101 - INFO - Eval script for sympy__sympy-21847 written to logs/run_evaluation/rerun-2026-10__google__forced__rep3__full__final/rerun-2026-10__google__forced__rep3__full__final/sympy__sympy-21847/eval.sh; copying to container...
+2026-10-10 19:33:47,477 - INFO - Test runtime: 6.30 seconds
+2026-10-10 19:33:47,478 - INFO - Test output for sympy__sympy-21847 written to logs/run_evaluation/rerun-2026-10__google__forced__rep3__full__final/rerun-2026-10__google__forced__rep3__full__final/sympy__sympy-21847/test_output.txt
+2026-10-10 19:33:47,527 - INFO - Git diff after:
+diff --git a/sympy/polys/monomials.py b/sympy/polys/monomials.py
+index 0e84403307..7c6a37933b 100755
+--- a/sympy/polys/monomials.py
++++ b/sympy/polys/monomials.py
+@@ -127,7 +127,7 @@ def itermonomials(variables, max_degrees, min_degrees=None):
+                 for variable in item:
+                     if variable != 1:
+                         powers[variable] += 1
+-                if max(powers.values()) >= min_degree:
++                if sum(powers.values()) >= min_degree:
+                     monomials_list_comm.append(Mul(*item))
+             yield from set(monomials_list_comm)
+         else:
+2026-10-10 19:33:47,527 - INFO - Grading answer for sympy__sympy-21847...
+2026-10-10 19:33:47,528 - INFO - report: {'sympy__sympy-21847': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_monomials']}, 'PASS_TO_PASS': {'success': ['test_monomial_count', 'test_monomial_mul', 'test_monomial_div', 'test_monomial_gcd', 'test_monomial_lcm', 'test_monomial_max', 'test_monomial_pow', 'test_monomial_min', 'test_monomial_divides'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-21847: resolved: False
+2026-10-10 19:33:47,529 - INFO - Attempting to stop container sweb.eval.sympy__sympy-21847.rerun-2026-10__google__forced__rep3__full__final...
+2026-10-10 19:34:06,616 - INFO - Attempting to remove container sweb.eval.sympy__sympy-21847.rerun-2026-10__google__forced__rep3__full__final...
+2026-10-10 19:34:08,236 - INFO - Container sweb.eval.sympy__sympy-21847.rerun-2026-10__google__forced__rep3__full__final removed.

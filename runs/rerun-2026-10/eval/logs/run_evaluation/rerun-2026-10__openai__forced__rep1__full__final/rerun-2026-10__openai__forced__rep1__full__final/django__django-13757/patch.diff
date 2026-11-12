@@ -1,0 +1,34 @@
+diff --git a/django/db/models/fields/json.py b/django/db/models/fields/json.py
+index 29c6ff0926..a3ce1516a3 100644
+--- a/django/db/models/fields/json.py
++++ b/django/db/models/fields/json.py
+@@ -368,11 +368,29 @@ class KeyTransformIsNull(lookups.IsNull):
+     def as_oracle(self, compiler, connection):
+         if not self.rhs:
+             return HasKey(self.lhs.lhs, self.lhs.key_name).as_oracle(compiler, connection)
++        # For isnull=True on Oracle, exclude keys with null values
++        if self.rhs:
++            lhs, lhs_params = self.lhs.process_lhs(compiler, connection)
++            key_path = "$.%s" % self.lhs.key_name
++            sql = (
++                "NOT JSON_EXISTS(%s, '%s') OR "
++                "JSON_VALUE(%s, '%s') IS NULL"
++            ) % (lhs, key_path, lhs, key_path)
++            params = lhs_params * 2
++            return sql, params
+         return super().as_sql(compiler, connection)
+ 
+     def as_sqlite(self, compiler, connection):
+         if not self.rhs:
+             return HasKey(self.lhs.lhs, self.lhs.key_name).as_sqlite(compiler, connection)
++        # For isnull=True on SQLite, exclude keys with null values
++        if self.rhs:
++            lhs, lhs_params = self.lhs.process_lhs(compiler, connection)
++            key_path = "$.%s" % self.lhs.key_name
++            sql = (
++                "JSON_TYPE(%s, '%s') IS NULL"
++            ) % (lhs, key_path)
++            return sql, lhs_params
+         return super().as_sql(compiler, connection)
+ 
+ 

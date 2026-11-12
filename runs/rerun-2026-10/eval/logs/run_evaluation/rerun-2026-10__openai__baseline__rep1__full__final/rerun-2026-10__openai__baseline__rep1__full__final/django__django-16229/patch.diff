@@ -1,0 +1,28 @@
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 2a98396cad..bce77671c7 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1013,8 +1013,8 @@ class Field(RegisterLookupMixin):
+         }
+         if self.has_default():
+             if callable(self.default):
+-                defaults["initial"] = self.default
+-                defaults["show_hidden_initial"] = True
++                defaults["initial"] = self.default()
++                defaults["show_hidden_initial"] = False
+             else:
+                 defaults["initial"] = self.get_default()
+         if self.choices is not None:
+diff --git a/django/forms/fields.py b/django/forms/fields.py
+index 46de2f53a0..defe7530a4 100644
+--- a/django/forms/fields.py
++++ b/django/forms/fields.py
+@@ -130,6 +130,8 @@ class Field:
+         #             is its widget is shown in the form but not editable.
+         # label_suffix -- Suffix to be added to the label. Overrides
+         #                 form's label_suffix.
++        if callable(initial):
++            initial = initial()
+         self.required, self.label, self.initial = required, label, initial
+         self.show_hidden_initial = show_hidden_initial
+         self.help_text = help_text

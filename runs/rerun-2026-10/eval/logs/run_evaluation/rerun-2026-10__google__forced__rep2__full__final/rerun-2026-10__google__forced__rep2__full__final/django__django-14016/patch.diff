@@ -1,0 +1,21 @@
+diff --git a/django/db/models/query_utils.py b/django/db/models/query_utils.py
+index c2623f099f..50f01a7f72 100644
+--- a/django/db/models/query_utils.py
++++ b/django/db/models/query_utils.py
+@@ -88,7 +88,15 @@ class Q(tree.Node):
+             child = self.children[0]
+             kwargs = {child[0]: child[1]}
+         else:
+-            args = tuple(self.children)
++            # Ensure all elements in children are pickleable
++            processed_children = []
++            for child in self.children:
++                key, value = child
++                # Convert dict_keys to list to make it pickleable
++                if isinstance(value, dict_keys):
++                    value = list(value)
++                processed_children.append((key, value))
++            args = tuple(processed_children)
+             if self.connector != self.default:
+                 kwargs = {'_connector': self.connector}
+         if self.negated:

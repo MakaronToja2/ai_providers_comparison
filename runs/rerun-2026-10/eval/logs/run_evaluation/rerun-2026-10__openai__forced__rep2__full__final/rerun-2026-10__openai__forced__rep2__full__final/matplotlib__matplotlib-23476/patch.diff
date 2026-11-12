@@ -1,0 +1,31 @@
+diff --git a/lib/matplotlib/figure.py b/lib/matplotlib/figure.py
+index c55864243a..82cfcfd6f6 100644
+--- a/lib/matplotlib/figure.py
++++ b/lib/matplotlib/figure.py
+@@ -3043,6 +3043,26 @@ class Figure(FigureBase):
+ 
+         self.__dict__ = state
+ 
++        # Fix for M1 Mac double DPI issue on unpickle
++        # On macOS with the MacOSX backend, the dpi is doubled on unpickling
++        # because the dpi is stored as physical dpi but then applied again
++        # scaled by device_pixel_ratio. We detect this and correct by halving dpi.
++        import sys
++        if sys.platform == "darwin":
++            import matplotlib.backends.backend_macosx as backend_macosx
++            if (hasattr(self, 'canvas') and
++                isinstance(self.canvas, backend_macosx.FigureCanvasMac)):
++                # The device_pixel_ratio is usually 2 on Retina displays (M1 Macs)
++                # If dpi is already scaled by device_pixel_ratio, divide by it once
++                try:
++                    device_pixel_ratio = self.canvas.device_pixel_ratio
++                    if device_pixel_ratio > 1:
++                        # Adjust dpi to avoid doubling on unpickle
++                        self._dpi = self._dpi / device_pixel_ratio
++                except Exception:
++                    # Defensive: in case device_pixel_ratio is not set or other issues
++                    pass
++
+         # re-initialise some of the unstored state information
+         FigureCanvasBase(self)  # Set self.canvas.
+ 

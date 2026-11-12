@@ -1,0 +1,89 @@
+2026-10-07 16:43:11,548 - INFO - Creating container for sphinx-doc__sphinx-7975...
+2026-10-07 16:43:11,707 - INFO - Container for sphinx-doc__sphinx-7975 created: 1cb50d9281ba0add87835c82de1a356ad1d9e2f98d5735c100364d4ad11b526a
+2026-10-07 16:43:12,145 - INFO - Container for sphinx-doc__sphinx-7975 started: 1cb50d9281ba0add87835c82de1a356ad1d9e2f98d5735c100364d4ad11b526a
+2026-10-07 16:43:12,145 - INFO - Intermediate patch for sphinx-doc__sphinx-7975 written to logs/run_evaluation/gold__smoke/gold/sphinx-doc__sphinx-7975/patch.diff, now applying to container...
+2026-10-07 16:43:12,286 - INFO - >>>>> Applied Patch:
+Checking patch sphinx/environment/adapters/indexentries.py...
+Applied patch sphinx/environment/adapters/indexentries.py cleanly.
+
+2026-10-07 16:43:13,037 - INFO - Git diff before:
+diff --git a/sphinx/environment/adapters/indexentries.py b/sphinx/environment/adapters/indexentries.py
+index 5af213932..b13ac97c3 100755
+--- a/sphinx/environment/adapters/indexentries.py
++++ b/sphinx/environment/adapters/indexentries.py
+@@ -98,9 +98,8 @@ class IndexEntries:
+             for subentry in indexentry[1].values():
+                 subentry[0].sort(key=keyfunc0)  # type: ignore
+ 
+-        # sort the index entries; put all symbols at the front, even those
+-        # following the letters in ASCII, this is where the chr(127) comes from
+-        def keyfunc(entry: Tuple[str, List]) -> Tuple[str, str]:
++        # sort the index entries
++        def keyfunc(entry: Tuple[str, List]) -> Tuple[Tuple[int, str], str]:
+             key, (void, void, category_key) = entry
+             if category_key:
+                 # using specified category key to sort
+@@ -108,11 +107,16 @@ class IndexEntries:
+             lckey = unicodedata.normalize('NFD', key.lower())
+             if lckey.startswith('\N{RIGHT-TO-LEFT MARK}'):
+                 lckey = lckey[1:]
++
+             if lckey[0:1].isalpha() or lckey.startswith('_'):
+-                lckey = chr(127) + lckey
++                # put non-symbol characters at the folloing group (1)
++                sortkey = (1, lckey)
++            else:
++                # put symbols at the front of the index (0)
++                sortkey = (0, lckey)
+             # ensure a determinstic order *within* letters by also sorting on
+             # the entry itself
+-            return (lckey, entry[0])
++            return (sortkey, entry[0])
+         newlist = sorted(new.items(), key=keyfunc)
+ 
+         if group_entries:
+2026-10-07 16:43:13,038 - INFO - Eval script for sphinx-doc__sphinx-7975 written to logs/run_evaluation/gold__smoke/gold/sphinx-doc__sphinx-7975/eval.sh; copying to container...
+2026-10-07 16:43:17,689 - INFO - Test runtime: 4.56 seconds
+2026-10-07 16:43:17,690 - INFO - Test output for sphinx-doc__sphinx-7975 written to logs/run_evaluation/gold__smoke/gold/sphinx-doc__sphinx-7975/test_output.txt
+2026-10-07 16:43:17,741 - INFO - Git diff after:
+diff --git a/sphinx/environment/adapters/indexentries.py b/sphinx/environment/adapters/indexentries.py
+index 5af213932..b13ac97c3 100755
+--- a/sphinx/environment/adapters/indexentries.py
++++ b/sphinx/environment/adapters/indexentries.py
+@@ -98,9 +98,8 @@ class IndexEntries:
+             for subentry in indexentry[1].values():
+                 subentry[0].sort(key=keyfunc0)  # type: ignore
+ 
+-        # sort the index entries; put all symbols at the front, even those
+-        # following the letters in ASCII, this is where the chr(127) comes from
+-        def keyfunc(entry: Tuple[str, List]) -> Tuple[str, str]:
++        # sort the index entries
++        def keyfunc(entry: Tuple[str, List]) -> Tuple[Tuple[int, str], str]:
+             key, (void, void, category_key) = entry
+             if category_key:
+                 # using specified category key to sort
+@@ -108,11 +107,16 @@ class IndexEntries:
+             lckey = unicodedata.normalize('NFD', key.lower())
+             if lckey.startswith('\N{RIGHT-TO-LEFT MARK}'):
+                 lckey = lckey[1:]
++
+             if lckey[0:1].isalpha() or lckey.startswith('_'):
+-                lckey = chr(127) + lckey
++                # put non-symbol characters at the folloing group (1)
++                sortkey = (1, lckey)
++            else:
++                # put symbols at the front of the index (0)
++                sortkey = (0, lckey)
+             # ensure a determinstic order *within* letters by also sorting on
+             # the entry itself
+-            return (lckey, entry[0])
++            return (sortkey, entry[0])
+         newlist = sorted(new.items(), key=keyfunc)
+ 
+         if group_entries:
+2026-10-07 16:43:17,741 - INFO - Grading answer for sphinx-doc__sphinx-7975...
+2026-10-07 16:43:17,745 - INFO - report: {'sphinx-doc__sphinx-7975': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['tests/test_environment_indexentries.py::test_create_single_index'], 'failure': []}, 'PASS_TO_PASS': {'success': ['tests/test_environment_indexentries.py::test_create_pair_index', 'tests/test_environment_indexentries.py::test_create_triple_index', 'tests/test_environment_indexentries.py::test_create_see_index', 'tests/test_environment_indexentries.py::test_create_seealso_index', 'tests/test_environment_indexentries.py::test_create_main_index', 'tests/test_environment_indexentries.py::test_create_index_with_name', 'tests/test_environment_indexentries.py::test_create_index_by_key'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sphinx-doc__sphinx-7975: resolved: True
+2026-10-07 16:43:17,745 - INFO - Attempting to stop container sweb.eval.sphinx-doc__sphinx-7975.gold__smoke...
+2026-10-07 16:43:36,343 - INFO - Attempting to remove container sweb.eval.sphinx-doc__sphinx-7975.gold__smoke...
+2026-10-07 16:43:36,386 - INFO - Container sweb.eval.sphinx-doc__sphinx-7975.gold__smoke removed.

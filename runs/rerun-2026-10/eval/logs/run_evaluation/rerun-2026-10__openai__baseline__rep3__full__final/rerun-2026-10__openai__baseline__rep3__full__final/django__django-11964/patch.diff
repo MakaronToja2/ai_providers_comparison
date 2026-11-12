@@ -1,0 +1,27 @@
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index d610dc86f0..c5cc504360 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1008,6 +1008,22 @@ class CharField(Field):
+         return "CharField"
+ 
+     def to_python(self, value):
++        # If the field has choices and the value is an enum member, convert to the underlying value
++        if hasattr(self, 'choices') and self.choices:
++            # Check if value is an enum member (enum.Enum)
++            enum_class = None
++            # Try to get enum class from choices
++            if hasattr(self.choices, '__class__') and hasattr(self.choices, '__iter__'):
++                # The choices property returns a list of tuples (value, label)
++                # We try to get the enum class from the first choice's value if it's an enum member
++                first_choice_value = None
++                for choice_value, _ in self.choices:
++                    first_choice_value = choice_value
++                    break
++                if first_choice_value is not None:
++                    enum_class = type(first_choice_value)
++            if enum_class and isinstance(value, enum_class):
++                return value.value
+         if isinstance(value, str) or value is None:
+             return value
+         return str(value)

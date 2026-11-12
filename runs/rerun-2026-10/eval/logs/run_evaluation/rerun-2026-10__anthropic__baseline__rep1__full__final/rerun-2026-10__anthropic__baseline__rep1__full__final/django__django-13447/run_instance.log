@@ -1,0 +1,98 @@
+2026-10-10 12:44:51,221 - INFO - Creating container for django__django-13447...
+2026-10-10 12:44:51,498 - INFO - Container for django__django-13447 created: 22bee5cbcce6a93a506202888fad69fdd1ef996964aa945b71d413f553d4e33a
+2026-10-10 12:44:51,949 - INFO - Container for django__django-13447 started: 22bee5cbcce6a93a506202888fad69fdd1ef996964aa945b71d413f553d4e33a
+2026-10-10 12:44:51,951 - INFO - Intermediate patch for django__django-13447 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep1__full__final/rerun-2026-10__anthropic__baseline__rep1__full__final/django__django-13447/patch.diff, now applying to container...
+2026-10-10 12:44:52,143 - INFO - >>>>> Applied Patch:
+Checking patch django/contrib/admin/sites.py...
+warning: django/contrib/admin/sites.py has type 100755, expected 100644
+Applied patch django/contrib/admin/sites.py cleanly.
+
+2026-10-10 12:44:52,966 - INFO - Git diff before:
+diff --git a/django/contrib/admin/sites.py b/django/contrib/admin/sites.py
+index 837dabfea8..7fd5515a42 100755
+--- a/django/contrib/admin/sites.py
++++ b/django/contrib/admin/sites.py
+@@ -430,7 +430,7 @@ class AdminSite:
+                     return HttpResponsePermanentRedirect(path)
+         raise Http404
+ 
+-    def _build_app_dict(self, request, label=None):
++    def build_app_dict(self, request, label=None):
+         """
+         Build the app dictionary. The optional `label` parameter filters models
+         of a specific app.
+@@ -466,6 +466,7 @@ class AdminSite:
+                 'perms': perms,
+                 'admin_url': None,
+                 'add_url': None,
++                'model': model,
+             }
+             if perms.get('change') or perms.get('view'):
+                 model_dict['view_only'] = not perms.get('change')
+@@ -503,7 +504,7 @@ class AdminSite:
+         Return a sorted list of all the installed apps that have been
+         registered in this site.
+         """
+-        app_dict = self._build_app_dict(request)
++        app_dict = self.build_app_dict(request)
+ 
+         # Sort the apps alphabetically.
+         app_list = sorted(app_dict.values(), key=lambda x: x['name'].lower())
+@@ -534,7 +535,7 @@ class AdminSite:
+         return TemplateResponse(request, self.index_template or 'admin/index.html', context)
+ 
+     def app_index(self, request, app_label, extra_context=None):
+-        app_dict = self._build_app_dict(request, app_label)
++        app_dict = self.build_app_dict(request, app_label)
+         if not app_dict:
+             raise Http404('The requested admin page does not exist.')
+         # Sort the models alphabetically within each app.
+2026-10-10 12:44:52,966 - INFO - Eval script for django__django-13447 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep1__full__final/rerun-2026-10__anthropic__baseline__rep1__full__final/django__django-13447/eval.sh; copying to container...
+2026-10-10 12:45:04,245 - INFO - Test runtime: 11.21 seconds
+2026-10-10 12:45:04,247 - INFO - Test output for django__django-13447 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep1__full__final/rerun-2026-10__anthropic__baseline__rep1__full__final/django__django-13447/test_output.txt
+2026-10-10 12:45:04,318 - INFO - Git diff after:
+diff --git a/django/contrib/admin/sites.py b/django/contrib/admin/sites.py
+index 837dabfea8..7fd5515a42 100755
+--- a/django/contrib/admin/sites.py
++++ b/django/contrib/admin/sites.py
+@@ -430,7 +430,7 @@ class AdminSite:
+                     return HttpResponsePermanentRedirect(path)
+         raise Http404
+ 
+-    def _build_app_dict(self, request, label=None):
++    def build_app_dict(self, request, label=None):
+         """
+         Build the app dictionary. The optional `label` parameter filters models
+         of a specific app.
+@@ -466,6 +466,7 @@ class AdminSite:
+                 'perms': perms,
+                 'admin_url': None,
+                 'add_url': None,
++                'model': model,
+             }
+             if perms.get('change') or perms.get('view'):
+                 model_dict['view_only'] = not perms.get('change')
+@@ -503,7 +504,7 @@ class AdminSite:
+         Return a sorted list of all the installed apps that have been
+         registered in this site.
+         """
+-        app_dict = self._build_app_dict(request)
++        app_dict = self.build_app_dict(request)
+ 
+         # Sort the apps alphabetically.
+         app_list = sorted(app_dict.values(), key=lambda x: x['name'].lower())
+@@ -534,7 +535,7 @@ class AdminSite:
+         return TemplateResponse(request, self.index_template or 'admin/index.html', context)
+ 
+     def app_index(self, request, app_label, extra_context=None):
+-        app_dict = self._build_app_dict(request, app_label)
++        app_dict = self.build_app_dict(request, app_label)
+         if not app_dict:
+             raise Http404('The requested admin page does not exist.')
+         # Sort the models alphabetically within each app.
+2026-10-10 12:45:04,319 - INFO - Grading answer for django__django-13447...
+2026-10-10 12:45:04,324 - INFO - report: {'django__django-13447': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_available_apps (admin_views.test_adminsite.SiteEachContextTest)'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_add_action (admin_views.test_adminsite.SiteActionsTests)', 'test_disable_action (admin_views.test_adminsite.SiteActionsTests)', "AdminSite.get_action() returns an action even if it's disabled.", 'test_each_context (admin_views.test_adminsite.SiteEachContextTest)', 'test_each_context_site_url_with_script_name (admin_views.test_adminsite.SiteEachContextTest)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-13447: resolved: True
+2026-10-10 12:45:04,324 - INFO - Attempting to stop container sweb.eval.django__django-13447.rerun-2026-10__anthropic__baseline__rep1__full__final...
+2026-10-10 12:45:26,964 - INFO - Attempting to remove container sweb.eval.django__django-13447.rerun-2026-10__anthropic__baseline__rep1__full__final...
+2026-10-10 12:45:27,147 - INFO - Container sweb.eval.django__django-13447.rerun-2026-10__anthropic__baseline__rep1__full__final removed.

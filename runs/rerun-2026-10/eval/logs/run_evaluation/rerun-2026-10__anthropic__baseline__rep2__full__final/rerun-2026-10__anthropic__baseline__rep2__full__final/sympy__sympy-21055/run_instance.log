@@ -1,0 +1,114 @@
+2026-10-10 19:26:20,512 - INFO - Creating container for sympy__sympy-21055...
+2026-10-10 19:26:31,131 - INFO - Container for sympy__sympy-21055 created: b68221712a4ce15b1eb9add0d936b265bc36dbe4f81eed14a8f9ad4261a6eafd
+2026-10-10 19:26:40,120 - INFO - Container for sympy__sympy-21055 started: b68221712a4ce15b1eb9add0d936b265bc36dbe4f81eed14a8f9ad4261a6eafd
+2026-10-10 19:26:40,120 - INFO - Intermediate patch for sympy__sympy-21055 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep2__full__final/rerun-2026-10__anthropic__baseline__rep2__full__final/sympy__sympy-21055/patch.diff, now applying to container...
+2026-10-10 19:26:40,208 - INFO - >>>>> Applied Patch:
+Checking patch sympy/assumptions/refine.py...
+warning: sympy/assumptions/refine.py has type 100755, expected 100644
+Applied patch sympy/assumptions/refine.py cleanly.
+
+2026-10-10 19:26:40,510 - INFO - Git diff before:
+diff --git a/sympy/assumptions/refine.py b/sympy/assumptions/refine.py
+index e1f97190c0..33eb290252 100755
+--- a/sympy/assumptions/refine.py
++++ b/sympy/assumptions/refine.py
+@@ -350,6 +350,35 @@ def refine_sign(expr, assumptions):
+     return expr
+ 
+ 
++def refine_arg(expr, assumptions):
++    """
++    Handler for the argument function.
++
++    Examples
++    ========
++
++    >>> from sympy import Q, arg
++    >>> from sympy.assumptions.refine import refine_arg
++    >>> from sympy.abc import x
++    >>> refine_arg(arg(x), Q.positive(x))
++    0
++    >>> refine_arg(arg(x), Q.negative(x))
++    pi
++    """
++    arg_expr = expr.args[0]
++    if ask(Q.positive(arg_expr), assumptions):
++        return S.Zero
++    if ask(Q.negative(arg_expr), assumptions):
++        return S.Pi
++    if ask(Q.imaginary(arg_expr), assumptions):
++        arg_re, arg_im = arg_expr.as_real_imag()
++        if ask(Q.positive(arg_im), assumptions):
++            return S.Pi / 2
++        if ask(Q.negative(arg_im), assumptions):
++            return -S.Pi / 2
++    return expr
++
++
+ def refine_matrixelement(expr, assumptions):
+     """
+     Handler for symmetric part.
+@@ -380,5 +409,6 @@ def refine_matrixelement(expr, assumptions):
+     're': refine_re,
+     'im': refine_im,
+     'sign': refine_sign,
++    'arg': refine_arg,
+     'MatrixElement': refine_matrixelement
+ }  # type: Dict[str, Callable[[Expr, Boolean], Expr]]
+2026-10-10 19:26:40,510 - INFO - Eval script for sympy__sympy-21055 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep2__full__final/rerun-2026-10__anthropic__baseline__rep2__full__final/sympy__sympy-21055/eval.sh; copying to container...
+2026-10-10 19:26:49,398 - INFO - Test runtime: 8.84 seconds
+2026-10-10 19:26:49,399 - INFO - Test output for sympy__sympy-21055 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep2__full__final/rerun-2026-10__anthropic__baseline__rep2__full__final/sympy__sympy-21055/test_output.txt
+2026-10-10 19:26:49,449 - INFO - Git diff after:
+diff --git a/sympy/assumptions/refine.py b/sympy/assumptions/refine.py
+index e1f97190c0..33eb290252 100755
+--- a/sympy/assumptions/refine.py
++++ b/sympy/assumptions/refine.py
+@@ -350,6 +350,35 @@ def refine_sign(expr, assumptions):
+     return expr
+ 
+ 
++def refine_arg(expr, assumptions):
++    """
++    Handler for the argument function.
++
++    Examples
++    ========
++
++    >>> from sympy import Q, arg
++    >>> from sympy.assumptions.refine import refine_arg
++    >>> from sympy.abc import x
++    >>> refine_arg(arg(x), Q.positive(x))
++    0
++    >>> refine_arg(arg(x), Q.negative(x))
++    pi
++    """
++    arg_expr = expr.args[0]
++    if ask(Q.positive(arg_expr), assumptions):
++        return S.Zero
++    if ask(Q.negative(arg_expr), assumptions):
++        return S.Pi
++    if ask(Q.imaginary(arg_expr), assumptions):
++        arg_re, arg_im = arg_expr.as_real_imag()
++        if ask(Q.positive(arg_im), assumptions):
++            return S.Pi / 2
++        if ask(Q.negative(arg_im), assumptions):
++            return -S.Pi / 2
++    return expr
++
++
+ def refine_matrixelement(expr, assumptions):
+     """
+     Handler for symmetric part.
+@@ -380,5 +409,6 @@ def refine_matrixelement(expr, assumptions):
+     're': refine_re,
+     'im': refine_im,
+     'sign': refine_sign,
++    'arg': refine_arg,
+     'MatrixElement': refine_matrixelement
+ }  # type: Dict[str, Callable[[Expr, Boolean], Expr]]
+2026-10-10 19:26:49,449 - INFO - Grading answer for sympy__sympy-21055...
+2026-10-10 19:26:49,451 - INFO - report: {'sympy__sympy-21055': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_arg'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_Abs', 'test_pow1', 'test_pow2', 'test_exp', 'test_Piecewise', 'test_atan2', 'test_re', 'test_im', 'test_complex', 'test_sign', 'test_func_args', 'test_eval_refine', 'test_refine_issue_12724'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-21055: resolved: True
+2026-10-10 19:26:49,451 - INFO - Attempting to stop container sweb.eval.sympy__sympy-21055.rerun-2026-10__anthropic__baseline__rep2__full__final...
+2026-10-10 19:27:14,302 - INFO - Attempting to remove container sweb.eval.sympy__sympy-21055.rerun-2026-10__anthropic__baseline__rep2__full__final...
+2026-10-10 19:27:20,204 - INFO - Container sweb.eval.sympy__sympy-21055.rerun-2026-10__anthropic__baseline__rep2__full__final removed.

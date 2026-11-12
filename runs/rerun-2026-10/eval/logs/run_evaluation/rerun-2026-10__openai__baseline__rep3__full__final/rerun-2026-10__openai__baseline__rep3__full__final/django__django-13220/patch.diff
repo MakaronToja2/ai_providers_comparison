@@ -1,0 +1,53 @@
+diff --git a/django/core/exceptions.py b/django/core/exceptions.py
+index dc084b8692..949724d39a 100644
+--- a/django/core/exceptions.py
++++ b/django/core/exceptions.py
+@@ -182,6 +182,48 @@ class ValidationError(Exception):
+     def __repr__(self):
+         return 'ValidationError(%s)' % self
+ 
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++
++        def normalize_errors(errors):
++            # Normalize to a list of strings, ignoring order
++            if isinstance(errors, dict):
++                # Flatten dict values and sort each list
++                normalized = []
++                for key in sorted(errors.keys()):
++                    msgs = errors[key]
++                    if isinstance(msgs, ValidationError):
++                        msgs = normalize_errors(msgs)
++                    elif isinstance(msgs, list):
++                        # Flatten nested ValidationErrors in list
++                        flat_msgs = []
++                        for m in msgs:
++                            if isinstance(m, ValidationError):
++                                flat_msgs.extend(normalize_errors(m))
++                            else:
++                                flat_msgs.append(str(m))
++                        msgs = flat_msgs
++                    else:
++                        msgs = [str(msgs)]
++                    normalized.extend(sorted(str(m) for m in msgs))
++                return sorted(normalized)
++            elif isinstance(errors, list):
++                normalized = []
++                for e in errors:
++                    if isinstance(e, ValidationError):
++                        normalized.extend(normalize_errors(e))
++                    else:
++                        normalized.append(str(e))
++                return sorted(normalized)
++            else:
++                return [str(errors)]
++
++        self_errors = normalize_errors(self.error_dict if hasattr(self, 'error_dict') else self.error_list)
++        other_errors = normalize_errors(other.error_dict if hasattr(other, 'error_dict') else other.error_list)
++
++        return self_errors == other_errors
++
+ 
+ class EmptyResultSet(Exception):
+     """A database query predicate is impossible."""

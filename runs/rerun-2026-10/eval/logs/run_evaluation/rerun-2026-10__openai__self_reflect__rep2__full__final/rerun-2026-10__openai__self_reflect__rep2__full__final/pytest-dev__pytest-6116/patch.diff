@@ -1,0 +1,18 @@
+diff --git a/src/_pytest/cacheprovider.py b/src/_pytest/cacheprovider.py
+index 3c60fdb33..799df51d6 100755
+--- a/src/_pytest/cacheprovider.py
++++ b/src/_pytest/cacheprovider.py
+@@ -301,6 +301,13 @@ class NFPlugin:
+ 
+ def pytest_addoption(parser):
+     group = parser.getgroup("general")
++    group.addoption(
++        "-c",
++        "--collect-only",
++        action="store_true",
++        dest="collectonly",
++        help="only collect tests, don't execute them",
++    )
+     group.addoption(
+         "--lf",
+         "--last-failed",

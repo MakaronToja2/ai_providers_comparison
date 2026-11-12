@@ -1,0 +1,14 @@
+diff --git a/django/db/models/query.py b/django/db/models/query.py
+index be0deb90b0..6073f3fce3 100644
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -2621,6 +2621,9 @@ def get_related_populators(klass_info, select, db):
+     iterators = []
+     related_klass_infos = klass_info.get("related_klass_infos", [])
+     for rel_klass_info in related_klass_infos:
++        # Fix for proxy models: use concrete_model meta for pk index lookup
+         rel_cls = RelatedPopulator(rel_klass_info, select, db)
++        # Patch rel_cls to use concrete_model meta for pk_idx initialization
++        rel_cls.model_cls = rel_cls.model_cls._meta.concrete_model.model_class()
+         iterators.append(rel_cls)
+     return iterators

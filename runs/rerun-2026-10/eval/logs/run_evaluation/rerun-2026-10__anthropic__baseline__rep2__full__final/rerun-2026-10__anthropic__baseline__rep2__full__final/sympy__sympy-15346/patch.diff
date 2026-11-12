@@ -1,0 +1,43 @@
+diff --git a/sympy/simplify/fu.py b/sympy/simplify/fu.py
+index 9d939727c5..d80727dcd0 100644
+--- a/sympy/simplify/fu.py
++++ b/sympy/simplify/fu.py
+@@ -1938,12 +1938,22 @@ def pow_cos_sin(a, two):
+                 b = args[0]
+                 if isinstance(b, cos):
+                     if c:
+-                        s = b
++                        if isinstance(c, cos):
++                            # both are cos, keep both
++                            s = b
++                        else:
++                            # c is sin, b is cos
++                            s = b
+                     else:
+                         c = b
+                 elif isinstance(b, sin):
+                     if s:
+-                        c = b
++                        if isinstance(s, sin):
++                            # both are sin, keep both
++                            c = b
++                        else:
++                            # s is cos, b is sin
++                            c = b
+                     else:
+                         s = b
+                 elif b.is_Pow and b.exp is S.Half:
+@@ -1989,6 +1999,13 @@ def pow_cos_sin(a, two):
+                 if not all(i.args in args for i in (cb, sb)):
+                     return
+                 return gcd, n1, n2, ca.args[0], sa.args[0], isinstance(ca, sa.func)
++            # Handle case where we have two trig functions of the same type
++            # e.g., cos(x)*cos(y) or sin(x)*sin(y)
++            if (ca and cb and not sa and not sb) or (sa and sb and not ca and not cb):
++                c = ca or sa
++                s = cb or sb
++                if isinstance(c, s.func):
++                    return gcd, n1, n2, c.args[0], s.args[0], isinstance(c, cos)
+         if ca and sa or cb and sb or \
+             two and (ca is None and sa is None or cb is None and sb is None):
+             return

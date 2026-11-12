@@ -1,0 +1,29 @@
+diff --git a/src/_pytest/config/__init__.py b/src/_pytest/config/__init__.py
+index 8e11b56e5..2a8e58810 100644
+--- a/src/_pytest/config/__init__.py
++++ b/src/_pytest/config/__init__.py
+@@ -38,6 +38,24 @@ from .findpaths import exists
+ from _pytest._code import ExceptionInfo
+ from _pytest._code import filter_traceback
+ from _pytest.compat import importlib_metadata
++
++def pytest_addoption(parser):
++    group = parser.getgroup("collection", "collection options")
++    group.addoption(
++        "--collect-only",
++        action="store_true",
++        dest="collectonly",
++        default=False,
++        help="only collect tests, don't execute them",
++    )
++    # Add short option -c for --collect-only
++    group.addoption(
++        "-c",
++        action="store_true",
++        dest="collectonly",
++        default=False,
++        help="shortcut for --collect-only",
++    )
+ from _pytest.outcomes import fail
+ from _pytest.outcomes import Skipped
+ from _pytest.warning_types import PytestConfigWarning

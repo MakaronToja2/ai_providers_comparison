@@ -1,0 +1,224 @@
+{
+  "job": "rerun-2026-10__anthropic__self_reflect__rep1__full",
+  "kind": "initial",
+  "subset": "full",
+  "run_id": "rerun-2026-10__anthropic__self_reflect__rep1__full__initial",
+  "counts": {
+    "resolved": 12,
+    "tests_failed": 16
+  },
+  "verdicts": {
+    "astropy__astropy-7746": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 56,
+      "p2p_total": 56
+    },
+    "django__django-10924": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 1,
+      "p2p_total": 1
+    },
+    "django__django-12113": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 0,
+      "p2p_total": 0
+    },
+    "django__django-13220": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 4,
+      "p2p_passed": 1,
+      "p2p_total": 1
+    },
+    "django__django-14016": {
+      "status": "resolved",
+      "f2p_passed": 2,
+      "f2p_total": 2,
+      "p2p_passed": 13,
+      "p2p_total": 13
+    },
+    "django__django-14997": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 3,
+      "p2p_passed": 144,
+      "p2p_total": 144
+    },
+    "django__django-15252": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 2,
+      "p2p_passed": 34,
+      "p2p_total": 34
+    },
+    "matplotlib__matplotlib-23476": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 104,
+      "p2p_total": 104
+    },
+    "matplotlib__matplotlib-24149": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 767,
+      "p2p_total": 767
+    },
+    "matplotlib__matplotlib-24265": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 16,
+      "p2p_total": 16
+    },
+    "matplotlib__matplotlib-25433": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 55,
+      "p2p_total": 55
+    },
+    "matplotlib__matplotlib-26020": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 48,
+      "p2p_total": 48
+    },
+    "mwaskom__seaborn-3407": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 120,
+      "p2p_total": 120
+    },
+    "pallets__flask-5063": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 2,
+      "p2p_passed": 54,
+      "p2p_total": 54
+    },
+    "pylint-dev__pylint-7114": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 56,
+      "p2p_total": 56
+    },
+    "pylint-dev__pylint-7993": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 10,
+      "p2p_total": 10
+    },
+    "pytest-dev__pytest-11148": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 2,
+      "p2p_passed": 129,
+      "p2p_total": 129
+    },
+    "pytest-dev__pytest-7373": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 81,
+      "p2p_total": 81
+    },
+    "scikit-learn__scikit-learn-13496": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 19,
+      "p2p_total": 19
+    },
+    "scikit-learn__scikit-learn-14894": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 85,
+      "p2p_total": 85
+    },
+    "sphinx-doc__sphinx-10325": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 5,
+      "p2p_total": 5
+    },
+    "sphinx-doc__sphinx-7738": {
+      "status": "tests_failed",
+      "kind": "both",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 27,
+      "p2p_total": 30
+    },
+    "sympy__sympy-11400": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 2,
+      "p2p_passed": 29,
+      "p2p_total": 29
+    },
+    "sympy__sympy-14396": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 44,
+      "p2p_total": 44
+    },
+    "sympy__sympy-17630": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 2,
+      "p2p_passed": 19,
+      "p2p_total": 19
+    },
+    "sympy__sympy-21055": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 13,
+      "p2p_total": 13
+    },
+    "sympy__sympy-22714": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 11,
+      "p2p_total": 11
+    },
+    "sympy__sympy-22840": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 2,
+      "p2p_passed": 95,
+      "p2p_total": 95
+    }
+  }
+}

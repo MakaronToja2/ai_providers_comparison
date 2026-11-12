@@ -1,0 +1,122 @@
+2026-10-10 18:12:53,496 - INFO - Creating container for scikit-learn__scikit-learn-13584...
+2026-10-10 18:12:54,841 - INFO - Container for scikit-learn__scikit-learn-13584 created: 5ecfb82e51d5755179911aad6a60a7b9e1cd4d3581a2b75f807ba303f87479c9
+2026-10-10 18:12:56,326 - INFO - Container for scikit-learn__scikit-learn-13584 started: 5ecfb82e51d5755179911aad6a60a7b9e1cd4d3581a2b75f807ba303f87479c9
+2026-10-10 18:12:56,326 - INFO - Intermediate patch for scikit-learn__scikit-learn-13584 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/scikit-learn__scikit-learn-13584/patch.diff, now applying to container...
+2026-10-10 18:12:56,419 - INFO - >>>>> Applied Patch:
+Checking patch sklearn/utils/_pprint.py...
+warning: sklearn/utils/_pprint.py has type 100755, expected 100644
+Applied patch sklearn/utils/_pprint.py cleanly.
+
+2026-10-10 18:12:56,579 - INFO - Git diff before:
+diff --git a/sklearn/utils/_pprint.py b/sklearn/utils/_pprint.py
+index b8686dba5..997cf3435 100755
+--- a/sklearn/utils/_pprint.py
++++ b/sklearn/utils/_pprint.py
+@@ -70,6 +70,7 @@ from collections import OrderedDict
+ from ..base import BaseEstimator
+ from .._config import get_config
+ from . import is_scalar_nan
++import numpy as np
+ 
+ 
+ class KeyValTuple(tuple):
+@@ -93,10 +94,36 @@ def _changed_params(estimator):
+     init_func = getattr(estimator.__init__, 'deprecated_original',
+                         estimator.__init__)
+     init_params = signature(init_func).parameters
+-    init_params = {name: param.default for name, param in init_params.items()}
++    init_defaults = {name: param.default for name, param in init_params.items()}
++
+     for k, v in params.items():
+-        if (v != init_params[k] and
+-                not (is_scalar_nan(init_params[k]) and is_scalar_nan(v))):
++        default_v = init_defaults.get(k)
++
++        # Check if v is different from default_v
++        are_different = False
++        if isinstance(v, np.ndarray):
++            if isinstance(default_v, np.ndarray):
++                # Both are arrays, compare element-wise
++                if not np.array_equal(v, default_v):
++                    are_different = True
++            else:
++                # v is array, default_v is not.
++                # Check if default_v is NaN and v is an array of NaNs.
++                if is_scalar_nan(default_v):
++                    # default_v is a scalar NaN. Check if v is an array of NaNs.
++                    if not np.all(np.isnan(v)):
++                        are_different = True
++                else:
++                    # default_v is not a scalar NaN. Since v is an array and
++                    # default_v is not, they are different.
++                    are_different = True
++        else:
++            # v is not an array. Use original comparison logic.
++            if (v != default_v and
++                    not (is_scalar_nan(default_v) and is_scalar_nan(v))):
++                are_different = True
++
++        if are_different:
+             filtered_params[k] = v
+     return filtered_params
+2026-10-10 18:12:56,580 - INFO - Eval script for scikit-learn__scikit-learn-13584 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/scikit-learn__scikit-learn-13584/eval.sh; copying to container...
+2026-10-10 18:13:00,230 - INFO - Test runtime: 3.60 seconds
+2026-10-10 18:13:00,230 - INFO - Test output for scikit-learn__scikit-learn-13584 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/scikit-learn__scikit-learn-13584/test_output.txt
+2026-10-10 18:13:00,276 - INFO - Git diff after:
+diff --git a/sklearn/utils/_pprint.py b/sklearn/utils/_pprint.py
+index b8686dba5..997cf3435 100755
+--- a/sklearn/utils/_pprint.py
++++ b/sklearn/utils/_pprint.py
+@@ -70,6 +70,7 @@ from collections import OrderedDict
+ from ..base import BaseEstimator
+ from .._config import get_config
+ from . import is_scalar_nan
++import numpy as np
+ 
+ 
+ class KeyValTuple(tuple):
+@@ -93,10 +94,36 @@ def _changed_params(estimator):
+     init_func = getattr(estimator.__init__, 'deprecated_original',
+                         estimator.__init__)
+     init_params = signature(init_func).parameters
+-    init_params = {name: param.default for name, param in init_params.items()}
++    init_defaults = {name: param.default for name, param in init_params.items()}
++
+     for k, v in params.items():
+-        if (v != init_params[k] and
+-                not (is_scalar_nan(init_params[k]) and is_scalar_nan(v))):
++        default_v = init_defaults.get(k)
++
++        # Check if v is different from default_v
++        are_different = False
++        if isinstance(v, np.ndarray):
++            if isinstance(default_v, np.ndarray):
++                # Both are arrays, compare element-wise
++                if not np.array_equal(v, default_v):
++                    are_different = True
++            else:
++                # v is array, default_v is not.
++                # Check if default_v is NaN and v is an array of NaNs.
++                if is_scalar_nan(default_v):
++                    # default_v is a scalar NaN. Check if v is an array of NaNs.
++                    if not np.all(np.isnan(v)):
++                        are_different = True
++                else:
++                    # default_v is not a scalar NaN. Since v is an array and
++                    # default_v is not, they are different.
++                    are_different = True
++        else:
++            # v is not an array. Use original comparison logic.
++            if (v != default_v and
++                    not (is_scalar_nan(default_v) and is_scalar_nan(v))):
++                are_different = True
++
++        if are_different:
+             filtered_params[k] = v
+     return filtered_params
+2026-10-10 18:13:00,277 - INFO - Grading answer for scikit-learn__scikit-learn-13584...
+2026-10-10 18:13:00,278 - INFO - report: {'scikit-learn__scikit-learn-13584': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['sklearn/utils/tests/test_pprint.py::test_changed_only', 'sklearn/utils/tests/test_pprint.py::test_pipeline', 'sklearn/utils/tests/test_pprint.py::test_deeply_nested', 'sklearn/utils/tests/test_pprint.py::test_gridsearch', 'sklearn/utils/tests/test_pprint.py::test_gridsearch_pipeline', 'sklearn/utils/tests/test_pprint.py::test_n_max_elements_to_show'], 'failure': []}, 'PASS_TO_PASS': {'success': ['sklearn/utils/tests/test_pprint.py::test_basic', 'sklearn/utils/tests/test_pprint.py::test_length_constraint', 'sklearn/utils/tests/test_pprint.py::test_builtin_prettyprinter'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for scikit-learn__scikit-learn-13584: resolved: True
+2026-10-10 18:13:00,278 - INFO - Attempting to stop container sweb.eval.scikit-learn__scikit-learn-13584.rerun-2026-10__google__self_reflect__rep2__full__final...
+2026-10-10 18:13:18,380 - INFO - Attempting to remove container sweb.eval.scikit-learn__scikit-learn-13584.rerun-2026-10__google__self_reflect__rep2__full__final...
+2026-10-10 18:13:18,955 - INFO - Container sweb.eval.scikit-learn__scikit-learn-13584.rerun-2026-10__google__self_reflect__rep2__full__final removed.

@@ -1,0 +1,66 @@
+2026-10-10 18:46:57,186 - INFO - Creating container for sympy__sympy-16792...
+2026-10-10 18:47:01,908 - INFO - Container for sympy__sympy-16792 created: 4961ee3fb95c47f7290e0dfa262808828b8c7e2e9d89845485cbbabc08014d47
+2026-10-10 18:47:06,517 - INFO - Container for sympy__sympy-16792 started: 4961ee3fb95c47f7290e0dfa262808828b8c7e2e9d89845485cbbabc08014d47
+2026-10-10 18:47:06,517 - INFO - Intermediate patch for sympy__sympy-16792 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep2__full__final/rerun-2026-10__openai__forced__rep2__full__final/sympy__sympy-16792/patch.diff, now applying to container...
+2026-10-10 18:47:06,631 - INFO - >>>>> Applied Patch:
+Checking patch sympy/utilities/autowrap.py...
+warning: sympy/utilities/autowrap.py has type 100755, expected 100644
+Applied patch sympy/utilities/autowrap.py cleanly.
+
+2026-10-10 18:47:06,922 - INFO - Git diff before:
+diff --git a/sympy/utilities/autowrap.py b/sympy/utilities/autowrap.py
+index bd6afb12d..b6d7aa19b 100755
+--- a/sympy/utilities/autowrap.py
++++ b/sympy/utilities/autowrap.py
+@@ -434,6 +434,18 @@ def _partition_args(self, args):
+                 py_inferred[arg] = py_inferred.pop(arg.name)
+         # Filter inferred arguments from py_args
+         py_args = [a for a in py_args if a not in py_inferred]
++
++        # Fix for arguments that do not appear in the expression but are arrays:
++        # They should be passed as pointers (e.g. double *) not as scalars (double).
++        # So if an argument is an array but does not appear in the expression,
++        # ensure it is treated as an array argument.
++        for arg in args:
++            if arg not in py_args and not isinstance(arg, (OutputArgument, InOutArgument)):
++                # If arg is a matrix or array argument (has dimensions) but is not in py_args,
++                # add it to py_args so it is passed correctly.
++                if hasattr(arg, 'dimensions') and arg.dimensions:
++                    py_args.append(arg)
++
+         return py_returns, py_args, py_locals, py_inferred
+ 
+     def _prototype_arg(self, arg):
+2026-10-10 18:47:06,923 - INFO - Eval script for sympy__sympy-16792 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep2__full__final/rerun-2026-10__openai__forced__rep2__full__final/sympy__sympy-16792/eval.sh; copying to container...
+2026-10-10 18:47:13,819 - INFO - Test runtime: 6.83 seconds
+2026-10-10 18:47:13,820 - INFO - Test output for sympy__sympy-16792 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep2__full__final/rerun-2026-10__openai__forced__rep2__full__final/sympy__sympy-16792/test_output.txt
+2026-10-10 18:47:13,889 - INFO - Git diff after:
+diff --git a/sympy/utilities/autowrap.py b/sympy/utilities/autowrap.py
+index bd6afb12d..b6d7aa19b 100755
+--- a/sympy/utilities/autowrap.py
++++ b/sympy/utilities/autowrap.py
+@@ -434,6 +434,18 @@ def _partition_args(self, args):
+                 py_inferred[arg] = py_inferred.pop(arg.name)
+         # Filter inferred arguments from py_args
+         py_args = [a for a in py_args if a not in py_inferred]
++
++        # Fix for arguments that do not appear in the expression but are arrays:
++        # They should be passed as pointers (e.g. double *) not as scalars (double).
++        # So if an argument is an array but does not appear in the expression,
++        # ensure it is treated as an array argument.
++        for arg in args:
++            if arg not in py_args and not isinstance(arg, (OutputArgument, InOutArgument)):
++                # If arg is a matrix or array argument (has dimensions) but is not in py_args,
++                # add it to py_args so it is passed correctly.
++                if hasattr(arg, 'dimensions') and arg.dimensions:
++                    py_args.append(arg)
++
+         return py_returns, py_args, py_locals, py_inferred
+ 
+     def _prototype_arg(self, arg):
+2026-10-10 18:47:13,889 - INFO - Grading answer for sympy__sympy-16792...
+2026-10-10 18:47:13,891 - INFO - report: {'sympy__sympy-16792': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_ccode_unused_array_arg']}, 'PASS_TO_PASS': {'success': ['test_Routine_argument_order', 'test_empty_c_code', 'test_empty_c_code_with_comment', 'test_empty_c_header', 'test_simple_c_code', 'test_c_code_reserved_words', 'test_numbersymbol_c_code', 'test_c_code_argument_order', 'test_simple_c_header', 'test_simple_c_codegen', 'test_multiple_results_c', 'test_no_results_c', 'test_ansi_math1_codegen', 'test_ansi_math2_codegen', 'test_complicated_codegen', 'test_loops_c', 'test_dummy_loops_c', 'test_partial_loops_c', 'test_output_arg_c', 'test_output_arg_c_reserved_words', 'test_ccode_results_named_ordered', 'test_ccode_matrixsymbol_slice', 'test_ccode_cse', 'test_empty_f_code', 'test_empty_f_code_with_header', 'test_empty_f_header', 'test_simple_f_code', 'test_numbersymbol_f_code', 'test_erf_f_code', 'test_f_code_argument_order', 'test_simple_f_header', 'test_simple_f_codegen', 'test_multiple_results_f', 'test_no_results_f', 'test_intrinsic_math_codegen', 'test_intrinsic_math2_codegen', 'test_complicated_codegen_f95', 'test_loops', 'test_dummy_loops_f95', 'test_loops_InOut', 'test_partial_loops_f', 'test_output_arg_f', 'test_inline_function', 'test_f_code_call_signature_wrap', 'test_check_case', 'test_check_case_false_positive', 'test_c_fortran_omit_routine_name', 'test_fcode_matrix_output', 'test_fcode_results_named_ordered', 'test_fcode_matrixsymbol_slice', 'test_fcode_matrixsymbol_slice_autoname', 'test_global_vars', 'test_custom_codegen', 'test_c_with_printer'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-16792: resolved: False
+2026-10-10 18:47:13,891 - INFO - Attempting to stop container sweb.eval.sympy__sympy-16792.rerun-2026-10__openai__forced__rep2__full__final...
+2026-10-10 18:47:30,712 - INFO - Attempting to remove container sweb.eval.sympy__sympy-16792.rerun-2026-10__openai__forced__rep2__full__final...
+2026-10-10 18:47:31,242 - INFO - Container sweb.eval.sympy__sympy-16792.rerun-2026-10__openai__forced__rep2__full__final removed.

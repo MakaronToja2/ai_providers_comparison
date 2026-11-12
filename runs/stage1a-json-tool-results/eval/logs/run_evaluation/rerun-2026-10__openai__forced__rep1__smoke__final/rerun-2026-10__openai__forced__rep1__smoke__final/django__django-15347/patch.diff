@@ -1,0 +1,8 @@
+--- a/django/contrib/messages/storage/cookie.py
++++ b/django/contrib/messages/storage/cookie.py
+@@ class MessageEncoder(json.JSONEncoder):
+-            if obj.extra_tags:
+-                message.append(obj.extra_tags)
++            # Append extra_tags if it is not None (allow empty string)
++            if obj.extra_tags is not None:
++                message.append(obj.extra_tags)

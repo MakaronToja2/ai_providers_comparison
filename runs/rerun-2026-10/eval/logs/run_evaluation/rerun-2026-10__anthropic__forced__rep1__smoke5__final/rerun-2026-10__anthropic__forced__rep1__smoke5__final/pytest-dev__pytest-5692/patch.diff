@@ -1,0 +1,39 @@
+diff --git a/src/_pytest/junitxml.py b/src/_pytest/junitxml.py
+index 15c630b1d..281c576f1 100644
+--- a/src/_pytest/junitxml.py
++++ b/src/_pytest/junitxml.py
+@@ -11,6 +11,7 @@ src/main/resources/org/jenkinsci/plugins/xunit/types/model/xsd/junit-10.xsd
+ import functools
+ import os
+ import re
++import socket
+ import sys
+ import time
+ 
+@@ -640,6 +641,17 @@ class LogXML:
+     def pytest_sessionstart(self):
+         self.suite_start_time = time.time()
+ 
++    def _get_timestamp(self):
++        """Return the timestamp in ISO 8601 format."""
++        return time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(self.suite_start_time))
++
++    def _get_hostname(self):
++        """Return the hostname of the machine running the tests."""
++        try:
++            return socket.gethostname()
++        except (socket.error, OSError):
++            return "unknown"
++
+     def pytest_sessionfinish(self):
+         dirname = os.path.dirname(os.path.abspath(self.logfile))
+         if not os.path.isdir(dirname):
+@@ -666,6 +678,8 @@ class LogXML:
+             skipped=self.stats["skipped"],
+             tests=numtests,
+             time="%.3f" % suite_time_delta,
++            timestamp=self._get_timestamp(),
++            hostname=self._get_hostname(),
+         )
+         logfile.write(Junit.testsuites([suite_node]).unicode(indent=0))
+         logfile.close()

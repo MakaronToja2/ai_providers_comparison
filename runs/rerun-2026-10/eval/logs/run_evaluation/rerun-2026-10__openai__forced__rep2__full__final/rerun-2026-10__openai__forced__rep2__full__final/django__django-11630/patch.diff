@@ -1,0 +1,44 @@
+diff --git a/django/core/checks/model_checks.py b/django/core/checks/model_checks.py
+index 5c2266ca1d..609a09291e 100644
+--- a/django/core/checks/model_checks.py
++++ b/django/core/checks/model_checks.py
+@@ -37,14 +37,32 @@ def check_all_models(app_configs=None, **kwargs):
+             constraints[model_constraint.name].append(model._meta.label)
+     for db_table, model_labels in db_table_models.items():
+         if len(model_labels) != 1:
+-            errors.append(
+-                Error(
+-                    "db_table '%s' is used by multiple models: %s."
+-                    % (db_table, ', '.join(db_table_models[db_table])),
+-                    obj=db_table,
+-                    id='models.E028',
++            # Allow same db_table name if models belong to different databases
++            # i.e. different app labels and different database routing
++            # This requires checking the database routing or app config which is not trivial here.
++            # Instead, we relax the check if models belong to different app configs with different databases.
++            # We assume models with same db_table in different apps with different databases are allowed.
++            # We check if all models share the same database alias, if so, error, else allow.
++            from django.db import router
++            # Get the database alias for each model
++            db_aliases = set()
++            for label in model_labels:
++                try:
++                    model = apps.get_model(label)
++                    db_alias = router.db_for_read(model)
++                    db_aliases.add(db_alias)
++                except LookupError:
++                    # If model not found, fallback to error
++                    db_aliases.add(None)
++            if len(db_aliases) == 1:
++                errors.append(
++                    Error(
++                        "db_table '%s' is used by multiple models: %s."
++                        % (db_table, ', '.join(model_labels)),
++                        obj=db_table,
++                        id='models.E028',
++                    )
+                 )
+-            )
+     for index_name, model_labels in indexes.items():
+         if len(model_labels) > 1:
+             model_labels = set(model_labels)

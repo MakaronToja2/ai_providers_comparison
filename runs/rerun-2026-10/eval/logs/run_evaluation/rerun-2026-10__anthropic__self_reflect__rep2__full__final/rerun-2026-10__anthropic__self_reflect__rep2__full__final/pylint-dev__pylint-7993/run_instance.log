@@ -1,0 +1,68 @@
+2026-10-10 17:37:44,690 - INFO - Creating container for pylint-dev__pylint-7993...
+2026-10-10 17:37:49,222 - INFO - Container for pylint-dev__pylint-7993 created: 73bae8012bc791323182f48ff5ddc00387ca86671e0993829b96392f5fadc4a1
+2026-10-10 17:37:54,223 - INFO - Container for pylint-dev__pylint-7993 started: 73bae8012bc791323182f48ff5ddc00387ca86671e0993829b96392f5fadc4a1
+2026-10-10 17:37:54,224 - INFO - Intermediate patch for pylint-dev__pylint-7993 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep2__full__final/rerun-2026-10__anthropic__self_reflect__rep2__full__final/pylint-dev__pylint-7993/patch.diff, now applying to container...
+2026-10-10 17:37:54,342 - INFO - >>>>> Applied Patch:
+Checking patch pylint/reporters/text.py...
+warning: pylint/reporters/text.py has type 100755, expected 100644
+Applied patch pylint/reporters/text.py cleanly.
+
+2026-10-10 17:37:54,495 - INFO - Git diff before:
+diff --git a/pylint/reporters/text.py b/pylint/reporters/text.py
+index 29bd46798..a815ac4c7 100755
+--- a/pylint/reporters/text.py
++++ b/pylint/reporters/text.py
+@@ -175,14 +175,17 @@ class TextReporter(BaseReporter):
+         self._template = template
+ 
+         # Check to see if all parameters in the template are attributes of the Message
+-        arguments = re.findall(r"\{(.+?)(:.*)?\}", template)
++        # Only match valid format placeholders: must start with letter or underscore,
++        # followed by alphanumeric, underscore, or dot characters.
++        # Use negative lookbehind/lookahead to avoid matching escaped braces {{ and }}
++        arguments = re.findall(r"(?<!\{)\{([a-zA-Z_][a-zA-Z0-9_.]*)(?:\:[^}]*)?\}(?!\})", template)
+         for argument in arguments:
+             if argument[0] not in MESSAGE_FIELDS:
+                 warnings.warn(
+                     f"Don't recognize the argument '{argument[0]}' in the --msg-template. "
+                     "Are you sure it is supported on the current version of pylint?"
+                 )
+-                template = re.sub(r"\{" + argument[0] + r"(:.*?)?\}", "", template)
++                template = re.sub(r"(?<!\{)\{" + re.escape(argument[0]) + r"(?:\:[^}]*)?\}(?!\})", "", template)
+         self._fixed_template = template
+ 
+     def write_message(self, msg: Message) -> None:
+2026-10-10 17:37:54,495 - INFO - Eval script for pylint-dev__pylint-7993 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep2__full__final/rerun-2026-10__anthropic__self_reflect__rep2__full__final/pylint-dev__pylint-7993/eval.sh; copying to container...
+2026-10-10 17:38:03,733 - INFO - Test runtime: 9.19 seconds
+2026-10-10 17:38:03,734 - INFO - Test output for pylint-dev__pylint-7993 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep2__full__final/rerun-2026-10__anthropic__self_reflect__rep2__full__final/pylint-dev__pylint-7993/test_output.txt
+2026-10-10 17:38:03,775 - INFO - Git diff after:
+diff --git a/pylint/reporters/text.py b/pylint/reporters/text.py
+index 29bd46798..a815ac4c7 100755
+--- a/pylint/reporters/text.py
++++ b/pylint/reporters/text.py
+@@ -175,14 +175,17 @@ class TextReporter(BaseReporter):
+         self._template = template
+ 
+         # Check to see if all parameters in the template are attributes of the Message
+-        arguments = re.findall(r"\{(.+?)(:.*)?\}", template)
++        # Only match valid format placeholders: must start with letter or underscore,
++        # followed by alphanumeric, underscore, or dot characters.
++        # Use negative lookbehind/lookahead to avoid matching escaped braces {{ and }}
++        arguments = re.findall(r"(?<!\{)\{([a-zA-Z_][a-zA-Z0-9_.]*)(?:\:[^}]*)?\}(?!\})", template)
+         for argument in arguments:
+             if argument[0] not in MESSAGE_FIELDS:
+                 warnings.warn(
+                     f"Don't recognize the argument '{argument[0]}' in the --msg-template. "
+                     "Are you sure it is supported on the current version of pylint?"
+                 )
+-                template = re.sub(r"\{" + argument[0] + r"(:.*?)?\}", "", template)
++                template = re.sub(r"(?<!\{)\{" + re.escape(argument[0]) + r"(?:\:[^}]*)?\}(?!\})", "", template)
+         self._fixed_template = template
+ 
+     def write_message(self, msg: Message) -> None:
+2026-10-10 17:38:03,776 - INFO - Grading answer for pylint-dev__pylint-7993...
+2026-10-10 17:38:03,778 - INFO - report: {'pylint-dev__pylint-7993': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': ['tests/reporters/unittest_reporting.py::test_template_option_with_header'], 'failure': []}, 'PASS_TO_PASS': {'success': ['tests/reporters/unittest_reporting.py::test_template_option', 'tests/reporters/unittest_reporting.py::test_template_option_default', 'tests/reporters/unittest_reporting.py::test_template_option_end_line', 'tests/reporters/unittest_reporting.py::test_deprecation_set_output', 'tests/reporters/unittest_reporting.py::test_parseable_output_deprecated', 'tests/reporters/unittest_reporting.py::test_parseable_output_regression', 'tests/reporters/unittest_reporting.py::test_multi_format_output', 'tests/reporters/unittest_reporting.py::test_multi_reporter_independant_messages', 'tests/reporters/unittest_reporting.py::test_display_results_is_renamed'], 'failure': ['tests/reporters/unittest_reporting.py::test_template_option_non_existing']}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for pylint-dev__pylint-7993: resolved: False
+2026-10-10 17:38:03,778 - INFO - Attempting to stop container sweb.eval.pylint-dev__pylint-7993.rerun-2026-10__anthropic__self_reflect__rep2__full__final...
+2026-10-10 17:38:25,631 - INFO - Attempting to remove container sweb.eval.pylint-dev__pylint-7993.rerun-2026-10__anthropic__self_reflect__rep2__full__final...
+2026-10-10 17:38:27,247 - INFO - Container sweb.eval.pylint-dev__pylint-7993.rerun-2026-10__anthropic__self_reflect__rep2__full__final removed.

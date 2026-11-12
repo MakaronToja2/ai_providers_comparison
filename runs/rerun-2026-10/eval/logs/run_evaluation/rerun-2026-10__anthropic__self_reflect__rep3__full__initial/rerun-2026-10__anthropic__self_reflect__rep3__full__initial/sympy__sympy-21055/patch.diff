@@ -1,0 +1,65 @@
+diff --git a/sympy/assumptions/refine.py b/sympy/assumptions/refine.py
+index e1f97190c0..9190630e10 100644
+--- a/sympy/assumptions/refine.py
++++ b/sympy/assumptions/refine.py
+@@ -373,6 +373,37 @@ def refine_matrixelement(expr, assumptions):
+             return expr
+         return MatrixElement(matrix, j, i)
+ 
++
++def refine_arg(expr, assumptions):
++    """
++    Handler for the argument (phase) of a complex number.
++
++    Examples
++    ========
++
++    >>> from sympy import Q, arg
++    >>> from sympy.assumptions.refine import refine_arg
++    >>> from sympy.abc import x
++    >>> refine_arg(arg(x), Q.positive(x))
++    0
++    >>> refine_arg(arg(x), Q.real(x) & Q.positive(x))
++    0
++    >>> refine_arg(arg(x), Q.negative(x))
++    pi
++    """
++    arg_expr = expr.args[0]
++    if ask(Q.positive(arg_expr), assumptions):
++        return S.Zero
++    if ask(Q.negative(arg_expr), assumptions):
++        return S.Pi
++    if ask(Q.real(arg_expr), assumptions):
++        if ask(Q.positive(arg_expr), assumptions):
++            return S.Zero
++        if ask(Q.negative(arg_expr), assumptions):
++            return S.Pi
++    return expr
++
++
+ handlers_dict = {
+     'Abs': refine_abs,
+     'Pow': refine_Pow,
+@@ -380,5 +411,6 @@ def refine_matrixelement(expr, assumptions):
+     're': refine_re,
+     'im': refine_im,
+     'sign': refine_sign,
++    'arg': refine_arg,
+     'MatrixElement': refine_matrixelement
+ }  # type: Dict[str, Callable[[Expr, Boolean], Expr]]
+diff --git a/sympy/assumptions/tests/test_refine.py b/sympy/assumptions/tests/test_refine.py
+index 505cd609e8..15f5a9e978 100644
+--- a/sympy/assumptions/tests/test_refine.py
++++ b/sympy/assumptions/tests/test_refine.py
+@@ -208,3 +208,11 @@ def test_matrixelement():
+     assert refine(x[1, 0], Q.symmetric(x)) == x[0, 1]
+     assert refine(x[i, j], Q.symmetric(x)) == x[j, i]
+     assert refine(x[j, i], Q.symmetric(x)) == x[j, i]
++
++
++def test_arg():
++    from sympy import arg, pi
++    assert refine(arg(x), Q.positive(x)) == 0
++    assert refine(arg(x), Q.negative(x)) == pi
++    assert refine(arg(x), Q.real(x) & Q.positive(x)) == 0
++    assert refine(arg(x), Q.real(x) & Q.negative(x)) == pi

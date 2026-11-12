@@ -1,0 +1,15 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 171a3e7b0d..1fab549887 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -2093,7 +2093,9 @@ class AttributeDocumenter(DocstringStripSignatureMixin, ClassLevelDocumenter):
+         if not self.options.annotation:
+             # obtain type annotation for this attribute
+             try:
+-                annotations = get_type_hints(self.parent)
++                # Pass autodoc_type_aliases to get_type_hints for resolution
++                annotations = get_type_hints(self.parent, include_extras=True,
++                                            localns=self.config.autodoc_type_aliases)
+             except NameError:
+                 # Failed to evaluate ForwardRef (maybe TYPE_CHECKING)
+                 annotations = safe_getattr(self.parent, '__annotations__', {})

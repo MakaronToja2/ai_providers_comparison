@@ -1,0 +1,67 @@
+2026-10-10 18:22:07,929 - INFO - Creating container for sphinx-doc__sphinx-8435...
+2026-10-10 18:22:18,423 - INFO - Container for sphinx-doc__sphinx-8435 created: 9d25202ae085abb15638560eba333c2d6f64ca897655767ad4754b0c930b8803
+2026-10-10 18:22:26,714 - INFO - Container for sphinx-doc__sphinx-8435 started: 9d25202ae085abb15638560eba333c2d6f64ca897655767ad4754b0c930b8803
+2026-10-10 18:22:26,715 - INFO - Intermediate patch for sphinx-doc__sphinx-8435 written to logs/run_evaluation/gold__full/gold/sphinx-doc__sphinx-8435/patch.diff, now applying to container...
+2026-10-10 18:22:27,369 - INFO - >>>>> Applied Patch:
+Checking patch sphinx/ext/autodoc/__init__.py...
+Applied patch sphinx/ext/autodoc/__init__.py cleanly.
+
+2026-10-10 18:22:27,558 - INFO - Git diff before:
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 171a3e7b0..a79e540eb 100755
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1702,7 +1702,8 @@ class DataDocumenter(ModuleLevelDocumenter):
+         if not self.options.annotation:
+             # obtain annotation for this data
+             try:
+-                annotations = get_type_hints(self.parent)
++                annotations = get_type_hints(self.parent, None,
++                                             self.config.autodoc_type_aliases)
+             except NameError:
+                 # Failed to evaluate ForwardRef (maybe TYPE_CHECKING)
+                 annotations = safe_getattr(self.parent, '__annotations__', {})
+@@ -2093,7 +2094,8 @@ class AttributeDocumenter(DocstringStripSignatureMixin, ClassLevelDocumenter):
+         if not self.options.annotation:
+             # obtain type annotation for this attribute
+             try:
+-                annotations = get_type_hints(self.parent)
++                annotations = get_type_hints(self.parent, None,
++                                             self.config.autodoc_type_aliases)
+             except NameError:
+                 # Failed to evaluate ForwardRef (maybe TYPE_CHECKING)
+                 annotations = safe_getattr(self.parent, '__annotations__', {})
+2026-10-10 18:22:27,558 - INFO - Eval script for sphinx-doc__sphinx-8435 written to logs/run_evaluation/gold__full/gold/sphinx-doc__sphinx-8435/eval.sh; copying to container...
+2026-10-10 18:22:35,793 - INFO - Test runtime: 8.17 seconds
+2026-10-10 18:22:35,794 - INFO - Test output for sphinx-doc__sphinx-8435 written to logs/run_evaluation/gold__full/gold/sphinx-doc__sphinx-8435/test_output.txt
+2026-10-10 18:22:35,854 - INFO - Git diff after:
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 171a3e7b0..a79e540eb 100755
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1702,7 +1702,8 @@ class DataDocumenter(ModuleLevelDocumenter):
+         if not self.options.annotation:
+             # obtain annotation for this data
+             try:
+-                annotations = get_type_hints(self.parent)
++                annotations = get_type_hints(self.parent, None,
++                                             self.config.autodoc_type_aliases)
+             except NameError:
+                 # Failed to evaluate ForwardRef (maybe TYPE_CHECKING)
+                 annotations = safe_getattr(self.parent, '__annotations__', {})
+@@ -2093,7 +2094,8 @@ class AttributeDocumenter(DocstringStripSignatureMixin, ClassLevelDocumenter):
+         if not self.options.annotation:
+             # obtain type annotation for this attribute
+             try:
+-                annotations = get_type_hints(self.parent)
++                annotations = get_type_hints(self.parent, None,
++                                             self.config.autodoc_type_aliases)
+             except NameError:
+                 # Failed to evaluate ForwardRef (maybe TYPE_CHECKING)
+                 annotations = safe_getattr(self.parent, '__annotations__', {})
+2026-10-10 18:22:35,854 - INFO - Grading answer for sphinx-doc__sphinx-8435...
+2026-10-10 18:22:35,858 - INFO - report: {'sphinx-doc__sphinx-8435': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['tests/test_ext_autodoc_configs.py::test_autodoc_type_aliases'], 'failure': []}, 'PASS_TO_PASS': {'success': ['tests/test_ext_autodoc_configs.py::test_autoclass_content_class', 'tests/test_ext_autodoc_configs.py::test_autoclass_content_init', 'tests/test_ext_autodoc_configs.py::test_autoclass_content_both', 'tests/test_ext_autodoc_configs.py::test_autodoc_inherit_docstrings', 'tests/test_ext_autodoc_configs.py::test_autodoc_docstring_signature', 'tests/test_ext_autodoc_configs.py::test_autoclass_content_and_docstring_signature_class', 'tests/test_ext_autodoc_configs.py::test_autoclass_content_and_docstring_signature_init', 'tests/test_ext_autodoc_configs.py::test_autoclass_content_and_docstring_signature_both', 'tests/test_ext_autodoc_configs.py::test_mocked_module_imports', 'tests/test_ext_autodoc_configs.py::test_autodoc_typehints_signature', 'tests/test_ext_autodoc_configs.py::test_autodoc_typehints_none', 'tests/test_ext_autodoc_configs.py::test_autodoc_typehints_none_for_overload', 'tests/test_ext_autodoc_configs.py::test_autodoc_typehints_description', 'tests/test_ext_autodoc_configs.py::test_autodoc_typehints_description_for_invalid_node', 'tests/test_ext_autodoc_configs.py::test_autodoc_default_options', 'tests/test_ext_autodoc_configs.py::test_autodoc_default_options_with_values'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sphinx-doc__sphinx-8435: resolved: True
+2026-10-10 18:22:35,858 - INFO - Attempting to stop container sweb.eval.sphinx-doc__sphinx-8435.gold__full...
+2026-10-10 18:22:55,806 - INFO - Attempting to remove container sweb.eval.sphinx-doc__sphinx-8435.gold__full...
+2026-10-10 18:22:59,516 - INFO - Container sweb.eval.sphinx-doc__sphinx-8435.gold__full removed.

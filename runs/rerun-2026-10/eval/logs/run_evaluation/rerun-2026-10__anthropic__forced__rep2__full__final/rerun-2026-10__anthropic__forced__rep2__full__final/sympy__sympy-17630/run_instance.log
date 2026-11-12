@@ -1,0 +1,64 @@
+2026-10-10 18:59:55,386 - INFO - Creating container for sympy__sympy-17630...
+2026-10-10 18:59:59,708 - INFO - Container for sympy__sympy-17630 created: e5bc8218957c797b6f47d78df9391c360b150b5b6510ae4f42eb52d0ba4302e7
+2026-10-10 19:00:03,021 - INFO - Container for sympy__sympy-17630 started: e5bc8218957c797b6f47d78df9391c360b150b5b6510ae4f42eb52d0ba4302e7
+2026-10-10 19:00:03,022 - INFO - Intermediate patch for sympy__sympy-17630 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep2__full__final/rerun-2026-10__anthropic__forced__rep2__full__final/sympy__sympy-17630/patch.diff, now applying to container...
+2026-10-10 19:00:03,167 - INFO - >>>>> Applied Patch:
+Checking patch sympy/matrices/expressions/blockmatrix.py...
+warning: sympy/matrices/expressions/blockmatrix.py has type 100755, expected 100644
+Applied patch sympy/matrices/expressions/blockmatrix.py cleanly.
+
+2026-10-10 19:00:03,558 - INFO - Git diff before:
+diff --git a/sympy/matrices/expressions/blockmatrix.py b/sympy/matrices/expressions/blockmatrix.py
+index 95302a05ca..a56b6e10b3 100755
+--- a/sympy/matrices/expressions/blockmatrix.py
++++ b/sympy/matrices/expressions/blockmatrix.py
+@@ -164,7 +164,17 @@ def structurally_equal(self, other):
+     def _blockmul(self, other):
+         if (isinstance(other, BlockMatrix) and
+                 self.colblocksizes == other.rowblocksizes):
+-            return BlockMatrix(self.blocks*other.blocks)
++            from sympy.core.numbers import Zero
++            result = self.blocks*other.blocks
++            # Convert any Zero scalars to ZeroMatrix with appropriate dimensions
++            for i in range(result.rows):
++                for j in range(result.cols):
++                    if isinstance(result[i, j], Zero):
++                        # Get dimensions from row and column block sizes
++                        rows = self.rowblocksizes[i]
++                        cols = other.colblocksizes[j]
++                        result[i, j] = ZeroMatrix(rows, cols)
++            return BlockMatrix(result)
+ 
+         return self * other
+2026-10-10 19:00:03,559 - INFO - Eval script for sympy__sympy-17630 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep2__full__final/rerun-2026-10__anthropic__forced__rep2__full__final/sympy__sympy-17630/eval.sh; copying to container...
+2026-10-10 19:00:09,316 - INFO - Test runtime: 5.68 seconds
+2026-10-10 19:00:09,317 - INFO - Test output for sympy__sympy-17630 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep2__full__final/rerun-2026-10__anthropic__forced__rep2__full__final/sympy__sympy-17630/test_output.txt
+2026-10-10 19:00:09,397 - INFO - Git diff after:
+diff --git a/sympy/matrices/expressions/blockmatrix.py b/sympy/matrices/expressions/blockmatrix.py
+index 95302a05ca..a56b6e10b3 100755
+--- a/sympy/matrices/expressions/blockmatrix.py
++++ b/sympy/matrices/expressions/blockmatrix.py
+@@ -164,7 +164,17 @@ def structurally_equal(self, other):
+     def _blockmul(self, other):
+         if (isinstance(other, BlockMatrix) and
+                 self.colblocksizes == other.rowblocksizes):
+-            return BlockMatrix(self.blocks*other.blocks)
++            from sympy.core.numbers import Zero
++            result = self.blocks*other.blocks
++            # Convert any Zero scalars to ZeroMatrix with appropriate dimensions
++            for i in range(result.rows):
++                for j in range(result.cols):
++                    if isinstance(result[i, j], Zero):
++                        # Get dimensions from row and column block sizes
++                        rows = self.rowblocksizes[i]
++                        cols = other.colblocksizes[j]
++                        result[i, j] = ZeroMatrix(rows, cols)
++            return BlockMatrix(result)
+ 
+         return self * other
+2026-10-10 19:00:09,397 - INFO - Grading answer for sympy__sympy-17630...
+2026-10-10 19:00:09,399 - INFO - report: {'sympy__sympy-17630': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_issue_17624', 'test_zero_matrix_add']}, 'PASS_TO_PASS': {'success': ['test_bc_matmul', 'test_bc_matadd', 'test_bc_transpose', 'test_bc_dist_diag', 'test_block_plus_ident', 'test_BlockMatrix', 'test_block_collapse_explicit_matrices', 'test_BlockMatrix_trace', 'test_BlockMatrix_Determinant', 'test_squareBlockMatrix', 'test_BlockDiagMatrix', 'test_blockcut', 'test_reblock_2x2', 'test_deblock', 'test_sort_key', 'test_matadd_sympify', 'test_matadd_of_matrices', 'test_doit_args', 'test_generic_identity'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-17630: resolved: False
+2026-10-10 19:00:09,400 - INFO - Attempting to stop container sweb.eval.sympy__sympy-17630.rerun-2026-10__anthropic__forced__rep2__full__final...
+2026-10-10 19:00:28,433 - INFO - Attempting to remove container sweb.eval.sympy__sympy-17630.rerun-2026-10__anthropic__forced__rep2__full__final...
+2026-10-10 19:00:29,288 - INFO - Container sweb.eval.sympy__sympy-17630.rerun-2026-10__anthropic__forced__rep2__full__final removed.

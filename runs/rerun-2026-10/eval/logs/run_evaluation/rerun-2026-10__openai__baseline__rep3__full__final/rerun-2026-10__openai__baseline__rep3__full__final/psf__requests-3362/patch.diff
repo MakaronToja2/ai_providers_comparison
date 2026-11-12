@@ -1,0 +1,28 @@
+diff --git a/requests/models.py b/requests/models.py
+index fbb3c7e6..3666486f 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -695,7 +695,22 @@ class Response(object):
+         chunks = reused_chunks if self._content_consumed else stream_chunks
+ 
+         if decode_unicode:
+-            chunks = stream_decode_response_unicode(chunks, self)
++            # If decode_unicode is True, decode bytes chunks to str
++            # However, if the chunks are already str, do not decode again
++            # This can happen if _content_consumed is True and _content is str
++            first_chunk = next(chunks, None)
++            if first_chunk is None:
++                return iter(())
++            if isinstance(first_chunk, str):
++                # Already decoded, yield first chunk and the rest
++                def gen():
++                    yield first_chunk
++                    for c in chunks:
++                        yield c
++                chunks = gen()
++            else:
++                # Bytes, decode as usual
++                chunks = stream_decode_response_unicode(iter([first_chunk] + list(chunks)), self)
+ 
+         return chunks
+ 

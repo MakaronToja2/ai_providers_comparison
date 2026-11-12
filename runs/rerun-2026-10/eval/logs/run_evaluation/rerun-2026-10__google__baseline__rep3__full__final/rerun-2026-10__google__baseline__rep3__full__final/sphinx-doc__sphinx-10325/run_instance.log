@@ -1,0 +1,70 @@
+2026-10-10 18:10:44,922 - INFO - Creating container for sphinx-doc__sphinx-10325...
+2026-10-10 18:10:50,033 - INFO - Container for sphinx-doc__sphinx-10325 created: af5ce5e5109ad2e6f0ac49b21e4d3a01c75e6ed40f51e992f379a9403fda095a
+2026-10-10 18:10:52,256 - INFO - Container for sphinx-doc__sphinx-10325 started: af5ce5e5109ad2e6f0ac49b21e4d3a01c75e6ed40f51e992f379a9403fda095a
+2026-10-10 18:10:52,257 - INFO - Intermediate patch for sphinx-doc__sphinx-10325 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep3__full__final/rerun-2026-10__google__baseline__rep3__full__final/sphinx-doc__sphinx-10325/patch.diff, now applying to container...
+2026-10-10 18:10:52,420 - INFO - >>>>> Applied Patch:
+Checking patch sphinx/ext/autodoc/__init__.py...
+warning: sphinx/ext/autodoc/__init__.py has type 100755, expected 100644
+Applied patch sphinx/ext/autodoc/__init__.py cleanly.
+
+2026-10-10 18:10:52,716 - INFO - Git diff before:
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 62631f7ff..48fda2a11 100755
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1710,7 +1710,20 @@ class ClassDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # type:
+                                    (name, self.fullname), type='autodoc')
+             return False, selected
+         elif self.options.inherited_members:
+-            return False, list(members.values())
++            inherited_option = self.options.inherited_members
++            if inherited_option is True:
++                # If it's just True, include all inherited members
++                return False, list(members.values())
++            else:
++                # It's a string of class names, e.g., "ClassA, ClassB"
++                specified_classes = {name.strip() for name in inherited_option.split(',')}
++                # Filter members: include only those defined in the specified base classes
++                # and not defined directly in the current class.
++                filtered_members = [
++                    m for m in members.values()
++                    if m.class_ is not self.object and m.class_.__name__ in specified_classes
++                ]
++                return False, filtered_members
+         else:
+             return False, [m for m in members.values() if m.class_ == self.object]
+2026-10-10 18:10:52,716 - INFO - Eval script for sphinx-doc__sphinx-10325 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep3__full__final/rerun-2026-10__google__baseline__rep3__full__final/sphinx-doc__sphinx-10325/eval.sh; copying to container...
+2026-10-10 18:10:58,610 - INFO - Test runtime: 5.84 seconds
+2026-10-10 18:10:58,611 - INFO - Test output for sphinx-doc__sphinx-10325 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep3__full__final/rerun-2026-10__google__baseline__rep3__full__final/sphinx-doc__sphinx-10325/test_output.txt
+2026-10-10 18:10:58,674 - INFO - Git diff after:
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 62631f7ff..48fda2a11 100755
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1710,7 +1710,20 @@ class ClassDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # type:
+                                    (name, self.fullname), type='autodoc')
+             return False, selected
+         elif self.options.inherited_members:
+-            return False, list(members.values())
++            inherited_option = self.options.inherited_members
++            if inherited_option is True:
++                # If it's just True, include all inherited members
++                return False, list(members.values())
++            else:
++                # It's a string of class names, e.g., "ClassA, ClassB"
++                specified_classes = {name.strip() for name in inherited_option.split(',')}
++                # Filter members: include only those defined in the specified base classes
++                # and not defined directly in the current class.
++                filtered_members = [
++                    m for m in members.values()
++                    if m.class_ is not self.object and m.class_.__name__ in specified_classes
++                ]
++                return False, filtered_members
+         else:
+             return False, [m for m in members.values() if m.class_ == self.object]
+2026-10-10 18:10:58,674 - INFO - Grading answer for sphinx-doc__sphinx-10325...
+2026-10-10 18:10:58,678 - INFO - report: {'sphinx-doc__sphinx-10325': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['tests/test_ext_autodoc_automodule.py::test_automodule_inherited_members']}, 'PASS_TO_PASS': {'success': ['tests/test_ext_autodoc_automodule.py::test_empty_all', 'tests/test_ext_autodoc_automodule.py::test_automodule', 'tests/test_ext_autodoc_automodule.py::test_automodule_undoc_members', 'tests/test_ext_autodoc_automodule.py::test_automodule_special_members', 'tests/test_ext_autodoc_automodule.py::test_subclass_of_mocked_object'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sphinx-doc__sphinx-10325: resolved: False
+2026-10-10 18:10:58,678 - INFO - Attempting to stop container sweb.eval.sphinx-doc__sphinx-10325.rerun-2026-10__google__baseline__rep3__full__final...
+2026-10-10 18:11:19,064 - INFO - Attempting to remove container sweb.eval.sphinx-doc__sphinx-10325.rerun-2026-10__google__baseline__rep3__full__final...
+2026-10-10 18:11:29,488 - INFO - Container sweb.eval.sphinx-doc__sphinx-10325.rerun-2026-10__google__baseline__rep3__full__final removed.

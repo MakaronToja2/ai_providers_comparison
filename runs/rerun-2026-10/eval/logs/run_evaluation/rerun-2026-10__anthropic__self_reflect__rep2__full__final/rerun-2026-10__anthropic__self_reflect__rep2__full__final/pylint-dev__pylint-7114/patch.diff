@@ -1,0 +1,35 @@
+diff --git a/pylint/lint/expand_modules.py b/pylint/lint/expand_modules.py
+index 289e1afce..4c91e2d6a 100644
+--- a/pylint/lint/expand_modules.py
++++ b/pylint/lint/expand_modules.py
+@@ -84,16 +84,24 @@ def expand_modules(
+         additional_search_path = [".", module_path] + path
+         if os.path.exists(something):
+             # this is a file or a directory
+-            try:
+-                modname = ".".join(
+-                    modutils.modpath_from_file(something, path=additional_search_path)
+-                )
+-            except ImportError:
+-                modname = os.path.splitext(basename)[0]
+             if os.path.isdir(something):
+                 filepath = os.path.join(something, "__init__.py")
++                # For directories, get the module name from the directory path itself
++                try:
++                    # Call modpath_from_file on the directory to get its module path
++                    modname = ".".join(
++                        modutils.modpath_from_file(something, path=additional_search_path)
++                    )
++                except ImportError:
++                    modname = basename
+             else:
+                 filepath = something
++                try:
++                    modname = ".".join(
++                        modutils.modpath_from_file(something, path=additional_search_path)
++                    )
++                except ImportError:
++                    modname = os.path.splitext(basename)[0]
+         else:
+             # suppose it's a module or package
+             modname = something

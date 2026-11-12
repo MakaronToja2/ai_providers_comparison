@@ -1,0 +1,48 @@
+2026-10-10 13:04:54,834 - INFO - Creating container for django__django-16229...
+2026-10-10 13:05:06,729 - INFO - Container for django__django-16229 created: 214330454af10203a44c219f8864fe278055bde07dea10fd991ff6a088de3300
+2026-10-10 13:05:07,269 - INFO - Container for django__django-16229 started: 214330454af10203a44c219f8864fe278055bde07dea10fd991ff6a088de3300
+2026-10-10 13:05:07,270 - INFO - Intermediate patch for django__django-16229 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep1__full__final/rerun-2026-10__openai__forced__rep1__full__final/django__django-16229/patch.diff, now applying to container...
+2026-10-10 13:05:07,455 - INFO - >>>>> Applied Patch:
+Checking patch django/db/models/fields/__init__.py...
+warning: django/db/models/fields/__init__.py has type 100755, expected 100644
+Applied patch django/db/models/fields/__init__.py cleanly.
+
+2026-10-10 13:05:08,182 - INFO - Git diff before:
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 2a98396cad..23abcab2d2 100755
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1013,7 +1013,8 @@ class Field(RegisterLookupMixin):
+         }
+         if self.has_default():
+             if callable(self.default):
+-                defaults["initial"] = self.default
++                # If the default is callable, call it to get the initial value
++                defaults["initial"] = self.default()
+                 defaults["show_hidden_initial"] = True
+             else:
+                 defaults["initial"] = self.get_default()
+2026-10-10 13:05:08,182 - INFO - Eval script for django__django-16229 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep1__full__final/rerun-2026-10__openai__forced__rep1__full__final/django__django-16229/eval.sh; copying to container...
+2026-10-10 13:05:14,621 - INFO - Test runtime: 6.36 seconds
+2026-10-10 13:05:14,624 - INFO - Test output for django__django-16229 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep1__full__final/rerun-2026-10__openai__forced__rep1__full__final/django__django-16229/test_output.txt
+2026-10-10 13:05:14,706 - INFO - Git diff after:
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 2a98396cad..23abcab2d2 100755
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1013,7 +1013,8 @@ class Field(RegisterLookupMixin):
+         }
+         if self.has_default():
+             if callable(self.default):
+-                defaults["initial"] = self.default
++                # If the default is callable, call it to get the initial value
++                defaults["initial"] = self.default()
+                 defaults["show_hidden_initial"] = True
+             else:
+                 defaults["initial"] = self.get_default()
+2026-10-10 13:05:14,706 - INFO - Grading answer for django__django-16229...
+2026-10-10 13:05:14,869 - INFO - report: {'django__django-16229': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_callable_default_hidden_widget_value_not_overridden (forms_tests.tests.tests.ModelFormCallableModelDefault)']}, 'PASS_TO_PASS': {'success': [], 'failure': ['Test for issue 10405', "If a model's ManyToManyField has blank=True and is saved with no data,", 'test_m2m_field_exclusion (forms_tests.tests.tests.ManyToManyExclusionTestCase)', 'test_empty_field_char (forms_tests.tests.tests.Jinja2EmptyLabelTestCase)', 'test_empty_field_char_none (forms_tests.tests.tests.Jinja2EmptyLabelTestCase)', 'test_empty_field_integer (forms_tests.tests.tests.Jinja2EmptyLabelTestCase)', 'test_get_display_value_on_none (forms_tests.tests.tests.Jinja2EmptyLabelTestCase)', 'test_html_rendering_of_prepopulated_models (forms_tests.tests.tests.Jinja2EmptyLabelTestCase)', 'test_save_empty_label_forms (forms_tests.tests.tests.Jinja2EmptyLabelTestCase)', 'test_boundary_conditions (forms_tests.tests.tests.FormsModelTestCase)', 'test_formfield_initial (forms_tests.tests.tests.FormsModelTestCase)', 'test_unicode_filename (forms_tests.tests.tests.FormsModelTestCase)', 'test_empty_field_char (forms_tests.tests.tests.EmptyLabelTestCase)', 'test_empty_field_char_none (forms_tests.tests.tests.EmptyLabelTestCase)', 'test_empty_field_integer (forms_tests.tests.tests.EmptyLabelTestCase)', 'test_get_display_value_on_none (forms_tests.tests.tests.EmptyLabelTestCase)', 'test_html_rendering_of_prepopulated_models (forms_tests.tests.tests.EmptyLabelTestCase)', 'test_save_empty_label_forms (forms_tests.tests.tests.EmptyLabelTestCase)', 'The initial value for a callable default returning a queryset is the', 'Initial instances for model fields may also be instances (refs #7287)', "If a model's ForeignKey has blank=False and a default, no empty option"]}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-16229: resolved: False
+2026-10-10 13:05:14,869 - INFO - Attempting to stop container sweb.eval.django__django-16229.rerun-2026-10__openai__forced__rep1__full__final...
+2026-10-10 13:05:33,598 - INFO - Attempting to remove container sweb.eval.django__django-16229.rerun-2026-10__openai__forced__rep1__full__final...
+2026-10-10 13:05:33,638 - INFO - Container sweb.eval.django__django-16229.rerun-2026-10__openai__forced__rep1__full__final removed.

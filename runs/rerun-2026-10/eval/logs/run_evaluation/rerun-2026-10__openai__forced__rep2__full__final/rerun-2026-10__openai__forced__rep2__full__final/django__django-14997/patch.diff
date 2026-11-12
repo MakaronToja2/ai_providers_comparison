@@ -1,0 +1,41 @@
+diff --git a/django/db/backends/sqlite3/schema.py b/django/db/backends/sqlite3/schema.py
+index f0c81c123b..fc58e727e6 100644
+--- a/django/db/backends/sqlite3/schema.py
++++ b/django/db/backends/sqlite3/schema.py
+@@ -427,7 +427,18 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         ):
+             super().add_constraint(model, constraint)
+         else:
+-            self._remake_table(model)
++            # SQLite does not support unique constraints on expressions using the "." operator in index expressions.
++            # We need to check if any of the constraint fields are expressions with a "." operator and handle accordingly.
++            # If so, fallback to super().add_constraint to avoid the SQLite error.
++            # Otherwise, remake the table.
++            if any(
++                hasattr(expr, 'name') and '.' in expr.name
++                for expr in getattr(constraint, 'expressions', [])
++                if hasattr(expr, 'name')
++            ):
++                super().add_constraint(model, constraint)
++            else:
++                self._remake_table(model)
+ 
+     def remove_constraint(self, model, constraint):
+         if isinstance(constraint, UniqueConstraint) and (
+@@ -438,7 +449,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         ):
+             super().remove_constraint(model, constraint)
+         else:
+-            self._remake_table(model)
++            # Similar check as in add_constraint to avoid SQLite error on removing constraints with "." in expressions.
++            if any(
++                hasattr(expr, 'name') and '.' in expr.name
++                for expr in getattr(constraint, 'expressions', [])
++                if hasattr(expr, 'name')
++            ):
++                super().remove_constraint(model, constraint)
++            else:
++                self._remake_table(model)
+ 
+     def _collate_sql(self, collation):
+         return 'COLLATE ' + collation

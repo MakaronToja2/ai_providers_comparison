@@ -1,0 +1,17 @@
+diff --git a/sympy/printing/ccode.py b/sympy/printing/ccode.py
+index 30a07a7b59..a220d35b7a 100644
+--- a/sympy/printing/ccode.py
++++ b/sympy/printing/ccode.py
+@@ -158,6 +158,12 @@ def _print_Rational(self, expr):
+ 
+     def _print_Indexed(self, expr):
+         # calculate index for 1d array
++
++    def _print_sinc(self, expr):
++        # sinc(x) = Piecewise((sin(x)/x, x != 0), (1, True))
++        x = expr.args[0]
++        return "(%s)" % self._print(expr.func._eval_expand_func(expr))
++
+         dims = expr.shape
+         elem = S.Zero
+         offset = S.One

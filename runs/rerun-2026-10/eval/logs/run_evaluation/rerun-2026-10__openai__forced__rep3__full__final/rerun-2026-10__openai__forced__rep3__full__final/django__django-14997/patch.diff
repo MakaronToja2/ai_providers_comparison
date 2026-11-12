@@ -1,0 +1,42 @@
+diff --git a/django/db/backends/sqlite3/schema.py b/django/db/backends/sqlite3/schema.py
+index f0c81c123b..bf52884362 100644
+--- a/django/db/backends/sqlite3/schema.py
++++ b/django/db/backends/sqlite3/schema.py
+@@ -419,6 +419,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         self.delete_model(old_field.remote_field.through)
+ 
+     def add_constraint(self, model, constraint):
++        # SQLite does not support indexes on expressions or functional indexes
++        # without explicit support for them, so if the constraint contains expressions,
++        # we must rebuild the table.
+         if isinstance(constraint, UniqueConstraint) and (
+             constraint.condition or
+             constraint.contains_expressions or
+@@ -427,7 +430,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         ):
+             super().add_constraint(model, constraint)
+         else:
+-            self._remake_table(model)
++            # For SQLite, if the constraint is a UniqueConstraint with expressions (F() objects),
++            # rebuilding the table causes errors because SQLite does not support "." operator in index expressions.
++            # So we avoid rebuilding the table if the constraint contains expressions.
++            if isinstance(constraint, UniqueConstraint) and constraint.contains_expressions:
++                super().add_constraint(model, constraint)
++            else:
++                self._remake_table(model)
+ 
+     def remove_constraint(self, model, constraint):
+         if isinstance(constraint, UniqueConstraint) and (
+@@ -438,7 +447,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         ):
+             super().remove_constraint(model, constraint)
+         else:
+-            self._remake_table(model)
++            # Same logic as add_constraint for removing constraints
++            if isinstance(constraint, UniqueConstraint) and constraint.contains_expressions:
++                super().remove_constraint(model, constraint)
++            else:
++                self._remake_table(model)
+ 
+     def _collate_sql(self, collation):
+         return 'COLLATE ' + collation

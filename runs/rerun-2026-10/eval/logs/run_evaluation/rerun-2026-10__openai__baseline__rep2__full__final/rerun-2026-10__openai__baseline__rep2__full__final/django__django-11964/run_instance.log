@@ -1,0 +1,66 @@
+2026-10-10 12:28:25,109 - INFO - Creating container for django__django-11964...
+2026-10-10 12:28:25,499 - INFO - Container for django__django-11964 created: 68c6ac871d6739f8a251287af096e453d1c8c409e9b9028d54e35603f441cc2d
+2026-10-10 12:28:26,434 - INFO - Container for django__django-11964 started: 68c6ac871d6739f8a251287af096e453d1c8c409e9b9028d54e35603f441cc2d
+2026-10-10 12:28:26,434 - INFO - Intermediate patch for django__django-11964 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep2__full__final/rerun-2026-10__openai__baseline__rep2__full__final/django__django-11964/patch.diff, now applying to container...
+2026-10-10 12:28:26,731 - INFO - >>>>> Applied Patch:
+Checking patch django/db/models/fields/__init__.py...
+warning: django/db/models/fields/__init__.py has type 100755, expected 100644
+Applied patch django/db/models/fields/__init__.py cleanly.
+
+2026-10-10 12:28:27,866 - INFO - Git diff before:
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index d610dc86f0..829d4795e9 100755
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1008,12 +1008,18 @@ class CharField(Field):
+         return "CharField"
+ 
+     def to_python(self, value):
++        # If the field has choices and the value is an enum member, convert to its value
++        if hasattr(self, 'choices') and self.choices and isinstance(value, enum.Enum):
++            return value.value
+         if isinstance(value, str) or value is None:
+             return value
+         return str(value)
+ 
+     def get_prep_value(self, value):
+         value = super().get_prep_value(value)
++        # If the value is an enum member, convert to its value before saving to DB
++        if isinstance(value, enum.Enum):
++            value = value.value
+         return self.to_python(value)
+ 
+     def formfield(self, **kwargs):
+2026-10-10 12:28:27,866 - INFO - Eval script for django__django-11964 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep2__full__final/rerun-2026-10__openai__baseline__rep2__full__final/django__django-11964/eval.sh; copying to container...
+2026-10-10 12:28:41,159 - INFO - Test runtime: 13.16 seconds
+2026-10-10 12:28:41,166 - INFO - Test output for django__django-11964 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep2__full__final/rerun-2026-10__openai__baseline__rep2__full__final/django__django-11964/test_output.txt
+2026-10-10 12:28:41,290 - INFO - Git diff after:
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index d610dc86f0..829d4795e9 100755
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1008,12 +1008,18 @@ class CharField(Field):
+         return "CharField"
+ 
+     def to_python(self, value):
++        # If the field has choices and the value is an enum member, convert to its value
++        if hasattr(self, 'choices') and self.choices and isinstance(value, enum.Enum):
++            return value.value
+         if isinstance(value, str) or value is None:
+             return value
+         return str(value)
+ 
+     def get_prep_value(self, value):
+         value = super().get_prep_value(value)
++        # If the value is an enum member, convert to its value before saving to DB
++        if isinstance(value, enum.Enum):
++            value = value.value
+         return self.to_python(value)
+ 
+     def formfield(self, **kwargs):
+2026-10-10 12:28:41,290 - INFO - Grading answer for django__django-11964...
+2026-10-10 12:28:41,301 - INFO - report: {'django__django-11964': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_str (model_enums.tests.ChoicesTests)', 'test_textchoices (model_enums.tests.ChoicesTests)']}, 'PASS_TO_PASS': {'success': ['test_integerchoices (model_enums.tests.ChoicesTests)', 'test_integerchoices_auto_label (model_enums.tests.ChoicesTests)', 'test_integerchoices_containment (model_enums.tests.ChoicesTests)', 'test_integerchoices_empty_label (model_enums.tests.ChoicesTests)', 'test_integerchoices_functional_api (model_enums.tests.ChoicesTests)', 'test_invalid_definition (model_enums.tests.ChoicesTests)', 'test_textchoices_auto_label (model_enums.tests.ChoicesTests)', 'test_textchoices_blank_value (model_enums.tests.ChoicesTests)', 'test_textchoices_containment (model_enums.tests.ChoicesTests)', 'test_textchoices_empty_label (model_enums.tests.ChoicesTests)', 'test_textchoices_functional_api (model_enums.tests.ChoicesTests)', 'test_bool_unsupported (model_enums.tests.CustomChoicesTests)', 'test_labels_valid (model_enums.tests.CustomChoicesTests)', 'test_timezone_unsupported (model_enums.tests.CustomChoicesTests)', 'test_uuid_unsupported (model_enums.tests.CustomChoicesTests)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-11964: resolved: False
+2026-10-10 12:28:41,302 - INFO - Attempting to stop container sweb.eval.django__django-11964.rerun-2026-10__openai__baseline__rep2__full__final...
+2026-10-10 12:28:59,986 - INFO - Attempting to remove container sweb.eval.django__django-11964.rerun-2026-10__openai__baseline__rep2__full__final...
+2026-10-10 12:29:00,123 - INFO - Container sweb.eval.django__django-11964.rerun-2026-10__openai__baseline__rep2__full__final removed.

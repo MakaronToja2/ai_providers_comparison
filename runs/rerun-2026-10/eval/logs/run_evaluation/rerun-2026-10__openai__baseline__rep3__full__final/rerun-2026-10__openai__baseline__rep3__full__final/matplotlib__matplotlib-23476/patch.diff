@@ -1,0 +1,18 @@
+diff --git a/lib/matplotlib/figure.py b/lib/matplotlib/figure.py
+index c55864243a..b7e625e8b0 100644
+--- a/lib/matplotlib/figure.py
++++ b/lib/matplotlib/figure.py
+@@ -3046,6 +3046,13 @@ class Figure(FigureBase):
+         # re-initialise some of the unstored state information
+         FigureCanvasBase(self)  # Set self.canvas.
+ 
++        # Fix for M1 Mac double DPI issue: reset dpi to original value
++        # if dpi was scaled by device pixel ratio during pickling
++        if hasattr(self, '_dpi_orig'):
++            self.dpi = self._dpi_orig
++        else:
++            self._dpi_orig = self.dpi
++
+         if restore_to_pylab:
+             # lazy import to avoid circularity
+             import matplotlib.pyplot as plt

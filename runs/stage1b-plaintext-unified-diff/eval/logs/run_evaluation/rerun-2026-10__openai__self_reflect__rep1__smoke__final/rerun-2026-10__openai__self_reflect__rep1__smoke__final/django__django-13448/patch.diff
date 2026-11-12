@@ -1,0 +1,31 @@
+--- a/django/db/backends/base/creation.py
++++ b/django/db/backends/base/creation.py
+@@ -78,2 +78,7 @@
+-        if serialize:
+-            self.connection._test_serialized_contents = self.serialize_db_to_string()
++        if serialize:
++            # If MIGRATE is False in TEST settings, skip serialization to avoid querying non-existent tables
++            if self.connection.settings_dict['TEST'].get('MIGRATE', True):
++                self.connection._test_serialized_contents = self.serialize_db_to_string()
++            else:
++                # No serialization when migrations are skipped
++                self.connection._test_serialized_contents = None
+@@ -110,4 +118,8 @@
+-        def get_objects():
++        def get_objects():
++            # If MIGRATE is False, skip serialization to avoid querying non-existent tables
++            if not self.connection.settings_dict['TEST'].get('MIGRATE', True):
++                return
++
+             from django.db.migrations.loader import MigrationLoader
+             loader = MigrationLoader(self.connection)
+             for app_config in apps.get_app_configs():
+@@ -121,4 +133,4 @@
+-                        queryset = model._default_manager.using(
+-                            self.connection.alias,
+-                        ).order_by(model._meta.pk.name)
+-                        yield from queryset.iterator()
++                        queryset = model._default_manager.using(
++                            self.connection.alias,
++                        ).order_by(model._meta.pk.name)
++                        yield from queryset.iterator()

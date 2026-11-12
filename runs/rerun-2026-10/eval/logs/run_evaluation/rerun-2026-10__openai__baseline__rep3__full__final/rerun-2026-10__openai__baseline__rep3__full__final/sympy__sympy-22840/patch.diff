@@ -1,0 +1,18 @@
+diff --git a/sympy/simplify/cse_main.py b/sympy/simplify/cse_main.py
+index d649dd02a9..433f13af94 100644
+--- a/sympy/simplify/cse_main.py
++++ b/sympy/simplify/cse_main.py
+@@ -643,6 +643,13 @@ def _rebuild(expr):
+         if expr in opt_subs:
+             expr = opt_subs[expr]
+ 
++        # Special handling for MatrixSymbol indexing to avoid strange behavior in CSE
++        from sympy.matrices.expressions import MatrixSymbol
++        if isinstance(orig_expr, MatrixSymbol) and expr != orig_expr:
++            # Do not descend into MatrixSymbol indexing, treat as atomic
++            subs[orig_expr] = orig_expr
++            return orig_expr
++
+         # If enabled, parse Muls and Adds arguments by order to ensure
+         # replacement order independent from hashes
+         if order != 'none':

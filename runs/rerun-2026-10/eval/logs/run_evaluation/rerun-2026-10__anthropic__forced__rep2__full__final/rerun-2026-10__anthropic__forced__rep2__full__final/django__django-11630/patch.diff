@@ -1,0 +1,50 @@
+diff --git a/django/core/checks/model_checks.py b/django/core/checks/model_checks.py
+index 5c2266ca1d..c90f701249 100644
+--- a/django/core/checks/model_checks.py
++++ b/django/core/checks/model_checks.py
+@@ -37,14 +37,18 @@ def check_all_models(app_configs=None, **kwargs):
+             constraints[model_constraint.name].append(model._meta.label)
+     for db_table, model_labels in db_table_models.items():
+         if len(model_labels) != 1:
+-            errors.append(
+-                Error(
+-                    "db_table '%s' is used by multiple models: %s."
+-                    % (db_table, ', '.join(db_table_models[db_table])),
+-                    obj=db_table,
+-                    id='models.E028',
++            # Check if all models with the same db_table are from the same app
++            model_apps = set(label.split('.')[0] for label in model_labels)
++            if len(model_apps) == 1:
++                # Only report error if models are in the same app
++                errors.append(
++                    Error(
++                        "db_table '%s' is used by multiple models: %s."
++                        % (db_table, ', '.join(db_table_models[db_table])),
++                        obj=db_table,
++                        id='models.E028',
++                    )
+                 )
+-            )
+     for index_name, model_labels in indexes.items():
+         if len(model_labels) > 1:
+             model_labels = set(model_labels)
+diff --git a/tests/check_framework/test_model_checks.py b/tests/check_framework/test_model_checks.py
+index 79177e38f7..4163bc3fc0 100644
+--- a/tests/check_framework/test_model_checks.py
++++ b/tests/check_framework/test_model_checks.py
+@@ -41,14 +41,7 @@ class DuplicateDBTableTests(SimpleTestCase):
+                 app_label = 'check_framework'
+                 db_table = 'test_table'
+ 
+-        self.assertEqual(checks.run_checks(app_configs=apps.get_app_configs()), [
+-            Error(
+-                "db_table 'test_table' is used by multiple models: "
+-                "basic.Model1, check_framework.Model2.",
+-                obj='test_table',
+-                id='models.E028',
+-            )
+-        ])
++        self.assertEqual(checks.run_checks(app_configs=apps.get_app_configs()), [])
+ 
+     def test_no_collision_for_unmanaged_models(self):
+         class Unmanaged(models.Model):

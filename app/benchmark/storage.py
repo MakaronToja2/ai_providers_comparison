@@ -14,6 +14,8 @@ from ..models.benchmark import (
     ExperimentConfig,
     ExperimentStatus,
     ExperimentResult,
+    ResultStatus,
+    TERMINAL_RESULT_STATUSES,
     TestResult,
     ExperimentMetrics,
     ToolCallRecord,
@@ -227,7 +229,8 @@ class Storage:
             ("reflection_completion_tokens", "INTEGER"),
             ("reflection_total_tokens", "INTEGER"),
             ("reflection_outcome", "TEXT"),
-            ("original_patch", "TEXT"),  # Stores patch before test-guided revision
+            ("original_patch", "TEXT"),  # Patch before the self-reflection call
+            ("run_meta", "TEXT"),  # JSON: loop statistics and provenance of the row
         ]
 
         for col_name, col_type in reflection_cols:
@@ -358,8 +361,9 @@ class Storage:
                  tool_calls, tool_call_count, successful_tool_calls,
                  context_size_chars, context_size_tokens, success, error_message,
                  reflection_prompt_tokens, reflection_completion_tokens,
-                 reflection_total_tokens, reflection_outcome, original_patch)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 reflection_total_tokens, reflection_outcome, original_patch,
+                 split, result_status, run_meta)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 result.id,
                 result.experiment_id,
@@ -388,6 +392,9 @@ class Storage:
                 result.reflection_total_tokens,
                 result.reflection_outcome,
                 result.original_patch,
+                result.split,
+                result.result_status.value if result.result_status else None,
+                json.dumps(result.run_meta) if result.run_meta is not None else None,
             ))
             await db.commit()
 
@@ -431,15 +438,25 @@ class Storage:
             return [self._row_to_result(row) for row in rows]
 
     async def get_completed_result_keys(self, experiment_id: str) -> set:
-        """Get set of (instance_id, provider, model, tool_set) for completed results."""
+        """Get set of (instance_id, provider, model, tool_set) for completed results.
+
+        Completed means the row records what the model did (patch, abstention, format
+        failure, context overflow). Rows that record an API or harness error are not
+        completed: they are re-run, and the re-run replaces them (deterministic row id).
+        """
         async with self._get_db() as db:
             cursor = await db.execute("""
-                SELECT instance_id, provider, model, tool_set
+                SELECT instance_id, provider, model, tool_set, result_status
                 FROM experiment_results
-                WHERE experiment_id = ? AND success = 1
+                WHERE experiment_id = ?
             """, (experiment_id,))
             rows = await cursor.fetchall()
-            return {(r["instance_id"], r["provider"], r["model"], r["tool_set"]) for r in rows}
+            terminal = {status.value for status in TERMINAL_RESULT_STATUSES}
+            return {
+                (r["instance_id"], r["provider"], r["model"], r["tool_set"])
+                for r in rows
+                if r["result_status"] in terminal
+            }
 
     async def count_results(self, experiment_id: str, success_only: bool = False) -> int:
         """Count results for an experiment."""
@@ -498,6 +515,9 @@ class Storage:
             reflection_total_tokens=safe_get("reflection_total_tokens"),
             reflection_outcome=safe_get("reflection_outcome"),
             original_patch=safe_get("original_patch"),
+            split=safe_get("split") or "dev",
+            result_status=ResultStatus(safe_get("result_status")) if safe_get("result_status") else None,
+            run_meta=json.loads(safe_get("run_meta")) if safe_get("run_meta") else None,
         )
 
     # ==================== Test Results ====================

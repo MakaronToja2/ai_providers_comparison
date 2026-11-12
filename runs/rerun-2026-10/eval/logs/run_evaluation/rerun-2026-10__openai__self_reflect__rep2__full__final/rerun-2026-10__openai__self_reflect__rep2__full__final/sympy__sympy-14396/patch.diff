@@ -1,0 +1,20 @@
+diff --git a/sympy/polys/polyoptions.py b/sympy/polys/polyoptions.py
+index 6e504a3057..f17bff2d67 100644
+--- a/sympy/polys/polyoptions.py
++++ b/sympy/polys/polyoptions.py
+@@ -480,6 +480,15 @@ def preprocess(cls, domain):
+                 gens = list(map(sympify, r.groups()[1].split(',')))
+                 return sympy.polys.domains.QQ.algebraic_field(*gens)
+ 
++            # Try to parse real polynomial domain like RR[y,z]
++            r = re.match(r'^(R|RR)\[(.+)\]$', domain)
++            if r is not None:
++                ground, gens_str = r.groups()
++                gens = list(map(sympify, gens_str.split(',')))
++                if ground in ['R', 'RR']:
++                    # Return a polynomial ring over RR with generators
++                    return sympy.polys.domains.RR.poly_ring(*gens)
++
+         raise OptionError('expected a valid domain specification, got %s' % domain)
+ 
+     @classmethod

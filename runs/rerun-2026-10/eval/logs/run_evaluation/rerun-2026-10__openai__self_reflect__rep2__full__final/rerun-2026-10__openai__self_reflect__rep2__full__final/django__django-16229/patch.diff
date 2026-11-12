@@ -1,0 +1,14 @@
+diff --git a/django/forms/fields.py b/django/forms/fields.py
+index 46de2f53a0..7c727a6082 100644
+--- a/django/forms/fields.py
++++ b/django/forms/fields.py
+@@ -131,6 +131,9 @@ class Field:
+         # label_suffix -- Suffix to be added to the label. Overrides
+         #                 form's label_suffix.
+         self.required, self.label, self.initial = required, label, initial
++        # If initial is a callable, we want to call it here to get the actual initial value.
++        if callable(self.initial):
++            self.initial = self.initial()
+         self.show_hidden_initial = show_hidden_initial
+         self.help_text = help_text
+         self.disabled = disabled

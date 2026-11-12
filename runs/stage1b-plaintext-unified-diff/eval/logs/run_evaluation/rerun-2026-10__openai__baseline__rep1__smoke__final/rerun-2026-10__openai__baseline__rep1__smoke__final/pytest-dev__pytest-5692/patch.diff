@@ -1,0 +1,49 @@
+--- a/src/_pytest/junitxml.py
++++ b/src/_pytest/junitxml.py
+@@ -691,0 +691,22 @@
++import socket
++import datetime
++
++class JunitXml:
++    def __init__(self, *args, **kwargs):
++        self.hostname = socket.gethostname()
++        self.timestamp = datetime.datetime.now().isoformat()
++        # other init code...
++
++    def make_testsuite_node(self, *args, **kwargs):
++        # existing code to create testsuite node
++        testsuite_attrs = {
++            # existing attributes...
++            "hostname": self.hostname,
++            "timestamp": self.timestamp,
++        }
++        # merge with other attributes and create the testsuite node
++        testsuite = Junit.testsuite(**testsuite_attrs)
++        # rest of the method...
++        return testsuite
++
++    # rest of the class...
+@@ -50,10 +69,13 @@
+-families = {}
+-families["_base"] = {"testcase": ["classname", "name"]}
+-families["_base_legacy"] = {"testcase": ["file", "line", "url"]}
+-
+-# xUnit 1.x inherits legacy attributes
+-families["xunit1"] = families["_base"].copy()
+-merge_family(families["xunit1"], families["_base_legacy"])
+-
+-# xUnit 2.x uses strict base attributes
+-families["xunit2"] = families["_base"]
++families = {}
++families["_base"] = {"testcase": ["classname", "name"]}
++families["_base_legacy"] = {"testcase": ["file", "line", "url"]}
++
++# xUnit 1.x inherits legacy attributes
++families["xunit1"] = families["_base"].copy()
++merge_family(families["xunit1"], families["_base_legacy"])
++
++# xUnit 2.x uses strict base attributes
++families["xunit2"] = families["_base"]
++
++# Add hostname and timestamp to testsuite attributes for xunit2 family
++families["xunit2_testsuite_attrs"] = ["hostname", "timestamp"]

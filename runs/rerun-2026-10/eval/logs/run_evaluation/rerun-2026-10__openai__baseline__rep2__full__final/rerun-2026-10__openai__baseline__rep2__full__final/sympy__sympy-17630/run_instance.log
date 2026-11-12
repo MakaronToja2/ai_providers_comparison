@@ -1,0 +1,68 @@
+2026-10-10 18:42:48,879 - INFO - Creating container for sympy__sympy-17630...
+2026-10-10 18:42:54,829 - INFO - Container for sympy__sympy-17630 created: f4c315988b6eba674b00c3c1ac20da9795596f2c8de15c20e955ecb225a0d1a0
+2026-10-10 18:43:01,009 - INFO - Container for sympy__sympy-17630 started: f4c315988b6eba674b00c3c1ac20da9795596f2c8de15c20e955ecb225a0d1a0
+2026-10-10 18:43:01,009 - INFO - Intermediate patch for sympy__sympy-17630 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep2__full__final/rerun-2026-10__openai__baseline__rep2__full__final/sympy__sympy-17630/patch.diff, now applying to container...
+2026-10-10 18:43:01,129 - INFO - >>>>> Applied Patch:
+Checking patch sympy/matrices/expressions/blockmatrix.py...
+warning: sympy/matrices/expressions/blockmatrix.py has type 100755, expected 100644
+Applied patch sympy/matrices/expressions/blockmatrix.py cleanly.
+
+2026-10-10 18:43:01,870 - INFO - Git diff before:
+diff --git a/sympy/matrices/expressions/blockmatrix.py b/sympy/matrices/expressions/blockmatrix.py
+index 95302a05ca..2aeeab4b14 100755
+--- a/sympy/matrices/expressions/blockmatrix.py
++++ b/sympy/matrices/expressions/blockmatrix.py
+@@ -164,7 +164,19 @@ def structurally_equal(self, other):
+     def _blockmul(self, other):
+         if (isinstance(other, BlockMatrix) and
+                 self.colblocksizes == other.rowblocksizes):
+-            return BlockMatrix(self.blocks*other.blocks)
++            # Ensure that blocks resulting from multiplication that are zero are ZeroMatrix, not sympy.Zero
++            result_blocks = self.blocks * other.blocks
++            # Replace any sympy.Zero with ZeroMatrix of appropriate size
++            from sympy.matrices.expressions.zeros import ZeroMatrix
++            for i in range(result_blocks.rows):
++                for j in range(result_blocks.cols):
++                    block = result_blocks[i, j]
++                    if block == 0 or block == S.Zero:
++                        # Determine size from rowblocksizes and colblocksizes
++                        rowsize = self.rowblocksizes[i]
++                        colsize = other.colblocksizes[j]
++                        result_blocks[i, j] = ZeroMatrix(rowsize, colsize)
++            return BlockMatrix(result_blocks)
+ 
+         return self * other
+2026-10-10 18:43:01,870 - INFO - Eval script for sympy__sympy-17630 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep2__full__final/rerun-2026-10__openai__baseline__rep2__full__final/sympy__sympy-17630/eval.sh; copying to container...
+2026-10-10 18:43:07,892 - INFO - Test runtime: 5.38 seconds
+2026-10-10 18:43:07,892 - INFO - Test output for sympy__sympy-17630 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep2__full__final/rerun-2026-10__openai__baseline__rep2__full__final/sympy__sympy-17630/test_output.txt
+2026-10-10 18:43:07,938 - INFO - Git diff after:
+diff --git a/sympy/matrices/expressions/blockmatrix.py b/sympy/matrices/expressions/blockmatrix.py
+index 95302a05ca..2aeeab4b14 100755
+--- a/sympy/matrices/expressions/blockmatrix.py
++++ b/sympy/matrices/expressions/blockmatrix.py
+@@ -164,7 +164,19 @@ def structurally_equal(self, other):
+     def _blockmul(self, other):
+         if (isinstance(other, BlockMatrix) and
+                 self.colblocksizes == other.rowblocksizes):
+-            return BlockMatrix(self.blocks*other.blocks)
++            # Ensure that blocks resulting from multiplication that are zero are ZeroMatrix, not sympy.Zero
++            result_blocks = self.blocks * other.blocks
++            # Replace any sympy.Zero with ZeroMatrix of appropriate size
++            from sympy.matrices.expressions.zeros import ZeroMatrix
++            for i in range(result_blocks.rows):
++                for j in range(result_blocks.cols):
++                    block = result_blocks[i, j]
++                    if block == 0 or block == S.Zero:
++                        # Determine size from rowblocksizes and colblocksizes
++                        rowsize = self.rowblocksizes[i]
++                        colsize = other.colblocksizes[j]
++                        result_blocks[i, j] = ZeroMatrix(rowsize, colsize)
++            return BlockMatrix(result_blocks)
+ 
+         return self * other
+2026-10-10 18:43:07,939 - INFO - Grading answer for sympy__sympy-17630...
+2026-10-10 18:43:07,940 - INFO - report: {'sympy__sympy-17630': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_issue_17624', 'test_zero_matrix_add']}, 'PASS_TO_PASS': {'success': ['test_bc_matadd', 'test_bc_transpose', 'test_bc_dist_diag', 'test_block_plus_ident', 'test_block_collapse_explicit_matrices', 'test_BlockMatrix_trace', 'test_BlockMatrix_Determinant', 'test_squareBlockMatrix', 'test_BlockDiagMatrix', 'test_blockcut', 'test_reblock_2x2', 'test_deblock', 'test_sort_key', 'test_matadd_sympify', 'test_matadd_of_matrices', 'test_doit_args', 'test_generic_identity'], 'failure': ['test_bc_matmul', 'test_BlockMatrix']}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-17630: resolved: False
+2026-10-10 18:43:07,940 - INFO - Attempting to stop container sweb.eval.sympy__sympy-17630.rerun-2026-10__openai__baseline__rep2__full__final...
+2026-10-10 18:43:29,956 - INFO - Attempting to remove container sweb.eval.sympy__sympy-17630.rerun-2026-10__openai__baseline__rep2__full__final...
+2026-10-10 18:43:31,901 - INFO - Container sweb.eval.sympy__sympy-17630.rerun-2026-10__openai__baseline__rep2__full__final removed.

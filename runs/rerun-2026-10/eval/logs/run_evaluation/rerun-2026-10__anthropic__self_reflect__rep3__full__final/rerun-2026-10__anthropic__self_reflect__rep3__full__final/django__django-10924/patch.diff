@@ -1,0 +1,51 @@
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 0c64748ccd..d9263cd748 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1708,8 +1708,10 @@ class FilePathField(Field):
+         return str(value)
+ 
+     def formfield(self, **kwargs):
++        # Evaluate path if it's callable
++        path = self.path() if callable(self.path) else self.path
+         return super().formfield(**{
+-            'path': self.path,
++            'path': path,
+             'match': self.match,
+             'recursive': self.recursive,
+             'form_class': forms.FilePathField,
+diff --git a/django/forms/fields.py b/django/forms/fields.py
+index a977256525..e93f80a04c 100644
+--- a/django/forms/fields.py
++++ b/django/forms/fields.py
+@@ -1090,23 +1090,26 @@ class FilePathField(ChoiceField):
+         if self.match is not None:
+             self.match_re = re.compile(self.match)
+ 
++        # Evaluate path if it's callable
++        path_value = self.path() if callable(self.path) else self.path
++
+         if recursive:
+-            for root, dirs, files in sorted(os.walk(self.path)):
++            for root, dirs, files in sorted(os.walk(path_value)):
+                 if self.allow_files:
+                     for f in sorted(files):
+                         if self.match is None or self.match_re.search(f):
+                             f = os.path.join(root, f)
+-                            self.choices.append((f, f.replace(path, "", 1)))
++                            self.choices.append((f, f.replace(path_value, "", 1)))
+                 if self.allow_folders:
+                     for f in sorted(dirs):
+                         if f == '__pycache__':
+                             continue
+                         if self.match is None or self.match_re.search(f):
+                             f = os.path.join(root, f)
+-                            self.choices.append((f, f.replace(path, "", 1)))
++                            self.choices.append((f, f.replace(path_value, "", 1)))
+         else:
+             choices = []
+-            for f in os.scandir(self.path):
++            for f in os.scandir(path_value):
+                 if f.name == '__pycache__':
+                     continue
+                 if (((self.allow_files and f.is_file()) or

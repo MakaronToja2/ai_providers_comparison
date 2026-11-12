@@ -1,0 +1,15 @@
+diff --git a/django/test/testcases.py b/django/test/testcases.py
+index 23459f22cd..f27b72e404 100644
+--- a/django/test/testcases.py
++++ b/django/test/testcases.py
+@@ -1100,6 +1100,10 @@ class TestCase(TransactionTestCase):
+         super().setUpClass()
+         if not cls._databases_support_transactions():
+             return
++        # Close connections to avoid stale connections with locks when using
++        # persistent test databases (e.g., SQLite with --keepdb).
++        for conn in connections.all():
++            conn.close()
+         cls.cls_atomics = cls._enter_atomics()
+ 
+         if cls.fixtures:

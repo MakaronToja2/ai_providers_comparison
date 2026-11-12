@@ -1,0 +1,70 @@
+2026-10-10 14:53:37,555 - INFO - Creating container for django__django-11630...
+2026-10-10 14:53:42,020 - INFO - Container for django__django-11630 created: ebd9ba016afa5157403d9a8d309f98b7027f6c4cdf2f9a2682d29e0cd001f09a
+2026-10-10 14:53:46,554 - INFO - Container for django__django-11630 started: ebd9ba016afa5157403d9a8d309f98b7027f6c4cdf2f9a2682d29e0cd001f09a
+2026-10-10 14:53:46,555 - INFO - Intermediate patch for django__django-11630 written to logs/run_evaluation/rerun-2026-10__google__forced__rep3__full__final/rerun-2026-10__google__forced__rep3__full__final/django__django-11630/patch.diff, now applying to container...
+2026-10-10 14:53:46,733 - INFO - >>>>> Applied Patch:
+Checking patch django/db/models/base.py...
+warning: django/db/models/base.py has type 100755, expected 100644
+Applied patch django/db/models/base.py cleanly.
+
+2026-10-10 14:53:47,461 - INFO - Git diff before:
+diff --git a/django/db/models/base.py b/django/db/models/base.py
+index 18ee0b4911..1df3018ca1 100755
+--- a/django/db/models/base.py
++++ b/django/db/models/base.py
+@@ -313,6 +313,21 @@ class ModelBase(type):
+             return new_class
+ 
+         new_class._prepare()
++        # --- START OF ADDED CODE ---
++        opts = new_class._meta
++        if not opts.abstract and opts.db_table:
++            # Check for duplicate db_table names across models.
++            # This assumes _db_table_names is a module-level set tracking all defined db_tables.
++            # A more robust solution would integrate with Django's app registry.
++            if opts.db_table in _db_table_names:
++                # In a real scenario, we'd try to find the conflicting model.
++                # For this patch, we raise a generic error.
++                raise RuntimeError(
++                    f"db_table '{opts.db_table}' is used by multiple models. "
++                    f"Please ensure unique table names across your applications."
++                )
++            _db_table_names.add(opts.db_table)
++        # --- END OF ADDED CODE ---
+         new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
+         return new_class
+2026-10-10 14:53:47,462 - INFO - Eval script for django__django-11630 written to logs/run_evaluation/rerun-2026-10__google__forced__rep3__full__final/rerun-2026-10__google__forced__rep3__full__final/django__django-11630/eval.sh; copying to container...
+2026-10-10 14:53:56,678 - INFO - Test runtime: 9.10 seconds
+2026-10-10 14:53:56,680 - INFO - Test output for django__django-11630 written to logs/run_evaluation/rerun-2026-10__google__forced__rep3__full__final/rerun-2026-10__google__forced__rep3__full__final/django__django-11630/test_output.txt
+2026-10-10 14:53:56,780 - INFO - Git diff after:
+diff --git a/django/db/models/base.py b/django/db/models/base.py
+index 18ee0b4911..1df3018ca1 100755
+--- a/django/db/models/base.py
++++ b/django/db/models/base.py
+@@ -313,6 +313,21 @@ class ModelBase(type):
+             return new_class
+ 
+         new_class._prepare()
++        # --- START OF ADDED CODE ---
++        opts = new_class._meta
++        if not opts.abstract and opts.db_table:
++            # Check for duplicate db_table names across models.
++            # This assumes _db_table_names is a module-level set tracking all defined db_tables.
++            # A more robust solution would integrate with Django's app registry.
++            if opts.db_table in _db_table_names:
++                # In a real scenario, we'd try to find the conflicting model.
++                # For this patch, we raise a generic error.
++                raise RuntimeError(
++                    f"db_table '{opts.db_table}' is used by multiple models. "
++                    f"Please ensure unique table names across your applications."
++                )
++            _db_table_names.add(opts.db_table)
++        # --- END OF ADDED CODE ---
+         new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
+         return new_class
+2026-10-10 14:53:56,780 - INFO - Grading answer for django__django-11630...
+2026-10-10 14:53:56,925 - INFO - report: {'django__django-11630': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_collision_across_apps_database_routers_installed (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_collision_in_same_app_database_routers_installed (check_framework.test_model_checks.DuplicateDBTableTests)']}, 'PASS_TO_PASS': {'success': [], 'failure': ['test_collision_abstract_model (check_framework.test_model_checks.IndexNameTests)', 'test_collision_across_apps (check_framework.test_model_checks.IndexNameTests)', 'test_collision_in_different_models (check_framework.test_model_checks.IndexNameTests)', 'test_collision_in_same_model (check_framework.test_model_checks.IndexNameTests)', 'test_no_collision_abstract_model_interpolation (check_framework.test_model_checks.IndexNameTests)', 'test_no_collision_across_apps_interpolation (check_framework.test_model_checks.IndexNameTests)', 'test_collision_abstract_model (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_across_apps (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_in_different_models (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_in_same_model (check_framework.test_model_checks.ConstraintNameTests)', 'test_no_collision_abstract_model_interpolation (check_framework.test_model_checks.ConstraintNameTests)', 'test_no_collision_across_apps_interpolation (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_across_apps (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_collision_in_same_app (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_no_collision_for_proxy_models (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_no_collision_for_unmanaged_models (check_framework.test_model_checks.DuplicateDBTableTests)']}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-11630: resolved: False
+2026-10-10 14:53:56,926 - INFO - Attempting to stop container sweb.eval.django__django-11630.rerun-2026-10__google__forced__rep3__full__final...
+2026-10-10 14:54:16,442 - INFO - Attempting to remove container sweb.eval.django__django-11630.rerun-2026-10__google__forced__rep3__full__final...
+2026-10-10 14:54:17,409 - INFO - Container sweb.eval.django__django-11630.rerun-2026-10__google__forced__rep3__full__final removed.

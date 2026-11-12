@@ -1,0 +1,34 @@
+diff --git a/django/db/backends/sqlite3/schema.py b/django/db/backends/sqlite3/schema.py
+index f0c81c123b..aa1e79c4eb 100644
+--- a/django/db/backends/sqlite3/schema.py
++++ b/django/db/backends/sqlite3/schema.py
+@@ -427,7 +427,16 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         ):
+             super().add_constraint(model, constraint)
+         else:
+-            self._remake_table(model)
++            # SQLite does not support unique constraints on expressions or
++            # partial indexes, so we must recreate the table. However, SQLite
++            # also does not support indexes on expressions with the "." operator.
++            # We need to check if the unique constraint uses expressions with F()
++            # references and avoid recreating the table if so, to prevent errors.
++            if any(isinstance(expr, F) and '.' in expr.name for expr in getattr(constraint, 'expressions', [])):
++                # Fall back to super to avoid the "." operator error in index expressions
++                super().add_constraint(model, constraint)
++            else:
++                self._remake_table(model)
+ 
+     def remove_constraint(self, model, constraint):
+         if isinstance(constraint, UniqueConstraint) and (
+@@ -438,7 +447,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         ):
+             super().remove_constraint(model, constraint)
+         else:
+-            self._remake_table(model)
++            if any(isinstance(expr, F) and '.' in expr.name for expr in getattr(constraint, 'expressions', [])):
++                super().remove_constraint(model, constraint)
++            else:
++                self._remake_table(model)
+ 
+     def _collate_sql(self, collation):
+         return 'COLLATE ' + collation

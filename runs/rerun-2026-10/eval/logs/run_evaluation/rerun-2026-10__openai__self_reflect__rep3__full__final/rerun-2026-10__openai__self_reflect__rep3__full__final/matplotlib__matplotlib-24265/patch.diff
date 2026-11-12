@@ -1,0 +1,20 @@
+diff --git a/lib/matplotlib/style/core.py b/lib/matplotlib/style/core.py
+index fb0a5426e6..396688bf8c 100644
+--- a/lib/matplotlib/style/core.py
++++ b/lib/matplotlib/style/core.py
+@@ -138,6 +138,15 @@ def use(style):
+                     "they will remain available as 'seaborn-v0_8-<style>'. "
+                     "Alternatively, directly use the seaborn API instead.")
+                 s = s.replace("seaborn", "seaborn-v0_8")
++
++            # Also warn if the user tries to access the old seaborn style keys
++            if s.startswith("seaborn-") and not s.startswith("seaborn-v0_8-"):
++                _api.warn_deprecated(
++                    "3.6", message=(
++                        f"The style '{s}' is deprecated and has been renamed to "
++                        f"'seaborn-v0_8-{s[len('seaborn-'):]}' for compatibility."
++                    )
++                )
+         return s
+ 
+     for style in map(fix_style, styles):

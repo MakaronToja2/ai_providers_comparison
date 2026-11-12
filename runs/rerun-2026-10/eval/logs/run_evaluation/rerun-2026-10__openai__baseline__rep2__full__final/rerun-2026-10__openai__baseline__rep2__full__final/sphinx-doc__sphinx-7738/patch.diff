@@ -1,0 +1,14 @@
+diff --git a/sphinx/ext/napoleon/docstring.py b/sphinx/ext/napoleon/docstring.py
+index 11409e6f6b..e9fd19d737 100644
+--- a/sphinx/ext/napoleon/docstring.py
++++ b/sphinx/ext/napoleon/docstring.py
+@@ -318,7 +318,8 @@ class GoogleDocstring:
+             return [line[min_indent:] for line in lines]
+ 
+     def _escape_args_and_kwargs(self, name: str) -> str:
+-        if name.endswith('_'):
++        # Avoid escaping trailing underscore for attribute names to prevent overescaping in output
++        if name.endswith('_') and not name.isidentifier():
+             name = name[:-1] + r'\_'
+ 
+         if name[:2] == '**':

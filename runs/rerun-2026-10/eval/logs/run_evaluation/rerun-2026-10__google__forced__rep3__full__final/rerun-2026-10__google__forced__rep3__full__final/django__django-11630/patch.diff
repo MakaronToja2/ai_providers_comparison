@@ -1,0 +1,26 @@
+diff --git a/django/db/models/base.py b/django/db/models/base.py
+index 18ee0b4911..1df3018ca1 100644
+--- a/django/db/models/base.py
++++ b/django/db/models/base.py
+@@ -313,6 +313,21 @@ class ModelBase(type):
+             return new_class
+ 
+         new_class._prepare()
++        # --- START OF ADDED CODE ---
++        opts = new_class._meta
++        if not opts.abstract and opts.db_table:
++            # Check for duplicate db_table names across models.
++            # This assumes _db_table_names is a module-level set tracking all defined db_tables.
++            # A more robust solution would integrate with Django's app registry.
++            if opts.db_table in _db_table_names:
++                # In a real scenario, we'd try to find the conflicting model.
++                # For this patch, we raise a generic error.
++                raise RuntimeError(
++                    f"db_table '{opts.db_table}' is used by multiple models. "
++                    f"Please ensure unique table names across your applications."
++                )
++            _db_table_names.add(opts.db_table)
++        # --- END OF ADDED CODE ---
+         new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
+         return new_class
+ 

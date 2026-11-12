@@ -1,0 +1,3 @@
+# Separate environment for the official SWE-bench evaluation harness.
+# 4.1.0 is the release the January logs match; 5.x removed --namespace/--cache_level.
+swebench==4.1.0

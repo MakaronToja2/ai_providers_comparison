@@ -1,0 +1,30 @@
+{
+    "total_instances": 4,
+    "submitted_instances": 4,
+    "completed_instances": 1,
+    "resolved_instances": 0,
+    "unresolved_instances": 1,
+    "empty_patch_instances": 0,
+    "error_instances": 3,
+    "completed_ids": [
+        "sympy__sympy-19007"
+    ],
+    "incomplete_ids": [],
+    "empty_patch_ids": [],
+    "submitted_ids": [
+        "matplotlib__matplotlib-26011",
+        "pytest-dev__pytest-5692",
+        "sphinx-doc__sphinx-7975",
+        "sympy__sympy-19007"
+    ],
+    "resolved_ids": [],
+    "unresolved_ids": [
+        "sympy__sympy-19007"
+    ],
+    "error_ids": [
+        "matplotlib__matplotlib-26011",
+        "pytest-dev__pytest-5692",
+        "sphinx-doc__sphinx-7975"
+    ],
+    "schema_version": 2
+}

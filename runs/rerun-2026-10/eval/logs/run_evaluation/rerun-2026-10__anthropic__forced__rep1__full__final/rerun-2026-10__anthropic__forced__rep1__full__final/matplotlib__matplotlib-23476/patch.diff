@@ -1,0 +1,35 @@
+diff --git a/lib/matplotlib/figure.py b/lib/matplotlib/figure.py
+index c55864243a..e467c09613 100644
+--- a/lib/matplotlib/figure.py
++++ b/lib/matplotlib/figure.py
+@@ -3026,6 +3026,10 @@ class Figure(FigureBase):
+         # add version information to the state
+         state['__mpl_version__'] = mpl.__version__
+ 
++        # Preserve _original_dpi to avoid DPI scaling issues on unpickling
++        # (especially important for high-DPI displays like M1 Macs)
++        state['_original_dpi'] = getattr(self, '_original_dpi', self.dpi)
++
+         # check whether the figure manager (if any) is registered with pyplot
+         from matplotlib import _pylab_helpers
+         if self.canvas.manager in _pylab_helpers.Gcf.figs.values():
+@@ -3035,6 +3039,8 @@ class Figure(FigureBase):
+     def __setstate__(self, state):
+         version = state.pop('__mpl_version__')
+         restore_to_pylab = state.pop('_restore_to_pylab', False)
++        # Preserve _original_dpi before restoring state to avoid DPI scaling issues
++        original_dpi = state.pop('_original_dpi', None)
+ 
+         if version != mpl.__version__:
+             _api.warn_external(
+@@ -3043,6 +3049,10 @@ class Figure(FigureBase):
+ 
+         self.__dict__ = state
+ 
++        # Restore _original_dpi before creating canvas to ensure correct DPI scaling
++        if original_dpi is not None:
++            self._original_dpi = original_dpi
++
+         # re-initialise some of the unstored state information
+         FigureCanvasBase(self)  # Set self.canvas.
+ 

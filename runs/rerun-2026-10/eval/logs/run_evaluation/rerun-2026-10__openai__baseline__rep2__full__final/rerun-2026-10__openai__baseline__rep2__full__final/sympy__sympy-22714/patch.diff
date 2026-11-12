@@ -1,0 +1,14 @@
+diff --git a/sympy/geometry/point.py b/sympy/geometry/point.py
+index 73c20334d0..e8ec32b924 100644
+--- a/sympy/geometry/point.py
++++ b/sympy/geometry/point.py
+@@ -911,6 +911,9 @@ class Point2D(Point):
+ 
+     def __new__(cls, *args, _nocheck=False, **kwargs):
+         if not _nocheck:
++            # Pass evaluate flag explicitly to Point to avoid default global evaluate
++            if 'evaluate' not in kwargs:
++                kwargs['evaluate'] = kwargs.get('evaluate', True)
+             kwargs['dim'] = 2
+             args = Point(*args, **kwargs)
+         return GeometryEntity.__new__(cls, *args)

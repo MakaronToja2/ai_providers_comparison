@@ -1,0 +1,50 @@
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 0c64748ccd..c45f4ad3d1 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1668,6 +1668,45 @@ class FilePathField(Field):
+         kwargs.setdefault('max_length', 100)
+         super().__init__(verbose_name, name, **kwargs)
+ 
++    def deconstruct(self):
++        name, path, args, kwargs = super().deconstruct()
++        # If path is a callable, store its import path instead of calling it
++        if callable(self.path):
++            import_path = f"{self.path.__module__}.{self.path.__qualname__}"
++            kwargs['path'] = import_path
++        elif self.path != '':
++            kwargs['path'] = self.path
++        if self.match is not None:
++            kwargs['match'] = self.match
++        if self.recursive is not False:
++            kwargs['recursive'] = self.recursive
++        if self.allow_files is not True:
++            kwargs['allow_files'] = self.allow_files
++        if self.allow_folders is not False:
++            kwargs['allow_folders'] = self.allow_folders
++        if kwargs.get("max_length") == 100:
++            del kwargs["max_length"]
++        return name, path, args, kwargs
++
++    def get_prep_value(self, value):
++        value = super().get_prep_value(value)
++        if value is None:
++            return None
++        return str(value)
++
++    def formfield(self, **kwargs):
++        # If path is a callable, call it to get the path string
++        path = self.path() if callable(self.path) else self.path
++        return super().formfield(**{
++            'path': path,
++            'match': self.match,
++            'recursive': self.recursive,
++            'form_class': forms.FilePathField,
++            'allow_files': self.allow_files,
++            'allow_folders': self.allow_folders,
++            **kwargs,
++        })
++
+     def check(self, **kwargs):
+         return [
+             *super().check(**kwargs),

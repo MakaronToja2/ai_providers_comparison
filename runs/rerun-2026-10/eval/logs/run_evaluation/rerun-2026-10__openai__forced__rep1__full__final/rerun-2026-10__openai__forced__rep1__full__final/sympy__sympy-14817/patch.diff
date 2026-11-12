@@ -1,0 +1,25 @@
+diff --git a/sympy/printing/pretty/pretty.py b/sympy/printing/pretty/pretty.py
+index 0545797d5f..e7f38063f6 100644
+--- a/sympy/printing/pretty/pretty.py
++++ b/sympy/printing/pretty/pretty.py
+@@ -825,9 +825,18 @@ def _print_MatAdd(self, expr):
+             if s is None:
+                 s = pform     # First element
+             else:
+-                if S(item.args[0]).is_negative:
++                # Instead of trying to sympify item.args[0] which can be a string and cause errors,
++                # we check if the item is a Mul with a negative coefficient or a negative number directly.
++                from sympy import Mul, Number
++                first_arg = item.args[0]
++                is_negative = False
++                if isinstance(first_arg, Number):
++                    is_negative = first_arg.is_negative
++                elif isinstance(item, Mul) and item.args[0].is_Number:
++                    is_negative = item.args[0].is_negative
++
++                if is_negative:
+                     s = prettyForm(*stringPict.next(s, ' '))
+-                    pform = self._print(item)
+                 else:
+                     s = prettyForm(*stringPict.next(s, ' + '))
+                 s = prettyForm(*stringPict.next(s, pform))

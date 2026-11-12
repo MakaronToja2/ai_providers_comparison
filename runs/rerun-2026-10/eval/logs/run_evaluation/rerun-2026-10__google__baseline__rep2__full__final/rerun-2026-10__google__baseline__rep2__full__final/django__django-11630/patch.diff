@@ -1,0 +1,65 @@
+diff --git a/django/core/checks/model_checks.py b/django/core/checks/model_checks.py
+index 5c2266ca1d..53d3f4b01d 100644
+--- a/django/core/checks/model_checks.py
++++ b/django/core/checks/model_checks.py
+@@ -3,7 +3,7 @@ import types
+ from collections import defaultdict
+ from itertools import chain
+ 
+-from django.apps import apps
++from django.apps import apps, AppConfig
+ from django.core.checks import Error, Tags, register
+ 
+ 
+@@ -12,6 +12,8 @@ def check_all_models(app_configs=None, **kwargs):
+     db_table_models = defaultdict(list)
+     indexes = defaultdict(list)
+     constraints = defaultdict(list)
++    from django.db.utils import ConnectionRouter, DEFAULT_DB_ALIAS
++    router = ConnectionRouter()
+     errors = []
+     if app_configs is None:
+         models = apps.get_models()
+@@ -19,7 +21,7 @@ def check_all_models(app_configs=None, **kwargs):
+         models = chain.from_iterable(app_config.get_models() for app_config in app_configs)
+     for model in models:
+         if model._meta.managed and not model._meta.proxy:
+-            db_table_models[model._meta.db_table].append(model._meta.label)
++            db_table_models[model._meta.db_table].append((model._meta.label, router.db_for_read(model)))
+         if not inspect.ismethod(model.check):
+             errors.append(
+                 Error(
+@@ -35,16 +37,24 @@ def check_all_models(app_configs=None, **kwargs):
+             indexes[model_index.name].append(model._meta.label)
+         for model_constraint in model._meta.constraints:
+             constraints[model_constraint.name].append(model._meta.label)
+-    for db_table, model_labels in db_table_models.items():
+-        if len(model_labels) != 1:
+-            errors.append(
+-                Error(
+-                    "db_table '%s' is used by multiple models: %s."
+-                    % (db_table, ', '.join(db_table_models[db_table])),
+-                    obj=db_table,
+-                    id='models.E028',
++
++    # Group models by db_table and db_alias
++    grouped_db_tables = defaultdict(lambda: defaultdict(list))
++    for db_table, model_info_list in db_table_models.items():
++        for model_label, db_alias in model_info_list:
++            grouped_db_tables[db_alias][db_table].append(model_label)
++
++    for db_alias, tables in grouped_db_tables.items():
++        for db_table, model_labels in tables.items():
++            if len(model_labels) > 1:
++                errors.append(
++                    Error(
++                        "db_table '%s' is used by multiple models in database '%s': %s."
++                        % (db_table, db_alias, ', '.join(sorted(model_labels))),
++                        obj=db_table,
++                        id='models.E028',
++                    )
+                 )
+-            )
+     for index_name, model_labels in indexes.items():
+         if len(model_labels) > 1:
+             model_labels = set(model_labels)

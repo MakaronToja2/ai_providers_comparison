@@ -1,0 +1,134 @@
+2026-10-10 19:34:53,791 - INFO - Creating container for sympy__sympy-21847...
+2026-10-10 19:34:57,731 - INFO - Container for sympy__sympy-21847 created: cfd077319d1d62ccdff8ce038091d90735372fd026cc42870d5160ec559e5934
+2026-10-10 19:35:01,707 - INFO - Container for sympy__sympy-21847 started: cfd077319d1d62ccdff8ce038091d90735372fd026cc42870d5160ec559e5934
+2026-10-10 19:35:01,707 - INFO - Intermediate patch for sympy__sympy-21847 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep3__full__final/rerun-2026-10__google__self_reflect__rep3__full__final/sympy__sympy-21847/patch.diff, now applying to container...
+2026-10-10 19:35:01,794 - INFO - >>>>> Applied Patch:
+Checking patch sympy/polys/monomials.py...
+warning: sympy/polys/monomials.py has type 100755, expected 100644
+Applied patch sympy/polys/monomials.py cleanly.
+
+2026-10-10 19:35:02,094 - INFO - Git diff before:
+diff --git a/sympy/polys/monomials.py b/sympy/polys/monomials.py
+index 0e84403307..c860ee907e 100755
+--- a/sympy/polys/monomials.py
++++ b/sympy/polys/monomials.py
+@@ -113,35 +113,24 @@ def itermonomials(variables, max_degrees, min_degrees=None):
+     if total_degree:
+         if min_degree > max_degree:
+             return
+-        if not variables or max_degree == 0:
+-            yield S.One
++        if not variables:
++            if min_degree <= 0 <= max_degree:
++                yield S.One
+             return
+-        # Force to list in case of passed tuple or other incompatible collection
+-        variables = list(variables) + [S.One]
+-        if all(variable.is_commutative for variable in variables):
+-            monomials_list_comm = []
+-            for item in combinations_with_replacement(variables, max_degree):
+-                powers = dict()
+-                for variable in variables:
+-                    powers[variable] = 0
+-                for variable in item:
+-                    if variable != 1:
+-                        powers[variable] += 1
+-                if max(powers.values()) >= min_degree:
+-                    monomials_list_comm.append(Mul(*item))
+-            yield from set(monomials_list_comm)
+-        else:
+-            monomials_list_non_comm = []
+-            for item in product(variables, repeat=max_degree):
+-                powers = dict()
+-                for variable in variables:
+-                    powers[variable] = 0
+-                for variable in item:
+-                    if variable != 1:
+-                        powers[variable] += 1
+-                if max(powers.values()) >= min_degree:
+-                    monomials_list_non_comm.append(Mul(*item))
+-            yield from set(monomials_list_non_comm)
++
++        monomials_list = []
++        for d in range(min_degree, max_degree + 1):
++            if d == 0:
++                monomials_list.append(S.One)
++                continue
++
++            if all(variable.is_commutative for variable in variables):
++                for item in combinations_with_replacement(variables, d):
++                    monomials_list.append(Mul(*item))
++            else:
++                for item in product(variables, repeat=d):
++                    monomials_list.append(Mul(*item))
++        yield from set(monomials_list)
+     else:
+         if any(min_degrees[i] > max_degrees[i] for i in range(n)):
+             raise ValueError('min_degrees[i] must be <= max_degrees[i] for all i')
+2026-10-10 19:35:02,094 - INFO - Eval script for sympy__sympy-21847 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep3__full__final/rerun-2026-10__google__self_reflect__rep3__full__final/sympy__sympy-21847/eval.sh; copying to container...
+2026-10-10 19:35:05,842 - INFO - Test runtime: 3.69 seconds
+2026-10-10 19:35:05,843 - INFO - Test output for sympy__sympy-21847 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep3__full__final/rerun-2026-10__google__self_reflect__rep3__full__final/sympy__sympy-21847/test_output.txt
+2026-10-10 19:35:05,894 - INFO - Git diff after:
+diff --git a/sympy/polys/monomials.py b/sympy/polys/monomials.py
+index 0e84403307..c860ee907e 100755
+--- a/sympy/polys/monomials.py
++++ b/sympy/polys/monomials.py
+@@ -113,35 +113,24 @@ def itermonomials(variables, max_degrees, min_degrees=None):
+     if total_degree:
+         if min_degree > max_degree:
+             return
+-        if not variables or max_degree == 0:
+-            yield S.One
++        if not variables:
++            if min_degree <= 0 <= max_degree:
++                yield S.One
+             return
+-        # Force to list in case of passed tuple or other incompatible collection
+-        variables = list(variables) + [S.One]
+-        if all(variable.is_commutative for variable in variables):
+-            monomials_list_comm = []
+-            for item in combinations_with_replacement(variables, max_degree):
+-                powers = dict()
+-                for variable in variables:
+-                    powers[variable] = 0
+-                for variable in item:
+-                    if variable != 1:
+-                        powers[variable] += 1
+-                if max(powers.values()) >= min_degree:
+-                    monomials_list_comm.append(Mul(*item))
+-            yield from set(monomials_list_comm)
+-        else:
+-            monomials_list_non_comm = []
+-            for item in product(variables, repeat=max_degree):
+-                powers = dict()
+-                for variable in variables:
+-                    powers[variable] = 0
+-                for variable in item:
+-                    if variable != 1:
+-                        powers[variable] += 1
+-                if max(powers.values()) >= min_degree:
+-                    monomials_list_non_comm.append(Mul(*item))
+-            yield from set(monomials_list_non_comm)
++
++        monomials_list = []
++        for d in range(min_degree, max_degree + 1):
++            if d == 0:
++                monomials_list.append(S.One)
++                continue
++
++            if all(variable.is_commutative for variable in variables):
++                for item in combinations_with_replacement(variables, d):
++                    monomials_list.append(Mul(*item))
++            else:
++                for item in product(variables, repeat=d):
++                    monomials_list.append(Mul(*item))
++        yield from set(monomials_list)
+     else:
+         if any(min_degrees[i] > max_degrees[i] for i in range(n)):
+             raise ValueError('min_degrees[i] must be <= max_degrees[i] for all i')
+2026-10-10 19:35:05,894 - INFO - Grading answer for sympy__sympy-21847...
+2026-10-10 19:35:05,895 - INFO - report: {'sympy__sympy-21847': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_monomials'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_monomial_count', 'test_monomial_mul', 'test_monomial_div', 'test_monomial_gcd', 'test_monomial_lcm', 'test_monomial_max', 'test_monomial_pow', 'test_monomial_min', 'test_monomial_divides'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-21847: resolved: True
+2026-10-10 19:35:05,896 - INFO - Attempting to stop container sweb.eval.sympy__sympy-21847.rerun-2026-10__google__self_reflect__rep3__full__final...
+2026-10-10 19:35:23,979 - INFO - Attempting to remove container sweb.eval.sympy__sympy-21847.rerun-2026-10__google__self_reflect__rep3__full__final...
+2026-10-10 19:35:24,871 - INFO - Container sweb.eval.sympy__sympy-21847.rerun-2026-10__google__self_reflect__rep3__full__final removed.

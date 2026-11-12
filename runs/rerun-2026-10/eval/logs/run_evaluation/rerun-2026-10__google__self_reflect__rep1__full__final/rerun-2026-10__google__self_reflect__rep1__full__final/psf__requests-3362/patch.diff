@@ -1,0 +1,22 @@
+diff --git a/requests/utils.py b/requests/utils.py
+index 8d17b6b2..f20e0b87 100644
+--- a/requests/utils.py
++++ b/requests/utils.py
+@@ -359,12 +359,12 @@ def get_encoding_from_headers(headers):
+ def stream_decode_response_unicode(iterator, r):
+     """Stream decodes a iterator."""
+ 
+-    if r.encoding is None:
+-        for item in iterator:
+-            yield item
+-        return
++    # If encoding is not specified, fall back to UTF-8 for decoding.
++    # This ensures that decode_unicode=True in iter_content always
++    # attempts to decode, even if the encoding detection fails.
++    encoding = r.encoding if r.encoding is not None else 'utf-8'
+ 
+-    decoder = codecs.getincrementaldecoder(r.encoding)(errors='replace')
++    decoder = codecs.getincrementaldecoder(encoding)(errors='replace')
+     for chunk in iterator:
+         rv = decoder.decode(chunk)
+         if rv:

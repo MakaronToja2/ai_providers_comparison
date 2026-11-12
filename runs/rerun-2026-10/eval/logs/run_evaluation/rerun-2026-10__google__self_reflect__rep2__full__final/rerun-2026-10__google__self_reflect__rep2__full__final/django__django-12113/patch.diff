@@ -1,0 +1,16 @@
+diff --git a/tests/admin_views/test_multidb.py b/tests/admin_views/test_multidb.py
+index a02b637d34..bb57105e2b 100644
+--- a/tests/admin_views/test_multidb.py
++++ b/tests/admin_views/test_multidb.py
+@@ -36,7 +36,10 @@ class MultiDatabaseTests(TestCase):
+         cls.test_book_ids = {}
+         for db in connections:
+             Router.target_db = db
+-            cls.superusers[db] = User.objects.create_superuser(
++            # Ensure that User.objects.using(db) is used to explicitly set the database
++            # for the manager, which is then used by create_superuser.
++            user_manager = User.objects.using(db)
++            cls.superusers[db] = user_manager.create_superuser(
+                 username='admin', password='something', email='test@test.org',
+             )
+             b = Book(name='Test Book')

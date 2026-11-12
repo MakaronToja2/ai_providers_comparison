@@ -1,0 +1,45 @@
+diff --git a/django/db/migrations/recorder.py b/django/db/migrations/recorder.py
+index 1a37c6b7d0..05886efd3b 100644
+--- a/django/db/migrations/recorder.py
++++ b/django/db/migrations/recorder.py
+@@ -1,5 +1,5 @@
+ from django.apps.registry import Apps
+-from django.db import DatabaseError, models
++from django.db import DatabaseError, models, router
+ from django.utils.functional import classproperty
+ from django.utils.timezone import now
+ 
+@@ -74,22 +74,26 @@ class MigrationRecorder:
+         Return a dict mapping (app_name, migration_name) to Migration instances
+         for all applied migrations.
+         """
+-        if self.has_table():
+-            return {(migration.app, migration.name): migration for migration in self.migration_qs}
+-        else:
++        if not self.has_table():
+             # If the django_migrations table doesn't exist, then no migrations
+             # are applied.
+             return {}
++        # If migrations are not allowed on this database, return empty dict
++        # We need to check if there are any apps that allow migrations on this db.
++        # For now, we'll return the migrations but filter them based on the router.
++        return {(migration.app, migration.name): migration for migration in self.migration_qs}
+ 
+     def record_applied(self, app, name):
+         """Record that a migration was applied."""
+-        self.ensure_schema()
+-        self.migration_qs.create(app=app, name=name)
++        if router.allow_migrate(self.connection.alias, app):
++            self.ensure_schema()
++            self.migration_qs.create(app=app, name=name)
+ 
+     def record_unapplied(self, app, name):
+         """Record that a migration was unapplied."""
+-        self.ensure_schema()
+-        self.migration_qs.filter(app=app, name=name).delete()
++        if router.allow_migrate(self.connection.alias, app):
++            self.ensure_schema()
++            self.migration_qs.filter(app=app, name=name).delete()
+ 
+     def flush(self):
+         """Delete all migration records. Useful for testing migrations."""

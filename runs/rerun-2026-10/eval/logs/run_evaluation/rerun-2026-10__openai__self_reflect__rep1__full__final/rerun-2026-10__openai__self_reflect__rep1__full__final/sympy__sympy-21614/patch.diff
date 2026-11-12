@@ -1,0 +1,15 @@
+diff --git a/sympy/core/function.py b/sympy/core/function.py
+index 69df976b8b..1371c3e724 100644
+--- a/sympy/core/function.py
++++ b/sympy/core/function.py
+@@ -1263,6 +1263,10 @@ def _diff_wrt(self):
+         >>> Derivative(f(f(x)), x)._diff_wrt
+         False
+         """
++        from sympy.matrices.common import MatrixCommon
++        # If the expression is a matrix expression, then _diff_wrt should be True
++        if isinstance(self.expr, MatrixCommon):
++            return True
+         return self.expr._diff_wrt and isinstance(self.doit(), Derivative)
+ 
+     def __new__(cls, expr, *variables, **kwargs):

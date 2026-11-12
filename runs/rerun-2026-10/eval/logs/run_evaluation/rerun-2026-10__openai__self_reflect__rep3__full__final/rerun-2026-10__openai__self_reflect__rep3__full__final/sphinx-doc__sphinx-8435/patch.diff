@@ -1,0 +1,44 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 171a3e7b0d..0cdd8443af 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1273,7 +1273,38 @@ class FunctionDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # typ
+         return args
+ 
+     def document_members(self, all_members: bool = False) -> None:
+-        pass
++        # Document variables and attributes with type aliases applied
++        if not self.object:
++            return
++
++        # If the object is a module or class, document variables/attributes
++        if hasattr(self.object, '__dict__'):
++            members = self.object.__dict__.items()
++        else:
++            members = []
++
++        for name, member in members:
++            # Skip private and special members unless all_members is True
++            if not all_members and (name.startswith('_') or inspect.isroutine(member)):
++                continue
++
++            # Only document variables and attributes (not methods or classes)
++            if inspect.isroutine(member) or isinstance(member, type):
++                continue
++
++            # Create a Documenter for the variable/attribute
++            from sphinx.ext.autodoc.data import DataDocumenter
++            documenter = DataDocumenter(self.directive, name)
++            documenter.parent = self
++            documenter.object = member
++            documenter.objpath = self.objpath + [name]
++            documenter.options = self.options
++            documenter.config = self.config
++            documenter.env = self.env
++            documenter.state = self.state
++            documenter.state_machine = self.state_machine
++            documenter.document_members(all_members)
++            documenter.generate()
+ 
+     def add_directive_header(self, sig: str) -> None:
+         sourcename = self.get_sourcename()

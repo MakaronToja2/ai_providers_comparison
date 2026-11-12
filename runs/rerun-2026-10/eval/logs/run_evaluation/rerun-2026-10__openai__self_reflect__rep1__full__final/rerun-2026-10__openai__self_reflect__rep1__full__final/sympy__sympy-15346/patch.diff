@@ -1,0 +1,129 @@
+diff --git a/sympy/simplify/simplify.py b/sympy/simplify/simplify.py
+index 421bfba0a7..228d1594a3 100644
+--- a/sympy/simplify/simplify.py
++++ b/sympy/simplify/simplify.py
+@@ -34,9 +34,123 @@
+ 
+ from sympy.polys import (together, cancel, factor)
+ 
+-
+ import mpmath
+ 
++def simplify(expr, ratio=1.7, measure=None, rational=False, inverse=False):
++    """
++    Simplify an expression by applying a variety of simplification techniques.
++
++    Parameters
++    ==========
++    expr : Expr
++        The expression to simplify.
++    ratio : float, optional
++        The ratio of complexity reduction required to accept a simplification.
++    measure : callable, optional
++        A function to measure the complexity of the expression.
++    rational : bool, optional
++        If True, rational simplifications will be applied.
++    inverse : bool, optional
++        If True, inverse simplifications will be applied.
++
++    Returns
++    =======
++    Expr
++        The simplified expression.
++
++    Notes
++    =====
++    This function attempts to simplify expressions involving trigonometric
++    functions with rational arguments by converting them to exact values
++    where possible.
++
++    """
++    from sympy.core import Expr as ExprType
++    from sympy.functions.elementary.trigonometric import sin, cos
++    from sympy import simplify as sympy_simplify
++    from sympy import Add
++
++    expr = _sympify(expr)
++
++    # If the expression is a sum of terms involving sin and cos with rational arguments,
++    # try to use trigonometric identities to simplify.
++    # This is a heuristic to handle cases like sin(a)*sin(b) + cos(a)*cos(b) where a, b are Rational.
++
++    # We will try to rewrite sin(a)*sin(b) + cos(a)*cos(b) as cos(a-b) if a and b are Rational.
++
++    def match_sin_cos_pattern(e):
++        # Try to match e to sin(a)*sin(b) + cos(a)*cos(b)
++        if not e.is_Add:
++            return None
++        args = e.args
++        if len(args) != 2:
++            return None
++        a1, a2 = args
++        # Check if one term is sin(a)*sin(b) and the other cos(a)*cos(b)
++        def get_sin_cos_factors(expr):
++            if not expr.is_Mul:
++                return None
++            sin_args = []
++            cos_args = []
++            for f in expr.args:
++                if f.func == sin:
++                    sin_args.append(f.args[0])
++                elif f.func == cos:
++                    cos_args.append(f.args[0])
++                else:
++                    return None
++            return sin_args, cos_args
++
++        sin1, cos1 = get_sin_cos_factors(a1)
++        sin2, cos2 = get_sin_cos_factors(a2)
++        if sin1 is None or sin2 is None:
++            return None
++        # Check pattern sin(a)*sin(b) + cos(a)*cos(b)
++        # one term has two sin factors, other has two cos factors
++        if len(sin1) == 2 and len(cos2) == 2:
++            a, b = sin1
++            c, d = cos2
++            if a == c and b == d:
++                return a, b
++        if len(sin2) == 2 and len(cos1) == 2:
++            a, b = sin2
++            c, d = cos1
++            if a == c and b == d:
++                return a, b
++        return None
++
++    def try_trig_rational_simplify(e):
++        if e.is_Add:
++            # Try to match the pattern sin(a)*sin(b) + cos(a)*cos(b)
++            match = match_sin_cos_pattern(e)
++            if match:
++                a, b = match
++                if a.is_Rational and b.is_Rational:
++                    return cos(a - b)
++            # Otherwise recurse
++            return Add(*[try_trig_rational_simplify(arg) for arg in e.args])
++        elif e.is_Function:
++            # If it's sin or cos of Rational, evaluate numerically to high precision
++            if e.func in (sin, cos):
++                arg = e.args[0]
++                if arg.is_Rational:
++                    # Evaluate to high precision float to enable simplification
++                    return e.func(float(arg))
++            return e
++        elif e.is_Mul or e.is_Pow or e.is_Poly or e.is_Symbol:
++            # Recurse into args if any
++            if hasattr(e, 'args'):
++                return e.func(*[try_trig_rational_simplify(arg) for arg in e.args])
++            else:
++                return e
++        else:
++            return e
++
++    # Apply the heuristic simplification
++    expr = try_trig_rational_simplify(expr)
++
++    # Then apply the standard sympy simplify
++    return sympy_simplify(expr, ratio=ratio, measure=measure)
+ 
+ 
+ def separatevars(expr, symbols=[], dict=False, force=False):

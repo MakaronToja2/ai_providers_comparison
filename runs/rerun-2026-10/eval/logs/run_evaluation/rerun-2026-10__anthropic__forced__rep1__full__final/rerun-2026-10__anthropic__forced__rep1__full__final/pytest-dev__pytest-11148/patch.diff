@@ -1,0 +1,13 @@
+diff --git a/src/_pytest/pathlib.py b/src/_pytest/pathlib.py
+index e43310ef0..24c4fedd0 100644
+--- a/src/_pytest/pathlib.py
++++ b/src/_pytest/pathlib.py
+@@ -651,6 +651,8 @@ def insert_missing_modules(modules: Dict[str, ModuleType], module_name: str) ->
+                     module_name,
+                     doc="Empty module created by pytest's importmode=importlib.",
+                 )
++            # Ensure the module is in sys.modules to avoid duplicate imports
++            modules[module_name] = module
+         else:
+             module = modules[module_name]
+         if child_module:

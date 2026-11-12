@@ -1,0 +1,38 @@
+diff --git a/django/db/models/fields/json.py b/django/db/models/fields/json.py
+index 29c6ff0926..1ec6d00d95 100644
+--- a/django/db/models/fields/json.py
++++ b/django/db/models/fields/json.py
+@@ -368,11 +368,33 @@ class KeyTransformIsNull(lookups.IsNull):
+     def as_oracle(self, compiler, connection):
+         if not self.rhs:
+             return HasKey(self.lhs.lhs, self.lhs.key_name).as_oracle(compiler, connection)
++        # For isnull=True, exclude keys with JSON null values on Oracle
++        if self.rhs:
++            has_key_expr = HasKey(self.lhs.lhs, self.lhs.key_name)
++            has_key_sql, has_key_params = has_key_expr.as_oracle(compiler, connection)
++            is_null_expr = self.lhs.get_lookup('isnull')(self.lhs, True)
++            is_null_sql, is_null_params = is_null_expr.as_sql(compiler, connection)
++            # Exclude keys with JSON null values by negating the is_null condition
++            return (
++                '%s AND NOT (%s)' % (has_key_sql, is_null_sql),
++                tuple(has_key_params) + tuple(is_null_params),
++            )
+         return super().as_sql(compiler, connection)
+ 
+     def as_sqlite(self, compiler, connection):
+         if not self.rhs:
+             return HasKey(self.lhs.lhs, self.lhs.key_name).as_sqlite(compiler, connection)
++        # For isnull=True, exclude keys with JSON null values on SQLite
++        if self.rhs:
++            has_key_expr = HasKey(self.lhs.lhs, self.lhs.key_name)
++            has_key_sql, has_key_params = has_key_expr.as_sqlite(compiler, connection)
++            is_null_expr = self.lhs.get_lookup('isnull')(self.lhs, True)
++            is_null_sql, is_null_params = is_null_expr.as_sql(compiler, connection)
++            # Exclude keys with JSON null values by negating the is_null condition
++            return (
++                '%s AND NOT (%s)' % (has_key_sql, is_null_sql),
++                tuple(has_key_params) + tuple(is_null_params),
++            )
+         return super().as_sql(compiler, connection)
+ 
+ 

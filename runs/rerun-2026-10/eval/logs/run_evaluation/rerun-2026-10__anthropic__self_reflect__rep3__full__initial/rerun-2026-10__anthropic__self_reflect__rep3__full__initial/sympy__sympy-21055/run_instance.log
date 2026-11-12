@@ -1,0 +1,138 @@
+2026-10-10 19:31:27,858 - INFO - Creating container for sympy__sympy-21055...
+2026-10-10 19:31:34,095 - INFO - Container for sympy__sympy-21055 created: aa7122cc7441d240f8085034874a4a06a1e6f049a484a8a5efad57aef4fe28ad
+2026-10-10 19:31:41,942 - INFO - Container for sympy__sympy-21055 started: aa7122cc7441d240f8085034874a4a06a1e6f049a484a8a5efad57aef4fe28ad
+2026-10-10 19:31:41,942 - INFO - Intermediate patch for sympy__sympy-21055 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep3__full__initial/rerun-2026-10__anthropic__self_reflect__rep3__full__initial/sympy__sympy-21055/patch.diff, now applying to container...
+2026-10-10 19:31:42,039 - INFO - >>>>> Applied Patch:
+Checking patch sympy/assumptions/refine.py...
+warning: sympy/assumptions/refine.py has type 100755, expected 100644
+Checking patch sympy/assumptions/tests/test_refine.py...
+warning: sympy/assumptions/tests/test_refine.py has type 100755, expected 100644
+Applied patch sympy/assumptions/refine.py cleanly.
+Applied patch sympy/assumptions/tests/test_refine.py cleanly.
+
+2026-10-10 19:31:42,323 - INFO - Git diff before:
+diff --git a/sympy/assumptions/refine.py b/sympy/assumptions/refine.py
+index e1f97190c0..9190630e10 100755
+--- a/sympy/assumptions/refine.py
++++ b/sympy/assumptions/refine.py
+@@ -373,6 +373,37 @@ def refine_matrixelement(expr, assumptions):
+             return expr
+         return MatrixElement(matrix, j, i)
+ 
++
++def refine_arg(expr, assumptions):
++    """
++    Handler for the argument (phase) of a complex number.
++
++    Examples
++    ========
++
++    >>> from sympy import Q, arg
++    >>> from sympy.assumptions.refine import refine_arg
++    >>> from sympy.abc import x
++    >>> refine_arg(arg(x), Q.positive(x))
++    0
++    >>> refine_arg(arg(x), Q.real(x) & Q.positive(x))
++    0
++    >>> refine_arg(arg(x), Q.negative(x))
++    pi
++    """
++    arg_expr = expr.args[0]
++    if ask(Q.positive(arg_expr), assumptions):
++        return S.Zero
++    if ask(Q.negative(arg_expr), assumptions):
++        return S.Pi
++    if ask(Q.real(arg_expr), assumptions):
++        if ask(Q.positive(arg_expr), assumptions):
++            return S.Zero
++        if ask(Q.negative(arg_expr), assumptions):
++            return S.Pi
++    return expr
++
++
+ handlers_dict = {
+     'Abs': refine_abs,
+     'Pow': refine_Pow,
+@@ -380,5 +411,6 @@ def refine_matrixelement(expr, assumptions):
+     're': refine_re,
+     'im': refine_im,
+     'sign': refine_sign,
++    'arg': refine_arg,
+     'MatrixElement': refine_matrixelement
+ }  # type: Dict[str, Callable[[Expr, Boolean], Expr]]
+diff --git a/sympy/assumptions/tests/test_refine.py b/sympy/assumptions/tests/test_refine.py
+index 505cd609e8..15f5a9e978 100755
+--- a/sympy/assumptions/tests/test_refine.py
++++ b/sympy/assumptions/tests/test_refine.py
+@@ -208,3 +208,11 @@ def test_matrixelement():
+     assert refine(x[1, 0], Q.symmetric(x)) == x[0, 1]
+     assert refine(x[i, j], Q.symmetric(x)) == x[j, i]
+     assert refine(x[j, i], Q.symmetric(x)) == x[j, i]
++
++
++def test_arg():
++    from sympy import arg, pi
++    assert refine(arg(x), Q.positive(x)) == 0
++    assert refine(arg(x), Q.negative(x)) == pi
++    assert refine(arg(x), Q.real(x) & Q.positive(x)) == 0
++    assert refine(arg(x), Q.real(x) & Q.negative(x)) == pi
+2026-10-10 19:31:42,323 - INFO - Eval script for sympy__sympy-21055 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep3__full__initial/rerun-2026-10__anthropic__self_reflect__rep3__full__initial/sympy__sympy-21055/eval.sh; copying to container...
+2026-10-10 19:31:52,283 - INFO - Test runtime: 9.91 seconds
+2026-10-10 19:31:52,284 - INFO - Test output for sympy__sympy-21055 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep3__full__initial/rerun-2026-10__anthropic__self_reflect__rep3__full__initial/sympy__sympy-21055/test_output.txt
+2026-10-10 19:31:52,328 - INFO - Git diff after:
+diff --git a/sympy/assumptions/refine.py b/sympy/assumptions/refine.py
+index e1f97190c0..9190630e10 100755
+--- a/sympy/assumptions/refine.py
++++ b/sympy/assumptions/refine.py
+@@ -373,6 +373,37 @@ def refine_matrixelement(expr, assumptions):
+             return expr
+         return MatrixElement(matrix, j, i)
+ 
++
++def refine_arg(expr, assumptions):
++    """
++    Handler for the argument (phase) of a complex number.
++
++    Examples
++    ========
++
++    >>> from sympy import Q, arg
++    >>> from sympy.assumptions.refine import refine_arg
++    >>> from sympy.abc import x
++    >>> refine_arg(arg(x), Q.positive(x))
++    0
++    >>> refine_arg(arg(x), Q.real(x) & Q.positive(x))
++    0
++    >>> refine_arg(arg(x), Q.negative(x))
++    pi
++    """
++    arg_expr = expr.args[0]
++    if ask(Q.positive(arg_expr), assumptions):
++        return S.Zero
++    if ask(Q.negative(arg_expr), assumptions):
++        return S.Pi
++    if ask(Q.real(arg_expr), assumptions):
++        if ask(Q.positive(arg_expr), assumptions):
++            return S.Zero
++        if ask(Q.negative(arg_expr), assumptions):
++            return S.Pi
++    return expr
++
++
+ handlers_dict = {
+     'Abs': refine_abs,
+     'Pow': refine_Pow,
+@@ -380,5 +411,6 @@ def refine_matrixelement(expr, assumptions):
+     're': refine_re,
+     'im': refine_im,
+     'sign': refine_sign,
++    'arg': refine_arg,
+     'MatrixElement': refine_matrixelement
+ }  # type: Dict[str, Callable[[Expr, Boolean], Expr]]
+2026-10-10 19:31:52,329 - INFO - Git diff changed after running eval script
+2026-10-10 19:31:52,329 - INFO - Grading answer for sympy__sympy-21055...
+2026-10-10 19:31:52,330 - INFO - report: {'sympy__sympy-21055': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_arg'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_Abs', 'test_pow1', 'test_pow2', 'test_exp', 'test_Piecewise', 'test_atan2', 'test_re', 'test_im', 'test_complex', 'test_sign', 'test_func_args', 'test_eval_refine', 'test_refine_issue_12724'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-21055: resolved: True
+2026-10-10 19:31:52,330 - INFO - Attempting to stop container sweb.eval.sympy__sympy-21055.rerun-2026-10__anthropic__self_reflect__rep3__full__initial...
+2026-10-10 19:32:13,716 - INFO - Attempting to remove container sweb.eval.sympy__sympy-21055.rerun-2026-10__anthropic__self_reflect__rep3__full__initial...
+2026-10-10 19:32:16,642 - INFO - Container sweb.eval.sympy__sympy-21055.rerun-2026-10__anthropic__self_reflect__rep3__full__initial removed.

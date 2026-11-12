@@ -1,0 +1,48 @@
+2026-10-10 12:32:12,518 - INFO - Creating container for django__django-10924...
+2026-10-10 12:32:13,354 - INFO - Container for django__django-10924 created: 86601eb09744e25a899c2495a51fa82417494257e78308af107f077805d590b0
+2026-10-10 12:32:13,931 - INFO - Container for django__django-10924 started: 86601eb09744e25a899c2495a51fa82417494257e78308af107f077805d590b0
+2026-10-10 12:32:13,932 - INFO - Intermediate patch for django__django-10924 written to logs/run_evaluation/rerun-2026-10__google__forced__rep2__full__final/rerun-2026-10__google__forced__rep2__full__final/django__django-10924/patch.diff, now applying to container...
+2026-10-10 12:32:14,249 - INFO - >>>>> Applied Patch:
+Checking patch django/db/models/fields/__init__.py...
+warning: django/db/models/fields/__init__.py has type 100755, expected 100644
+Applied patch django/db/models/fields/__init__.py cleanly.
+
+2026-10-10 12:32:15,110 - INFO - Git diff before:
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 0c64748ccd..edeff6f59f 100755
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1663,7 +1663,8 @@ class FilePathField(Field):
+ 
+     def __init__(self, verbose_name=None, name=None, path='', match=None,
+                  recursive=False, allow_files=True, allow_folders=False, **kwargs):
+-        self.path, self.match, self.recursive = path, match, recursive
++        self.path = path() if callable(path) else path
++        self.match, self.recursive = match, recursive
+         self.allow_files, self.allow_folders = allow_files, allow_folders
+         kwargs.setdefault('max_length', 100)
+         super().__init__(verbose_name, name, **kwargs)
+2026-10-10 12:32:15,111 - INFO - Eval script for django__django-10924 written to logs/run_evaluation/rerun-2026-10__google__forced__rep2__full__final/rerun-2026-10__google__forced__rep2__full__final/django__django-10924/eval.sh; copying to container...
+2026-10-10 12:32:24,489 - INFO - Test runtime: 9.26 seconds
+2026-10-10 12:32:25,225 - INFO - Test output for django__django-10924 written to logs/run_evaluation/rerun-2026-10__google__forced__rep2__full__final/rerun-2026-10__google__forced__rep2__full__final/django__django-10924/test_output.txt
+2026-10-10 12:32:25,325 - INFO - Git diff after:
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index 0c64748ccd..edeff6f59f 100755
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1663,7 +1663,8 @@ class FilePathField(Field):
+ 
+     def __init__(self, verbose_name=None, name=None, path='', match=None,
+                  recursive=False, allow_files=True, allow_folders=False, **kwargs):
+-        self.path, self.match, self.recursive = path, match, recursive
++        self.path = path() if callable(path) else path
++        self.match, self.recursive = match, recursive
+         self.allow_files, self.allow_folders = allow_files, allow_folders
+         kwargs.setdefault('max_length', 100)
+         super().__init__(verbose_name, name, **kwargs)
+2026-10-10 12:32:25,325 - INFO - Grading answer for django__django-10924...
+2026-10-10 12:32:25,330 - INFO - report: {'django__django-10924': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_callable_path (model_fields.test_filepathfield.FilePathFieldTests)']}, 'PASS_TO_PASS': {'success': ['test_path (model_fields.test_filepathfield.FilePathFieldTests)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-10924: resolved: False
+2026-10-10 12:32:25,337 - INFO - Attempting to stop container sweb.eval.django__django-10924.rerun-2026-10__google__forced__rep2__full__final...
+2026-10-10 12:32:46,275 - INFO - Attempting to remove container sweb.eval.django__django-10924.rerun-2026-10__google__forced__rep2__full__final...
+2026-10-10 12:32:46,448 - INFO - Container sweb.eval.django__django-10924.rerun-2026-10__google__forced__rep2__full__final removed.

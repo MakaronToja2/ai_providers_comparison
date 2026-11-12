@@ -1,0 +1,78 @@
+2026-10-10 19:22:37,260 - INFO - Creating container for sympy__sympy-22714...
+2026-10-10 19:22:43,847 - INFO - Container for sympy__sympy-22714 created: 73258aa0a544dc9d76e846837b411b3a1bcc1d1f9a2649d9b6c60490aae37541
+2026-10-10 19:22:48,988 - INFO - Container for sympy__sympy-22714 started: 73258aa0a544dc9d76e846837b411b3a1bcc1d1f9a2649d9b6c60490aae37541
+2026-10-10 19:22:48,988 - INFO - Intermediate patch for sympy__sympy-22714 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep1__full__final/rerun-2026-10__openai__forced__rep1__full__final/sympy__sympy-22714/patch.diff, now applying to container...
+2026-10-10 19:22:49,101 - INFO - >>>>> Applied Patch:
+Checking patch sympy/geometry/point.py...
+warning: sympy/geometry/point.py has type 100755, expected 100644
+Applied patch sympy/geometry/point.py cleanly.
+
+2026-10-10 19:22:49,428 - INFO - Git diff before:
+diff --git a/sympy/geometry/point.py b/sympy/geometry/point.py
+index 73c20334d0..f3d54c5d8f 100755
+--- a/sympy/geometry/point.py
++++ b/sympy/geometry/point.py
+@@ -909,6 +909,24 @@ class Point2D(Point):
+ 
+     _ambient_dimension = 2
+ 
++    def __new__(cls, *args, **kwargs):
++        evaluate = kwargs.pop('evaluate', True)
++        # If evaluate is False, do not convert floats to Rational or check for imaginary parts
++        if not evaluate:
++            # Create instance without evaluation
++            from sympy.core.numbers import Float
++            # Accept args as is without conversion
++            if len(args) == 1 and hasattr(args[0], '__iter__'):
++                coords = tuple(args[0])
++            else:
++                coords = tuple(args)
++            obj = Point.__new__(cls, *coords, evaluate=False)
++            return obj
++
++        # Normal behavior: call Point.__new__ with evaluation
++        obj = Point.__new__(cls, *args, **kwargs)
++        return obj
++
+     def __new__(cls, *args, _nocheck=False, **kwargs):
+         if not _nocheck:
+             kwargs['dim'] = 2
+2026-10-10 19:22:49,428 - INFO - Eval script for sympy__sympy-22714 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep1__full__final/rerun-2026-10__openai__forced__rep1__full__final/sympy__sympy-22714/eval.sh; copying to container...
+2026-10-10 19:22:58,930 - INFO - Test runtime: 9.45 seconds
+2026-10-10 19:22:58,930 - INFO - Test output for sympy__sympy-22714 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep1__full__final/rerun-2026-10__openai__forced__rep1__full__final/sympy__sympy-22714/test_output.txt
+2026-10-10 19:22:58,980 - INFO - Git diff after:
+diff --git a/sympy/geometry/point.py b/sympy/geometry/point.py
+index 73c20334d0..f3d54c5d8f 100755
+--- a/sympy/geometry/point.py
++++ b/sympy/geometry/point.py
+@@ -909,6 +909,24 @@ class Point2D(Point):
+ 
+     _ambient_dimension = 2
+ 
++    def __new__(cls, *args, **kwargs):
++        evaluate = kwargs.pop('evaluate', True)
++        # If evaluate is False, do not convert floats to Rational or check for imaginary parts
++        if not evaluate:
++            # Create instance without evaluation
++            from sympy.core.numbers import Float
++            # Accept args as is without conversion
++            if len(args) == 1 and hasattr(args[0], '__iter__'):
++                coords = tuple(args[0])
++            else:
++                coords = tuple(args)
++            obj = Point.__new__(cls, *coords, evaluate=False)
++            return obj
++
++        # Normal behavior: call Point.__new__ with evaluation
++        obj = Point.__new__(cls, *args, **kwargs)
++        return obj
++
+     def __new__(cls, *args, _nocheck=False, **kwargs):
+         if not _nocheck:
+             kwargs['dim'] = 2
+2026-10-10 19:22:58,980 - INFO - Grading answer for sympy__sympy-22714...
+2026-10-10 19:22:58,982 - INFO - report: {'sympy__sympy-22714': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_issue_22684']}, 'PASS_TO_PASS': {'success': ['test_point', 'test_point3D', 'test_Point2D', 'test_issue_9214', 'test_issue_11617', 'test_transform', 'test_concyclic_doctest_bug', 'test_arguments', 'test_unit', 'test_dot', 'test__normalize_dimension'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-22714: resolved: False
+2026-10-10 19:22:58,982 - INFO - Attempting to stop container sweb.eval.sympy__sympy-22714.rerun-2026-10__openai__forced__rep1__full__final...
+2026-10-10 19:23:17,047 - INFO - Attempting to remove container sweb.eval.sympy__sympy-22714.rerun-2026-10__openai__forced__rep1__full__final...
+2026-10-10 19:23:20,228 - INFO - Container sweb.eval.sympy__sympy-22714.rerun-2026-10__openai__forced__rep1__full__final removed.

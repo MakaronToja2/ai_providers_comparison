@@ -1,0 +1,14 @@
+diff --git a/sympy/core/expr.py b/sympy/core/expr.py
+index f4b621a6f5..f8dce3dd86 100644
+--- a/sympy/core/expr.py
++++ b/sympy/core/expr.py
+@@ -3176,7 +3176,8 @@ def simplify(self, ratio=1.7, measure=None, rational=False, inverse=False):
+         from sympy.simplify import simplify
+         from sympy.core.function import count_ops
+         measure = measure or count_ops
+-        return simplify(self, ratio, measure)
++        # Pass rational argument to simplify to enable rational simplification
++        return simplify(self, ratio, measure, rational=rational)
+ 
+     def nsimplify(self, constants=[], tolerance=None, full=False):
+         """See the nsimplify function in sympy.simplify"""

@@ -1,0 +1,6 @@
+--- a/django/contrib/messages/storage/cookie.py
++++ b/django/contrib/messages/storage/cookie.py
+@@ -18,2 +18,2 @@
+-            if obj.extra_tags:
++            if obj.extra_tags is not None:
+                 message.append(obj.extra_tags)

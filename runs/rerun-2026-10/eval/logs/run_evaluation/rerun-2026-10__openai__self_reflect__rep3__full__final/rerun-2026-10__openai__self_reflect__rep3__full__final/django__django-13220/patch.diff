@@ -1,0 +1,38 @@
+diff --git a/django/core/exceptions.py b/django/core/exceptions.py
+index dc084b8692..63f1ab126e 100644
+--- a/django/core/exceptions.py
++++ b/django/core/exceptions.py
+@@ -182,6 +182,33 @@ class ValidationError(Exception):
+     def __repr__(self):
+         return 'ValidationError(%s)' % self
+ 
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++
++        if hasattr(self, 'error_dict') and hasattr(other, 'error_dict'):
++            if set(self.error_dict.keys()) != set(other.error_dict.keys()):
++                return False
++            for key in self.error_dict:
++                # Compare error lists as sets of messages to ignore order
++                self_errors = {str(e) for e in self.error_dict[key]}
++                other_errors = {str(e) for e in other.error_dict[key]}
++                if self_errors != other_errors:
++                    return False
++            return True
++
++        if hasattr(self, 'error_list') and hasattr(other, 'error_list'):
++            self_errors = {str(e) for e in self.error_list}
++            other_errors = {str(e) for e in other.error_list}
++            return self_errors == other_errors
++
++        # Compare single error attributes
++        return (
++            getattr(self, 'message', None) == getattr(other, 'message', None) and
++            getattr(self, 'code', None) == getattr(other, 'code', None) and
++            getattr(self, 'params', None) == getattr(other, 'params', None)
++        )
++
+ 
+ class EmptyResultSet(Exception):
+     """A database query predicate is impossible."""

@@ -1,0 +1,33 @@
+diff --git a/django/core/checks/model_checks.py b/django/core/checks/model_checks.py
+index 5c2266ca1d..d55fb8b4ee 100644
+--- a/django/core/checks/model_checks.py
++++ b/django/core/checks/model_checks.py
+@@ -18,8 +18,11 @@ def check_all_models(app_configs=None, **kwargs):
+     else:
+         models = chain.from_iterable(app_config.get_models() for app_config in app_configs)
+     for model in models:
++        # Only check managed, non-proxy models
+         if model._meta.managed and not model._meta.proxy:
+-            db_table_models[model._meta.db_table].append(model._meta.label)
++            # Use a tuple of (db_table, database_alias) as the key
++            db_table_key = (model._meta.db_table, model._meta.database)
++            db_table_models[db_table_key].append(model._meta.label)
+         if not inspect.ismethod(model.check):
+             errors.append(
+                 Error(
+@@ -35,12 +38,12 @@ def check_all_models(app_configs=None, **kwargs):
+             indexes[model_index.name].append(model._meta.label)
+         for model_constraint in model._meta.constraints:
+             constraints[model_constraint.name].append(model._meta.label)
+-    for db_table, model_labels in db_table_models.items():
++    for (db_table, database), model_labels in db_table_models.items():
+         if len(model_labels) != 1:
+             errors.append(
+                 Error(
+-                    "db_table '%s' is used by multiple models: %s."
+-                    % (db_table, ', '.join(db_table_models[db_table])),
++                    "db_table '%s' in database '%s' is used by multiple models: %s."
++                    % (db_table, database, ', '.join(model_labels)),
+                     obj=db_table,
+                     id='models.E028',
+                 )

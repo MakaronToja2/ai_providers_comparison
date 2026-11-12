@@ -1,0 +1,19 @@
+diff --git a/django/db/models/query.py b/django/db/models/query.py
+index 5fdee3ff37..8a750efb31 100644
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -1106,7 +1106,13 @@ class QuerySet:
+                 if clone._fields is None:
+                     clone.query.group_by = True
+                 else:
+-                    clone.query.set_group_by()
++                    # Fix for ambiguous column reference in GROUP BY for Subquery annotations
++                    # If the annotation is a Subquery, use the expression itself for group_by
++                    if hasattr(annotation, 'source_expressions') and annotation.source_expressions:
++                        expr = annotation.source_expressions[0]
++                        clone.query.group_by = [expr]
++                    else:
++                        clone.query.set_group_by()
+                 break
+ 
+         return clone

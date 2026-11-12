@@ -1,0 +1,22 @@
+diff --git a/lib/matplotlib/offsetbox.py b/lib/matplotlib/offsetbox.py
+index 77768e7383..4dcfc39a89 100644
+--- a/lib/matplotlib/offsetbox.py
++++ b/lib/matplotlib/offsetbox.py
+@@ -1499,6 +1499,7 @@ class DraggableBase:
+         if not ref_artist.pickable():
+             ref_artist.set_picker(True)
+         self.got_artist = False
++        self._canvas = ref_artist.figure.canvas
+         self._use_blit = use_blit and self.canvas.supports_blit
+         self.cids = [
+             self.canvas.callbacks._connect_picklable(
+@@ -1508,7 +1509,8 @@ class DraggableBase:
+         ]
+ 
+     # A property, not an attribute, to maintain picklability.
+-    canvas = property(lambda self: self.ref_artist.figure.canvas)
++    # Use the stored canvas reference if the figure is no longer parented.
++    canvas = property(lambda self: self._canvas if self.ref_artist.figure is None else self.ref_artist.figure.canvas)
+ 
+     def on_motion(self, evt):
+         if self._check_still_parented() and self.got_artist:

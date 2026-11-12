@@ -1,0 +1,114 @@
+2026-10-10 19:09:30,082 - INFO - Creating container for sympy__sympy-18835...
+2026-10-10 19:09:33,929 - INFO - Container for sympy__sympy-18835 created: 1307de85bcf3acdeb3a26b09f78cbfbaba78d9c551fd124fcc96c0fef9571e54
+2026-10-10 19:09:38,934 - INFO - Container for sympy__sympy-18835 started: 1307de85bcf3acdeb3a26b09f78cbfbaba78d9c551fd124fcc96c0fef9571e54
+2026-10-10 19:09:38,934 - INFO - Intermediate patch for sympy__sympy-18835 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/sympy__sympy-18835/patch.diff, now applying to container...
+2026-10-10 19:09:39,065 - INFO - >>>>> Applied Patch:
+Checking patch sympy/utilities/iterables.py...
+warning: sympy/utilities/iterables.py has type 100755, expected 100644
+Applied patch sympy/utilities/iterables.py cleanly.
+
+2026-10-10 19:09:39,419 - INFO - Git diff before:
+diff --git a/sympy/utilities/iterables.py b/sympy/utilities/iterables.py
+index d96e76263b..14b7c8059f 100755
+--- a/sympy/utilities/iterables.py
++++ b/sympy/utilities/iterables.py
+@@ -2106,20 +2106,43 @@ def uniq(seq, result=None):
+     >>> list(uniq([[1], [2, 1], [1]]))
+     [[1], [2, 1]]
+     """
++    # Record initial length if seq is a sequence type
++    initial_len = None
++    if hasattr(seq, '__len__'):
++        initial_len = len(seq)
++
+     try:
+         seen = set()
+         result = result or []
+         for i, s in enumerate(seq):
++            # Check if the sequence length has changed during iteration
++            if initial_len is not None and hasattr(seq, '__len__') and len(seq) != initial_len:
++                raise RuntimeError("Input sequence modified during iteration")
++
+             if not (s in seen or seen.add(s)):
+                 yield s
+     except TypeError:
++        # Handle unhashable types
++        # The `i` and `s` are from the last iteration of `enumerate(seq)` before TypeError.
++        # We need to re-check the length before proceeding with the rest of the sequence.
++        current_len = None
++        if hasattr(seq, '__len__'):
++            current_len = len(seq)
++
+         if s not in result:
+             yield s
+             result.append(s)
+         if hasattr(seq, '__getitem__'):
++            # Check length before slicing and recursive call
++            if initial_len is not None and hasattr(seq, '__len__') and len(seq) != initial_len:
++                raise RuntimeError("Input sequence modified during iteration")
+             for s in uniq(seq[i + 1:], result):
+                 yield s
+         else:
++            # If seq doesn't support __getitem__, it's likely an iterator.
++            # The current implementation re-iterates `seq` here, which is problematic for iterators.
++            # However, the bug is about modification of mutable sequences.
++            # For iterators, modification is less likely to cause this specific issue.
+             for s in uniq(seq, result):
+                 yield s
+2026-10-10 19:09:39,419 - INFO - Eval script for sympy__sympy-18835 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/sympy__sympy-18835/eval.sh; copying to container...
+2026-10-10 19:09:45,463 - INFO - Test runtime: 5.99 seconds
+2026-10-10 19:09:45,464 - INFO - Test output for sympy__sympy-18835 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep2__full__final/rerun-2026-10__google__self_reflect__rep2__full__final/sympy__sympy-18835/test_output.txt
+2026-10-10 19:09:45,539 - INFO - Git diff after:
+diff --git a/sympy/utilities/iterables.py b/sympy/utilities/iterables.py
+index d96e76263b..14b7c8059f 100755
+--- a/sympy/utilities/iterables.py
++++ b/sympy/utilities/iterables.py
+@@ -2106,20 +2106,43 @@ def uniq(seq, result=None):
+     >>> list(uniq([[1], [2, 1], [1]]))
+     [[1], [2, 1]]
+     """
++    # Record initial length if seq is a sequence type
++    initial_len = None
++    if hasattr(seq, '__len__'):
++        initial_len = len(seq)
++
+     try:
+         seen = set()
+         result = result or []
+         for i, s in enumerate(seq):
++            # Check if the sequence length has changed during iteration
++            if initial_len is not None and hasattr(seq, '__len__') and len(seq) != initial_len:
++                raise RuntimeError("Input sequence modified during iteration")
++
+             if not (s in seen or seen.add(s)):
+                 yield s
+     except TypeError:
++        # Handle unhashable types
++        # The `i` and `s` are from the last iteration of `enumerate(seq)` before TypeError.
++        # We need to re-check the length before proceeding with the rest of the sequence.
++        current_len = None
++        if hasattr(seq, '__len__'):
++            current_len = len(seq)
++
+         if s not in result:
+             yield s
+             result.append(s)
+         if hasattr(seq, '__getitem__'):
++            # Check length before slicing and recursive call
++            if initial_len is not None and hasattr(seq, '__len__') and len(seq) != initial_len:
++                raise RuntimeError("Input sequence modified during iteration")
+             for s in uniq(seq[i + 1:], result):
+                 yield s
+         else:
++            # If seq doesn't support __getitem__, it's likely an iterator.
++            # The current implementation re-iterates `seq` here, which is problematic for iterators.
++            # However, the bug is about modification of mutable sequences.
++            # For iterators, modification is less likely to cause this specific issue.
+             for s in uniq(seq, result):
+                 yield s
+2026-10-10 19:09:45,539 - INFO - Grading answer for sympy__sympy-18835...
+2026-10-10 19:09:45,541 - INFO - report: {'sympy__sympy-18835': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_uniq']}, 'PASS_TO_PASS': {'success': ['test_is_palindromic', 'test_postorder_traversal', 'test_flatten', 'test_iproduct', 'test_group', 'test_subsets', 'test_variations', 'test_cartes', 'test_filter_symbols', 'test_numbered_symbols', 'test_sift', 'test_take', 'test_dict_merge', 'test_prefixes', 'test_postfixes', 'test_topological_sort', 'test_strongly_connected_components', 'test_connected_components', 'test_rotate', 'test_multiset_partitions', 'test_multiset_combinations', 'test_multiset_permutations', 'test_partitions', 'test_binary_partitions', 'test_bell_perm', 'test_involutions', 'test_derangements', 'test_necklaces', 'test_bracelets', 'test_generate_oriented_forest', 'test_unflatten', 'test_common_prefix_suffix', 'test_minlex', 'test_ordered', 'test_runs', 'test_reshape', 'test_kbins', 'test_has_dups', 'test__partition', 'test_ordered_partitions', 'test_rotations'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-18835: resolved: False
+2026-10-10 19:09:45,542 - INFO - Attempting to stop container sweb.eval.sympy__sympy-18835.rerun-2026-10__google__self_reflect__rep2__full__final...
+2026-10-10 19:10:04,711 - INFO - Attempting to remove container sweb.eval.sympy__sympy-18835.rerun-2026-10__google__self_reflect__rep2__full__final...
+2026-10-10 19:10:06,778 - INFO - Container sweb.eval.sympy__sympy-18835.rerun-2026-10__google__self_reflect__rep2__full__final removed.

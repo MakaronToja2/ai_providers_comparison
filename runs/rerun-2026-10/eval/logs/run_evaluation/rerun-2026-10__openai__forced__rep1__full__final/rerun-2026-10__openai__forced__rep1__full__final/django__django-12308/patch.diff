@@ -1,0 +1,26 @@
+diff --git a/django/contrib/admin/utils.py b/django/contrib/admin/utils.py
+index e4ddc8f017..493faf73fe 100644
+--- a/django/contrib/admin/utils.py
++++ b/django/contrib/admin/utils.py
+@@ -379,6 +379,7 @@ def help_text_for_field(name, model):
+ 
+ def display_for_field(value, field, empty_value_display):
+     from django.contrib.admin.templatetags.admin_list import _boolean_icon
++    from django.db.models import JSONField
+ 
+     if getattr(field, 'flatchoices', None):
+         return dict(field.flatchoices).get(value, empty_value_display)
+@@ -388,6 +389,13 @@ def display_for_field(value, field, empty_value_display):
+         return _boolean_icon(value)
+     elif value is None:
+         return empty_value_display
++    elif isinstance(field, JSONField):
++        # Use the field's get_prep_value to prepare the JSON for display
++        try:
++            return field.get_prep_value(value)
++        except Exception:
++            # fallback to str if preparation fails
++            return str(value)
+     elif isinstance(field, models.DateTimeField):
+         return formats.localize(timezone.template_localtime(value))
+     elif isinstance(field, (models.DateField, models.TimeField)):

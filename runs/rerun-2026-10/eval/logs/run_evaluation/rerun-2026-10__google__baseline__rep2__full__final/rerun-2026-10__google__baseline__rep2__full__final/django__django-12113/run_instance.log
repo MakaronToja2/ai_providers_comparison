@@ -1,0 +1,44 @@
+2026-10-10 12:31:24,184 - INFO - Creating container for django__django-12113...
+2026-10-10 12:31:24,658 - INFO - Container for django__django-12113 created: 626c3dc4d9183813f3c6c625df86f703441f6c2c8f9a50797e0d7dfd16ae9a4a
+2026-10-10 12:31:25,114 - INFO - Container for django__django-12113 started: 626c3dc4d9183813f3c6c625df86f703441f6c2c8f9a50797e0d7dfd16ae9a4a
+2026-10-10 12:31:25,114 - INFO - Intermediate patch for django__django-12113 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep2__full__final/rerun-2026-10__google__baseline__rep2__full__final/django__django-12113/patch.diff, now applying to container...
+2026-10-10 12:31:25,314 - INFO - >>>>> Applied Patch:
+Checking patch tests/admin_views/test_multidb.py...
+warning: tests/admin_views/test_multidb.py has type 100755, expected 100644
+Applied patch tests/admin_views/test_multidb.py cleanly.
+
+2026-10-10 12:31:26,092 - INFO - Git diff before:
+diff --git a/tests/admin_views/test_multidb.py b/tests/admin_views/test_multidb.py
+index a02b637d34..57374075fb 100755
+--- a/tests/admin_views/test_multidb.py
++++ b/tests/admin_views/test_multidb.py
+@@ -38,6 +38,7 @@ class MultiDatabaseTests(TestCase):
+             Router.target_db = db
+             cls.superusers[db] = User.objects.create_superuser(
+                 username='admin', password='something', email='test@test.org',
++                using=db,
+             )
+             b = Book(name='Test Book')
+             b.save(using=db)
+2026-10-10 12:31:26,092 - INFO - Eval script for django__django-12113 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep2__full__final/rerun-2026-10__google__baseline__rep2__full__final/django__django-12113/eval.sh; copying to container...
+2026-10-10 12:31:38,035 - INFO - Test runtime: 11.85 seconds
+2026-10-10 12:31:38,037 - INFO - Test output for django__django-12113 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep2__full__final/rerun-2026-10__google__baseline__rep2__full__final/django__django-12113/test_output.txt
+2026-10-10 12:31:38,106 - INFO - Git diff after:
+diff --git a/tests/admin_views/test_multidb.py b/tests/admin_views/test_multidb.py
+index a02b637d34..57374075fb 100755
+--- a/tests/admin_views/test_multidb.py
++++ b/tests/admin_views/test_multidb.py
+@@ -38,6 +38,7 @@ class MultiDatabaseTests(TestCase):
+             Router.target_db = db
+             cls.superusers[db] = User.objects.create_superuser(
+                 username='admin', password='something', email='test@test.org',
++                using=db,
+             )
+             b = Book(name='Test Book')
+             b.save(using=db)
+2026-10-10 12:31:38,106 - INFO - Grading answer for django__django-12113...
+2026-10-10 12:31:38,111 - INFO - report: {'django__django-12113': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_custom_test_name (backends.sqlite.test_creation.TestDbSignatureTests)']}, 'PASS_TO_PASS': {'success': [], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-12113: resolved: False
+2026-10-10 12:31:38,111 - INFO - Attempting to stop container sweb.eval.django__django-12113.rerun-2026-10__google__baseline__rep2__full__final...
+2026-10-10 12:31:53,749 - INFO - Attempting to remove container sweb.eval.django__django-12113.rerun-2026-10__google__baseline__rep2__full__final...
+2026-10-10 12:31:54,051 - INFO - Container sweb.eval.django__django-12113.rerun-2026-10__google__baseline__rep2__full__final removed.

@@ -1,0 +1,30 @@
+{
+  "job": "rerun-2026-10__openai__baseline__rep2__full",
+  "experiment_id": "c1551d60-1a6e-5158-b44d-d9a3abf0bffc",
+  "provider": "openai",
+  "model": "gpt-4.1-mini",
+  "mode": "baseline",
+  "run_idx": 2,
+  "subset": "full",
+  "instances": 100,
+  "status_counts": {
+    "success_patch_generated": 75,
+    "edit_not_applicable": 17,
+    "hallucination_format_error": 5,
+    "failure_explicit": 3
+  },
+  "incomplete": 0,
+  "api_model_ids": [
+    "gpt-4.1-mini-2025-04-14"
+  ],
+  "input_tokens": 2895177,
+  "output_tokens": 89965,
+  "cached_input_tokens": 1843456,
+  "cost_usd_list_price": 1.302015,
+  "cost_usd_as_billed_estimate": 0.748978,
+  "last_invocation_started": "2026-10-10T10:02:39+00:00",
+  "last_invocation_finished": "2026-10-10T10:12:22+00:00",
+  "harness_commit": "df830ca3b811f3ce273099cbcc89666d5a22f7c9+dirty.10be19572b17",
+  "dataset_revision": "b0dde1093fe417d83b7184254edf8199c1f0dff5",
+  "instances_sha256": "4d38ee52ba38758144edce1e3c7866480dd73d2f5087f9a582d5670e820b9576"
+}

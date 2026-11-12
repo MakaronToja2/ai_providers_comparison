@@ -1,0 +1,17 @@
+diff --git a/sklearn/decomposition/kernel_pca.py b/sklearn/decomposition/kernel_pca.py
+index bb91d0cbbad..4de6e58611b 100644
+--- a/sklearn/decomposition/kernel_pca.py
++++ b/sklearn/decomposition/kernel_pca.py
+@@ -215,6 +215,12 @@ class KernelPCA(BaseEstimator, TransformerMixin, _UnstableOn32BitMixin):
+         self.lambdas_ = self.lambdas_[indices]
+         self.alphas_ = self.alphas_[:, indices]
+ 
++        # Normalize eigenvectors to have a consistent sign
++        for j in range(self.alphas_.shape[1]):
++            first_nonzero_idx = np.flatnonzero(self.alphas_[:, j]).first()
++            if first_nonzero_idx is not None and self.alphas_[first_nonzero_idx, j] < 0:
++                self.alphas_[:, j] *= -1
++
+         # remove eigenvectors with a zero eigenvalue
+         if self.remove_zero_eig or self.n_components is None:
+             self.alphas_ = self.alphas_[:, self.lambdas_ > 0]

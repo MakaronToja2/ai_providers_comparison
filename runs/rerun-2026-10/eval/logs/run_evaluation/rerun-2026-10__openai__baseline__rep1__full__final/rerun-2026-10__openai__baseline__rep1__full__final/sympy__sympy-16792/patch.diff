@@ -1,0 +1,22 @@
+diff --git a/sympy/utilities/autowrap.py b/sympy/utilities/autowrap.py
+index bd6afb12d1..3f06e7d3b0 100644
+--- a/sympy/utilities/autowrap.py
++++ b/sympy/utilities/autowrap.py
+@@ -434,6 +434,17 @@ def _partition_args(self, args):
+                 py_inferred[arg] = py_inferred.pop(arg.name)
+         # Filter inferred arguments from py_args
+         py_args = [a for a in py_args if a not in py_inferred]
++
++        # Fix for cython backend: if argument is an array but does not appear in the expression,
++        # it might be missing from py_args or incorrectly typed. We force all args to appear
++        # as pointers (ndarrays) in the signature if they have dimensions, even if unused.
++        # This is to avoid the bug where scalar is generated for array argument unused in expr.
++        for arg in args:
++            if hasattr(arg, 'dimensions') and arg.dimensions:
++                # If arg is not already in py_args, add it
++                if arg not in py_args and arg not in py_returns:
++                    py_args.append(arg)
++
+         return py_returns, py_args, py_locals, py_inferred
+ 
+     def _prototype_arg(self, arg):

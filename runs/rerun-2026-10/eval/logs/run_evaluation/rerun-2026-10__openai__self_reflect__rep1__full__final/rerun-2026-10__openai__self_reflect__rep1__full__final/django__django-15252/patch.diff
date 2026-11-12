@@ -1,0 +1,49 @@
+diff --git a/django/db/migrations/recorder.py b/django/db/migrations/recorder.py
+index 1a37c6b7d0..26b563b79f 100644
+--- a/django/db/migrations/recorder.py
++++ b/django/db/migrations/recorder.py
+@@ -60,6 +60,11 @@ class MigrationRecorder:
+         """Ensure the table exists and has the correct schema."""
+         # If the table's there, that's fine - we've never changed its schema
+         # in the codebase.
++        # Check if migration table should be created on this connection according to router
++        from django.db import router
++        if not router.allow_migrate(self.connection.alias, self.Migration):
++            # If not allowed to migrate on this connection, do not create the table
++            return
+         if self.has_table():
+             return
+         # Make the table
+@@ -74,6 +79,12 @@ class MigrationRecorder:
+         Return a dict mapping (app_name, migration_name) to Migration instances
+         for all applied migrations.
+         """
++        from django.db import router
++        # Check if migration table should be queried on this connection according to router
++        if not router.allow_migrate(self.connection.alias, self.Migration):
++            # If not allowed to migrate on this connection, return empty dict
++            return {}
++
+         if self.has_table():
+             return {(migration.app, migration.name): migration for migration in self.migration_qs}
+         else:
+@@ -83,11 +94,19 @@ class MigrationRecorder:
+ 
+     def record_applied(self, app, name):
+         """Record that a migration was applied."""
++        from django.db import router
++        if not router.allow_migrate(self.connection.alias, self.Migration):
++            # Do not record migration if not allowed on this connection
++            return
+         self.ensure_schema()
+         self.migration_qs.create(app=app, name=name)
+ 
+     def record_unapplied(self, app, name):
+         """Record that a migration was unapplied."""
++        from django.db import router
++        if not router.allow_migrate(self.connection.alias, self.Migration):
++            # Do not record migration if not allowed on this connection
++            return
+         self.ensure_schema()
+         self.migration_qs.filter(app=app, name=name).delete()
+ 

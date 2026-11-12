@@ -1,0 +1,40 @@
+diff --git a/pylint/reporters/text.py b/pylint/reporters/text.py
+index 29bd46798..887844bc1 100644
+--- a/pylint/reporters/text.py
++++ b/pylint/reporters/text.py
+@@ -12,6 +12,7 @@ from __future__ import annotations
+ 
+ import os
+ import re
++import string
+ import sys
+ import warnings
+ from dataclasses import asdict, fields
+@@ -175,14 +176,22 @@ class TextReporter(BaseReporter):
+         self._template = template
+ 
+         # Check to see if all parameters in the template are attributes of the Message
+-        arguments = re.findall(r"\{(.+?)(:.*)?\}", template)
+-        for argument in arguments:
+-            if argument[0] not in MESSAGE_FIELDS:
++        # Use string.Formatter to properly parse format fields and ignore escaped braces
++        formatter = string.Formatter()
++        try:
++            field_names = {field_name for _, field_name, _, _ in formatter.parse(template) if field_name}
++        except ValueError:
++            # If there's a formatting error, just use the template as-is
++            self._fixed_template = template
++            return
++        
++        for field_name in field_names:
++            if field_name not in MESSAGE_FIELDS:
+                 warnings.warn(
+-                    f"Don't recognize the argument '{argument[0]}' in the --msg-template. "
++                    f"Don't recognize the argument '{field_name}' in the --msg-template. "
+                     "Are you sure it is supported on the current version of pylint?"
+                 )
+-                template = re.sub(r"\{" + argument[0] + r"(:.*?)?\}", "", template)
++                template = re.sub(r"\{" + re.escape(field_name) + r"(:.*?)?\}", "", template)
+         self._fixed_template = template
+ 
+     def write_message(self, msg: Message) -> None:

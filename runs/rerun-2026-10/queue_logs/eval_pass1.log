@@ -1,0 +1,30 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[eval] batch 1/10: 10 instance(s), 34 patch(es)
+[eval] gold__full: attempt 1/3, 10 patch(es) to evaluate
+[eval] rerun-2026-10__openai__baseline__rep1__full__final: attempt 1/3, 6 patch(es) to evaluate
+[eval] rerun-2026-10__openai__forced__rep1__full__final: attempt 1/3, 8 patch(es) to evaluate
+[eval] rerun-2026-10__openai__self_reflect__rep1__full__final: attempt 1/3, 6 patch(es) to evaluate
+[eval] rerun-2026-10__google__baseline__rep1__full__final: attempt 1/3, 4 patch(es) to evaluate
+[eval] batch 2/10: 10 instance(s), 49 patch(es)
+[eval] gold__full: attempt 1/3, 10 patch(es) to evaluate
+[eval] rerun-2026-10__openai__baseline__rep1__full__final: attempt 1/3, 10 patch(es) to evaluate
+[eval] rerun-2026-10__openai__forced__rep1__full__final: attempt 1/3, 10 patch(es) to evaluate
+[eval] rerun-2026-10__openai__self_reflect__rep1__full__final: attempt 1/3, 8 patch(es) to evaluate
+[eval] rerun-2026-10__openai__self_reflect__rep1__full__initial: attempt 1/3, 2 patch(es) to evaluate
+[eval] rerun-2026-10__google__baseline__rep1__full__final: attempt 1/3, 5 patch(es) to evaluate
+[eval] rerun-2026-10__google__forced__rep1__full__final: attempt 1/3, 4 patch(es) to evaluate
+[eval] batch 3/10: 10 instance(s), 63 patch(es)
+[eval] gold__full: attempt 1/3, 10 patch(es) to evaluate
+[eval] rerun-2026-10__openai__baseline__rep1__full__final: attempt 1/3, 9 patch(es) to evaluate
+[eval] rerun-2026-10__openai__forced__rep1__full__final: attempt 1/3, 10 patch(es) to evaluate
+[eval] rerun-2026-10__openai__self_reflect__rep1__full__final: attempt 1/3, 8 patch(es) to evaluate
+[eval] rerun-2026-10__openai__self_reflect__rep1__full__initial: attempt 1/3, 5 patch(es) to evaluate
+[eval] rerun-2026-10__anthropic__baseline__rep1__full__final: attempt 1/3, 7 patch(es) to evaluate
+[eval] rerun-2026-10__google__baseline__rep1__full__final: attempt 1/3, 4 patch(es) to evaluate
+[eval] rerun-2026-10__google__forced__rep1__full__final: attempt 1/3, 6 patch(es) to evaluate
+[eval] rerun-2026-10__google__self_reflect__rep1__full__final: attempt 1/3, 3 patch(es) to evaluate
+[eval] rerun-2026-10__google__self_reflect__rep1__full__initial: attempt 1/3, 1 patch(es) to evaluate
+[eval] batch 4/10: 10 instance(s), 75 patch(es)
+[eval] gold__full: attempt 1/3, 10 patch(es) to evaluate
+[eval] rerun-2026-10__openai__baseline__rep1__full__final: attempt 1/3, 9 patch(es) to evaluate
+[eval] rerun-2026-10__openai__baseline__rep2__full__final: attempt 1/3, 8 patch(es) to evaluate

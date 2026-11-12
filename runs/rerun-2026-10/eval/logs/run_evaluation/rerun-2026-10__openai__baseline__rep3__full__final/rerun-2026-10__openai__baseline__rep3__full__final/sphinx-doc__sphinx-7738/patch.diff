@@ -1,0 +1,17 @@
+diff --git a/sphinx/ext/napoleon/docstring.py b/sphinx/ext/napoleon/docstring.py
+index 11409e6f6b..e9c7763c74 100644
+--- a/sphinx/ext/napoleon/docstring.py
++++ b/sphinx/ext/napoleon/docstring.py
+@@ -318,8 +318,11 @@ class GoogleDocstring:
+             return [line[min_indent:] for line in lines]
+ 
+     def _escape_args_and_kwargs(self, name: str) -> str:
++        # Fix for trailing underscore over-escaping causing visible backslash in output
+         if name.endswith('_'):
+-            name = name[:-1] + r'\_'
++            # Only escape if not already escaped (avoid double escaping)
++            if not name.endswith(r'\_'):
++                name = name[:-1] + r'\_'
+ 
+         if name[:2] == '**':
+             return r'\*\*' + name[2:]

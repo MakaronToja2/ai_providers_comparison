@@ -1,0 +1,29 @@
+diff --git a/lib/mpl_toolkits/axes_grid1/axes_grid.py b/lib/mpl_toolkits/axes_grid1/axes_grid.py
+index 2b1b1d3200..d46a4bd3b0 100644
+--- a/lib/mpl_toolkits/axes_grid1/axes_grid.py
++++ b/lib/mpl_toolkits/axes_grid1/axes_grid.py
+@@ -13,8 +13,22 @@ from .mpl_axes import Axes
+ def _tick_only(ax, bottom_on, left_on):
+     bottom_off = not bottom_on
+     left_off = not left_on
+-    ax.axis["bottom"].toggle(ticklabels=bottom_off, label=bottom_off)
+-    ax.axis["left"].toggle(ticklabels=left_off, label=left_off)
++    # Handle the case where ax.axis is a method (e.g., GeoAxes) or a dict-like (mpl_axes.Axes)
++    axis = ax.axis
++    if callable(axis):
++        # axis() returns a tuple of limits, so no toggle possible, skip toggling
++        # Instead, try to toggle ticks via ax.xaxis and ax.yaxis
++        if bottom_off:
++            ax.xaxis.set_tick_params(labelbottom=False)
++        else:
++            ax.xaxis.set_tick_params(labelbottom=True)
++        if left_off:
++            ax.yaxis.set_tick_params(labelleft=False)
++        else:
++            ax.yaxis.set_tick_params(labelleft=True)
++    else:
++        axis["bottom"].toggle(ticklabels=bottom_off, label=bottom_off)
++        axis["left"].toggle(ticklabels=left_off, label=left_off)
+ 
+ 
+ class CbarAxesBase:

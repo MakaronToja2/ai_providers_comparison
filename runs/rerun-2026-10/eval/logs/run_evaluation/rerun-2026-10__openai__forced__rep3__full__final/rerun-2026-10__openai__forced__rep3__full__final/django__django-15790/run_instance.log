@@ -1,0 +1,74 @@
+2026-10-10 13:06:59,755 - INFO - Creating container for django__django-15790...
+2026-10-10 13:06:59,926 - INFO - Container for django__django-15790 created: 390c38adbade3bd6f84f5f7c4fa65f8aa11fcb329d7417d0214b476def97a27a
+2026-10-10 13:07:00,290 - INFO - Container for django__django-15790 started: 390c38adbade3bd6f84f5f7c4fa65f8aa11fcb329d7417d0214b476def97a27a
+2026-10-10 13:07:00,290 - INFO - Intermediate patch for django__django-15790 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep3__full__final/rerun-2026-10__openai__forced__rep3__full__final/django__django-15790/patch.diff, now applying to container...
+2026-10-10 13:07:00,466 - INFO - >>>>> Applied Patch:
+Checking patch django/core/checks/templates.py...
+warning: django/core/checks/templates.py has type 100755, expected 100644
+Applied patch django/core/checks/templates.py cleanly.
+
+2026-10-10 13:07:01,120 - INFO - Git diff before:
+diff --git a/django/core/checks/templates.py b/django/core/checks/templates.py
+index 5214276987..0de9b11dd3 100755
+--- a/django/core/checks/templates.py
++++ b/django/core/checks/templates.py
+@@ -52,12 +52,21 @@ def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
+     errors = []
+     libraries = defaultdict(list)
+ 
++    # Collect all libraries from TEMPLATES OPTIONS 'libraries'
+     for conf in settings.TEMPLATES:
+         custom_libraries = conf.get("OPTIONS", {}).get("libraries", {})
+         for module_name, module_path in custom_libraries.items():
+             libraries[module_name].append(module_path)
+ 
+-    for module_name, module_path in get_template_tag_modules():
++    # Collect all libraries from installed apps
++    installed_libraries = dict(get_template_tag_modules())
++
++    # Remove any libraries that are already declared in TEMPLATES OPTIONS to avoid duplicate error
++    for module_name in custom_libraries.keys():
++        installed_libraries.pop(module_name, None)
++
++    # Add remaining installed libraries
++    for module_name, module_path in installed_libraries.items():
+         libraries[module_name].append(module_path)
+ 
+     for library_name, items in libraries.items():
+2026-10-10 13:07:01,121 - INFO - Eval script for django__django-15790 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep3__full__final/rerun-2026-10__openai__forced__rep3__full__final/django__django-15790/eval.sh; copying to container...
+2026-10-10 13:07:07,658 - INFO - Test runtime: 6.46 seconds
+2026-10-10 13:07:07,661 - INFO - Test output for django__django-15790 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep3__full__final/rerun-2026-10__openai__forced__rep3__full__final/django__django-15790/test_output.txt
+2026-10-10 13:07:07,731 - INFO - Git diff after:
+diff --git a/django/core/checks/templates.py b/django/core/checks/templates.py
+index 5214276987..0de9b11dd3 100755
+--- a/django/core/checks/templates.py
++++ b/django/core/checks/templates.py
+@@ -52,12 +52,21 @@ def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
+     errors = []
+     libraries = defaultdict(list)
+ 
++    # Collect all libraries from TEMPLATES OPTIONS 'libraries'
+     for conf in settings.TEMPLATES:
+         custom_libraries = conf.get("OPTIONS", {}).get("libraries", {})
+         for module_name, module_path in custom_libraries.items():
+             libraries[module_name].append(module_path)
+ 
+-    for module_name, module_path in get_template_tag_modules():
++    # Collect all libraries from installed apps
++    installed_libraries = dict(get_template_tag_modules())
++
++    # Remove any libraries that are already declared in TEMPLATES OPTIONS to avoid duplicate error
++    for module_name in custom_libraries.keys():
++        installed_libraries.pop(module_name, None)
++
++    # Add remaining installed libraries
++    for module_name, module_path in installed_libraries.items():
+         libraries[module_name].append(module_path)
+ 
+     for library_name, items in libraries.items():
+2026-10-10 13:07:07,731 - INFO - Grading answer for django__django-15790...
+2026-10-10 13:07:07,737 - INFO - report: {'django__django-15790': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_template_tags_same_library_in_installed_apps_libraries (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)'], 'failure': []}, 'PASS_TO_PASS': {'success': ['Error if template loaders are specified and APP_DIRS is True.', 'test_app_dirs_removed (check_framework.test_templates.CheckTemplateSettingsAppDirsTest)', 'test_loaders_removed (check_framework.test_templates.CheckTemplateSettingsAppDirsTest)', 'test_string_if_invalid_both_are_strings (check_framework.test_templates.CheckTemplateStringIfInvalidTest)', 'test_string_if_invalid_first_is_string (check_framework.test_templates.CheckTemplateStringIfInvalidTest)', 'test_string_if_invalid_not_specified (check_framework.test_templates.CheckTemplateStringIfInvalidTest)', 'test_string_if_invalid_not_string (check_framework.test_templates.CheckTemplateStringIfInvalidTest)', 'test_template_tags_with_different_library_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)', 'test_template_tags_with_different_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)', 'test_template_tags_with_same_library_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)'], 'failure': ['test_template_tags_with_same_library_name_and_module_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)', 'test_template_tags_with_same_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)']}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-15790: resolved: False
+2026-10-10 13:07:07,738 - INFO - Attempting to stop container sweb.eval.django__django-15790.rerun-2026-10__openai__forced__rep3__full__final...
+2026-10-10 13:07:25,977 - INFO - Attempting to remove container sweb.eval.django__django-15790.rerun-2026-10__openai__forced__rep3__full__final...
+2026-10-10 13:07:26,029 - INFO - Container sweb.eval.django__django-15790.rerun-2026-10__openai__forced__rep3__full__final removed.

@@ -1,0 +1,32 @@
+diff --git a/sympy/printing/latex.py b/sympy/printing/latex.py
+index 737e16cc74..5856faf257 100644
+--- a/sympy/printing/latex.py
++++ b/sympy/printing/latex.py
+@@ -1854,7 +1854,26 @@ def _print_PolynomialRingBase(self, expr):
+ 
+     def _print_Poly(self, poly):
+         cls = poly.__class__.__name__
+-        expr = self._print(poly.as_expr())
++        
++        # Build the expression from terms to preserve monomial order
++        # (same order as str and pretty printers)
++        from sympy import Add, Mul
++        terms = []
++        for monom, coeff in poly.terms():
++            # Build the monomial part
++            monomial_factors = [poly.gens[i]**exp for i, exp in enumerate(monom) if exp > 0]
++            if monomial_factors:
++                term = Mul(coeff, *monomial_factors, evaluate=False)
++            else:
++                term = coeff
++            terms.append(term)
++        
++        if terms:
++            expr = Add(*terms, evaluate=False)
++        else:
++            expr = poly.domain.zero
++        
++        expr = self._print(expr)
+         gens = list(map(self._print, poly.gens))
+         domain = "domain=%s" % self._print(poly.get_domain())
+ 

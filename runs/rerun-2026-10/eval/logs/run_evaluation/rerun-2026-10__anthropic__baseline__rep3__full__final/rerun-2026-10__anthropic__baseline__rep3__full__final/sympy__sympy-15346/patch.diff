@@ -1,0 +1,17 @@
+diff --git a/sympy/simplify/fu.py b/sympy/simplify/fu.py
+index 9d939727c5..880a28adf3 100644
+--- a/sympy/simplify/fu.py
++++ b/sympy/simplify/fu.py
+@@ -1985,10 +1985,8 @@ def pow_cos_sin(a, two):
+             if (ca and cb and sa and sb):
+                 if isinstance(ca, sa.func) is not isinstance(cb, sb.func):
+                     return
+-                args = {j.args for j in (ca, sa)}
+-                if not all(i.args in args for i in (cb, sb)):
+-                    return
+-                return gcd, n1, n2, ca.args[0], sa.args[0], isinstance(ca, sa.func)
++                return gcd, n1, n2, ca.args[0], cb.args[0], isinstance(ca, cos)
++=======
+         if ca and sa or cb and sb or \
+             two and (ca is None and sa is None or cb is None and sb is None):
+             return

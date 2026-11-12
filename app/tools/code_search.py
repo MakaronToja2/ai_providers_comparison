@@ -2,10 +2,24 @@
 Code search tool for finding patterns and symbols in repository
 """
 import os
+import shutil
 import subprocess
+from pathlib import Path
 from typing import Dict, Any, Optional
 from ..core.tools import BaseTool, ToolResult
 from ..utils.repo_context import get_current_repo_path
+
+
+def ripgrep_binary() -> Optional[str]:
+    """Path of the ripgrep binary: RG_PATH, then the project-local copy, then PATH."""
+    candidates = [
+        os.environ.get("RG_PATH"),
+        str(Path(__file__).resolve().parents[2] / ".cache" / "bin" / "rg"),
+    ]
+    for candidate in candidates:
+        if candidate and os.path.isfile(candidate) and os.access(candidate, os.X_OK):
+            return candidate
+    return shutil.which("rg")
 
 
 def _resolve_path(relative_path: str) -> str:
@@ -61,6 +75,21 @@ class CodeSearchTool(BaseTool):
             "required": ["pattern"]
         }
     
+    def render_result(self, data: Any) -> str:
+        """grep-style lines: path:line: matched text."""
+        summary = f"Matches: {data['total_matches']}"
+        if data.get("truncated"):
+            summary += " (truncated: more matches exist)"
+        lines = [
+            f"Search pattern: {data['pattern']}",
+            f"Case sensitive: {'yes' if data.get('case_sensitive') else 'no'}",
+            summary,
+            "",
+        ]
+        for match in data["matches"]:
+            lines.append(f"{match['file_path']}:{match['line_number']}: {match['content']}")
+        return "\n".join(lines)
+
     async def execute(self, pattern: str, file_pattern: str = "*", directory: str = ".",
                      case_sensitive: bool = False, max_results: int = 20, **kwargs) -> ToolResult:
         """Search for code patterns in the repository"""
@@ -80,8 +109,9 @@ class CodeSearchTool(BaseTool):
 
             # Build search command
             try:
-                # Try ripgrep first (faster and better)
-                cmd = ["rg", "-n"]
+                # Try ripgrep first (faster and better). Results are sorted by path so the
+                # first max_results matches are the same on every run.
+                cmd = [ripgrep_binary() or "rg", "-n", "--sort", "path"]
                 if not case_sensitive:
                     cmd.append("-i")
 

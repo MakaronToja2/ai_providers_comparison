@@ -1,0 +1,30 @@
+diff --git a/sympy/simplify/cse_main.py b/sympy/simplify/cse_main.py
+index d649dd02a9..e47d4be8c2 100644
+--- a/sympy/simplify/cse_main.py
++++ b/sympy/simplify/cse_main.py
+@@ -616,6 +616,25 @@ def _find_repeated(expr):
+         if isinstance(e, Basic):
+             _find_repeated(e)
+ 
++    # Collect MatrixSymbols that are parents of MatrixElements
++    # These should not be eliminated as they are only used for indexing
++    from sympy.matrices.expressions.matexpr import MatrixElement
++    matrix_element_parents = set()
++    def _collect_matrix_element_parents(expr):
++        if isinstance(expr, MatrixElement):
++            matrix_element_parents.add(expr.parent)
++        if isinstance(expr, Basic):
++            for arg in expr.args:
++                _collect_matrix_element_parents(arg)
++
++    for e in exprs:
++        if isinstance(e, Basic):
++            _collect_matrix_element_parents(e)
++
++    # Remove MatrixSymbols that are only used as parents of MatrixElements
++    # from the elimination set, as extracting them separately is inefficient
++    to_eliminate = to_eliminate - matrix_element_parents
++
+     ## Rebuild tree
+ 
+     # Remove symbols from the generator that conflict with names in the expressions.

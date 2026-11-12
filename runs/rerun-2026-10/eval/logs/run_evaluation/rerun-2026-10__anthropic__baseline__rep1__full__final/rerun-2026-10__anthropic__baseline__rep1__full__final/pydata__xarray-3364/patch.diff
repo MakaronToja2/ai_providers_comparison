@@ -1,0 +1,86 @@
+diff --git a/xarray/core/concat.py b/xarray/core/concat.py
+index ecae2566c..681c7f2da 100644
+--- a/xarray/core/concat.py
++++ b/xarray/core/concat.py
+@@ -197,23 +197,26 @@ def _calc_concat_over(datasets, dim, dim_names, data_vars, coords, compat):
+                         # We'll need to know later on if variables are equal.
+                         computed = []
+                         for ds_rhs in datasets[1:]:
+-                            v_rhs = ds_rhs.variables[k].compute()
+-                            computed.append(v_rhs)
+-                            if not getattr(v_lhs, compat)(v_rhs):
+-                                concat_over.add(k)
+-                                equals[k] = False
+-                                # computed variables are not to be re-computed
+-                                # again in the future
+-                                for ds, v in zip(datasets[1:], computed):
+-                                    ds.variables[k].data = v.data
+-                                break
++                            if k in ds_rhs.variables:
++                                v_rhs = ds_rhs.variables[k].compute()
++                                computed.append(v_rhs)
++                                if not getattr(v_lhs, compat)(v_rhs):
++                                    concat_over.add(k)
++                                    equals[k] = False
++                                    # computed variables are not to be re-computed
++                                    # again in the future
++                                    for ds, v in zip(datasets[1:], computed):
++                                        ds.variables[k].data = v.data
++                                    break
+                         else:
+                             equals[k] = True
+ 
+             elif opt == "all":
+-                concat_over.update(
+-                    set(getattr(datasets[0], subset)) - set(datasets[0].dims)
+-                )
++                # Collect all variables from all datasets
++                all_vars = set()
++                for ds in datasets:
++                    all_vars.update(set(getattr(ds, subset)) - set(ds.dims))
++                concat_over.update(all_vars)
+             elif opt == "minimal":
+                 pass
+             else:
+@@ -356,12 +359,35 @@ def _dataset_concat(
+ 
+     # stack up each variable to fill-out the dataset (in order)
+     # n.b. this loop preserves variable order, needed for groupby.
+-    for k in datasets[0].variables:
+-        if k in concat_over:
+-            try:
+-                vars = ensure_common_dims([ds.variables[k] for ds in datasets])
+-            except KeyError:
+-                raise ValueError("%r is not present in all datasets." % k)
++    for k in concat_over:
++        if k not in dim_names:
++            # Collect variables from all datasets, filling missing ones with fill_value
++            vars = []
++            var_template = None
++            for ds in datasets:
++                if k in ds.variables:
++                    vars.append(ds.variables[k])
++                    if var_template is None:
++                        var_template = ds.variables[k]
++            
++            # If variable is missing from some datasets, fill with fill_value
++            if len(vars) < len(datasets):
++                if var_template is None:
++                    raise ValueError("%r is not present in any dataset." % k)
++                
++                # Rebuild vars list with fill values for missing datasets
++                vars = []
++                for ds in datasets:
++                    if k in ds.variables:
++                        vars.append(ds.variables[k])
++                    else:
++                        # Create a variable filled with fill_value for missing data
++                        import numpy as np
++                        shape = tuple(dims_sizes.get(d, 1) for d in var_template.dims)
++                        data = np.full(shape, fill_value, dtype=var_template.dtype)
++                        vars.append(Variable(var_template.dims, data))
++            
++            vars = ensure_common_dims(vars)
+             combined = concat_vars(vars, dim, positions)
+             assert isinstance(combined, Variable)
+             result_vars[k] = combined

@@ -1,0 +1,48 @@
+2026-10-10 10:40:41,484 - INFO - Creating container for django__django-13448...
+2026-10-10 10:40:41,602 - INFO - Container for django__django-13448 created: b96e3ed0ec6f35b92c5c1e585ae9cd2a19ebd9946888b96676fe3d2d185459e1
+2026-10-10 10:40:41,860 - INFO - Container for django__django-13448 started: b96e3ed0ec6f35b92c5c1e585ae9cd2a19ebd9946888b96676fe3d2d185459e1
+2026-10-10 10:40:41,861 - INFO - Intermediate patch for django__django-13448 written to logs/run_evaluation/rerun-2026-10__google__forced__rep1__smoke5__final/rerun-2026-10__google__forced__rep1__smoke5__final/django__django-13448/patch.diff, now applying to container...
+2026-10-10 10:40:42,016 - INFO - >>>>> Applied Patch:
+Checking patch django/db/backends/base/creation.py...
+warning: django/db/backends/base/creation.py has type 100755, expected 100644
+Applied patch django/db/backends/base/creation.py cleanly.
+
+2026-10-10 10:40:42,797 - INFO - Git diff before:
+diff --git a/django/db/backends/base/creation.py b/django/db/backends/base/creation.py
+index 503f7f56fd..747ce919e5 100755
+--- a/django/db/backends/base/creation.py
++++ b/django/db/backends/base/creation.py
+@@ -74,7 +74,8 @@ class BaseDatabaseCreation:
+         # and store it on the connection. This slightly horrific process is so people
+         # who are testing on databases without transactions or who are using
+         # a TransactionTestCase still get a clean database on every test run.
+-        if serialize:
++        # Only serialize if migrations are run or if explicitly requested.
++        if serialize and self.connection.settings_dict['TEST'].get('MIGRATE', True):
+             self.connection._test_serialized_contents = self.serialize_db_to_string()
+ 
+         call_command('createcachetable', database=self.connection.alias)
+2026-10-10 10:40:42,797 - INFO - Eval script for django__django-13448 written to logs/run_evaluation/rerun-2026-10__google__forced__rep1__smoke5__final/rerun-2026-10__google__forced__rep1__smoke5__final/django__django-13448/eval.sh; copying to container...
+2026-10-10 10:40:49,444 - INFO - Test runtime: 6.57 seconds
+2026-10-10 10:40:49,448 - INFO - Test output for django__django-13448 written to logs/run_evaluation/rerun-2026-10__google__forced__rep1__smoke5__final/rerun-2026-10__google__forced__rep1__smoke5__final/django__django-13448/test_output.txt
+2026-10-10 10:40:49,540 - INFO - Git diff after:
+diff --git a/django/db/backends/base/creation.py b/django/db/backends/base/creation.py
+index 503f7f56fd..747ce919e5 100755
+--- a/django/db/backends/base/creation.py
++++ b/django/db/backends/base/creation.py
+@@ -74,7 +74,8 @@ class BaseDatabaseCreation:
+         # and store it on the connection. This slightly horrific process is so people
+         # who are testing on databases without transactions or who are using
+         # a TransactionTestCase still get a clean database on every test run.
+-        if serialize:
++        # Only serialize if migrations are run or if explicitly requested.
++        if serialize and self.connection.settings_dict['TEST'].get('MIGRATE', True):
+             self.connection._test_serialized_contents = self.serialize_db_to_string()
+ 
+         call_command('createcachetable', database=self.connection.alias)
+2026-10-10 10:40:49,540 - INFO - Grading answer for django__django-13448...
+2026-10-10 10:40:49,547 - INFO - report: {'django__django-13448': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_migrate_test_setting_false (backends.base.test_creation.TestDbCreationTests)']}, 'PASS_TO_PASS': {'success': ['test_custom_test_name (backends.base.test_creation.TestDbSignatureTests)', 'test_custom_test_name_with_test_prefix (backends.base.test_creation.TestDbSignatureTests)', 'test_default_name (backends.base.test_creation.TestDbSignatureTests)', 'test_migrate_test_setting_true (backends.base.test_creation.TestDbCreationTests)', 'test_circular_reference (backends.base.test_creation.TestDeserializeDbFromString)', 'test_circular_reference_with_natural_key (backends.base.test_creation.TestDeserializeDbFromString)', 'test_self_reference (backends.base.test_creation.TestDeserializeDbFromString)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-13448: resolved: False
+2026-10-10 10:40:49,548 - INFO - Attempting to stop container sweb.eval.django__django-13448.rerun-2026-10__google__forced__rep1__smoke5__final...
+2026-10-10 10:41:06,704 - INFO - Attempting to remove container sweb.eval.django__django-13448.rerun-2026-10__google__forced__rep1__smoke5__final...
+2026-10-10 10:41:06,764 - INFO - Container sweb.eval.django__django-13448.rerun-2026-10__google__forced__rep1__smoke5__final removed.

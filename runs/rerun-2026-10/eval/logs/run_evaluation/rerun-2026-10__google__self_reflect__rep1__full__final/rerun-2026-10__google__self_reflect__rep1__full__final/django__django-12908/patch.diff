@@ -1,0 +1,12 @@
+diff --git a/django/db/models/query.py b/django/db/models/query.py
+index e0eeccefa6..04a56892df 100644
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -994,6 +994,7 @@ class QuerySet:
+         clone.query.combined_queries = (self.query,) + tuple(qs.query for qs in other_qs)
+         clone.query.combinator = combinator
+         clone.query.combinator_all = all
++        clone.query.distinct_fields = self.query.distinct_fields
+         return clone
+ 
+     def union(self, *other_qs, all=False):

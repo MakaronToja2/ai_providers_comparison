@@ -1,0 +1,19 @@
+diff --git a/sympy/printing/pretty/pretty.py b/sympy/printing/pretty/pretty.py
+index 0545797d5f..33d8365d53 100644
+--- a/sympy/printing/pretty/pretty.py
++++ b/sympy/printing/pretty/pretty.py
+@@ -825,11 +825,9 @@ def _print_MatAdd(self, expr):
+             if s is None:
+                 s = pform     # First element
+             else:
+-                if S(item.args[0]).is_negative:
+-                    s = prettyForm(*stringPict.next(s, ' '))
+-                    pform = self._print(item)
+-                else:
+-                    s = prettyForm(*stringPict.next(s, ' + '))
++                # Instead of trying to sympify strings or assuming structure,
++                # just print with a ' + ' separator always.
++                s = prettyForm(*stringPict.next(s, ' + '))
+                 s = prettyForm(*stringPict.next(s, pform))
+ 
+         return s

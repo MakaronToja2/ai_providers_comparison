@@ -1,0 +1,41 @@
+diff --git a/sympy/utilities/autowrap.py b/sympy/utilities/autowrap.py
+index bd6afb12d1..78a835d64c 100644
+--- a/sympy/utilities/autowrap.py
++++ b/sympy/utilities/autowrap.py
+@@ -412,15 +412,21 @@ def _partition_args(self, args):
+         py_returns = []
+         py_locals = []
+         py_inferred = {}
++        # Track all argument names to detect unused array arguments
++        arg_names = {arg.name for arg in args}
++        used_arg_names = set()
+         for arg in args:
+             if isinstance(arg, OutputArgument):
+                 py_returns.append(arg)
+                 py_locals.append(arg)
++                used_arg_names.add(arg.name)
+             elif isinstance(arg, InOutArgument):
+                 py_returns.append(arg)
+                 py_args.append(arg)
++                used_arg_names.add(arg.name)
+             else:
+                 py_args.append(arg)
++                used_arg_names.add(arg.name)
+         # Find arguments that are array dimensions. These can be inferred
+         # locally in the Cython code.
+             if isinstance(arg, (InputArgument, InOutArgument)) and arg.dimensions:
+@@ -434,6 +440,14 @@ def _partition_args(self, args):
+                 py_inferred[arg] = py_inferred.pop(arg.name)
+         # Filter inferred arguments from py_args
+         py_args = [a for a in py_args if a not in py_inferred]
++
++        # Add back any array arguments that are unused in the expression
++        # but should appear as pointer arguments in the C function signature
++        unused_args = arg_names - used_arg_names
++        for arg in args:
++            if arg.name in unused_args and arg.dimensions:
++                py_args.append(arg)
++
+         return py_returns, py_args, py_locals, py_inferred
+ 
+     def _prototype_arg(self, arg):

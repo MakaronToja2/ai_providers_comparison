@@ -1,0 +1,16 @@
+diff --git a/django/urls/resolvers.py b/django/urls/resolvers.py
+index 2154a46320..5daca38fd7 100644
+--- a/django/urls/resolvers.py
++++ b/django/urls/resolvers.py
+@@ -260,6 +260,11 @@ class RoutePattern(CheckURLMixin):
+                     kwargs[key] = converter.to_python(value)
+                 except ValueError:
+                     return None
++                except Http404:
++                    # If a converter raises Http404, it means the path is valid
++                    # but the value is not. Re-raise as Resolver404 to indicate
++                    # that this path should not be used.
++                    raise Resolver404 from None
+             return path[match.end():], (), kwargs
+         return None
+ 

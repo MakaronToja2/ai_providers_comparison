@@ -1,0 +1,16 @@
+diff --git a/sympy/matrices/expressions/blockmatrix.py b/sympy/matrices/expressions/blockmatrix.py
+index 95302a05ca..8ecdda9946 100644
+--- a/sympy/matrices/expressions/blockmatrix.py
++++ b/sympy/matrices/expressions/blockmatrix.py
+@@ -152,7 +152,10 @@ def rowblocksizes(self):
+ 
+     @property
+     def colblocksizes(self):
+-        return [self.blocks[0, i].cols for i in range(self.blockshape[1])]
++        # ZeroMatrix can simplify to Zero, which has no .cols attribute.
++        # In this context, a Zero scalar has 0 columns.
++        return [self.blocks[0, i].cols if not self.blocks[0, i].is_Zero else 0
++                for i in range(self.blockshape[1])]
+ 
+     def structurally_equal(self, other):
+         return (isinstance(other, BlockMatrix)

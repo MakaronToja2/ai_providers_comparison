@@ -1,0 +1,71 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 171a3e7b0d..d96c1a65a0 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1273,7 +1273,65 @@ class FunctionDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # typ
+         return args
+ 
+     def document_members(self, all_members: bool = False) -> None:
+-        pass
++        """Generate reST for member documentation.
++
++        If *all_members* is True, do all members, else those given by
++        *self.options.members*.
++        """
++        # set current namespace for finding members
++        self.env.temp_data['autodoc:module'] = self.modname
++        if self.objpath:
++            self.env.temp_data['autodoc:class'] = self.objpath[0]
++
++        want_all = all_members or self.options.inherited_members or \
++            self.options.members is ALL
++        # find out which members are documentable
++        members_check_module, members = self.get_object_members(want_all)
++
++        # document non-skipped members
++        memberdocumenters = []  # type: List[Tuple[Documenter, bool]]
++        for (mname, member, isattr) in self.filter_members(members, want_all):
++            classes = [cls for cls in self.documenters.values()
++                       if cls.can_document_member(member, mname, isattr, self)]
++            if not classes:
++                # don't know how to document this member
++                continue
++            # prefer the documenter with the highest priority
++            classes.sort(key=lambda cls: cls.priority)
++            # give explicitly separated module name, so that members
++            # of inner classes can be documented
++            full_mname = self.modname + '::' + \
++                '.'.join(self.objpath + [mname])
++            documenter = classes[-1](self.directive, full_mname, self.indent)
++            memberdocumenters.append((documenter, isattr))
++
++        member_order = self.options.member_order or self.config.autodoc_member_order
++        memberdocumenters = self.sort_members(memberdocumenters, member_order)
++
++        for documenter, isattr in memberdocumenters:
++            # Patch to apply autodoc_type_aliases to variables and attributes
++            if hasattr(documenter, 'format_type'):
++                # Patch format_type to use type_aliases
++                orig_format_type = documenter.format_type
++
++                def patched_format_type(self, annotation, **kwargs):
++                    # Use type_aliases from config if available
++                    type_aliases = getattr(self.config, 'autodoc_type_aliases', {})
++                    if annotation is not None and type_aliases:
++                        # Try to replace annotation string if in aliases
++                        if isinstance(annotation, str) and annotation in type_aliases:
++                            annotation = type_aliases[annotation]
++                    return orig_format_type(annotation, **kwargs)
++
++                documenter.format_type = patched_format_type.__get__(documenter, documenter.__class__)
++
++            documenter.generate(
++                all_members=True, real_modname=self.real_modname,
++                check_module=members_check_module and not isattr)
++
++        # reset current objects
++        self.env.temp_data['autodoc:module'] = None
++        self.env.temp_data['autodoc:class'] = None
+ 
+     def add_directive_header(self, sig: str) -> None:
+         sourcename = self.get_sourcename()

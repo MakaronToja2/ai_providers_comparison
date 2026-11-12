@@ -1,0 +1,36 @@
+diff --git a/sympy/series/sequences.py b/sympy/series/sequences.py
+index 08f36df061..b5ba8a5ae2 100644
+--- a/sympy/series/sequences.py
++++ b/sympy/series/sequences.py
+@@ -710,6 +710,31 @@ def coeff_mul(self, coeff):
+         formula = self.formula * coeff
+         return SeqFormula(formula, self.args[1])
+ 
++    def _latex(self, printer):
++        # Custom LaTeX printer for SeqFormula to avoid escaping square brackets
++        from sympy.printing.latex import LatexPrinter
++        # Compose the sequence as a LaTeX list without escaping brackets
++        # Format: [a_0, a_1, a_2, ...]
++        # We generate the first few terms to display
++        start = self.limits[1]
++        stop = self.limits[2]
++        var = self.variables[0]
++        # We limit to first 5 terms or less if stop is finite and smaller
++        max_terms = 5
++        if stop.is_infinite:
++            n_terms = max_terms
++        else:
++            n_terms = min(max_terms, int(stop - start) + 1)
++        terms = []
++        for i in range(n_terms):
++            val = self._eval_coeff(start + i)
++            terms.append(printer._print(val))
++        terms.append(r"\ldots")
++        # Join terms with commas
++        content = ", ".join(terms)
++        # Return the sequence in square brackets without escaping
++        return r"\left[{} \right]".format(content)
++
+ 
+ def sequence(seq, limits=None):
+     """Returns appropriate sequence object.

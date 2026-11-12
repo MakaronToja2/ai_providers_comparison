@@ -1,0 +1,17 @@
+diff --git a/lib/matplotlib/figure.py b/lib/matplotlib/figure.py
+index c55864243a..586c6005e6 100644
+--- a/lib/matplotlib/figure.py
++++ b/lib/matplotlib/figure.py
+@@ -3043,6 +3043,12 @@ class Figure(FigureBase):
+ 
+         self.__dict__ = state
+ 
++        # Fix for M1 Mac unpickling issue: DPI is doubled on unpickle, so halve it here
++        if mpl.get_backend().lower() == 'macosx':
++            # Only adjust if dpi is suspiciously high (e.g., >300)
++            if hasattr(self, 'dpi') and self.dpi > 300:
++                self.dpi /= 2
++
+         # re-initialise some of the unstored state information
+         FigureCanvasBase(self)  # Set self.canvas.
+ 

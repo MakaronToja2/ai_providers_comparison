@@ -1,0 +1,22 @@
+diff --git a/django/contrib/admin/helpers.py b/django/contrib/admin/helpers.py
+index 6f0be6b148..76ecc5dfde 100644
+--- a/django/contrib/admin/helpers.py
++++ b/django/contrib/admin/helpers.py
+@@ -187,7 +187,17 @@ class AdminReadonlyField:
+         attrs = {}
+         if not self.is_first:
+             attrs["class"] = "inline"
++
+         label = self.field['label']
++        # Get the widget instance for the current field.
++        widget = self.form[self.field['field']].field.widget
++
++        # Only add the 'for' attribute if the widget is not marked as read-only.
++        # Widgets like ReadOnlyPasswordHashWidget are read-only and do not render
++        # an input element, so they should not have a 'for' attribute on their label.
++        if not getattr(widget, 'read_only', False):
++            attrs["for"] = self.form[self.field['field']].id_for_label
++
+         return format_html('<label{}>{}{}</label>', flatatt(attrs), capfirst(label), self.form.label_suffix)
+ 
+     def get_admin_url(self, remote_field, remote_obj):

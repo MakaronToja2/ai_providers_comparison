@@ -1,0 +1,62 @@
+diff --git a/sympy/utilities/autowrap.py b/sympy/utilities/autowrap.py
+index bd6afb12d1..c233f2b1a0 100644
+--- a/sympy/utilities/autowrap.py
++++ b/sympy/utilities/autowrap.py
+@@ -632,18 +632,45 @@ def autowrap(expr, language=None, backend='f2py', tempdir=None, args=None,
+         if expr.has(expr_h):
+             name_h = binary_function(name_h, expr_h, backend='dummy')
+             expr = expr.subs(expr_h, name_h(*args_h))
+-    try:
+-        routine = code_gen.routine('autofunc', expr, args)
+-    except CodeGenArgumentListError as e:
+-        # if all missing arguments are for pure output, we simply attach them
+-        # at the end and try again, because the wrappers will silently convert
+-        # them to return values anyway.
+-        new_args = []
+-        for missing in e.missing_args:
+-            if not isinstance(missing, OutputArgument):
+-                raise
+-            new_args.append(missing.name)
+-        routine = code_gen.routine('autofunc', expr, args + new_args)
++    # Fix for cython backend: ensure all args have correct pointer types even if not in expr
++    # This is because code_gen.routine may infer scalar args if expr does not depend on them,
++    # which causes incorrect C signatures for array arguments.
++    # We patch args types for cython backend here.
++    if backend.lower() == 'cython':
++        # We need to ensure that all MatrixSymbol args are treated as pointers
++        from sympy.codegen.ast import Pointer
++        from sympy.matrices.expressions.matexpr import MatrixSymbol
++
++        def fix_arg_type(arg):
++            # If arg is a MatrixSymbol, it should be a pointer in C signature
++            if isinstance(arg, MatrixSymbol):
++                # sympy.codegen.ast.Pointer is used to mark pointer args
++                return Pointer(arg)
++            return arg
++
++        fixed_args = [fix_arg_type(a) for a in args] if args else args
++        try:
++            routine = code_gen.routine('autofunc', expr, fixed_args)
++        except CodeGenArgumentListError as e:
++            new_args = []
++            for missing in e.missing_args:
++                if not isinstance(missing, OutputArgument):
++                    raise
++                new_args.append(missing.name)
++            routine = code_gen.routine('autofunc', expr, fixed_args + new_args)
++    else:
++        try:
++            routine = code_gen.routine('autofunc', expr, args)
++        except CodeGenArgumentListError as e:
++            # if all missing arguments are for pure output, we simply attach them
++            # at the end and try again, because the wrappers will silently convert
++            # them to return values anyway.
++            new_args = []
++            for missing in e.missing_args:
++                if not isinstance(missing, OutputArgument):
++                    raise
++                new_args.append(missing.name)
++            routine = code_gen.routine('autofunc', expr, args + new_args)
+ 
+     return code_wrapper.wrap_code(routine, helpers=helps)
+ 

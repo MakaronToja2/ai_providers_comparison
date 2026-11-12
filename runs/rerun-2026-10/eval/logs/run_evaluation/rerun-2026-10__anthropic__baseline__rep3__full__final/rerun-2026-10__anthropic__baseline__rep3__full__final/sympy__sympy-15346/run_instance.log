@@ -1,0 +1,54 @@
+2026-10-10 18:55:48,590 - INFO - Creating container for sympy__sympy-15346...
+2026-10-10 18:55:58,652 - INFO - Container for sympy__sympy-15346 created: b55c78412e9a916fa3fb751ed33ce113c968a41e4677f61ab09118c129f44d11
+2026-10-10 18:56:02,424 - INFO - Container for sympy__sympy-15346 started: b55c78412e9a916fa3fb751ed33ce113c968a41e4677f61ab09118c129f44d11
+2026-10-10 18:56:02,424 - INFO - Intermediate patch for sympy__sympy-15346 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep3__full__final/rerun-2026-10__anthropic__baseline__rep3__full__final/sympy__sympy-15346/patch.diff, now applying to container...
+2026-10-10 18:56:02,587 - INFO - >>>>> Applied Patch:
+Checking patch sympy/simplify/fu.py...
+warning: sympy/simplify/fu.py has type 100755, expected 100644
+Applied patch sympy/simplify/fu.py cleanly.
+
+2026-10-10 18:56:02,962 - INFO - Git diff before:
+diff --git a/sympy/simplify/fu.py b/sympy/simplify/fu.py
+index 9d939727c..880a28adf 100755
+--- a/sympy/simplify/fu.py
++++ b/sympy/simplify/fu.py
+@@ -1985,10 +1985,8 @@ def pow_cos_sin(a, two):
+             if (ca and cb and sa and sb):
+                 if isinstance(ca, sa.func) is not isinstance(cb, sb.func):
+                     return
+-                args = {j.args for j in (ca, sa)}
+-                if not all(i.args in args for i in (cb, sb)):
+-                    return
+-                return gcd, n1, n2, ca.args[0], sa.args[0], isinstance(ca, sa.func)
++                return gcd, n1, n2, ca.args[0], cb.args[0], isinstance(ca, cos)
++=======
+         if ca and sa or cb and sb or \
+             two and (ca is None and sa is None or cb is None and sb is None):
+             return
+2026-10-10 18:56:02,962 - INFO - Eval script for sympy__sympy-15346 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep3__full__final/rerun-2026-10__anthropic__baseline__rep3__full__final/sympy__sympy-15346/eval.sh; copying to container...
+2026-10-10 18:56:06,474 - INFO - Test runtime: 3.43 seconds
+2026-10-10 18:56:06,475 - INFO - Test output for sympy__sympy-15346 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep3__full__final/rerun-2026-10__anthropic__baseline__rep3__full__final/sympy__sympy-15346/test_output.txt
+2026-10-10 18:56:06,556 - INFO - Git diff after:
+diff --git a/sympy/simplify/fu.py b/sympy/simplify/fu.py
+index 9d939727c..880a28adf 100755
+--- a/sympy/simplify/fu.py
++++ b/sympy/simplify/fu.py
+@@ -1985,10 +1985,8 @@ def pow_cos_sin(a, two):
+             if (ca and cb and sa and sb):
+                 if isinstance(ca, sa.func) is not isinstance(cb, sb.func):
+                     return
+-                args = {j.args for j in (ca, sa)}
+-                if not all(i.args in args for i in (cb, sb)):
+-                    return
+-                return gcd, n1, n2, ca.args[0], sa.args[0], isinstance(ca, sa.func)
++                return gcd, n1, n2, ca.args[0], cb.args[0], isinstance(ca, cos)
++=======
+         if ca and sa or cb and sb or \
+             two and (ca is None and sa is None or cb is None and sb is None):
+             return
+2026-10-10 18:56:06,556 - INFO - Grading answer for sympy__sympy-15346...
+2026-10-10 18:56:06,581 - INFO - report: {'sympy__sympy-15346': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_issue_15129_trigsimp_methods']}, 'PASS_TO_PASS': {'success': [], 'failure': ['test_trigsimp1', 'test_trigsimp1a', 'test_trigsimp2', 'test_issue_4373', 'test_trigsimp3', 'test_issue_4661', 'test_issue_4494', 'test_issue_5948', 'test_issue_4775', 'test_issue_4280', 'test_issue_3210', 'test_trigsimp_issues', 'test_trigsimp_issue_2515', 'test_trigsimp_issue_3826', 'test_trigsimp_issue_4032', 'test_trigsimp_issue_7761', 'test_trigsimp_noncommutative', 'test_hyperbolic_simp', 'test_trigsimp_groebner', 'test_issue_2827_trigsimp_methods', 'test_exptrigsimp', 'test_powsimp_on_numbers']}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-15346: resolved: False
+2026-10-10 18:56:06,581 - INFO - Attempting to stop container sweb.eval.sympy__sympy-15346.rerun-2026-10__anthropic__baseline__rep3__full__final...
+2026-10-10 18:56:27,429 - INFO - Attempting to remove container sweb.eval.sympy__sympy-15346.rerun-2026-10__anthropic__baseline__rep3__full__final...
+2026-10-10 18:56:30,872 - INFO - Container sweb.eval.sympy__sympy-15346.rerun-2026-10__anthropic__baseline__rep3__full__final removed.

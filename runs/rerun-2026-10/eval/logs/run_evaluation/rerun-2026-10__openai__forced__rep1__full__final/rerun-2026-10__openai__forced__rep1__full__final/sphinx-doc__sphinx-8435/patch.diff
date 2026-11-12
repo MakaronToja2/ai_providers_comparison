@@ -1,0 +1,33 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 171a3e7b0d..89e52df407 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1273,7 +1273,27 @@ class FunctionDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # typ
+         return args
+ 
+     def document_members(self, all_members: bool = False) -> None:
+-        pass
++        # Override to apply autodoc_type_aliases to variables and attributes
++        if not self.object:
++            return
++        from sphinx.util.typing import stringify_typehint
++
++        # If the object is a variable or attribute with a type annotation,
++        # apply autodoc_type_aliases to the annotation string.
++        if hasattr(self, 'annotation') and self.annotation:
++            # stringify_typehint applies type_aliases internally
++            self.annotation = stringify_typehint(self.annotation, type_aliases=self.config.autodoc_type_aliases)
++
++        # For variables and attributes, update the content to reflect the alias
++        # if the annotation string differs from the original.
++        # This is a minimal fix to apply autodoc_type_aliases to variables and attributes.
++        # The actual content generation might be more complex depending on the documenter.
++        if hasattr(self, 'annotation') and self.annotation:
++            # Clear existing content and add updated annotation content
++            self.content = [self.annotation]
++
++        # Call super if needed (depending on base class)
++        # super().document_members(all_members)
+ 
+     def add_directive_header(self, sig: str) -> None:
+         sourcename = self.get_sourcename()

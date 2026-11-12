@@ -1,0 +1,1129 @@
+[queue] anthropic spend so far $9.41 (budget $96)
+[job] rerun-2026-10__anthropic__baseline__rep1__full
+[job] model claude-haiku-4-5-20251001 | 100 instances | db runs/rerun-2026-10/results_anthropic.db
+[job] outcomes: {'success_patch_generated': 68, 'hallucination_format_error': 25, 'edit_not_applicable': 7}
+[job] model ids returned by the API: ['claude-haiku-4-5-20251001']
+[job] cost at list price: $8.098 | as billed (cached input discounted): $8.098
+[job] complete
+[queue] anthropic spend so far $9.41 (budget $96)
+[job] rerun-2026-10__anthropic__forced__rep1__full
+[job] model claude-haiku-4-5-20251001 | 100 instances | db runs/rerun-2026-10/results_anthropic.db
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[1/100] astropy__astropy-12907                   hallucination_format_error   $0.0817 (job $0.082)
+[2/100] astropy__astropy-7746                    success_patch_generated      $0.0782 (job $0.160)
+[3/100] django__django-11179                     success_patch_generated      $0.0339 (job $0.194)
+[4/100] django__django-10924                     edit_not_applicable          $0.0777 (job $0.272)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[5/100] django__django-11620                     success_patch_generated      $0.3743 (job $0.646)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[6/100] django__django-11964                     hallucination_format_error   $0.0686 (job $0.714)
+[7/100] django__django-11630                     edit_not_applicable          $0.0983 (job $0.813)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[8/100] django__django-12113                     success_patch_generated      $0.0764 (job $0.889)
+[9/100] django__django-12184                     success_patch_generated      $0.0784 (job $0.968)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[10/100] django__django-12284                     success_patch_generated      $0.0697 (job $1.037)
+[cost] after 10 instances: $1.037 spent this invocation, projected $10.37 for the 100 instances in this invocation
+[11/100] django__django-12453                     success_patch_generated      $0.0541 (job $1.091)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[12/100] django__django-12308                     success_patch_generated      $0.1139 (job $1.205)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[13/100] django__django-12589                     hallucination_format_error   $0.0598 (job $1.265)
+[14/100] django__django-12497                     success_patch_generated      $0.0590 (job $1.324)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[15/100] django__django-12908                     success_patch_generated      $0.0635 (job $1.388)
+[16/100] django__django-13028                     success_patch_generated      $0.0697 (job $1.457)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[17/100] django__django-13220                     success_patch_generated      $0.0747 (job $1.532)
+[18/100] django__django-13590                     success_patch_generated      $0.0392 (job $1.571)
+[19/100] django__django-13447                     success_patch_generated      $0.0963 (job $1.667)
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[20/100] django__django-13933                     success_patch_generated      $0.0563 (job $1.724)
+[21/100] django__django-13757                     success_patch_generated      $0.0805 (job $1.804)
+[22/100] django__django-13710                     edit_not_applicable          $0.0839 (job $1.888)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[23/100] django__django-14411                     success_patch_generated      $0.0665 (job $1.955)
+[24/100] django__django-14238                     edit_not_applicable          $0.0409 (job $1.996)
+[25/100] django__django-14016                     success_patch_generated      $0.0929 (job $2.088)
+[26/100] django__django-14752                     success_patch_generated      $0.0638 (job $2.152)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[27/100] django__django-14608                     success_patch_generated      $0.1122 (job $2.264)
+[28/100] django__django-14730                     success_patch_generated      $0.0822 (job $2.347)
+[29/100] django__django-14915                     success_patch_generated      $0.0329 (job $2.379)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[30/100] django__django-14997                     success_patch_generated      $0.1447 (job $2.524)
+[31/100] django__django-15252                     success_patch_generated      $0.1062 (job $2.630)
+[32/100] django__django-15400                     edit_not_applicable          $0.1142 (job $2.745)
+[33/100] django__django-15790                     success_patch_generated      $0.0454 (job $2.790)
+[34/100] django__django-15814                     success_patch_generated      $0.0661 (job $2.856)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[35/100] django__django-16379                     success_patch_generated      $0.0252 (job $2.881)
+[36/100] django__django-16229                     success_patch_generated      $0.0832 (job $2.965)
+[37/100] django__django-15819                     success_patch_generated      $0.1371 (job $3.102)
+[38/100] django__django-16527                     success_patch_generated      $0.0544 (job $3.156)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=forced
+[39/100] django__django-16595                     success_patch_generated      $0.0955 (job $3.252)
+[40/100] django__django-17051                     success_patch_generated      $0.0810 (job $3.333)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[41/100] matplotlib__matplotlib-23476             success_patch_generated      $0.0854 (job $3.418)
+[anthropic] Forcing final answer: iterations=9, tool_calls=10, cap_hit=False, mode=forced
+[42/100] matplotlib__matplotlib-24149             success_patch_generated      $0.0698 (job $3.488)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[43/100] matplotlib__matplotlib-24265             edit_not_applicable          $0.0583 (job $3.546)
+[44/100] matplotlib__matplotlib-24334             success_patch_generated      $0.0667 (job $3.613)
+[45/100] matplotlib__matplotlib-24970             success_patch_generated      $0.0484 (job $3.661)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[46/100] matplotlib__matplotlib-25433             success_patch_generated      $0.0908 (job $3.752)
+[47/100] matplotlib__matplotlib-25442             success_patch_generated      $0.0547 (job $3.807)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=forced
+[48/100] matplotlib__matplotlib-26020             edit_not_applicable          $0.1156 (job $3.922)
+[49/100] mwaskom__seaborn-3407                    success_patch_generated      $0.0891 (job $4.011)
+[50/100] pallets__flask-5063                      success_patch_generated      $0.0597 (job $4.071)
+[51/100] psf__requests-863                        success_patch_generated      $0.0732 (job $4.144)
+[52/100] psf__requests-3362                       success_patch_generated      $0.0562 (job $4.200)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[53/100] pylint-dev__pylint-7114                  hallucination_format_error   $0.0508 (job $4.251)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[54/100] pylint-dev__pylint-7993                  success_patch_generated      $0.0929 (job $4.344)
+[55/100] pydata__xarray-3364                      edit_not_applicable          $0.1206 (job $4.465)
+[56/100] pytest-dev__pytest-11148                 success_patch_generated      $0.1156 (job $4.580)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[57/100] pytest-dev__pytest-5103                  hallucination_format_error   $0.0794 (job $4.660)
+[58/100] pytest-dev__pytest-5227                  success_patch_generated      $0.0979 (job $4.758)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[59/100] pytest-dev__pytest-5413                  success_patch_generated      $0.1009 (job $4.858)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[60/100] pytest-dev__pytest-7373                  success_patch_generated      $0.0402 (job $4.899)
+[61/100] pytest-dev__pytest-6116                  success_patch_generated      $0.0677 (job $4.966)
+[62/100] scikit-learn__scikit-learn-10297         success_patch_generated      $0.0633 (job $5.030)
+[63/100] scikit-learn__scikit-learn-10508         success_patch_generated      $0.0855 (job $5.115)
+[64/100] scikit-learn__scikit-learn-13142         success_patch_generated      $0.1251 (job $5.240)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[65/100] scikit-learn__scikit-learn-13241         success_patch_generated      $0.1007 (job $5.341)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[66/100] scikit-learn__scikit-learn-13779         success_patch_generated      $0.0405 (job $5.381)
+[67/100] scikit-learn__scikit-learn-13584         success_patch_generated      $0.1491 (job $5.530)
+[68/100] scikit-learn__scikit-learn-13496         success_patch_generated      $0.1333 (job $5.664)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=14, cap_hit=True, mode=forced
+[69/100] scikit-learn__scikit-learn-14894         success_patch_generated      $0.0651 (job $5.729)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[70/100] sphinx-doc__sphinx-10325                 success_patch_generated      $0.0788 (job $5.808)
+[71/100] sphinx-doc__sphinx-7738                  success_patch_generated      $0.0653 (job $5.873)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[72/100] sphinx-doc__sphinx-8713                  success_patch_generated      $0.0460 (job $5.919)
+[73/100] sphinx-doc__sphinx-8506                  success_patch_generated      $0.0934 (job $6.012)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[74/100] sphinx-doc__sphinx-8435                  edit_not_applicable          $0.1166 (job $6.129)
+[75/100] sympy__sympy-11400                       success_patch_generated      $0.1241 (job $6.253)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[76/100] sympy__sympy-13043                       success_patch_generated      $0.1165 (job $6.369)
+[77/100] sympy__sympy-13146                       hallucination_format_error   $0.0677 (job $6.437)
+[78/100] sympy__sympy-13177                       edit_not_applicable          $0.0462 (job $6.483)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[79/100] sympy__sympy-13971                       success_patch_generated      $0.1092 (job $6.592)
+[80/100] sympy__sympy-14317                       success_patch_generated      $0.0660 (job $6.659)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[81/100] sympy__sympy-14774                       success_patch_generated      $0.0216 (job $6.680)
+[82/100] sympy__sympy-14396                       hallucination_format_error   $0.0696 (job $6.750)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[83/100] sympy__sympy-14817                       success_patch_generated      $0.0670 (job $6.817)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[84/100] sympy__sympy-16792                       success_patch_generated      $0.1362 (job $6.953)
+[85/100] sympy__sympy-15346                       success_patch_generated      $0.1322 (job $7.085)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[86/100] sympy__sympy-17022                       hallucination_format_error   $0.1080 (job $7.193)
+[87/100] sympy__sympy-17139                       success_patch_generated      $0.0653 (job $7.258)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[88/100] sympy__sympy-17630                       hallucination_format_error   $0.1080 (job $7.366)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=forced
+[89/100] sympy__sympy-18057                       success_patch_generated      $0.0726 (job $7.439)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[90/100] sympy__sympy-18835                       success_patch_generated      $0.0590 (job $7.498)
+[91/100] sympy__sympy-19487                       success_patch_generated      $0.1257 (job $7.624)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[92/100] sympy__sympy-20590                       hallucination_format_error   $0.1008 (job $7.724)
+[93/100] sympy__sympy-20154                       success_patch_generated      $0.0646 (job $7.789)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[94/100] sympy__sympy-21055                       success_patch_generated      $0.1135 (job $7.903)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[95/100] sympy__sympy-21614                       hallucination_format_error   $0.1141 (job $8.017)
+[anthropic] Forcing final answer: iterations=10, tool_calls=15, cap_hit=True, mode=forced
+[96/100] sympy__sympy-21847                       success_patch_generated      $0.1265 (job $8.143)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[97/100] sympy__sympy-22714                       success_patch_generated      $0.0793 (job $8.222)
+[98/100] sympy__sympy-22840                       success_patch_generated      $0.1346 (job $8.357)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[99/100] sympy__sympy-23191                       hallucination_format_error   $0.0663 (job $8.423)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[100/100] sympy__sympy-24152                       success_patch_generated      $0.1101 (job $8.533)
+[job] outcomes: {'success_patch_generated': 78, 'hallucination_format_error': 12, 'edit_not_applicable': 10}
+[job] model ids returned by the API: ['claude-haiku-4-5-20251001']
+[job] cost at list price: $8.533 | as billed (cached input discounted): $8.533
+[job] complete
+[queue] anthropic spend so far $17.95 (budget $96)
+[job] rerun-2026-10__anthropic__self_reflect__rep1__full
+[job] model claude-haiku-4-5-20251001 | 100 instances | db runs/rerun-2026-10/results_anthropic.db
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[1/100] astropy__astropy-12907                   success_patch_generated      $0.1101 (job $0.110)
+[anthropic] Self-reflect: revised
+[2/100] django__django-10924                     success_patch_generated      $0.0945 (job $0.205)
+[anthropic] Self-reflect: revised
+[3/100] astropy__astropy-7746                    success_patch_generated      $0.0831 (job $0.288)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[anthropic] Self-reflect: approved
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[4/100] django__django-11179                     success_patch_generated      $0.0503 (job $0.338)
+[5/100] django__django-11620                     success_patch_generated      $0.0855 (job $0.423)
+[anthropic] Self-reflect: approved
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=14, cap_hit=True, mode=self_reflect
+[6/100] django__django-11630                     success_patch_generated      $0.1177 (job $0.541)
+[7/100] django__django-11964                     hallucination_format_error   $0.0751 (job $0.616)
+[anthropic] Self-reflect: revised
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[8/100] django__django-12113                     success_patch_generated      $0.1280 (job $0.744)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[9/100] django__django-12284                     hallucination_format_error   $0.0658 (job $0.810)
+[10/100] django__django-12184                     success_patch_generated      $0.0984 (job $0.909)
+[cost] after 10 instances: $0.909 spent this invocation, projected $9.09 for the 100 instances in this invocation
+[anthropic] Self-reflect: approved
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[11/100] django__django-12308                     success_patch_generated      $0.1305 (job $1.039)
+[anthropic] Self-reflect: approved
+[anthropic] Self-reflect: approved
+[12/100] django__django-12453                     success_patch_generated      $0.0833 (job $1.122)
+[13/100] django__django-12497                     success_patch_generated      $0.0814 (job $1.204)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[14/100] django__django-12589                     hallucination_format_error   $0.0943 (job $1.298)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[15/100] django__django-12908                     success_patch_generated      $0.0756 (job $1.374)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[16/100] django__django-13028                     success_patch_generated      $0.0842 (job $1.458)
+[anthropic] Self-reflect: revised
+[17/100] django__django-13220                     success_patch_generated      $0.0802 (job $1.538)
+[anthropic] Self-reflect: approved
+[18/100] django__django-13590                     success_patch_generated      $0.0495 (job $1.587)
+[anthropic] Self-reflect: unstructured
+[19/100] django__django-13447                     success_patch_generated      $0.0753 (job $1.663)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[anthropic] Self-reflect: approved
+[20/100] django__django-13710                     success_patch_generated      $0.0823 (job $1.745)
+[21/100] django__django-13757                     success_patch_generated      $0.0896 (job $1.835)
+[anthropic] Self-reflect: approved
+[22/100] django__django-13933                     success_patch_generated      $0.0631 (job $1.898)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[23/100] django__django-14411                     hallucination_format_error   $0.0485 (job $1.946)
+[anthropic] Self-reflect: approved
+[24/100] django__django-14238                     success_patch_generated      $0.0607 (job $2.007)
+[anthropic] Self-reflect: revised
+[25/100] django__django-14016                     success_patch_generated      $0.1133 (job $2.120)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[anthropic] Self-reflect: approved
+[26/100] django__django-14730                     hallucination_format_error   $0.0667 (job $2.187)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[27/100] django__django-14608                     success_patch_generated      $0.1404 (job $2.327)
+[28/100] django__django-14752                     success_patch_generated      $0.0550 (job $2.382)
+[anthropic] Self-reflect: revised
+[29/100] django__django-14915                     success_patch_generated      $0.0613 (job $2.444)
+[30/100] django__django-15252                     success_patch_generated      $0.1270 (job $2.570)
+[anthropic] Self-reflect: revised
+[31/100] django__django-14997                     success_patch_generated      $0.1904 (job $2.761)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[32/100] django__django-15400                     success_patch_generated      $0.1361 (job $2.897)
+[anthropic] Self-reflect: approved
+[33/100] django__django-15790                     success_patch_generated      $0.0540 (job $2.951)
+[anthropic] Self-reflect: approved
+[34/100] django__django-15814                     success_patch_generated      $0.0614 (job $3.012)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[35/100] django__django-16229                     hallucination_format_error   $0.0729 (job $3.085)
+[anthropic] Self-reflect: approved
+[anthropic] Self-reflect: approved
+[36/100] django__django-15819                     success_patch_generated      $0.1605 (job $3.246)
+[37/100] django__django-16379                     success_patch_generated      $0.0441 (job $3.290)
+[anthropic] Self-reflect: revised
+[38/100] django__django-16527                     success_patch_generated      $0.0452 (job $3.335)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[39/100] django__django-17051                     hallucination_format_error   $0.0735 (job $3.409)
+[anthropic] Self-reflect: approved
+[40/100] django__django-16595                     success_patch_generated      $0.1131 (job $3.522)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[41/100] matplotlib__matplotlib-23476             success_patch_generated      $0.1012 (job $3.623)
+[anthropic] Self-reflect: revised
+[42/100] matplotlib__matplotlib-24149             success_patch_generated      $0.0742 (job $3.697)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[43/100] matplotlib__matplotlib-24265             success_patch_generated      $0.0689 (job $3.766)
+[anthropic] Self-reflect: unstructured
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[44/100] matplotlib__matplotlib-24334             success_patch_generated      $0.0737 (job $3.840)
+[anthropic] Self-reflect: revised
+[45/100] matplotlib__matplotlib-24970             success_patch_generated      $0.0696 (job $3.909)
+[anthropic] Self-reflect: approved
+[46/100] matplotlib__matplotlib-25442             success_patch_generated      $0.0399 (job $3.949)
+[anthropic] Self-reflect: revised
+[47/100] matplotlib__matplotlib-25433             success_patch_generated      $0.1154 (job $4.065)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[48/100] matplotlib__matplotlib-26020             success_patch_generated      $0.1367 (job $4.201)
+[anthropic] Self-reflect: revised
+[49/100] mwaskom__seaborn-3407                    edit_not_applicable          $0.1011 (job $4.302)
+[anthropic] Forcing final answer: iterations=10, tool_calls=14, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[50/100] pallets__flask-5063                      success_patch_generated      $0.0822 (job $4.385)
+[anthropic] Self-reflect: approved
+[anthropic] Self-reflect: approved
+[51/100] psf__requests-3362                       success_patch_generated      $0.0794 (job $4.464)
+[52/100] psf__requests-863                        success_patch_generated      $0.0668 (job $4.531)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[anthropic] Self-reflect: revised
+[53/100] pylint-dev__pylint-7993                  success_patch_generated      $0.0880 (job $4.619)
+[54/100] pylint-dev__pylint-7114                  success_patch_generated      $0.0851 (job $4.704)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[55/100] pytest-dev__pytest-5103                  hallucination_format_error   $0.0817 (job $4.786)
+[anthropic] Self-reflect: revised
+[56/100] pytest-dev__pytest-11148                 success_patch_generated      $0.1369 (job $4.923)
+[anthropic] Self-reflect: approved
+[57/100] pytest-dev__pytest-5227                  success_patch_generated      $0.1231 (job $5.046)
+[anthropic] Self-reflect: revised
+[58/100] pydata__xarray-3364                      success_patch_generated      $0.1445 (job $5.190)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[59/100] pytest-dev__pytest-5413                  success_patch_generated      $0.1350 (job $5.325)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[60/100] pytest-dev__pytest-7373                  success_patch_generated      $0.0628 (job $5.388)
+[61/100] pytest-dev__pytest-6116                  hallucination_format_error   $0.0731 (job $5.461)
+[anthropic] Self-reflect: revised
+[62/100] scikit-learn__scikit-learn-10297         success_patch_generated      $0.0691 (job $5.530)
+[anthropic] Self-reflect: approved
+[63/100] scikit-learn__scikit-learn-10508         success_patch_generated      $0.1009 (job $5.631)
+[anthropic] Self-reflect: approved
+[64/100] scikit-learn__scikit-learn-13142         success_patch_generated      $0.1228 (job $5.754)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[65/100] scikit-learn__scikit-learn-13241         success_patch_generated      $0.1319 (job $5.886)
+[anthropic] Self-reflect: approved
+[anthropic] Self-reflect: revised
+[66/100] scikit-learn__scikit-learn-13779         success_patch_generated      $0.0531 (job $5.939)
+[67/100] scikit-learn__scikit-learn-13496         success_patch_generated      $0.1509 (job $6.090)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[68/100] scikit-learn__scikit-learn-13584         success_patch_generated      $0.1886 (job $6.278)
+[anthropic] Self-reflect: revised
+[69/100] sphinx-doc__sphinx-10325                 success_patch_generated      $0.0792 (job $6.358)
+[anthropic] Self-reflect: revised
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[70/100] scikit-learn__scikit-learn-14894         success_patch_generated      $0.0918 (job $6.449)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[71/100] sphinx-doc__sphinx-8435                  hallucination_format_error   $0.0744 (job $6.524)
+[anthropic] Self-reflect: revised
+[72/100] sphinx-doc__sphinx-7738                  edit_not_applicable          $0.0935 (job $6.617)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[73/100] sphinx-doc__sphinx-8506                  success_patch_generated      $0.1153 (job $6.733)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[74/100] sphinx-doc__sphinx-8713                  success_patch_generated      $0.1276 (job $6.860)
+[anthropic] Self-reflect: revised
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[75/100] sympy__sympy-11400                       success_patch_generated      $0.1201 (job $6.980)
+[76/100] sympy__sympy-13146                       hallucination_format_error   $0.0636 (job $7.044)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[77/100] sympy__sympy-13971                       hallucination_format_error   $0.0748 (job $7.119)
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=self_reflect
+[78/100] sympy__sympy-14317                       hallucination_format_error   $0.0715 (job $7.190)
+[anthropic] Self-reflect: revised
+[79/100] sympy__sympy-13177                       success_patch_generated      $0.0720 (job $7.262)
+[anthropic] Self-reflect: revised
+[80/100] sympy__sympy-13043                       edit_not_applicable          $0.1121 (job $7.374)
+[anthropic] Self-reflect: approved
+[anthropic] Self-reflect: revised
+[81/100] sympy__sympy-14774                       success_patch_generated      $0.0515 (job $7.426)
+[anthropic] Self-reflect: approved
+[82/100] sympy__sympy-14396                       success_patch_generated      $0.0847 (job $7.510)
+[83/100] sympy__sympy-14817                       success_patch_generated      $0.0678 (job $7.578)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[84/100] sympy__sympy-15346                       hallucination_format_error   $0.0710 (job $7.649)
+[85/100] sympy__sympy-16792                       hallucination_format_error   $0.1190 (job $7.768)
+[86/100] sympy__sympy-17022                       hallucination_format_error   $0.1051 (job $7.873)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[87/100] sympy__sympy-17139                       success_patch_generated      $0.0484 (job $7.922)
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[88/100] sympy__sympy-17630                       success_patch_generated      $0.1364 (job $8.058)
+[anthropic] Self-reflect: approved
+[89/100] sympy__sympy-18835                       success_patch_generated      $0.0647 (job $8.123)
+[anthropic] Self-reflect: revised
+[90/100] sympy__sympy-18057                       success_patch_generated      $0.1104 (job $8.233)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[anthropic] Forcing final answer: iterations=10, tool_calls=15, cap_hit=True, mode=self_reflect
+[91/100] sympy__sympy-19487                       success_patch_generated      $0.1214 (job $8.354)
+[anthropic] Self-reflect: approved
+[92/100] sympy__sympy-20154                       success_patch_generated      $0.0684 (job $8.423)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[93/100] sympy__sympy-21614                       hallucination_format_error   $0.0850 (job $8.508)
+[94/100] sympy__sympy-20590                       failure_explicit             $0.1201 (job $8.628)
+[95/100] sympy__sympy-21055                       success_patch_generated      $0.1178 (job $8.746)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[96/100] sympy__sympy-22714                       success_patch_generated      $0.0741 (job $8.820)
+[anthropic] Self-reflect: revised
+[anthropic] Self-reflect: approved
+[97/100] sympy__sympy-22840                       success_patch_generated      $0.1672 (job $8.987)
+[anthropic] Forcing final answer: iterations=10, tool_calls=15, cap_hit=True, mode=self_reflect
+[98/100] sympy__sympy-21847                       success_patch_generated      $0.1155 (job $9.103)
+[99/100] sympy__sympy-23191                       hallucination_format_error   $0.1239 (job $9.226)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[100/100] sympy__sympy-24152                       success_patch_generated      $0.1221 (job $9.349)
+[job] outcomes: {'success_patch_generated': 78, 'hallucination_format_error': 18, 'failure_explicit': 1, 'edit_not_applicable': 3}
+[job] model ids returned by the API: ['claude-haiku-4-5-20251001']
+[job] cost at list price: $9.349 | as billed (cached input discounted): $9.349
+[job] complete
+[queue] anthropic spend so far $27.29 (budget $96)
+[job] rerun-2026-10__anthropic__baseline__rep2__full
+[job] model claude-haiku-4-5-20251001 | 100 instances | db runs/rerun-2026-10/results_anthropic.db
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=baseline
+[1/100] astropy__astropy-12907                   success_patch_generated      $0.0816 (job $0.082)
+[2/100] django__django-10924                     edit_not_applicable          $0.0857 (job $0.167)
+[3/100] astropy__astropy-7746                    success_patch_generated      $0.0650 (job $0.232)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=9, tool_calls=9, cap_hit=False, mode=baseline
+[4/100] django__django-11179                     success_patch_generated      $0.0748 (job $0.307)
+[5/100] django__django-11630                     success_patch_generated      $0.0775 (job $0.384)
+[6/100] django__django-11620                     edit_not_applicable          $0.0995 (job $0.484)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[7/100] django__django-11964                     hallucination_format_error   $0.0644 (job $0.548)
+[anthropic] Forcing final answer: iterations=10, tool_calls=17, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=14, cap_hit=True, mode=baseline
+[8/100] django__django-12113                     success_patch_generated      $0.1101 (job $0.658)
+[9/100] django__django-12184                     success_patch_generated      $0.0910 (job $0.749)
+[10/100] django__django-12284                     success_patch_generated      $0.0585 (job $0.808)
+[cost] after 10 instances: $0.808 spent this invocation, projected $8.08 for the 100 instances in this invocation
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[11/100] django__django-12453                     success_patch_generated      $0.0872 (job $0.895)
+[12/100] django__django-12497                     success_patch_generated      $0.0578 (job $0.953)
+[13/100] django__django-12308                     success_patch_generated      $0.0726 (job $1.026)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[14/100] django__django-12908                     hallucination_format_error   $0.0653 (job $1.091)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[15/100] django__django-12589                     success_patch_generated      $0.0861 (job $1.177)
+[16/100] django__django-13028                     success_patch_generated      $0.0663 (job $1.243)
+[17/100] django__django-13220                     success_patch_generated      $0.0440 (job $1.287)
+[18/100] django__django-13590                     success_patch_generated      $0.0346 (job $1.322)
+[19/100] django__django-13447                     success_patch_generated      $0.0596 (job $1.381)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=baseline
+[20/100] django__django-13710                     success_patch_generated      $0.0756 (job $1.457)
+[21/100] django__django-13757                     success_patch_generated      $0.0640 (job $1.521)
+[22/100] django__django-13933                     success_patch_generated      $0.0742 (job $1.595)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[23/100] django__django-14016                     edit_not_applicable          $0.0962 (job $1.691)
+[24/100] django__django-14238                     success_patch_generated      $0.0505 (job $1.742)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=baseline
+[25/100] django__django-14411                     success_patch_generated      $0.0910 (job $1.833)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=baseline
+[26/100] django__django-14608                     success_patch_generated      $0.1290 (job $1.962)
+[27/100] django__django-14752                     success_patch_generated      $0.0366 (job $1.999)
+[28/100] django__django-14730                     success_patch_generated      $0.0741 (job $2.073)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[29/100] django__django-14915                     success_patch_generated      $0.0534 (job $2.126)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[30/100] django__django-14997                     success_patch_generated      $0.1682 (job $2.294)
+[31/100] django__django-15252                     success_patch_generated      $0.0709 (job $2.365)
+[anthropic] Forcing final answer: iterations=10, tool_calls=9, cap_hit=False, mode=baseline
+[32/100] django__django-15400                     success_patch_generated      $0.1356 (job $2.501)
+[33/100] django__django-15790                     success_patch_generated      $0.0491 (job $2.550)
+[34/100] django__django-15814                     success_patch_generated      $0.0723 (job $2.622)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=baseline
+[35/100] django__django-16379                     success_patch_generated      $0.0390 (job $2.661)
+[36/100] django__django-15819                     success_patch_generated      $0.1207 (job $2.782)
+[37/100] django__django-16229                     edit_not_applicable          $0.0845 (job $2.866)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[38/100] django__django-16527                     success_patch_generated      $0.0553 (job $2.922)
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=baseline
+[39/100] django__django-17051                     success_patch_generated      $0.0791 (job $3.001)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[40/100] matplotlib__matplotlib-23476             hallucination_format_error   $0.0653 (job $3.066)
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=baseline
+[41/100] matplotlib__matplotlib-24149             success_patch_generated      $0.0958 (job $3.162)
+[42/100] matplotlib__matplotlib-24265             success_patch_generated      $0.0493 (job $3.211)
+[43/100] django__django-16595                     edit_not_applicable          $0.1372 (job $3.348)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[44/100] matplotlib__matplotlib-24970             success_patch_generated      $0.0397 (job $3.388)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=baseline
+[45/100] matplotlib__matplotlib-25433             hallucination_format_error   $0.0705 (job $3.459)
+[46/100] matplotlib__matplotlib-24334             success_patch_generated      $0.0709 (job $3.530)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=baseline
+[47/100] matplotlib__matplotlib-25442             success_patch_generated      $0.0408 (job $3.570)
+[48/100] matplotlib__matplotlib-26020             success_patch_generated      $0.1157 (job $3.686)
+[49/100] mwaskom__seaborn-3407                    edit_not_applicable          $0.0774 (job $3.763)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[50/100] pallets__flask-5063                      success_patch_generated      $0.0582 (job $3.822)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=baseline
+[51/100] psf__requests-3362                       success_patch_generated      $0.0551 (job $3.877)
+[52/100] psf__requests-863                        success_patch_generated      $0.0758 (job $3.952)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=baseline
+[53/100] pylint-dev__pylint-7993                  success_patch_generated      $0.0813 (job $4.034)
+[54/100] pylint-dev__pylint-7114                  edit_not_applicable          $0.0769 (job $4.111)
+[55/100] pydata__xarray-3364                      success_patch_generated      $0.1325 (job $4.243)
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[56/100] pytest-dev__pytest-5103                  hallucination_format_error   $0.0737 (job $4.317)
+[57/100] pytest-dev__pytest-11148                 hallucination_format_error   $0.0874 (job $4.404)
+[58/100] pytest-dev__pytest-5227                  success_patch_generated      $0.0840 (job $4.488)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[59/100] pytest-dev__pytest-5413                  hallucination_format_error   $0.1187 (job $4.607)
+[60/100] pytest-dev__pytest-7373                  success_patch_generated      $0.0386 (job $4.645)
+[61/100] scikit-learn__scikit-learn-10297         success_patch_generated      $0.0763 (job $4.722)
+[62/100] scikit-learn__scikit-learn-10508         success_patch_generated      $0.0829 (job $4.805)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[63/100] pytest-dev__pytest-6116                  edit_not_applicable          $0.1042 (job $4.909)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[64/100] scikit-learn__scikit-learn-13142         success_patch_generated      $0.1433 (job $5.052)
+[65/100] scikit-learn__scikit-learn-13241         success_patch_generated      $0.1047 (job $5.157)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=baseline
+[66/100] scikit-learn__scikit-learn-13779         success_patch_generated      $0.0409 (job $5.198)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[67/100] scikit-learn__scikit-learn-13496         success_patch_generated      $0.1462 (job $5.344)
+[68/100] scikit-learn__scikit-learn-13584         success_patch_generated      $0.1480 (job $5.492)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[69/100] scikit-learn__scikit-learn-14894         success_patch_generated      $0.0564 (job $5.548)
+[70/100] sphinx-doc__sphinx-10325                 hallucination_format_error   $0.0593 (job $5.608)
+[71/100] sphinx-doc__sphinx-7738                  hallucination_format_error   $0.0541 (job $5.662)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[72/100] sphinx-doc__sphinx-8713                  success_patch_generated      $0.1031 (job $5.765)
+[73/100] sphinx-doc__sphinx-8435                  success_patch_generated      $0.0835 (job $5.848)
+[74/100] sphinx-doc__sphinx-8506                  success_patch_generated      $0.0940 (job $5.942)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=baseline
+[75/100] sympy__sympy-13043                       success_patch_generated      $0.0587 (job $6.001)
+[76/100] sympy__sympy-11400                       success_patch_generated      $0.1271 (job $6.128)
+[77/100] sympy__sympy-13146                       success_patch_generated      $0.0869 (job $6.215)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=14, cap_hit=True, mode=baseline
+[78/100] sympy__sympy-13971                       success_patch_generated      $0.1053 (job $6.320)
+[79/100] sympy__sympy-14317                       hallucination_format_error   $0.0717 (job $6.392)
+[80/100] sympy__sympy-14774                       success_patch_generated      $0.0461 (job $6.438)
+[81/100] sympy__sympy-14396                       success_patch_generated      $0.0668 (job $6.505)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[82/100] sympy__sympy-13177                       edit_not_applicable          $0.0907 (job $6.596)
+[83/100] sympy__sympy-14817                       success_patch_generated      $0.0576 (job $6.653)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=baseline
+[84/100] sympy__sympy-16792                       hallucination_format_error   $0.1149 (job $6.768)
+[85/100] sympy__sympy-17022                       hallucination_format_error   $0.1006 (job $6.869)
+[86/100] sympy__sympy-15346                       success_patch_generated      $0.0863 (job $6.955)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=baseline
+[87/100] sympy__sympy-17139                       success_patch_generated      $0.0463 (job $7.001)
+[88/100] sympy__sympy-17630                       success_patch_generated      $0.1143 (job $7.115)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=baseline
+[89/100] sympy__sympy-18835                       success_patch_generated      $0.0314 (job $7.147)
+[90/100] sympy__sympy-18057                       success_patch_generated      $0.0924 (job $7.239)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[91/100] sympy__sympy-19487                       success_patch_generated      $0.1278 (job $7.367)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=baseline
+[92/100] sympy__sympy-20590                       hallucination_format_error   $0.0818 (job $7.449)
+[93/100] sympy__sympy-20154                       success_patch_generated      $0.0603 (job $7.509)
+[94/100] sympy__sympy-21055                       success_patch_generated      $0.1067 (job $7.616)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[95/100] sympy__sympy-21614                       hallucination_format_error   $0.0886 (job $7.705)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[96/100] sympy__sympy-21847                       success_patch_generated      $0.0942 (job $7.799)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=baseline
+[97/100] sympy__sympy-22840                       hallucination_format_error   $0.1375 (job $7.936)
+[98/100] sympy__sympy-22714                       hallucination_format_error   $0.0981 (job $8.034)
+[anthropic] Forcing final answer: iterations=10, tool_calls=15, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[99/100] sympy__sympy-24152                       success_patch_generated      $0.1116 (job $8.146)
+[100/100] sympy__sympy-23191                       success_patch_generated      $0.1289 (job $8.275)
+[job] outcomes: {'success_patch_generated': 75, 'hallucination_format_error': 16, 'edit_not_applicable': 9}
+[job] model ids returned by the API: ['claude-haiku-4-5-20251001']
+[job] cost at list price: $8.275 | as billed (cached input discounted): $8.275
+[job] complete
+[queue] anthropic spend so far $35.57 (budget $96)
+[job] rerun-2026-10__anthropic__forced__rep2__full
+[job] model claude-haiku-4-5-20251001 | 100 instances | db runs/rerun-2026-10/results_anthropic.db
+[1/100] astropy__astropy-12907                   success_patch_generated      $0.0555 (job $0.055)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[2/100] astropy__astropy-7746                    success_patch_generated      $0.0645 (job $0.120)
+[3/100] django__django-10924                     success_patch_generated      $0.0828 (job $0.203)
+[4/100] django__django-11179                     success_patch_generated      $0.0328 (job $0.236)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[5/100] django__django-11620                     success_patch_generated      $0.0688 (job $0.304)
+[6/100] django__django-11964                     hallucination_format_error   $0.0702 (job $0.374)
+[7/100] django__django-11630                     success_patch_generated      $0.0912 (job $0.466)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[8/100] django__django-12113                     edit_not_applicable          $0.1106 (job $0.576)
+[9/100] django__django-12184                     success_patch_generated      $0.0741 (job $0.650)
+[10/100] django__django-12284                     success_patch_generated      $0.0701 (job $0.720)
+[cost] after 10 instances: $0.720 spent this invocation, projected $7.20 for the 100 instances in this invocation
+[anthropic] Forcing final answer: iterations=10, tool_calls=15, cap_hit=True, mode=forced
+[11/100] django__django-12453                     success_patch_generated      $0.0619 (job $0.782)
+[12/100] django__django-12308                     success_patch_generated      $0.0937 (job $0.876)
+[13/100] django__django-12497                     success_patch_generated      $0.0568 (job $0.933)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[14/100] django__django-12589                     hallucination_format_error   $0.0687 (job $1.002)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[15/100] django__django-12908                     success_patch_generated      $0.0621 (job $1.064)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[16/100] django__django-13028                     success_patch_generated      $0.0680 (job $1.132)
+[17/100] django__django-13447                     success_patch_generated      $0.0704 (job $1.202)
+[18/100] django__django-13590                     success_patch_generated      $0.0341 (job $1.236)
+[19/100] django__django-13220                     edit_not_applicable          $0.0706 (job $1.307)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[20/100] django__django-13933                     success_patch_generated      $0.0583 (job $1.365)
+[21/100] django__django-13757                     success_patch_generated      $0.0605 (job $1.426)
+[22/100] django__django-13710                     edit_not_applicable          $0.0676 (job $1.493)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[23/100] django__django-14238                     edit_not_applicable          $0.0452 (job $1.538)
+[24/100] django__django-14411                     success_patch_generated      $0.0897 (job $1.628)
+[25/100] django__django-14016                     success_patch_generated      $0.0926 (job $1.721)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[26/100] django__django-14752                     success_patch_generated      $0.0489 (job $1.770)
+[27/100] django__django-14608                     success_patch_generated      $0.0950 (job $1.865)
+[28/100] django__django-14730                     success_patch_generated      $0.0767 (job $1.941)
+[29/100] django__django-14915                     success_patch_generated      $0.0368 (job $1.978)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[30/100] django__django-15252                     success_patch_generated      $0.0984 (job $2.076)
+[31/100] django__django-14997                     success_patch_generated      $0.1589 (job $2.235)
+[anthropic] Forcing final answer: iterations=8, tool_calls=8, cap_hit=False, mode=forced
+[32/100] django__django-15400                     success_patch_generated      $0.0960 (job $2.331)
+[33/100] django__django-15790                     success_patch_generated      $0.0517 (job $2.383)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[34/100] django__django-15814                     success_patch_generated      $0.0874 (job $2.470)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[35/100] django__django-15819                     success_patch_generated      $0.1331 (job $2.603)
+[36/100] django__django-16229                     success_patch_generated      $0.0582 (job $2.662)
+[37/100] django__django-16379                     success_patch_generated      $0.0311 (job $2.693)
+[38/100] django__django-16527                     success_patch_generated      $0.0481 (job $2.741)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=forced
+[39/100] django__django-16595                     success_patch_generated      $0.0814 (job $2.822)
+[40/100] django__django-17051                     success_patch_generated      $0.0810 (job $2.903)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[41/100] matplotlib__matplotlib-23476             hallucination_format_error   $0.0636 (job $2.967)
+[anthropic] Forcing final answer: iterations=9, tool_calls=13, cap_hit=False, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[42/100] matplotlib__matplotlib-24265             success_patch_generated      $0.0443 (job $3.011)
+[43/100] matplotlib__matplotlib-24149             success_patch_generated      $0.0754 (job $3.087)
+[44/100] matplotlib__matplotlib-24334             hallucination_format_error   $0.0639 (job $3.151)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[45/100] matplotlib__matplotlib-25442             success_patch_generated      $0.0389 (job $3.189)
+[46/100] matplotlib__matplotlib-24970             success_patch_generated      $0.0393 (job $3.229)
+[47/100] matplotlib__matplotlib-25433             hallucination_format_error   $0.0842 (job $3.313)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[48/100] mwaskom__seaborn-3407                    success_patch_generated      $0.0960 (job $3.409)
+[49/100] matplotlib__matplotlib-26020             success_patch_generated      $0.1335 (job $3.542)
+[50/100] pallets__flask-5063                      success_patch_generated      $0.0582 (job $3.601)
+[51/100] psf__requests-863                        success_patch_generated      $0.0672 (job $3.668)
+[52/100] psf__requests-3362                       success_patch_generated      $0.0498 (job $3.718)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[53/100] pydata__xarray-3364                      success_patch_generated      $0.0837 (job $3.801)
+[54/100] pylint-dev__pylint-7993                  success_patch_generated      $0.1103 (job $3.912)
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[55/100] pytest-dev__pytest-11148                 success_patch_generated      $0.0877 (job $3.999)
+[56/100] pylint-dev__pylint-7114                  edit_not_applicable          $0.0783 (job $4.078)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[57/100] pytest-dev__pytest-5227                  success_patch_generated      $0.1132 (job $4.191)
+[58/100] pytest-dev__pytest-5103                  success_patch_generated      $0.0953 (job $4.286)
+[59/100] pytest-dev__pytest-5413                  success_patch_generated      $0.1161 (job $4.402)
+[60/100] pytest-dev__pytest-7373                  success_patch_generated      $0.0500 (job $4.452)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[61/100] scikit-learn__scikit-learn-10297         success_patch_generated      $0.0912 (job $4.544)
+[62/100] pytest-dev__pytest-6116                  success_patch_generated      $0.0674 (job $4.611)
+[63/100] scikit-learn__scikit-learn-10508         success_patch_generated      $0.0882 (job $4.699)
+[64/100] scikit-learn__scikit-learn-13142         success_patch_generated      $0.1094 (job $4.808)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[65/100] scikit-learn__scikit-learn-13241         success_patch_generated      $0.0877 (job $4.896)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[66/100] scikit-learn__scikit-learn-13779         success_patch_generated      $0.0434 (job $4.940)
+[67/100] scikit-learn__scikit-learn-13584         success_patch_generated      $0.1381 (job $5.078)
+[68/100] scikit-learn__scikit-learn-13496         success_patch_generated      $0.1272 (job $5.205)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[69/100] sphinx-doc__sphinx-10325                 hallucination_format_error   $0.0585 (job $5.263)
+[70/100] scikit-learn__scikit-learn-14894         success_patch_generated      $0.0779 (job $5.341)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[71/100] sphinx-doc__sphinx-8435                  hallucination_format_error   $0.0502 (job $5.392)
+[72/100] sphinx-doc__sphinx-7738                  success_patch_generated      $0.0708 (job $5.462)
+[73/100] sphinx-doc__sphinx-8713                  success_patch_generated      $0.0509 (job $5.513)
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=forced
+[74/100] sympy__sympy-11400                       success_patch_generated      $0.0805 (job $5.594)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[75/100] sympy__sympy-13146                       hallucination_format_error   $0.0655 (job $5.659)
+[76/100] sphinx-doc__sphinx-8506                  edit_not_applicable          $0.1197 (job $5.779)
+[77/100] sympy__sympy-13177                       edit_not_applicable          $0.0479 (job $5.827)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[78/100] sympy__sympy-13971                       success_patch_generated      $0.1094 (job $5.936)
+[anthropic] Forcing final answer: iterations=10, tool_calls=14, cap_hit=True, mode=forced
+[79/100] sympy__sympy-14317                       hallucination_format_error   $0.0628 (job $5.999)
+[80/100] sympy__sympy-13043                       edit_not_applicable          $0.1499 (job $6.149)
+[81/100] sympy__sympy-14774                       success_patch_generated      $0.0409 (job $6.190)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[82/100] sympy__sympy-14396                       success_patch_generated      $0.0556 (job $6.245)
+[83/100] sympy__sympy-14817                       success_patch_generated      $0.0681 (job $6.313)
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=forced
+[84/100] sympy__sympy-15346                       hallucination_format_error   $0.1305 (job $6.444)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[85/100] sympy__sympy-17022                       hallucination_format_error   $0.1052 (job $6.549)
+[86/100] sympy__sympy-16792                       success_patch_generated      $0.1411 (job $6.690)
+[87/100] sympy__sympy-17139                       success_patch_generated      $0.0515 (job $6.742)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=forced
+[88/100] sympy__sympy-17630                       success_patch_generated      $0.1150 (job $6.857)
+[89/100] sympy__sympy-18835                       success_patch_generated      $0.0423 (job $6.899)
+[90/100] sympy__sympy-18057                       edit_not_applicable          $0.0785 (job $6.978)
+[91/100] sympy__sympy-20154                       success_patch_generated      $0.0489 (job $7.027)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=forced
+[92/100] sympy__sympy-20590                       hallucination_format_error   $0.0943 (job $7.121)
+[93/100] sympy__sympy-19487                       success_patch_generated      $0.1251 (job $7.246)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[94/100] sympy__sympy-21614                       hallucination_format_error   $0.0604 (job $7.306)
+[95/100] sympy__sympy-21055                       success_patch_generated      $0.0905 (job $7.397)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=forced
+[96/100] sympy__sympy-21847                       success_patch_generated      $0.1056 (job $7.503)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[97/100] sympy__sympy-22840                       success_patch_generated      $0.1331 (job $7.636)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=forced
+[98/100] sympy__sympy-23191                       success_patch_generated      $0.0985 (job $7.734)
+[99/100] sympy__sympy-24152                       success_patch_generated      $0.0996 (job $7.834)
+[100/100] sympy__sympy-22714                       hallucination_format_error   $0.1117 (job $7.945)
+[job] outcomes: {'hallucination_format_error': 14, 'success_patch_generated': 77, 'edit_not_applicable': 9}
+[job] model ids returned by the API: ['claude-haiku-4-5-20251001']
+[job] cost at list price: $7.945 | as billed (cached input discounted): $7.945
+[job] complete
+[queue] anthropic spend so far $43.51 (budget $96)
+[job] rerun-2026-10__anthropic__self_reflect__rep2__full
+[job] model claude-haiku-4-5-20251001 | 100 instances | db runs/rerun-2026-10/results_anthropic.db
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[1/100] astropy__astropy-12907                   success_patch_generated      $0.0786 (job $0.079)
+[anthropic] Self-reflect: approved
+[2/100] astropy__astropy-7746                    success_patch_generated      $0.0665 (job $0.145)
+[anthropic] Self-reflect: revised
+[3/100] django__django-10924                     success_patch_generated      $0.1035 (job $0.249)
+[anthropic] Self-reflect: approved
+[4/100] django__django-11179                     success_patch_generated      $0.0523 (job $0.301)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[5/100] django__django-11620                     success_patch_generated      $0.0750 (job $0.376)
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[6/100] django__django-11630                     success_patch_generated      $0.1076 (job $0.483)
+[anthropic] Self-reflect: revised
+[7/100] django__django-11964                     success_patch_generated      $0.0970 (job $0.580)
+[anthropic] Self-reflect: approved
+[8/100] django__django-12113                     success_patch_generated      $0.1161 (job $0.697)
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[9/100] django__django-12284                     success_patch_generated      $0.0822 (job $0.779)
+[anthropic] Self-reflect: approved
+[10/100] django__django-12184                     success_patch_generated      $0.0974 (job $0.876)
+[cost] after 10 instances: $0.876 spent this invocation, projected $8.76 for the 100 instances in this invocation
+[anthropic] Self-reflect: approved
+[11/100] django__django-12308                     success_patch_generated      $0.1358 (job $1.012)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: unstructured
+[12/100] django__django-12497                     success_patch_generated      $0.0670 (job $1.079)
+[anthropic] Self-reflect: approved
+[13/100] django__django-12453                     success_patch_generated      $0.0969 (job $1.176)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[14/100] django__django-12589                     success_patch_generated      $0.0949 (job $1.271)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[15/100] django__django-12908                     success_patch_generated      $0.0763 (job $1.347)
+[anthropic] Self-reflect: approved
+[16/100] django__django-13028                     success_patch_generated      $0.0839 (job $1.431)
+[anthropic] Self-reflect: revised
+[anthropic] Self-reflect: revised
+[17/100] django__django-13220                     success_patch_generated      $0.0677 (job $1.499)
+[anthropic] Self-reflect: approved
+[18/100] django__django-13590                     success_patch_generated      $0.0524 (job $1.551)
+[19/100] django__django-13447                     success_patch_generated      $0.0935 (job $1.645)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[20/100] django__django-13710                     success_patch_generated      $0.0851 (job $1.730)
+[anthropic] Self-reflect: approved
+[anthropic] Self-reflect: approved
+[21/100] django__django-13933                     success_patch_generated      $0.0704 (job $1.800)
+[22/100] django__django-13757                     success_patch_generated      $0.0917 (job $1.892)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[anthropic] Self-reflect: approved
+[anthropic] Self-reflect: approved
+[23/100] django__django-14411                     success_patch_generated      $0.1072 (job $1.999)
+[24/100] django__django-14238                     edit_not_applicable          $0.0596 (job $2.059)
+[25/100] django__django-14016                     success_patch_generated      $0.1130 (job $2.172)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[26/100] django__django-14752                     success_patch_generated      $0.0531 (job $2.225)
+[anthropic] Self-reflect: approved
+[anthropic] Self-reflect: revised
+[27/100] django__django-14608                     success_patch_generated      $0.1313 (job $2.356)
+[28/100] django__django-14730                     success_patch_generated      $0.0723 (job $2.428)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[29/100] django__django-14915                     success_patch_generated      $0.0502 (job $2.479)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[30/100] django__django-15252                     success_patch_generated      $0.1159 (job $2.594)
+[anthropic] Self-reflect: revised
+[anthropic] Self-reflect: approved
+[31/100] django__django-14997                     success_patch_generated      $0.1653 (job $2.760)
+[32/100] django__django-15400                     success_patch_generated      $0.1413 (job $2.901)
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[33/100] django__django-15790                     success_patch_generated      $0.0706 (job $2.972)
+[anthropic] Self-reflect: revised
+[34/100] django__django-15814                     success_patch_generated      $0.0943 (job $3.066)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[35/100] django__django-15819                     success_patch_generated      $0.1567 (job $3.223)
+[anthropic] Self-reflect: approved
+[36/100] django__django-16229                     hallucination_format_error   $0.0840 (job $3.307)
+[37/100] django__django-16379                     success_patch_generated      $0.0352 (job $3.342)
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[38/100] django__django-16527                     success_patch_generated      $0.0736 (job $3.415)
+[anthropic] Self-reflect: unstructured
+[39/100] django__django-17051                     success_patch_generated      $0.0937 (job $3.509)
+[anthropic] Self-reflect: revised
+[40/100] django__django-16595                     success_patch_generated      $0.1353 (job $3.644)
+[anthropic] Forcing final answer: iterations=10, tool_calls=14, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[41/100] matplotlib__matplotlib-23476             success_patch_generated      $0.1071 (job $3.751)
+[anthropic] Self-reflect: approved
+[42/100] matplotlib__matplotlib-24149             success_patch_generated      $0.0679 (job $3.819)
+[anthropic] Self-reflect: revised
+[43/100] matplotlib__matplotlib-24265             success_patch_generated      $0.0781 (job $3.897)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[44/100] matplotlib__matplotlib-24334             success_patch_generated      $0.0860 (job $3.983)
+[anthropic] Self-reflect: approved
+[45/100] matplotlib__matplotlib-24970             success_patch_generated      $0.0590 (job $4.042)
+[anthropic] Self-reflect: revised
+[46/100] matplotlib__matplotlib-25433             success_patch_generated      $0.0965 (job $4.139)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[47/100] matplotlib__matplotlib-26020             success_patch_generated      $0.1487 (job $4.288)
+[anthropic] Self-reflect: revised
+[48/100] mwaskom__seaborn-3407                    success_patch_generated      $0.1113 (job $4.399)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=8, tool_calls=7, cap_hit=False, mode=self_reflect
+[anthropic] Self-reflect: approved
+[49/100] pallets__flask-5063                      success_patch_generated      $0.0686 (job $4.468)
+[anthropic] Self-reflect: approved
+[50/100] psf__requests-3362                       success_patch_generated      $0.0718 (job $4.539)
+[anthropic] Self-reflect: approved
+[51/100] matplotlib__matplotlib-25442             success_patch_generated      $0.1118 (job $4.651)
+[anthropic] Self-reflect: revised
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[52/100] psf__requests-863                        success_patch_generated      $0.0632 (job $4.714)
+[anthropic] Self-reflect: revised
+[53/100] pylint-dev__pylint-7114                  success_patch_generated      $0.1003 (job $4.815)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[54/100] pydata__xarray-3364                      success_patch_generated      $0.1278 (job $4.942)
+[55/100] pytest-dev__pytest-11148                 hallucination_format_error   $0.0779 (job $5.020)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[56/100] pylint-dev__pylint-7993                  success_patch_generated      $0.1277 (job $5.148)
+[anthropic] Self-reflect: unstructured
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[57/100] pytest-dev__pytest-5227                  success_patch_generated      $0.0925 (job $5.240)
+[58/100] pytest-dev__pytest-5413                  hallucination_format_error   $0.1146 (job $5.355)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[anthropic] Self-reflect: approved
+[59/100] pytest-dev__pytest-6116                  success_patch_generated      $0.0721 (job $5.427)
+[60/100] pytest-dev__pytest-7373                  success_patch_generated      $0.0794 (job $5.507)
+[anthropic] Self-reflect: revised
+[anthropic] Self-reflect: approved
+[61/100] pytest-dev__pytest-5103                  success_patch_generated      $0.1599 (job $5.667)
+[62/100] scikit-learn__scikit-learn-10508         success_patch_generated      $0.0965 (job $5.763)
+[anthropic] Self-reflect: approved
+[63/100] scikit-learn__scikit-learn-10297         success_patch_generated      $0.1016 (job $5.865)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[64/100] scikit-learn__scikit-learn-13142         success_patch_generated      $0.1608 (job $6.026)
+[anthropic] Self-reflect: revised
+[65/100] scikit-learn__scikit-learn-13241         success_patch_generated      $0.1225 (job $6.148)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[anthropic] Self-reflect: approved
+[66/100] scikit-learn__scikit-learn-13779         success_patch_generated      $0.0534 (job $6.201)
+[67/100] scikit-learn__scikit-learn-13496         success_patch_generated      $0.1910 (job $6.392)
+[anthropic] Self-reflect: revised
+[68/100] scikit-learn__scikit-learn-13584         success_patch_generated      $0.1179 (job $6.510)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=self_reflect
+[69/100] sphinx-doc__sphinx-7738                  hallucination_format_error   $0.0628 (job $6.573)
+[anthropic] Self-reflect: approved
+[70/100] scikit-learn__scikit-learn-14894         success_patch_generated      $0.1216 (job $6.695)
+[anthropic] Self-reflect: revised
+[71/100] sphinx-doc__sphinx-10325                 success_patch_generated      $0.0991 (job $6.794)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[72/100] sphinx-doc__sphinx-8435                  hallucination_format_error   $0.0642 (job $6.858)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[73/100] sphinx-doc__sphinx-8713                  success_patch_generated      $0.1131 (job $6.971)
+[anthropic] Self-reflect: revised
+[74/100] sphinx-doc__sphinx-8506                  success_patch_generated      $0.1488 (job $7.120)
+[anthropic] Self-reflect: revised
+[75/100] sympy__sympy-11400                       success_patch_generated      $0.1507 (job $7.271)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[76/100] sympy__sympy-13146                       hallucination_format_error   $0.0723 (job $7.343)
+[anthropic] Self-reflect: revised
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[77/100] sympy__sympy-13043                       success_patch_generated      $0.1164 (job $7.459)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[anthropic] Self-reflect: unstructured
+[78/100] sympy__sympy-13177                       edit_not_applicable          $0.0626 (job $7.522)
+[79/100] sympy__sympy-13971                       success_patch_generated      $0.1154 (job $7.637)
+[anthropic] Self-reflect: revised
+[80/100] sympy__sympy-14317                       success_patch_generated      $0.0755 (job $7.713)
+[anthropic] Self-reflect: approved
+[anthropic] Self-reflect: approved
+[81/100] sympy__sympy-14774                       success_patch_generated      $0.0392 (job $7.752)
+[82/100] sympy__sympy-14396                       success_patch_generated      $0.0838 (job $7.836)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[83/100] sympy__sympy-15346                       hallucination_format_error   $0.0907 (job $7.927)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[84/100] sympy__sympy-14817                       success_patch_generated      $0.0837 (job $8.010)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[85/100] sympy__sympy-16792                       success_patch_generated      $0.1813 (job $8.192)
+[86/100] sympy__sympy-17022                       hallucination_format_error   $0.1096 (job $8.301)
+[anthropic] Self-reflect: approved
+[87/100] sympy__sympy-17139                       success_patch_generated      $0.0462 (job $8.347)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=14, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: revised
+[88/100] sympy__sympy-17630                       success_patch_generated      $0.1327 (job $8.480)
+[anthropic] Self-reflect: revised
+[anthropic] Self-reflect: approved
+[89/100] sympy__sympy-18835                       success_patch_generated      $0.0633 (job $8.543)
+[90/100] sympy__sympy-18057                       success_patch_generated      $0.0903 (job $8.634)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=self_reflect
+[91/100] sympy__sympy-20590                       hallucination_format_error   $0.1052 (job $8.739)
+[anthropic] Self-reflect: approved
+[anthropic] Self-reflect: revised
+[92/100] sympy__sympy-20154                       success_patch_generated      $0.0659 (job $8.805)
+[93/100] sympy__sympy-19487                       success_patch_generated      $0.1306 (job $8.935)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=self_reflect
+[94/100] sympy__sympy-21614                       hallucination_format_error   $0.0609 (job $8.996)
+[anthropic] Self-reflect: revised
+[95/100] sympy__sympy-21055                       success_patch_generated      $0.1205 (job $9.117)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[anthropic] Self-reflect: approved
+[96/100] sympy__sympy-21847                       success_patch_generated      $0.1197 (job $9.236)
+[anthropic] Self-reflect: approved
+[97/100] sympy__sympy-22714                       success_patch_generated      $0.0746 (job $9.311)
+[anthropic] Forcing final answer: iterations=10, tool_calls=18, cap_hit=True, mode=self_reflect
+[98/100] sympy__sympy-23191                       hallucination_format_error   $0.0835 (job $9.394)
+[anthropic] Self-reflect: revised
+[99/100] sympy__sympy-22840                       success_patch_generated      $0.1618 (job $9.556)
+[anthropic] Self-reflect: approved
+[100/100] sympy__sympy-24152                       success_patch_generated      $0.0878 (job $9.644)
+[job] outcomes: {'success_patch_generated': 87, 'hallucination_format_error': 11, 'edit_not_applicable': 2}
+[job] model ids returned by the API: ['claude-haiku-4-5-20251001']
+[job] cost at list price: $9.644 | as billed (cached input discounted): $9.644
+[job] complete
+[queue] anthropic spend so far $53.16 (budget $96)
+[job] rerun-2026-10__anthropic__baseline__rep3__full
+[job] model claude-haiku-4-5-20251001 | 100 instances | db runs/rerun-2026-10/results_anthropic.db
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[1/100] astropy__astropy-12907                   success_patch_generated      $0.0853 (job $0.085)
+[2/100] astropy__astropy-7746                    success_patch_generated      $0.0597 (job $0.145)
+[3/100] django__django-10924                     success_patch_generated      $0.0758 (job $0.221)
+[4/100] django__django-11179                     success_patch_generated      $0.0526 (job $0.273)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[5/100] django__django-11964                     success_patch_generated      $0.0654 (job $0.339)
+[6/100] django__django-11630                     success_patch_generated      $0.1088 (job $0.448)
+[7/100] django__django-11620                     success_patch_generated      $0.0632 (job $0.511)
+[anthropic] Forcing final answer: iterations=10, tool_calls=14, cap_hit=True, mode=baseline
+[8/100] django__django-12113                     success_patch_generated      $0.0757 (job $0.587)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[9/100] django__django-12184                     success_patch_generated      $0.0729 (job $0.659)
+[10/100] django__django-12284                     success_patch_generated      $0.0615 (job $0.721)
+[cost] after 10 instances: $0.721 spent this invocation, projected $7.21 for the 100 instances in this invocation
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[11/100] django__django-12308                     success_patch_generated      $0.0744 (job $0.795)
+[12/100] django__django-12453                     success_patch_generated      $0.0624 (job $0.858)
+[13/100] django__django-12497                     edit_not_applicable          $0.0521 (job $0.910)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=baseline
+[14/100] django__django-12589                     success_patch_generated      $0.0865 (job $0.996)
+[15/100] django__django-12908                     success_patch_generated      $0.0645 (job $1.061)
+[16/100] django__django-13028                     success_patch_generated      $0.0697 (job $1.131)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=baseline
+[17/100] django__django-13220                     success_patch_generated      $0.0510 (job $1.182)
+[18/100] django__django-13590                     success_patch_generated      $0.0400 (job $1.222)
+[19/100] django__django-13447                     success_patch_generated      $0.1110 (job $1.333)
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=baseline
+[20/100] django__django-13710                     success_patch_generated      $0.0716 (job $1.404)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[21/100] django__django-13757                     hallucination_format_error   $0.0624 (job $1.467)
+[22/100] django__django-13933                     success_patch_generated      $0.0773 (job $1.544)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[23/100] django__django-14016                     success_patch_generated      $0.0899 (job $1.634)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[24/100] django__django-14411                     success_patch_generated      $0.0639 (job $1.698)
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=baseline
+[25/100] django__django-14238                     success_patch_generated      $0.0766 (job $1.774)
+[26/100] django__django-14608                     success_patch_generated      $0.0798 (job $1.854)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[27/100] django__django-14730                     hallucination_format_error   $0.0721 (job $1.926)
+[28/100] django__django-14752                     success_patch_generated      $0.0469 (job $1.973)
+[29/100] django__django-14915                     success_patch_generated      $0.0370 (job $2.010)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=baseline
+[30/100] django__django-15252                     success_patch_generated      $0.0768 (job $2.087)
+[31/100] django__django-15400                     edit_not_applicable          $0.0976 (job $2.184)
+[32/100] django__django-14997                     success_patch_generated      $0.1582 (job $2.343)
+[33/100] django__django-15790                     success_patch_generated      $0.0476 (job $2.390)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[34/100] django__django-15814                     success_patch_generated      $0.0604 (job $2.450)
+[35/100] django__django-16379                     success_patch_generated      $0.0263 (job $2.477)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=baseline
+[36/100] django__django-15819                     success_patch_generated      $0.1531 (job $2.630)
+[37/100] django__django-16229                     edit_not_applicable          $0.0803 (job $2.710)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=baseline
+[38/100] django__django-16527                     success_patch_generated      $0.0699 (job $2.780)
+[39/100] django__django-16595                     success_patch_generated      $0.0804 (job $2.860)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[40/100] django__django-17051                     success_patch_generated      $0.0732 (job $2.934)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[41/100] matplotlib__matplotlib-23476             hallucination_format_error   $0.0708 (job $3.004)
+[42/100] matplotlib__matplotlib-24149             success_patch_generated      $0.0705 (job $3.075)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[43/100] matplotlib__matplotlib-24265             edit_not_applicable          $0.0853 (job $3.160)
+[44/100] matplotlib__matplotlib-24970             success_patch_generated      $0.0392 (job $3.199)
+[45/100] matplotlib__matplotlib-24334             success_patch_generated      $0.0690 (job $3.268)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[46/100] matplotlib__matplotlib-25442             success_patch_generated      $0.0352 (job $3.304)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=baseline
+[47/100] matplotlib__matplotlib-26020             success_patch_generated      $0.1110 (job $3.415)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=13, cap_hit=True, mode=baseline
+[48/100] matplotlib__matplotlib-25433             success_patch_generated      $0.1004 (job $3.515)
+[49/100] mwaskom__seaborn-3407                    edit_not_applicable          $0.0989 (job $3.614)
+[50/100] pallets__flask-5063                      success_patch_generated      $0.0633 (job $3.677)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=baseline
+[51/100] psf__requests-863                        success_patch_generated      $0.0651 (job $3.742)
+[52/100] psf__requests-3362                       success_patch_generated      $0.0508 (job $3.793)
+[53/100] pydata__xarray-3364                      edit_not_applicable          $0.0947 (job $3.888)
+[anthropic] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[54/100] pylint-dev__pylint-7114                  edit_not_applicable          $0.0693 (job $3.957)
+[55/100] pylint-dev__pylint-7993                  success_patch_generated      $0.0977 (job $4.055)
+[56/100] pytest-dev__pytest-11148                 hallucination_format_error   $0.0743 (job $4.129)
+[anthropic] Forcing final answer: iterations=10, tool_calls=12, cap_hit=True, mode=baseline
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[57/100] pytest-dev__pytest-5227                  success_patch_generated      $0.0672 (job $4.196)
+[58/100] pytest-dev__pytest-5413                  success_patch_generated      $0.1151 (job $4.311)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[59/100] pytest-dev__pytest-7373                  success_patch_generated      $0.0444 (job $4.356)
+[60/100] pytest-dev__pytest-5103                  success_patch_generated      $0.1110 (job $4.467)
+[61/100] pytest-dev__pytest-6116                  success_patch_generated      $0.0664 (job $4.533)
+[62/100] scikit-learn__scikit-learn-10508         success_patch_generated      $0.0631 (job $4.596)
+[anthropic] Forcing final answer: iterations=10, tool_calls=11, cap_hit=True, mode=baseline
+[63/100] scikit-learn__scikit-learn-10297         success_patch_generated      $0.1257 (job $4.722)

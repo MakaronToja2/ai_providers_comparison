@@ -1,0 +1,161 @@
+[job] rerun-2026-10__openai__baseline__rep1__full
+[job] model gpt-4.1-mini | 100 instances | db runs/rerun-2026-10/results_openai.db
+[job] outcomes: {'success_patch_generated': 74, 'edit_not_applicable': 12, 'hallucination_format_error': 12, 'failure_explicit': 2}
+[job] model ids returned by the API: ['gpt-4.1-mini-2025-04-14']
+[job] cost at list price: $1.313 | as billed (cached input discounted): $0.893
+[job] complete
+[job] rerun-2026-10__openai__forced__rep1__full
+[job] model gpt-4.1-mini | 100 instances | db runs/rerun-2026-10/results_openai.db
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[59/42] pytest-dev__pytest-5413                  success_patch_generated      $0.0144 (job $0.014)
+[60/42] pytest-dev__pytest-6116                  success_patch_generated      $0.0119 (job $0.026)
+[61/42] pytest-dev__pytest-7373                  success_patch_generated      $0.0114 (job $0.038)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[62/42] scikit-learn__scikit-learn-10508         edit_not_applicable          $0.0104 (job $0.048)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[63/42] scikit-learn__scikit-learn-13241         success_patch_generated      $0.0164 (job $0.064)
+[64/42] scikit-learn__scikit-learn-10297         success_patch_generated      $0.0147 (job $0.079)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[65/42] scikit-learn__scikit-learn-13496         success_patch_generated      $0.0147 (job $0.094)
+[66/42] scikit-learn__scikit-learn-13584         success_patch_generated      $0.0116 (job $0.105)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[67/42] scikit-learn__scikit-learn-13142         edit_not_applicable          $0.0268 (job $0.132)
+[68/42] scikit-learn__scikit-learn-14894         success_patch_generated      $0.0136 (job $0.146)
+[cost] after 10 instances: $0.146 spent this invocation, projected $0.61 for the 42 instances in this invocation
+[69/42] scikit-learn__scikit-learn-13779         success_patch_generated      $0.0139 (job $0.160)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[70/42] sphinx-doc__sphinx-7738                  success_patch_generated      $0.0115 (job $0.171)
+[71/42] sphinx-doc__sphinx-10325                 success_patch_generated      $0.0158 (job $0.187)
+[72/42] sphinx-doc__sphinx-8435                  success_patch_generated      $0.0148 (job $0.202)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[73/42] sphinx-doc__sphinx-8713                  success_patch_generated      $0.0124 (job $0.214)
+[74/42] sphinx-doc__sphinx-8506                  success_patch_generated      $0.0105 (job $0.225)
+[75/42] sympy__sympy-11400                       success_patch_generated      $0.0128 (job $0.237)
+[76/42] sympy__sympy-13043                       success_patch_generated      $0.0097 (job $0.247)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[77/42] sympy__sympy-13177                       success_patch_generated      $0.0066 (job $0.254)
+[78/42] sympy__sympy-13146                       success_patch_generated      $0.0135 (job $0.267)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[79/42] sympy__sympy-14317                       edit_not_applicable          $0.0095 (job $0.277)
+[80/42] sympy__sympy-14396                       success_patch_generated      $0.0147 (job $0.291)
+[81/42] sympy__sympy-13971                       success_patch_generated      $0.0145 (job $0.306)
+[82/42] sympy__sympy-14774                       success_patch_generated      $0.0100 (job $0.316)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[83/42] sympy__sympy-14817                       success_patch_generated      $0.0123 (job $0.328)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[84/42] sympy__sympy-15346                       success_patch_generated      $0.0162 (job $0.344)
+[85/42] sympy__sympy-16792                       success_patch_generated      $0.0163 (job $0.361)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[86/42] sympy__sympy-17022                       hallucination_format_error   $0.0139 (job $0.375)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[87/42] sympy__sympy-17139                       success_patch_generated      $0.0154 (job $0.390)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[88/42] sympy__sympy-17630                       edit_not_applicable          $0.0196 (job $0.410)
+[89/42] sympy__sympy-18057                       success_patch_generated      $0.0124 (job $0.422)
+[openai] Forcing final answer: iterations=7, tool_calls=6, cap_hit=False, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[90/42] sympy__sympy-18835                       hallucination_format_error   $0.0087 (job $0.431)
+[91/42] sympy__sympy-20154                       edit_not_applicable          $0.0068 (job $0.437)
+[92/42] sympy__sympy-19487                       success_patch_generated      $0.0132 (job $0.451)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[93/42] sympy__sympy-20590                       success_patch_generated      $0.0115 (job $0.462)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[94/42] sympy__sympy-21055                       edit_not_applicable          $0.0150 (job $0.477)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[95/42] sympy__sympy-21847                       success_patch_generated      $0.0139 (job $0.491)
+[96/42] sympy__sympy-22714                       success_patch_generated      $0.0128 (job $0.504)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[97/42] sympy__sympy-22840                       success_patch_generated      $0.0202 (job $0.524)
+[98/42] sympy__sympy-23191                       edit_not_applicable          $0.0098 (job $0.534)
+[99/42] sympy__sympy-21614                       edit_not_applicable          $0.0200 (job $0.554)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=forced
+[100/42] sympy__sympy-24152                       success_patch_generated      $0.0112 (job $0.565)
+[job] outcomes: {'success_patch_generated': 76, 'edit_not_applicable': 15, 'hallucination_format_error': 9}
+[job] model ids returned by the API: ['gpt-4.1-mini-2025-04-14']
+[job] cost at list price: $1.291 | as billed (cached input discounted): $0.855
+[job] complete
+[job] rerun-2026-10__openai__self_reflect__rep1__full
+[job] model gpt-4.1-mini | 100 instances | db runs/rerun-2026-10/results_openai.db
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[openai] Self-reflect: revised
+[1/100] astropy__astropy-12907                   success_patch_generated      $0.0163 (job $0.016)
+[openai] Self-reflect: approved
+[openai] Self-reflect: approved
+[2/100] django__django-10924                     success_patch_generated      $0.0158 (job $0.032)
+[3/100] astropy__astropy-7746                    success_patch_generated      $0.0199 (job $0.052)
+[openai] Self-reflect: approved
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[4/100] django__django-11179                     success_patch_generated      $0.0095 (job $0.061)
+[openai] Self-reflect: revised
+[5/100] django__django-11620                     success_patch_generated      $0.0105 (job $0.072)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[openai] Self-reflect: revised
+[6/100] django__django-11964                     edit_not_applicable          $0.0156 (job $0.088)
+[openai] Self-reflect: revised
+[openai] Self-reflect: approved
+[7/100] django__django-11630                     edit_not_applicable          $0.0186 (job $0.106)
+[8/100] django__django-12113                     success_patch_generated      $0.0191 (job $0.125)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[openai] Self-reflect: revised
+[openai] Self-reflect: approved
+[9/100] django__django-12184                     success_patch_generated      $0.0129 (job $0.138)
+[10/100] django__django-12284                     edit_not_applicable          $0.0101 (job $0.148)
+[cost] after 10 instances: $0.148 spent this invocation, projected $1.48 for the 100 instances in this invocation
+[openai] Self-reflect: revised
+[11/100] django__django-12308                     edit_not_applicable          $0.0145 (job $0.163)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[openai] Self-reflect: approved
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[12/100] django__django-12453                     success_patch_generated      $0.0141 (job $0.177)
+[openai] Self-reflect: approved
+[13/100] django__django-12497                     success_patch_generated      $0.0172 (job $0.194)
+[openai] Self-reflect: approved
+[14/100] django__django-12589                     success_patch_generated      $0.0164 (job $0.210)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[openai] Self-reflect: approved
+[15/100] django__django-12908                     success_patch_generated      $0.0129 (job $0.223)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[openai] Self-reflect: approved
+[16/100] django__django-13028                     success_patch_generated      $0.0155 (job $0.239)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[openai] Self-reflect: revised
+[17/100] django__django-13220                     edit_not_applicable          $0.0146 (job $0.253)
+[openai] Self-reflect: approved
+[18/100] django__django-13590                     success_patch_generated      $0.0115 (job $0.265)
+[openai] Self-reflect: approved
+[19/100] django__django-13447                     success_patch_generated      $0.0147 (job $0.280)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[openai] Self-reflect: revised
+[20/100] django__django-13710                     edit_not_applicable          $0.0143 (job $0.294)
+[openai] Self-reflect: revised
+[21/100] django__django-13757                     edit_not_applicable          $0.0175 (job $0.311)
+[openai] Forcing final answer: iterations=10, tool_calls=10, cap_hit=True, mode=self_reflect
+[openai] Self-reflect: approved
+[22/100] django__django-13933                     edit_not_applicable          $0.0163 (job $0.328)
+[openai] Self-reflect: revised
+[23/100] django__django-14016                     edit_not_applicable          $0.0148 (job $0.343)

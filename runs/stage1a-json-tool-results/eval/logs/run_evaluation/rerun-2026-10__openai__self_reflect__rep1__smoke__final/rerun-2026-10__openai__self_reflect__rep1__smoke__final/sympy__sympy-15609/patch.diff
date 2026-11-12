@@ -1,0 +1,13 @@
+--- a/sympy/printing/latex.py
++++ b/sympy/printing/latex.py
+@@ -613,4 +613,6 @@
+-        tex_base = self._print(expr.base)
+-        tex = '{'+tex_base+'}'+'_{%s}' % ','.join(
+-            map(self._print, expr.indices))
+-        return tex
++        tex_base = self._print(expr.base)
++        # Remove outer braces if present to avoid double subscripts like _{_i_1}
++        if tex_base.startswith('{') and tex_base.endswith('}'):
++            tex_base = tex_base[1:-1]
++        tex = tex_base + '_{' + ','.join(map(self._print, expr.indices)) + '}'
++        return tex

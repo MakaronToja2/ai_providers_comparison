@@ -1,0 +1,41 @@
+diff --git a/sympy/functions/elementary/complexes.py b/sympy/functions/elementary/complexes.py
+index 7fda45982b..71a0d7e1c5 100644
+--- a/sympy/functions/elementary/complexes.py
++++ b/sympy/functions/elementary/complexes.py
+@@ -394,6 +394,9 @@ def _eval_rewrite_as_Heaviside(self, arg, **kwargs):
+         if arg.is_extended_real:
+             return Heaviside(arg, H0=S(1)/2) * 2 - 1
+ 
++    def _eval_rewrite_as_Abs(self, arg, **kwargs):
++        return arg / Abs(arg)
++
+     def _eval_simplify(self, **kwargs):
+         return self.func(self.args[0].factor())  # XXX include doit?
+ 
+diff --git a/sympy/functions/elementary/tests/test_complexes.py b/sympy/functions/elementary/tests/test_complexes.py
+index adb6cf0d83..1f40b47b35 100644
+--- a/sympy/functions/elementary/tests/test_complexes.py
++++ b/sympy/functions/elementary/tests/test_complexes.py
+@@ -486,6 +486,22 @@ def test_Abs_rewrite():
+         -exp(I*x)*exp(-I*y) + 2 - exp(-I*x)*exp(I*y)
+ 
+ 
++def test_sign_rewrite_as_Abs():
++    x = Symbol('x')
++    assert sign(x).rewrite(Abs) == x/Abs(x)
++    
++    y = Symbol('y', real=True)
++    assert sign(y).rewrite(Abs) == y/Abs(y)
++    
++    i = Symbol('i', imaginary=True)
++    assert sign(i).rewrite(Abs) == i/Abs(i)
++    
++    # Test with concrete values
++    assert sign(2).rewrite(Abs) == 1
++    assert sign(-2).rewrite(Abs) == -1
++    assert sign(2*I).rewrite(Abs) == I
++
++
+ def test_Abs_real():
+     # test some properties of abs that only apply
+     # to real numbers

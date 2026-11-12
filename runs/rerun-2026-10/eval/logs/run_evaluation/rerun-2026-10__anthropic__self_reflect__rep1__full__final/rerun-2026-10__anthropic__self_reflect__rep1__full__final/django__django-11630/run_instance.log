@@ -1,0 +1,119 @@
+2026-10-10 14:50:50,830 - INFO - Creating container for django__django-11630...
+2026-10-10 14:50:58,611 - INFO - Container for django__django-11630 created: c60adc3cd4c5f78126988560a1a8344496d0326867d6aec51849e5c68126b9ad
+2026-10-10 14:51:03,128 - INFO - Container for django__django-11630 started: c60adc3cd4c5f78126988560a1a8344496d0326867d6aec51849e5c68126b9ad
+2026-10-10 14:51:03,128 - INFO - Intermediate patch for django__django-11630 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep1__full__final/rerun-2026-10__anthropic__self_reflect__rep1__full__final/django__django-11630/patch.diff, now applying to container...
+2026-10-10 14:51:03,387 - INFO - >>>>> Applied Patch:
+/tmp/patch.diff:22: trailing whitespace.
+            
+Checking patch django/core/checks/model_checks.py...
+warning: django/core/checks/model_checks.py has type 100755, expected 100644
+Checking patch tests/check_framework/test_model_checks.py...
+warning: tests/check_framework/test_model_checks.py has type 100755, expected 100644
+Applied patch django/core/checks/model_checks.py cleanly.
+Applied patch tests/check_framework/test_model_checks.py cleanly.
+warning: 1 line adds whitespace errors.
+
+2026-10-10 14:51:04,052 - INFO - Git diff before:
+diff --git a/django/core/checks/model_checks.py b/django/core/checks/model_checks.py
+index 5c2266ca1d..ff741d09a2 100755
+--- a/django/core/checks/model_checks.py
++++ b/django/core/checks/model_checks.py
+@@ -37,14 +37,23 @@ def check_all_models(app_configs=None, **kwargs):
+             constraints[model_constraint.name].append(model._meta.label)
+     for db_table, model_labels in db_table_models.items():
+         if len(model_labels) != 1:
+-            errors.append(
+-                Error(
+-                    "db_table '%s' is used by multiple models: %s."
+-                    % (db_table, ', '.join(db_table_models[db_table])),
+-                    obj=db_table,
+-                    id='models.E028',
+-                )
+-            )
++            # Group models by app_label to check for collisions within the same app
++            models_by_app = defaultdict(list)
++            for model_label in model_labels:
++                app_label = model_label.split('.')[0]
++                models_by_app[app_label].append(model_label)
++            
++            # Only report an error if multiple models in the same app share the same db_table
++            for app_label, app_model_labels in models_by_app.items():
++                if len(app_model_labels) > 1:
++                    errors.append(
++                        Error(
++                            "db_table '%s' is used by multiple models: %s."
++                            % (db_table, ', '.join(app_model_labels)),
++                            obj=db_table,
++                            id='models.E028',
++                        )
++                    )
+     for index_name, model_labels in indexes.items():
+         if len(model_labels) > 1:
+             model_labels = set(model_labels)
+diff --git a/tests/check_framework/test_model_checks.py b/tests/check_framework/test_model_checks.py
+index 79177e38f7..4163bc3fc0 100755
+--- a/tests/check_framework/test_model_checks.py
++++ b/tests/check_framework/test_model_checks.py
+@@ -41,14 +41,7 @@ class DuplicateDBTableTests(SimpleTestCase):
+                 app_label = 'check_framework'
+                 db_table = 'test_table'
+ 
+-        self.assertEqual(checks.run_checks(app_configs=apps.get_app_configs()), [
+-            Error(
+-                "db_table 'test_table' is used by multiple models: "
+-                "basic.Model1, check_framework.Model2.",
+-                obj='test_table',
+-                id='models.E028',
+-            )
+-        ])
++        self.assertEqual(checks.run_checks(app_configs=apps.get_app_configs()), [])
+ 
+     def test_no_collision_for_unmanaged_models(self):
+         class Unmanaged(models.Model):
+2026-10-10 14:51:04,053 - INFO - Eval script for django__django-11630 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep1__full__final/rerun-2026-10__anthropic__self_reflect__rep1__full__final/django__django-11630/eval.sh; copying to container...
+2026-10-10 14:51:13,177 - INFO - Test runtime: 9.03 seconds
+2026-10-10 14:51:13,364 - INFO - Test output for django__django-11630 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep1__full__final/rerun-2026-10__anthropic__self_reflect__rep1__full__final/django__django-11630/test_output.txt
+2026-10-10 14:51:13,500 - INFO - Git diff after:
+diff --git a/django/core/checks/model_checks.py b/django/core/checks/model_checks.py
+index 5c2266ca1d..ff741d09a2 100755
+--- a/django/core/checks/model_checks.py
++++ b/django/core/checks/model_checks.py
+@@ -37,14 +37,23 @@ def check_all_models(app_configs=None, **kwargs):
+             constraints[model_constraint.name].append(model._meta.label)
+     for db_table, model_labels in db_table_models.items():
+         if len(model_labels) != 1:
+-            errors.append(
+-                Error(
+-                    "db_table '%s' is used by multiple models: %s."
+-                    % (db_table, ', '.join(db_table_models[db_table])),
+-                    obj=db_table,
+-                    id='models.E028',
+-                )
+-            )
++            # Group models by app_label to check for collisions within the same app
++            models_by_app = defaultdict(list)
++            for model_label in model_labels:
++                app_label = model_label.split('.')[0]
++                models_by_app[app_label].append(model_label)
++            
++            # Only report an error if multiple models in the same app share the same db_table
++            for app_label, app_model_labels in models_by_app.items():
++                if len(app_model_labels) > 1:
++                    errors.append(
++                        Error(
++                            "db_table '%s' is used by multiple models: %s."
++                            % (db_table, ', '.join(app_model_labels)),
++                            obj=db_table,
++                            id='models.E028',
++                        )
++                    )
+     for index_name, model_labels in indexes.items():
+         if len(model_labels) > 1:
+             model_labels = set(model_labels)
+2026-10-10 14:51:13,500 - INFO - Git diff changed after running eval script
+2026-10-10 14:51:13,500 - INFO - Grading answer for django__django-11630...
+2026-10-10 14:51:13,512 - INFO - report: {'django__django-11630': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_collision_across_apps_database_routers_installed (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_collision_in_same_app_database_routers_installed (check_framework.test_model_checks.DuplicateDBTableTests)']}, 'PASS_TO_PASS': {'success': ['test_collision_abstract_model (check_framework.test_model_checks.IndexNameTests)', 'test_collision_across_apps (check_framework.test_model_checks.IndexNameTests)', 'test_collision_in_different_models (check_framework.test_model_checks.IndexNameTests)', 'test_collision_in_same_model (check_framework.test_model_checks.IndexNameTests)', 'test_no_collision_abstract_model_interpolation (check_framework.test_model_checks.IndexNameTests)', 'test_no_collision_across_apps_interpolation (check_framework.test_model_checks.IndexNameTests)', 'test_collision_abstract_model (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_across_apps (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_in_different_models (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_in_same_model (check_framework.test_model_checks.ConstraintNameTests)', 'test_no_collision_abstract_model_interpolation (check_framework.test_model_checks.ConstraintNameTests)', 'test_no_collision_across_apps_interpolation (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_in_same_app (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_no_collision_for_proxy_models (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_no_collision_for_unmanaged_models (check_framework.test_model_checks.DuplicateDBTableTests)'], 'failure': ['test_collision_across_apps (check_framework.test_model_checks.DuplicateDBTableTests)']}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-11630: resolved: False
+2026-10-10 14:51:13,515 - INFO - Attempting to stop container sweb.eval.django__django-11630.rerun-2026-10__anthropic__self_reflect__rep1__full__final...
+2026-10-10 14:51:32,152 - INFO - Attempting to remove container sweb.eval.django__django-11630.rerun-2026-10__anthropic__self_reflect__rep1__full__final...
+2026-10-10 14:51:34,825 - INFO - Container sweb.eval.django__django-11630.rerun-2026-10__anthropic__self_reflect__rep1__full__final removed.

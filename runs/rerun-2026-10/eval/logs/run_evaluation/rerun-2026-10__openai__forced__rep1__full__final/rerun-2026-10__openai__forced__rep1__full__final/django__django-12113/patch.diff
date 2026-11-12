@@ -1,0 +1,30 @@
+diff --git a/django/db/backends/sqlite3/creation.py b/django/db/backends/sqlite3/creation.py
+index d97052f52d..7436beb635 100644
+--- a/django/db/backends/sqlite3/creation.py
++++ b/django/db/backends/sqlite3/creation.py
+@@ -24,6 +24,12 @@ class DatabaseCreation(BaseDatabaseCreation):
+         test_database_name = self._get_test_db_name()
+ 
+         if keepdb:
++            # When using keepdb, ensure the database is not locked by closing all connections
++            for conn in self.connection._connections.all():
++                try:
++                    conn.close()
++                except Exception:
++                    pass
+             return test_database_name
+         if not self.is_in_memory_db(test_database_name):
+             # Erase the old test database
+@@ -65,6 +71,12 @@ class DatabaseCreation(BaseDatabaseCreation):
+             # Erase the old test database
+             if os.access(target_database_name, os.F_OK):
+                 if keepdb:
++                    # When using keepdb, ensure the database is not locked by closing all connections
++                    for conn in self.connection._connections.all():
++                        try:
++                            conn.close()
++                        except Exception:
++                            pass
+                     return
+                 if verbosity >= 1:
+                     self.log('Destroying old test database for alias %s...' % (

@@ -1,0 +1,82 @@
+--- a/src/_pytest/junitxml.py
++++ b/src/_pytest/junitxml.py
+@@ -1,22 +1,23 @@
+-\"\"\"
+-    report test results in JUnit-XML format,
+-    for use with Jenkins and build integration servers.
+-
+-
+-Based on initial code from Ross Lawley.
+-
+-Output conforms to https://github.com/jenkinsci/xunit-plugin/blob/master/
+-src/main/resources/org/jenkinsci/plugins/xunit/types/model/xsd/junit-10.xsd
+-\"\"\"
++\"\"\"
++    report test results in JUnit-XML format,
++    for use with Jenkins and build integration servers.
++
++    Based on initial code from Ross Lawley.
++
++    Output conforms to https://github.com/jenkinsci/xunit-plugin/blob/master/
++    src/main/resources/org/jenkinsci/plugins/xunit/types/model/xsd/junit-10.xsd
++
++    This patch adds hostname and timestamp attributes to the root <testsuite> element.
++\"\"\"
+ import functools
+ import os
+ import re
+ import sys
+ import time
+ 
+ import py
+ 
+ import pytest
+ from _pytest import nodes
+ from _pytest.config import filename_arg
+ 
+@@ class _NodeReporter:
+-    def __init__(self, nodeid, xml):
+-        self.id = nodeid
+-        self.xml = xml
+-        self.add_stats = self.xml.add_stats
+-        self.family = self.xml.family
+-        self.duration = 0
+-        self.properties = []
+-        self.nodes = []
+-        self.testcase = None
+-        self.attrs = {}
++    def __init__(self, nodeid, xml):
++        self.id = nodeid
++        self.xml = xml
++        self.add_stats = self.xml.add_stats
++        self.family = self.xml.family
++        self.duration = 0
++        self.properties = []
++        self.nodes = []
++        self.testcase = None
++        self.attrs = {}
++
++        # Add hostname and timestamp attributes to the root testsuite element
++        if nodeid == "":
++            try:
++                import socket
++                hostname = socket.gethostname()
++            except Exception:
++                hostname = "unknown"
++            timestamp = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime())
++            self.attrs["hostname"] = hostname
++            self.attrs["timestamp"] = timestamp
++
+@@ class _NodeReporter:
+-    def append(self, node):
+-        self.xml.add_stats(type(node).__name__)
+-        self.nodes.append(node)
++    def append(self, node):
++        self.xml.add_stats(type(node).__name__)
++        self.nodes.append(node)
++
+@@ class _NodeReporter:
+-    def add_property(self, name, value):
+-        self.properties.append((str(name), bin_xml_escape(value)))
++    def add_property(self, name, value):
++        self.properties.append((str(name), bin_xml_escape(value)))

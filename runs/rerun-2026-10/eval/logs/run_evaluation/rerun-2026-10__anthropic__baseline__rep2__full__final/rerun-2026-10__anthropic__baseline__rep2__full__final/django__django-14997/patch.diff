@@ -1,0 +1,55 @@
+diff --git a/django/db/backends/sqlite3/schema.py b/django/db/backends/sqlite3/schema.py
+index f0c81c123b..727f6a061a 100644
+--- a/django/db/backends/sqlite3/schema.py
++++ b/django/db/backends/sqlite3/schema.py
+@@ -237,6 +237,22 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+             ]
+ 
+         constraints = list(model._meta.constraints)
++        # Constraints with expressions cannot be used in the CREATE TABLE
++        # statement on SQLite, so they are deferred and added after the table
++        # is created.
++        constraints_to_defer = [
++            constraint for constraint in constraints
++            if isinstance(constraint, UniqueConstraint) and (
++                constraint.condition or
++                constraint.contains_expressions or
++                constraint.include or
++                constraint.deferrable
++            )
++        ]
++        constraints_for_create = [
++            constraint for constraint in constraints
++            if constraint not in constraints_to_defer
++        ]
+ 
+         # Provide isolated instances of the fields to the new model body so
+         # that the existing model's internals aren't interfered with when
+@@ -254,7 +270,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+             'unique_together': unique_together,
+             'index_together': index_together,
+             'indexes': indexes,
+-            'constraints': constraints,
++            'constraints': constraints_for_create,
+             'apps': apps,
+         }
+         meta = type("Meta", (), meta_contents)
+@@ -270,7 +286,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+             'unique_together': unique_together,
+             'index_together': index_together,
+             'indexes': indexes,
+-            'constraints': constraints,
++            'constraints': constraints_for_create,
+             'apps': apps,
+         }
+         meta = type("Meta", (), meta_contents)
+@@ -302,6 +318,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         for sql in self.deferred_sql:
+             self.execute(sql)
+         self.deferred_sql = []
++        # Add back any deferred constraints that have expressions
++        for constraint in constraints_to_defer:
++            self.add_constraint(model, constraint)
+         # Fix any PK-removed field
+         if restore_pk_field:
+             restore_pk_field.primary_key = True

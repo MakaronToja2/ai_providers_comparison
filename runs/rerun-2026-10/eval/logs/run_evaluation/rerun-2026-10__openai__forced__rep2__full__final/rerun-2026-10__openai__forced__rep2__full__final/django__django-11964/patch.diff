@@ -1,0 +1,40 @@
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index d610dc86f0..c94723ff77 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -397,6 +397,35 @@ class Field(RegisterLookupMixin):
+         else:
+             return self.cached_col
+ 
++    def from_db_value(self, value, expression, connection):
++        # If the field has choices that are subclasses of enum.Enum, convert the
++        # value from the database back to the enum instance.
++        if value is None:
++            return value
++        if self.choices:
++            enum_class = None
++            # The choices attribute can be a list of tuples (value, label).
++            # Try to find an enum class among the choices.
++            for choice_value, _ in self.choices:
++                if isinstance(choice_value, enum.Enum):
++                    enum_class = type(choice_value)
++                    break
++            # If no enum instance found in choices, try to infer from the field
++            # default or type.
++            if enum_class is None:
++                # Try to get enum class from the first choice's type if possible
++                first_choice_value = self.choices[0][0]
++                if isinstance(first_choice_value, enum.Enum):
++                    enum_class = type(first_choice_value)
++            if enum_class is not None:
++                try:
++                    # Convert the raw value to the enum instance
++                    return enum_class(value)
++                except ValueError:
++                    # If the value is not valid for the enum, return as is
++                    return value
++        return value
++
+     @cached_property
+     def cached_col(self):
+         from django.db.models.expressions import Col

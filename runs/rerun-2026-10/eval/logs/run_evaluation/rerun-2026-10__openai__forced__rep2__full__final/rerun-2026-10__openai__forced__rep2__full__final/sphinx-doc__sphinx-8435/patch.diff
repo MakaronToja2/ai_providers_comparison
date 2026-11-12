@@ -1,0 +1,50 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 171a3e7b0d..f1e6ceb26a 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1273,7 +1273,44 @@ class FunctionDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # typ
+         return args
+ 
+     def document_members(self, all_members: bool = False) -> None:
+-        pass
++        # Document variables and attributes with type aliases applied
++        if not self.object:
++            return
++
++        # Document variables or attributes with type aliases applied
++        # Only document if the object is a variable or attribute (not a function or method)
++        from sphinx.util.inspect import stringify_annotation
++
++        # get annotations dict from the parent object if possible
++        annotations = getattr(self.parent.object, '__annotations__', {}) if self.parent else {}
++
++        # Use autodoc_type_aliases to replace type aliases in annotations
++        type_aliases = self.config.autodoc_type_aliases
++
++        # Compose lines for the variable or attribute documentation
++        sourcename = self.get_sourcename()
++
++        # Determine the type annotation for this member if available
++        annotation = annotations.get(self.object_name)
++        if annotation:
++            # Apply type aliases if any
++            if type_aliases and isinstance(annotation, str):
++                # If annotation is a string, replace aliases by string replacement
++                for alias, replacement in type_aliases.items():
++                    if annotation == alias:
++                        annotation = replacement
++                        break
++            elif type_aliases:
++                # If annotation is not a string, try to stringify with aliases
++                annotation = stringify_annotation(annotation, type_aliases)
++
++            self.add_line(f":type {self.object_name}: {annotation}", sourcename)
++
++        # Add the variable or attribute description if available
++        doc = getattr(self.object, '__doc__', None)
++        if doc:
++            for line in doc.splitlines():
++                self.add_line(line, sourcename)
+ 
+     def add_directive_header(self, sig: str) -> None:
+         sourcename = self.get_sourcename()

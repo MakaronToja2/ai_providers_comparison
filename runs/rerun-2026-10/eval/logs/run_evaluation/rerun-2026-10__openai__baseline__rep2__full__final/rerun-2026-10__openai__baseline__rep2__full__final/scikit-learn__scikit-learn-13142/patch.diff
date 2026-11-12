@@ -1,0 +1,58 @@
+diff --git a/sklearn/mixture/base.py b/sklearn/mixture/base.py
+index bd34333c063..58c37eaac88 100644
+--- a/sklearn/mixture/base.py
++++ b/sklearn/mixture/base.py
+@@ -228,6 +228,53 @@ class BaseMixture(DensityMixin, BaseEstimator, metaclass=ABCMeta):
+ 
+         n_samples, _ = X.shape
+         for init in range(n_init):
++            if self.verbose:
++                print("Initialization %d" % (init + 1))
++            # Initialize the parameters
++            if do_init:
++                self._initialize_parameters(X, random_state=random_state)
++            else:
++                # warm_start: reuse the parameters from previous fit
++                pass
++
++            lower_bound = -np.infty
++            self.converged_ = False
++
++            for n_iter in range(self.max_iter):
++                prev_lower_bound = lower_bound
++
++                # E-step
++                log_prob_norm, log_resp = self._e_step(X)
++
++                # M-step
++                self._m_step(X, log_resp)
++
++                # Check for convergence
++                lower_bound = self._compute_lower_bound(X, log_prob_norm)
++                change = lower_bound - prev_lower_bound
++                if self.verbose > 1:
++                    print(f"Iteration {n_iter + 1}, lower bound change: {change}")
++                if abs(change) < self.tol:
++                    self.converged_ = True
++                    break
++
++            if not self.converged_:
++                warnings.warn(
++                    "Initialization %d did not converge. Consider increasing "
++                    "max_iter, tol or check the initialization." % (init + 1),
++                    ConvergenceWarning)
++
++            if lower_bound > max_lower_bound:
++                max_lower_bound = lower_bound
++                best_params = self._get_parameters()
++                best_n_iter = n_iter + 1
++                best_converged = self.converged_
++
++        self._set_parameters(best_params)
++        self.n_iter_ = best_n_iter
++        self.converged_ = best_converged
++
++        return self.predict(X)
+             self._print_verbose_msg_init_beg(init)
+ 
+             if do_init:

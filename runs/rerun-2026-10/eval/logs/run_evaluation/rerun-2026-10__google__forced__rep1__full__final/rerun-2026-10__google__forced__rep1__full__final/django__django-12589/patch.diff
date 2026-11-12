@@ -1,0 +1,25 @@
+diff --git a/django/db/models/sql/compiler.py b/django/db/models/sql/compiler.py
+index 63ca817355..48873db3e6 100644
+--- a/django/db/models/sql/compiler.py
++++ b/django/db/models/sql/compiler.py
+@@ -133,7 +133,19 @@ class SQLCompiler:
+         expressions = self.collapse_group_by(expressions, having_group_by)
+ 
+         for expr in expressions:
+-            sql, params = self.compile(expr)
++            # If the expression is a reference to a subquery, compile the subquery
++            # directly to avoid ambiguity in the GROUP BY clause.
++            if isinstance(expr, Ref):
++                target_expr = expr.target
++                # Check if the target is a Query instance that has been marked as a subquery.
++                # This covers AggregateQuery and potentially other subquery types.
++                if isinstance(target_expr, Query) and getattr(target_expr, 'subquery', False):
++                    sql, params = self.compile(target_expr)
++                else:
++                    sql, params = self.compile(expr)
++            else:
++                sql, params = self.compile(expr)
++
+             params_hash = make_hashable(params)
+             if (sql, params_hash) not in seen:
+                 result.append((sql, params))

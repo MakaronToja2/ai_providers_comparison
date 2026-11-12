@@ -1,0 +1,21 @@
+diff --git a/sklearn/ensemble/voting.py b/sklearn/ensemble/voting.py
+index 7afa7180cc5..06a63100770 100644
+--- a/sklearn/ensemble/voting.py
++++ b/sklearn/ensemble/voting.py
+@@ -270,6 +270,16 @@ class VotingClassifier(_BaseVoting, ClassifierMixin):
+         self.classes_ = self.le_.classes_
+         transformed_y = self.le_.transform(y)
+ 
++        # Filter out None estimators before fitting
++        self.estimators_ = [est for est in self.estimators if est is not None]
++
++        # If sample_weight is given, pass it to each estimator's fit if supported
++        if sample_weight is not None:
++            for est in self.estimators_:
++                fit_params = est.fit.__code__.co_varnames
++                if 'sample_weight' not in fit_params:
++                    raise ValueError(f"Underlying estimator {est} does not support sample_weight")
++
+         return super().fit(X, transformed_y, sample_weight)
+ 
+     def predict(self, X):

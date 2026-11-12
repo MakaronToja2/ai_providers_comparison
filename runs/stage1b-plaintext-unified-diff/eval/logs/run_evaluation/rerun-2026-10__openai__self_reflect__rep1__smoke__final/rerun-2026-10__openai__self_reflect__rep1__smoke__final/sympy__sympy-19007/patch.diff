@@ -1,0 +1,71 @@
+--- a/sympy/matrices/expressions/blockmatrix.py
++++ b/sympy/matrices/expressions/blockmatrix.py
+@@ -215,13 +215,55 @@
+-    def _entry(self, i, j, **kwargs):
+-        # Find row entry
+-        for row_block, numrows in enumerate(self.rowblocksizes):
+-            if (i < numrows) != False:
+-                break
+-            else:
+-                i -= numrows
+-        for col_block, numcols in enumerate(self.colblocksizes):
+-            if (j < numcols) != False:
+-                break
+-            else:
+-                j -= numcols
+-        return self.blocks[row_block, col_block][i, j]
++    def _entry(self, i, j, **kwargs):
++        # If i or j are not concrete integers, do not attempt to index blocks,
++        # return unevaluated to avoid incorrect simplification.
++        from sympy import Integer
++        # Accept also Python int as concrete integer
++        def is_concrete_integer(x):
++            return (isinstance(x, (int, Integer)) and (not hasattr(x, 'is_number') or x.is_number))
++
++        if not (is_concrete_integer(i) and is_concrete_integer(j)):
++            # Return unevaluated BlockMatrix element
++            from sympy.matrices.expressions.blockmatrix import BlockMatrixElement
++            return BlockMatrixElement(self, i, j)
++
++        # Convert Python int to sympy Integer for safe arithmetic
++        from sympy import Integer as SymInteger
++        if isinstance(i, int):
++            i = SymInteger(i)
++        if isinstance(j, int):
++            j = SymInteger(j)
++
++        # Find row block
++        for row_block, numrows in enumerate(self.rowblocksizes):
++            if i < numrows:
++                break
++            else:
++                i -= numrows
++        # Find column block
++        for col_block, numcols in enumerate(self.colblocksizes):
++            if j < numcols:
++                break
++            else:
++                j -= numcols
++        return self.blocks[row_block, col_block][i, j]
++
++
++from sympy.core.basic import Basic
++
++class BlockMatrixElement(Basic):
++    def __new__(cls, blockmatrix, i, j):
++        return Basic.__new__(cls, blockmatrix, i, j)
++
++    @property
++    def blockmatrix(self):
++        return self.args[0]
++
++    @property
++    def i(self):
++        return self.args[1]
++
++    @property
++    def j(self):
++        return self.args[2]
++
++    def _sympystr(self, printer):
++        return f"{printer.parenthesize(self.blockmatrix)}[{self.i}, {self.j}]"

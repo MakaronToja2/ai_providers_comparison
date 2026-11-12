@@ -15,6 +15,8 @@ class ToolCall(BaseModel):
     result: Optional[Dict[str, Any]] = Field(None, description="Tool execution result")
     success: bool = Field(..., description="Whether tool call succeeded")
     error: Optional[str] = Field(None, description="Error message if failed")
+    # Text of the result exactly as it was sent to the model (not serialised)
+    rendered: Optional[str] = Field(None, exclude=True)
 
 
 class ReflectionMetrics(BaseModel):
@@ -35,9 +37,13 @@ class LLMResponse(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.now)
     success: bool = Field(True, description="Whether the request was successful")
     error_message: Optional[str] = Field(None, description="Error message if failed")
+    error_kind: Optional[str] = Field(None, description="api_error, context_overflow or infra_error when success is False")
     raw_response: Optional[Dict[str, Any]] = Field(None, description="Raw provider response")
     tool_calls: Optional[List[ToolCall]] = Field(None, description="Tool calls made during generation")
-    conversation_history: Optional[List[Dict[str, str]]] = Field(None, description="Full conversation history including tool results (for self-reflection)")
+    conversation_history: Optional[List[Dict[str, Any]]] = Field(None, description="Full conversation history including tool turns")
+    final_answer: Optional[str] = Field(None, description="Text of the model's final answer message (the only place a patch or abstention marker is read from)")
+    reflection_text: Optional[str] = Field(None, description="Text of the self-reflection response, if that phase ran")
+    run_meta: Optional[Dict[str, Any]] = Field(None, description="Loop statistics: iterations, termination reason, fallback use, API call counts, returned model ids")
 
 
 class ComparisonResponse(BaseModel):

@@ -1,0 +1,60 @@
+2026-10-10 19:49:17,377 - INFO - Creating container for django__django-12113...
+2026-10-10 19:49:20,981 - INFO - Container for django__django-12113 created: 5eb31d05a5487c3c161322942fa51de5377d6564378f8bc9ef3965e13c51a087
+2026-10-10 19:49:25,883 - INFO - Container for django__django-12113 started: 5eb31d05a5487c3c161322942fa51de5377d6564378f8bc9ef3965e13c51a087
+2026-10-10 19:49:25,883 - INFO - Intermediate patch for django__django-12113 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep3__full__final/rerun-2026-10__anthropic__self_reflect__rep3__full__final/django__django-12113/patch.diff, now applying to container...
+2026-10-10 19:49:25,999 - INFO - >>>>> Applied Patch:
+Checking patch django/test/testcases.py...
+warning: django/test/testcases.py has type 100755, expected 100644
+Applied patch django/test/testcases.py cleanly.
+
+2026-10-10 19:49:26,576 - INFO - Git diff before:
+diff --git a/django/test/testcases.py b/django/test/testcases.py
+index 23459f22cd..20347f3e6a 100755
+--- a/django/test/testcases.py
++++ b/django/test/testcases.py
+@@ -1059,7 +1059,14 @@ def connections_support_transactions(aliases=None):
+     transactions.
+     """
+     conns = connections.all() if aliases is None else (connections[alias] for alias in aliases)
+-    return all(conn.features.supports_transactions for conn in conns)
++    conns = list(conns)
++    if not all(conn.features.supports_transactions for conn in conns):
++        return False
++    # If there are multiple connections and any of them doesn't allow multiple
++    # connections, we can't use transactions for test isolation.
++    if len(conns) > 1:
++        return all(conn.features.test_db_allows_multiple_connections for conn in conns)
++    return True
+ 
+ 
+ class TestCase(TransactionTestCase):
+2026-10-10 19:49:26,576 - INFO - Eval script for django__django-12113 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep3__full__final/rerun-2026-10__anthropic__self_reflect__rep3__full__final/django__django-12113/eval.sh; copying to container...
+2026-10-10 19:49:34,629 - INFO - Test runtime: 7.99 seconds
+2026-10-10 19:49:34,630 - INFO - Test output for django__django-12113 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep3__full__final/rerun-2026-10__anthropic__self_reflect__rep3__full__final/django__django-12113/test_output.txt
+2026-10-10 19:49:34,680 - INFO - Git diff after:
+diff --git a/django/test/testcases.py b/django/test/testcases.py
+index 23459f22cd..20347f3e6a 100755
+--- a/django/test/testcases.py
++++ b/django/test/testcases.py
+@@ -1059,7 +1059,14 @@ def connections_support_transactions(aliases=None):
+     transactions.
+     """
+     conns = connections.all() if aliases is None else (connections[alias] for alias in aliases)
+-    return all(conn.features.supports_transactions for conn in conns)
++    conns = list(conns)
++    if not all(conn.features.supports_transactions for conn in conns):
++        return False
++    # If there are multiple connections and any of them doesn't allow multiple
++    # connections, we can't use transactions for test isolation.
++    if len(conns) > 1:
++        return all(conn.features.test_db_allows_multiple_connections for conn in conns)
++    return True
+ 
+ 
+ class TestCase(TransactionTestCase):
+2026-10-10 19:49:34,680 - INFO - Grading answer for django__django-12113...
+2026-10-10 19:49:34,683 - INFO - report: {'django__django-12113': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_custom_test_name (backends.sqlite.test_creation.TestDbSignatureTests)']}, 'PASS_TO_PASS': {'success': [], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-12113: resolved: False
+2026-10-10 19:49:34,683 - INFO - Attempting to stop container sweb.eval.django__django-12113.rerun-2026-10__anthropic__self_reflect__rep3__full__final...
+2026-10-10 19:49:54,880 - INFO - Attempting to remove container sweb.eval.django__django-12113.rerun-2026-10__anthropic__self_reflect__rep3__full__final...
+2026-10-10 19:49:57,431 - INFO - Container sweb.eval.django__django-12113.rerun-2026-10__anthropic__self_reflect__rep3__full__final removed.

@@ -1,0 +1,90 @@
+2026-10-10 14:45:06,558 - INFO - Creating container for django__django-11630...
+2026-10-10 14:45:15,826 - INFO - Container for django__django-11630 created: 8732c91d459213c0918b00963eb3a69a3e0903dcf08562dc96ca4461cea5b648
+2026-10-10 14:45:21,656 - INFO - Container for django__django-11630 started: 8732c91d459213c0918b00963eb3a69a3e0903dcf08562dc96ca4461cea5b648
+2026-10-10 14:45:21,657 - INFO - Intermediate patch for django__django-11630 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep2__full__final/rerun-2026-10__openai__self_reflect__rep2__full__final/django__django-11630/patch.diff, now applying to container...
+2026-10-10 14:45:21,922 - INFO - >>>>> Applied Patch:
+Checking patch django/core/checks/model_checks.py...
+warning: django/core/checks/model_checks.py has type 100755, expected 100644
+Applied patch django/core/checks/model_checks.py cleanly.
+
+2026-10-10 14:45:22,988 - INFO - Git diff before:
+diff --git a/django/core/checks/model_checks.py b/django/core/checks/model_checks.py
+index 5c2266ca1d..31d8297711 100755
+--- a/django/core/checks/model_checks.py
++++ b/django/core/checks/model_checks.py
+@@ -19,7 +19,14 @@ def check_all_models(app_configs=None, **kwargs):
+         models = chain.from_iterable(app_config.get_models() for app_config in app_configs)
+     for model in models:
+         if model._meta.managed and not model._meta.proxy:
+-            db_table_models[model._meta.db_table].append(model._meta.label)
++            # Use a key that includes the database alias to allow same table names on different databases
++            # The db_alias attribute is not standard on _meta, so fallback to 'default'
++            db_alias = getattr(model._meta, 'db_alias', None)
++            if db_alias is None:
++                # Try to get the database alias from the router for this model, fallback to 'default'
++                from django.db import router
++                db_alias = router.db_for_read(model, **kwargs) or 'default'
++            db_table_models[(db_alias, model._meta.db_table)].append(model._meta.label)
+         if not inspect.ismethod(model.check):
+             errors.append(
+                 Error(
+@@ -35,12 +42,12 @@ def check_all_models(app_configs=None, **kwargs):
+             indexes[model_index.name].append(model._meta.label)
+         for model_constraint in model._meta.constraints:
+             constraints[model_constraint.name].append(model._meta.label)
+-    for db_table, model_labels in db_table_models.items():
++    for (db_alias, db_table), model_labels in db_table_models.items():
+         if len(model_labels) != 1:
+             errors.append(
+                 Error(
+                     "db_table '%s' is used by multiple models: %s."
+-                    % (db_table, ', '.join(db_table_models[db_table])),
++                    % (db_table, ', '.join(model_labels)),
+                     obj=db_table,
+                     id='models.E028',
+                 )
+2026-10-10 14:45:22,989 - INFO - Eval script for django__django-11630 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep2__full__final/rerun-2026-10__openai__self_reflect__rep2__full__final/django__django-11630/eval.sh; copying to container...
+2026-10-10 14:45:37,008 - INFO - Test runtime: 13.87 seconds
+2026-10-10 14:45:37,011 - INFO - Test output for django__django-11630 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep2__full__final/rerun-2026-10__openai__self_reflect__rep2__full__final/django__django-11630/test_output.txt
+2026-10-10 14:45:37,170 - INFO - Git diff after:
+diff --git a/django/core/checks/model_checks.py b/django/core/checks/model_checks.py
+index 5c2266ca1d..31d8297711 100755
+--- a/django/core/checks/model_checks.py
++++ b/django/core/checks/model_checks.py
+@@ -19,7 +19,14 @@ def check_all_models(app_configs=None, **kwargs):
+         models = chain.from_iterable(app_config.get_models() for app_config in app_configs)
+     for model in models:
+         if model._meta.managed and not model._meta.proxy:
+-            db_table_models[model._meta.db_table].append(model._meta.label)
++            # Use a key that includes the database alias to allow same table names on different databases
++            # The db_alias attribute is not standard on _meta, so fallback to 'default'
++            db_alias = getattr(model._meta, 'db_alias', None)
++            if db_alias is None:
++                # Try to get the database alias from the router for this model, fallback to 'default'
++                from django.db import router
++                db_alias = router.db_for_read(model, **kwargs) or 'default'
++            db_table_models[(db_alias, model._meta.db_table)].append(model._meta.label)
+         if not inspect.ismethod(model.check):
+             errors.append(
+                 Error(
+@@ -35,12 +42,12 @@ def check_all_models(app_configs=None, **kwargs):
+             indexes[model_index.name].append(model._meta.label)
+         for model_constraint in model._meta.constraints:
+             constraints[model_constraint.name].append(model._meta.label)
+-    for db_table, model_labels in db_table_models.items():
++    for (db_alias, db_table), model_labels in db_table_models.items():
+         if len(model_labels) != 1:
+             errors.append(
+                 Error(
+                     "db_table '%s' is used by multiple models: %s."
+-                    % (db_table, ', '.join(db_table_models[db_table])),
++                    % (db_table, ', '.join(model_labels)),
+                     obj=db_table,
+                     id='models.E028',
+                 )
+2026-10-10 14:45:37,170 - INFO - Grading answer for django__django-11630...
+2026-10-10 14:45:37,179 - INFO - report: {'django__django-11630': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_collision_across_apps_database_routers_installed (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_collision_in_same_app_database_routers_installed (check_framework.test_model_checks.DuplicateDBTableTests)']}, 'PASS_TO_PASS': {'success': ['test_collision_abstract_model (check_framework.test_model_checks.IndexNameTests)', 'test_collision_across_apps (check_framework.test_model_checks.IndexNameTests)', 'test_collision_in_different_models (check_framework.test_model_checks.IndexNameTests)', 'test_collision_in_same_model (check_framework.test_model_checks.IndexNameTests)', 'test_no_collision_abstract_model_interpolation (check_framework.test_model_checks.IndexNameTests)', 'test_no_collision_across_apps_interpolation (check_framework.test_model_checks.IndexNameTests)', 'test_collision_abstract_model (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_across_apps (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_in_different_models (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_in_same_model (check_framework.test_model_checks.ConstraintNameTests)', 'test_no_collision_abstract_model_interpolation (check_framework.test_model_checks.ConstraintNameTests)', 'test_no_collision_across_apps_interpolation (check_framework.test_model_checks.ConstraintNameTests)', 'test_collision_across_apps (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_collision_in_same_app (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_no_collision_for_proxy_models (check_framework.test_model_checks.DuplicateDBTableTests)', 'test_no_collision_for_unmanaged_models (check_framework.test_model_checks.DuplicateDBTableTests)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-11630: resolved: False
+2026-10-10 14:45:37,180 - INFO - Attempting to stop container sweb.eval.django__django-11630.rerun-2026-10__openai__self_reflect__rep2__full__final...
+2026-10-10 14:45:55,562 - INFO - Attempting to remove container sweb.eval.django__django-11630.rerun-2026-10__openai__self_reflect__rep2__full__final...
+2026-10-10 14:45:58,217 - INFO - Container sweb.eval.django__django-11630.rerun-2026-10__openai__self_reflect__rep2__full__final removed.

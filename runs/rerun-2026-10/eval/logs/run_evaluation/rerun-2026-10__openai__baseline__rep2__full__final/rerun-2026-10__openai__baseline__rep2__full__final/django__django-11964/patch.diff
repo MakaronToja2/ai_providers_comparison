@@ -1,0 +1,23 @@
+diff --git a/django/db/models/fields/__init__.py b/django/db/models/fields/__init__.py
+index d610dc86f0..829d4795e9 100644
+--- a/django/db/models/fields/__init__.py
++++ b/django/db/models/fields/__init__.py
+@@ -1008,12 +1008,18 @@ class CharField(Field):
+         return "CharField"
+ 
+     def to_python(self, value):
++        # If the field has choices and the value is an enum member, convert to its value
++        if hasattr(self, 'choices') and self.choices and isinstance(value, enum.Enum):
++            return value.value
+         if isinstance(value, str) or value is None:
+             return value
+         return str(value)
+ 
+     def get_prep_value(self, value):
+         value = super().get_prep_value(value)
++        # If the value is an enum member, convert to its value before saving to DB
++        if isinstance(value, enum.Enum):
++            value = value.value
+         return self.to_python(value)
+ 
+     def formfield(self, **kwargs):

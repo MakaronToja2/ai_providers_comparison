@@ -1,0 +1,52 @@
+diff --git a/django/db/models/query_utils.py b/django/db/models/query_utils.py
+index c2623f099f..7897673df0 100644
+--- a/django/db/models/query_utils.py
++++ b/django/db/models/query_utils.py
+@@ -46,10 +46,10 @@ class Q(tree.Node):
+ 
+         # If the other Q() is empty, ignore it and just use `self`.
+         if not other:
+-            return copy.deepcopy(self)
++            return self._deep_copy()
+         # Or if this Q is empty, ignore it and just use `other`.
+         elif not self:
+-            return copy.deepcopy(other)
++            return other._deep_copy()
+ 
+         obj = type(self)()
+         obj.connector = conn
+@@ -57,6 +57,34 @@ class Q(tree.Node):
+         obj.add(other, conn)
+         return obj
+ 
++    def _deep_copy(self):
++        """
++        Create a deep copy of this Q object, handling non-pickleable objects
++        in children by converting them to lists.
++        """
++        obj = type(self)()
++        obj.connector = self.connector
++        obj.negated = self.negated
++        obj.children = []
++        for child in self.children:
++            if isinstance(child, Q):
++                obj.children.append(child._deep_copy())
++            elif isinstance(child, tuple) and len(child) == 2:
++                # This is a (key, value) tuple from kwargs
++                key, value = child
++                # Convert non-pickleable objects to pickleable equivalents
++                if hasattr(value, '__iter__') and not isinstance(value, (str, bytes)):
++                    try:
++                        # Try to convert to list if it's an iterable but not string/bytes
++                        value = list(value)
++                    except TypeError:
++                        # If conversion fails, keep original value
++                        pass
++                obj.children.append((key, value))
++            else:
++                obj.children.append(child)
++        return obj
++
+     def __or__(self, other):
+         return self._combine(other, self.OR)
+ 

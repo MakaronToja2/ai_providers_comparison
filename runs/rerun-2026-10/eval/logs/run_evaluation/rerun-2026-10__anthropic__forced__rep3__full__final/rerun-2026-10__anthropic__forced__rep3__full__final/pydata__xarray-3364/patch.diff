@@ -1,0 +1,71 @@
+diff --git a/xarray/core/concat.py b/xarray/core/concat.py
+index ecae2566c..e349139f5 100644
+--- a/xarray/core/concat.py
++++ b/xarray/core/concat.py
+@@ -312,20 +312,15 @@ def _dataset_concat(
+         to_merge = {var: [] for var in variables_to_merge}
+ 
+         for ds in datasets:
+-            absent_merge_vars = variables_to_merge - set(ds.variables)
+-            if absent_merge_vars:
+-                raise ValueError(
+-                    "variables %r are present in some datasets but not others. "
+-                    % absent_merge_vars
+-                )
+-
+             for var in variables_to_merge:
+-                to_merge[var].append(ds.variables[var])
++                if var in ds.variables:
++                    to_merge[var].append(ds.variables[var])
+ 
+         for var in variables_to_merge:
+-            result_vars[var] = unique_variable(
+-                var, to_merge[var], compat=compat, equals=equals.get(var, None)
+-            )
++            if to_merge[var]:
++                result_vars[var] = unique_variable(
++                    var, to_merge[var], compat=compat, equals=equals.get(var, None)
++                )
+     else:
+         result_vars = {}
+     result_vars.update(dim_coords)
+@@ -358,10 +353,35 @@ def _dataset_concat(
+     # n.b. this loop preserves variable order, needed for groupby.
+     for k in datasets[0].variables:
+         if k in concat_over:
+-            try:
+-                vars = ensure_common_dims([ds.variables[k] for ds in datasets])
+-            except KeyError:
+-                raise ValueError("%r is not present in all datasets." % k)
++            vars_to_concat = []
++            for ds in datasets:
++                if k in ds.variables:
++                    vars_to_concat.append(ds.variables[k])
++                else:
++                    # Variable is missing in this dataset, skip it for now
++                    # It will be handled by creating a new variable with NaN values
++                    pass
++            
++            if vars_to_concat:
++                vars = ensure_common_dims(vars_to_concat)
++                combined = concat_vars(vars, dim, positions)
++                assert isinstance(combined, Variable)
++                result_vars[k] = combined
++
++    # Add any variables that are in concat_over but not in the first dataset
++    # by checking all datasets
++    all_vars_in_concat_over = set()
++    for ds in datasets:
++        all_vars_in_concat_over.update(k for k in ds.variables if k in concat_over)
++    
++    for k in all_vars_in_concat_over - set(result_vars.keys()):
++        vars_to_concat = []
++        for ds in datasets:
++            if k in ds.variables:
++                vars_to_concat.append(ds.variables[k])
++        
++        if vars_to_concat:
++            vars = ensure_common_dims(vars_to_concat)
+             combined = concat_vars(vars, dim, positions)
+             assert isinstance(combined, Variable)
+             result_vars[k] = combined

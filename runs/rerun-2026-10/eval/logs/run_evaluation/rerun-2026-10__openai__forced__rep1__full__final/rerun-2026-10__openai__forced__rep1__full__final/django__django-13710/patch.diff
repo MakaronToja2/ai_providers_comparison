@@ -1,0 +1,17 @@
+diff --git a/django/contrib/admin/options.py b/django/contrib/admin/options.py
+index dadd4acfa1..2d1dff8b16 100644
+--- a/django/contrib/admin/options.py
++++ b/django/contrib/admin/options.py
+@@ -2040,7 +2040,11 @@ class InlineModelAdmin(BaseModelAdmin):
+         if self.verbose_name is None:
+             self.verbose_name = self.model._meta.verbose_name
+         if self.verbose_name_plural is None:
+-            self.verbose_name_plural = self.model._meta.verbose_name_plural
++            # Use plural form of verbose_name if verbose_name is specified
++            if self.verbose_name is not None:
++                self.verbose_name_plural = capfirst(ngettext_lazy(self.verbose_name, self.verbose_name, 2))
++            else:
++                self.verbose_name_plural = self.model._meta.verbose_name_plural
+ 
+     @property
+     def media(self):

@@ -1,0 +1,48 @@
+<frozen runpy>:128: RuntimeWarning: 'swebench.harness.run_evaluation' found in sys.modules after import of package 'swebench.harness', but prior to execution of 'swebench.harness.run_evaluation'; this may result in unpredictable behaviour
+Found 8 existing instance images. Will reuse them.
+Running 8 instances...
+Evaluation:   0%|          | 0/8 [00:00<?, ?it/s, error=0, ✓=0, ✖=0]Evaluation:   0%|          | 0/8 [00:20<?, ?it/s, ✓=0, ✖=0, error=1]Evaluation:  12%|█▎        | 1/8 [00:20<02:20, 20.07s/it, ✓=0, ✖=0, error=1]Evaluation:  12%|█▎        | 1/8 [00:20<02:20, 20.07s/it, ✓=0, ✖=0, error=2]Evaluation:  25%|██▌       | 2/8 [00:20<02:00, 20.07s/it, ✓=0, ✖=0, error=3]Evaluation:  38%|███▊      | 3/8 [00:20<00:26,  5.26s/it, ✓=0, ✖=0, error=3]Evaluation:  38%|███▊      | 3/8 [00:33<00:26,  5.26s/it, ✓=0, ✖=0, error=3]Evaluation:  38%|███▊      | 3/8 [00:39<00:26,  5.26s/it, ✓=0, ✖=0, error=4]Evaluation:  50%|█████     | 4/8 [00:39<00:40, 10.09s/it, ✓=0, ✖=0, error=4]Evaluation:  50%|█████     | 4/8 [00:39<00:40, 10.09s/it, ✓=0, ✖=0, error=5]Evaluation:  62%|██████▎   | 5/8 [00:39<00:20,  6.85s/it, ✓=0, ✖=0, error=5]Evaluation:  62%|██████▎   | 5/8 [00:39<00:20,  6.85s/it, ✓=0, ✖=0, error=6]Evaluation:  75%|███████▌  | 6/8 [00:39<00:09,  4.69s/it, ✓=0, ✖=0, error=6]Evaluation:  75%|███████▌  | 6/8 [00:59<00:09,  4.69s/it, ✓=0, ✖=1, error=6]Evaluation:  88%|████████▊ | 7/8 [00:59<00:09,  9.25s/it, ✓=0, ✖=1, error=6]Evaluation:  88%|████████▊ | 7/8 [01:55<00:09,  9.25s/it, ✓=0, ✖=2, error=6]Evaluation: 100%|██████████| 8/8 [01:55<00:00, 23.76s/it, ✓=0, ✖=2, error=6]Evaluation: 100%|██████████| 8/8 [01:55<00:00, 14.39s/it, ✓=0, ✖=2, error=6]
+django__django-13448: >>>>> Patch Apply Failed:
+patch: **** Only garbage was found in the patch input.
+
+Check (logs/run_evaluation/rerun-2026-10__openai__forced__rep1__smoke__final/rerun-2026-10__openai__forced__rep1__smoke__final/django__django-13448/run_instance.log) for more information.
+django__django-15347: >>>>> Patch Apply Failed:
+patch: **** Only garbage was found in the patch input.
+
+Check (logs/run_evaluation/rerun-2026-10__openai__forced__rep1__smoke__final/rerun-2026-10__openai__forced__rep1__smoke__final/django__django-15347/run_instance.log) for more information.
+pytest-dev__pytest-5692: >>>>> Patch Apply Failed:
+patching file src/_pytest/junitxml.py
+Hunk #1 FAILED at 646.
+1 out of 1 hunk FAILED -- saving rejects to file src/_pytest/junitxml.py.rej
+
+Check (logs/run_evaluation/rerun-2026-10__openai__forced__rep1__smoke__final/rerun-2026-10__openai__forced__rep1__smoke__final/pytest-dev__pytest-5692/run_instance.log) for more information.
+scikit-learn__scikit-learn-13439: >>>>> Patch Apply Failed:
+patch: **** Only garbage was found in the patch input.
+
+Check (logs/run_evaluation/rerun-2026-10__openai__forced__rep1__smoke__final/rerun-2026-10__openai__forced__rep1__smoke__final/scikit-learn__scikit-learn-13439/run_instance.log) for more information.
+sphinx-doc__sphinx-7975: >>>>> Patch Apply Failed:
+patching file sphinx/environment/adapters/indexentries.py
+Hunk #1 FAILED at 27.
+1 out of 1 hunk FAILED -- saving rejects to file sphinx/environment/adapters/indexentries.py.rej
+
+Check (logs/run_evaluation/rerun-2026-10__openai__forced__rep1__smoke__final/rerun-2026-10__openai__forced__rep1__smoke__final/sphinx-doc__sphinx-7975/run_instance.log) for more information.
+sympy__sympy-15609: >>>>> Patch Apply Failed:
+patching file sympy/printing/latex.py
+Hunk #1 FAILED at 1438.
+1 out of 1 hunk FAILED -- saving rejects to file sympy/printing/latex.py.rej
+
+Check (logs/run_evaluation/rerun-2026-10__openai__forced__rep1__smoke__final/rerun-2026-10__openai__forced__rep1__smoke__final/sympy__sympy-15609/run_instance.log) for more information.
+All instances run.
+Cleaning cached images...
+Removed 0 images.
+Total instances: 8
+Instances submitted: 8
+Instances completed: 2
+Instances incomplete: 0
+Instances resolved: 0
+Instances unresolved: 2
+Instances with empty patches: 0
+Instances with errors: 6
+Unstopped containers: 0
+Unremoved images: 8
+Report written to rerun-2026-10__openai__forced__rep1__smoke__final.rerun-2026-10__openai__forced__rep1__smoke__final.json

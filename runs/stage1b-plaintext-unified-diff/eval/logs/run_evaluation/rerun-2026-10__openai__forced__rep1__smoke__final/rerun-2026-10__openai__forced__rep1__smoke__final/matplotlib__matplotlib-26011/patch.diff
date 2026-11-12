@@ -1,0 +1,52 @@
+--- a/lib/matplotlib/axes/_base.py
++++ b/lib/matplotlib/axes/_base.py
+@@ -3568,40 +3568,42 @@
+     def set_xlim(self, left=None, right=None, *, emit=True, auto=False,
+                  xmin=None, xmax=None):
+         """
+         Set the x-axis view limits.
+ 
+         Parameters
+         ----------
+         left : float, optional
+             The left xlim in data coordinates. Passing *None* leaves the
+             limit unchanged.
+ 
+             The left and right xlims may also be passed as the tuple
+             (*left*, *right*) as the first positional argument (or as
+             the *left* keyword argument).
+ 
+             .. ACCEPTS: (bottom: float, top: float)
+ 
+         right : float, optional
+             The right xlim in data coordinates. Passing *None* leaves the
+             limit unchanged.
+ 
+         emit : bool, default: True
+             Whether to notify observers of limit change.
+ 
+         auto : bool or None, default: False
+             Whether to turn on autoscaling of the x-axis. True turns on,
+             False turns off, None leaves unchanged.
+ 
+         xmin, xmax : float, optional
+             They are equivalent to left and right respectively, and it is an
+             error to pass both *xmin* and *left* or *xmax* and *right*.
+         """
+-        if emit:
+-            self.callbacks.process('xlim_changed', self)
+-            # Call all of the other x-axes that are shared with this one
+-            for other in self._shared_x_axes.get_siblings(self):
+-                if other is not self:
+-                    other.set_xlim(self.viewLim.intervalx,
+-                                   emit=False, auto=auto)
++        # Call all of the other x-axes that are shared with this one
++        for other in self._shared_x_axes.get_siblings(self):
++            if other is not self:
++                other.set_xlim(self.viewLim.intervalx,
++                               emit=False, auto=auto)
++
++        if emit:
++            self.callbacks.process('xlim_changed', self)
++
+         # ... rest of set_xlim implementation ...

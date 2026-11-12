@@ -1,0 +1,33 @@
+diff --git a/pylint/reporters/text.py b/pylint/reporters/text.py
+index 29bd46798..32357b6b9 100644
+--- a/pylint/reporters/text.py
++++ b/pylint/reporters/text.py
+@@ -175,14 +175,23 @@ class TextReporter(BaseReporter):
+         self._template = template
+ 
+         # Check to see if all parameters in the template are attributes of the Message
+-        arguments = re.findall(r"\{(.+?)(:.*)?\}", template)
+-        for argument in arguments:
+-            if argument[0] not in MESSAGE_FIELDS:
++        # The regex is changed to be more specific and only capture valid field names.
++        # It now matches {FIELD_NAME} or {FIELD_NAME:FORMAT_SPEC}.
++        # It also correctly handles literal double braces {{ and }} by not matching them as placeholders.
++        potential_placeholders = re.findall(r"\{(\w+(?::[^}]+)?)\}", template)
++        for placeholder in potential_placeholders:
++            field_name = placeholder.split(":", 1)[0]  # Extract field name before any format specifier
++            if field_name not in MESSAGE_FIELDS:
+                 warnings.warn(
+-                    f"Don't recognize the argument '{argument[0]}' in the --msg-template. "
++                    f"Don't recognize the argument '{field_name}' in the --msg-template. "
+                     "Are you sure it is supported on the current version of pylint?"
+                 )
+-                template = re.sub(r"\{" + argument[0] + r"(:.*?)?\}", "", template)
++                # Remove the unrecognized placeholder from the template.
++                # We need to remove the entire placeholder, including potential format specifiers.
++                # The original regex was too broad and could incorrectly match parts of JSON.
++                # The new regex ensures we only target valid-looking placeholders.
++                # We use re.escape on the placeholder to handle any special characters if they were to appear.
++                template = re.sub(re.escape(f"{{{placeholder}}}"), "", template)
+         self._fixed_template = template
+ 
+     def write_message(self, msg: Message) -> None:

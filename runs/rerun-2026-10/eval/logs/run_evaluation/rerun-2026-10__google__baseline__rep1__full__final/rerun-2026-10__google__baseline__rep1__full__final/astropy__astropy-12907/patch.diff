@@ -1,0 +1,18 @@
+diff --git a/astropy/modeling/separable.py b/astropy/modeling/separable.py
+index a308e27297..966023fc2c 100644
+--- a/astropy/modeling/separable.py
++++ b/astropy/modeling/separable.py
+@@ -241,8 +241,12 @@ def _cstack(left, right):
+     if isinstance(right, Model):
+         cright = _coord_matrix(right, 'right', noutp)
+     else:
++        # If right is a matrix, it should be placed in the right part of the new matrix.
++        # The number of rows in `right` should match the number of outputs of the right operand.
++        # `right.shape[0]` should be the number of outputs of the right operand.
++        # This should be consistent with `noutp` calculation.
+         cright = np.zeros((noutp, right.shape[1]))
+-        cright[-right.shape[0]:, -right.shape[1]:] = 1
++        cright[: right.shape[0], :] = right
+ 
+     return np.hstack([cleft, cright])
+ 

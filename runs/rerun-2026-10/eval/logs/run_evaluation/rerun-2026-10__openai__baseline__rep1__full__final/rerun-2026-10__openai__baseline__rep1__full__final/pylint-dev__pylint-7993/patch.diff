@@ -1,0 +1,25 @@
+diff --git a/pylint/reporters/text.py b/pylint/reporters/text.py
+index 29bd46798..4bdc9d484 100644
+--- a/pylint/reporters/text.py
++++ b/pylint/reporters/text.py
+@@ -175,14 +175,18 @@ class TextReporter(BaseReporter):
+         self._template = template
+ 
+         # Check to see if all parameters in the template are attributes of the Message
+-        arguments = re.findall(r"\{(.+?)(:.*)?\}", template)
++        # To allow literal braces, we need to ignore doubled braces {{ or }}
++        # We use a regex to find single braces only
++        # This regex finds {field} or {field:format_spec} but ignores doubled braces
++        # It uses a negative lookbehind and lookahead to ensure braces are not doubled
++        arguments = re.findall(r"(?<!\{)\{([^{}:]+)(:[^{}]+)?\}(?!\})", template)
+         for argument in arguments:
+             if argument[0] not in MESSAGE_FIELDS:
+                 warnings.warn(
+                     f"Don't recognize the argument '{argument[0]}' in the --msg-template. "
+                     "Are you sure it is supported on the current version of pylint?"
+                 )
+-                template = re.sub(r"\{" + argument[0] + r"(:.*?)?\}", "", template)
++                template = re.sub(r"(?<!\{)\{" + argument[0] + r"(:.*?)?\}(?!\})", "", template)
+         self._fixed_template = template
+ 
+     def write_message(self, msg: Message) -> None:

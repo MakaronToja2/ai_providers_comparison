@@ -1,0 +1,13 @@
+diff --git a/sympy/integrals/intpoly.py b/sympy/integrals/intpoly.py
+index fc72bd206f..b147e65a90 100644
+--- a/sympy/integrals/intpoly.py
++++ b/sympy/integrals/intpoly.py
+@@ -84,6 +84,8 @@ def polytope_integrate(poly, expr, **kwargs):
+                     continue
+                 integral_value = S.Zero
+                 monoms = decompose(polys, separate=True)
++                # Sort the monomials to ensure consistent order
++                monoms = sorted(monoms)
+                 for monom in monoms:
+                     if monom.is_number:
+                         integral_value += result_dict[1] * monom

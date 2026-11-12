@@ -1,0 +1,22 @@
+diff --git a/lib/matplotlib/axes/_axes.py b/lib/matplotlib/axes/_axes.py
+index fdac0f3560..c9511dc112 100644
+--- a/lib/matplotlib/axes/_axes.py
++++ b/lib/matplotlib/axes/_axes.py
+@@ -2369,8 +2369,15 @@ class Axes(_AxesBase):
+         # subtracted uniformly
+         if self.xaxis is not None:
+             x0 = x
+-            x = np.asarray(self.convert_xunits(x))
+-            width = self._convert_dx(width, x0, x, self.convert_xunits)
++            # Fix for all-NaN x data: skip _safe_first_finite call in _convert_dx
++            # if all values are NaN, to avoid StopIteration error.
++            # We do this by checking if all x0 are non-finite.
++            if np.all(~np.isfinite(x0)):
++                # all x0 are NaN or infinite, so skip _safe_first_finite usage
++                width = np.asarray(width)
++            else:
++                x = np.asarray(self.convert_xunits(x))
++                width = self._convert_dx(width, x0, x, self.convert_xunits)
+             if xerr is not None:
+                 xerr = self._convert_dx(xerr, x0, x, self.convert_xunits)
+         if self.yaxis is not None:

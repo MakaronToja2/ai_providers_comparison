@@ -1,0 +1,20 @@
+diff --git a/sklearn/linear_model/ridge.py b/sklearn/linear_model/ridge.py
+index 911c74ae3b9..3f2bf8662c1 100644
+--- a/sklearn/linear_model/ridge.py
++++ b/sklearn/linear_model/ridge.py
+@@ -1060,7 +1060,14 @@ class _RidgeGCV(LinearModel):
+             # they are already computed efficiently by _RidgeGCV. This
+             # identity_estimator will just return them
+             def identity_estimator():
+-                pass
++                def __init__(self, alphas=(0.1, 1.0, 10.0),
++                 fit_intercept=True, normalize=False, scoring=None,
++                 cv=None, gcv_mode=None,
++                 store_cv_values=False):
++        super(RidgeClassifierCV, self).__init__(
++            alphas=alphas, fit_intercept=fit_intercept, normalize=normalize,
++            scoring=scoring, cv=cv, gcv_mode=gcv_mode,
++            store_cv_values=store_cv_values)
+             identity_estimator.decision_function = lambda y_predict: y_predict
+             identity_estimator.predict = lambda y_predict: y_predict
+ 

@@ -1,0 +1,126 @@
+2026-10-10 12:42:33,005 - INFO - Creating container for django__django-13220...
+2026-10-10 12:42:33,824 - INFO - Container for django__django-13220 created: 97fe1aea5948223c3ff14519b11830c4e49ba12c2081f20305de264b41827529
+2026-10-10 12:42:35,037 - INFO - Container for django__django-13220 started: 97fe1aea5948223c3ff14519b11830c4e49ba12c2081f20305de264b41827529
+2026-10-10 12:42:35,038 - INFO - Intermediate patch for django__django-13220 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep3__full__final/rerun-2026-10__openai__baseline__rep3__full__final/django__django-13220/patch.diff, now applying to container...
+2026-10-10 12:42:35,271 - INFO - >>>>> Applied Patch:
+Checking patch django/core/exceptions.py...
+warning: django/core/exceptions.py has type 100755, expected 100644
+Applied patch django/core/exceptions.py cleanly.
+
+2026-10-10 12:42:36,232 - INFO - Git diff before:
+diff --git a/django/core/exceptions.py b/django/core/exceptions.py
+index dc084b8692..949724d39a 100755
+--- a/django/core/exceptions.py
++++ b/django/core/exceptions.py
+@@ -182,6 +182,48 @@ class ValidationError(Exception):
+     def __repr__(self):
+         return 'ValidationError(%s)' % self
+ 
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++
++        def normalize_errors(errors):
++            # Normalize to a list of strings, ignoring order
++            if isinstance(errors, dict):
++                # Flatten dict values and sort each list
++                normalized = []
++                for key in sorted(errors.keys()):
++                    msgs = errors[key]
++                    if isinstance(msgs, ValidationError):
++                        msgs = normalize_errors(msgs)
++                    elif isinstance(msgs, list):
++                        # Flatten nested ValidationErrors in list
++                        flat_msgs = []
++                        for m in msgs:
++                            if isinstance(m, ValidationError):
++                                flat_msgs.extend(normalize_errors(m))
++                            else:
++                                flat_msgs.append(str(m))
++                        msgs = flat_msgs
++                    else:
++                        msgs = [str(msgs)]
++                    normalized.extend(sorted(str(m) for m in msgs))
++                return sorted(normalized)
++            elif isinstance(errors, list):
++                normalized = []
++                for e in errors:
++                    if isinstance(e, ValidationError):
++                        normalized.extend(normalize_errors(e))
++                    else:
++                        normalized.append(str(e))
++                return sorted(normalized)
++            else:
++                return [str(errors)]
++
++        self_errors = normalize_errors(self.error_dict if hasattr(self, 'error_dict') else self.error_list)
++        other_errors = normalize_errors(other.error_dict if hasattr(other, 'error_dict') else other.error_list)
++
++        return self_errors == other_errors
++
+ 
+ class EmptyResultSet(Exception):
+     """A database query predicate is impossible."""
+2026-10-10 12:42:36,233 - INFO - Eval script for django__django-13220 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep3__full__final/rerun-2026-10__openai__baseline__rep3__full__final/django__django-13220/eval.sh; copying to container...
+2026-10-10 12:42:51,182 - INFO - Test runtime: 14.51 seconds
+2026-10-10 12:42:51,193 - INFO - Test output for django__django-13220 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep3__full__final/rerun-2026-10__openai__baseline__rep3__full__final/django__django-13220/test_output.txt
+2026-10-10 12:42:51,398 - INFO - Git diff after:
+diff --git a/django/core/exceptions.py b/django/core/exceptions.py
+index dc084b8692..949724d39a 100755
+--- a/django/core/exceptions.py
++++ b/django/core/exceptions.py
+@@ -182,6 +182,48 @@ class ValidationError(Exception):
+     def __repr__(self):
+         return 'ValidationError(%s)' % self
+ 
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++
++        def normalize_errors(errors):
++            # Normalize to a list of strings, ignoring order
++            if isinstance(errors, dict):
++                # Flatten dict values and sort each list
++                normalized = []
++                for key in sorted(errors.keys()):
++                    msgs = errors[key]
++                    if isinstance(msgs, ValidationError):
++                        msgs = normalize_errors(msgs)
++                    elif isinstance(msgs, list):
++                        # Flatten nested ValidationErrors in list
++                        flat_msgs = []
++                        for m in msgs:
++                            if isinstance(m, ValidationError):
++                                flat_msgs.extend(normalize_errors(m))
++                            else:
++                                flat_msgs.append(str(m))
++                        msgs = flat_msgs
++                    else:
++                        msgs = [str(msgs)]
++                    normalized.extend(sorted(str(m) for m in msgs))
++                return sorted(normalized)
++            elif isinstance(errors, list):
++                normalized = []
++                for e in errors:
++                    if isinstance(e, ValidationError):
++                        normalized.extend(normalize_errors(e))
++                    else:
++                        normalized.append(str(e))
++                return sorted(normalized)
++            else:
++                return [str(errors)]
++
++        self_errors = normalize_errors(self.error_dict if hasattr(self, 'error_dict') else self.error_list)
++        other_errors = normalize_errors(other.error_dict if hasattr(other, 'error_dict') else other.error_list)
++
++        return self_errors == other_errors
++
+ 
+ class EmptyResultSet(Exception):
+     """A database query predicate is impossible."""
+2026-10-10 12:42:51,399 - INFO - Grading answer for django__django-13220...
+2026-10-10 12:42:51,406 - INFO - report: {'django__django-13220': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_eq (test_exceptions.test_validation_error.TestValidationError)', 'test_eq_nested (test_exceptions.test_validation_error.TestValidationError)', 'test_hash (test_exceptions.test_validation_error.TestValidationError)', 'test_hash_nested (test_exceptions.test_validation_error.TestValidationError)']}, 'PASS_TO_PASS': {'success': ['test_messages_concatenates_error_dict_values (test_exceptions.test_validation_error.TestValidationError)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-13220: resolved: False
+2026-10-10 12:42:51,411 - INFO - Attempting to stop container sweb.eval.django__django-13220.rerun-2026-10__openai__baseline__rep3__full__final...
+2026-10-10 12:43:10,049 - INFO - Attempting to remove container sweb.eval.django__django-13220.rerun-2026-10__openai__baseline__rep3__full__final...
+2026-10-10 12:43:10,384 - INFO - Container sweb.eval.django__django-13220.rerun-2026-10__openai__baseline__rep3__full__final removed.

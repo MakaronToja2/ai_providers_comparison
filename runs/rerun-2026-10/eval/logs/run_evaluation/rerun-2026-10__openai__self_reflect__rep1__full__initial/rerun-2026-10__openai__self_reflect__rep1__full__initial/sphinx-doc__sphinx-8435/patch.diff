@@ -1,0 +1,29 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 171a3e7b0d..6cc6e2fb10 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1272,6 +1272,24 @@ class FunctionDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # typ
+             args = args.replace('\\', '\\\\')
+         return args
+ 
++    def format_annotation(self, annotation: Any) -> str:
++        # Override to apply autodoc_type_aliases to variable and attribute annotations
++        if annotation is None:
++            return ''
++        type_aliases = self.config.autodoc_type_aliases
++        if type_aliases and isinstance(annotation, str):
++            # If annotation is a string, try to replace aliases
++            for alias, real in type_aliases.items():
++                if annotation == alias:
++                    annotation = real
++                    break
++        elif type_aliases and hasattr(annotation, '__name__'):
++            # If annotation is a type object, try to replace aliases by name
++            name = getattr(annotation, '__qualname__', None) or getattr(annotation, '__name__', None)
++            if name in type_aliases:
++                annotation = type_aliases[name]
++        return stringify_annotation(annotation)
++
+     def document_members(self, all_members: bool = False) -> None:
+         pass
+ 

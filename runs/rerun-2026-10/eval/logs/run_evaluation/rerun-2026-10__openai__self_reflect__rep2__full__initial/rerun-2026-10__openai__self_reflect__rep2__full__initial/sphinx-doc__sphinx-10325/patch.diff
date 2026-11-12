@@ -1,0 +1,37 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 62631f7ff9..830786a425 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1710,7 +1710,31 @@ class ClassDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # type:
+                                    (name, self.fullname), type='autodoc')
+             return False, selected
+         elif self.options.inherited_members:
+-            return False, list(members.values())
++            # Support inherited-members as a list of class names to ignore
++            ignore_bases = []
++            if isinstance(self.options.inherited_members, (list, tuple)):
++                ignore_bases = self.options.inherited_members
++            elif isinstance(self.options.inherited_members, str):
++                ignore_bases = [self.options.inherited_members]
++
++            def is_inherited_member(m):
++                # Include member if it is defined in this class or in a base class
++                # that is not in ignore_bases.
++                if m.class_ == self.object:
++                    return True
++                # Check if the member's class is a subclass of the documented class
++                # and if the member's class name is not in ignore_bases.
++                if isinstance(m.class_, type):
++                    for base in m.class_.__mro__:
++                        if base == self.object:
++                            # Check if any base class to ignore is in the m.class_ MRO
++                            if any(base_name == base.__name__ for base_name in ignore_bases):
++                                return False
++                            return True
++                return False
++
++            filtered_members = [m for m in members.values() if is_inherited_member(m)]
++            return False, filtered_members
+         else:
+             return False, [m for m in members.values() if m.class_ == self.object]
+ 

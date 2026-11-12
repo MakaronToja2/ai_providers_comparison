@@ -1,0 +1,48 @@
+2026-10-10 13:17:04,358 - INFO - Creating container for django__django-15819...
+2026-10-10 13:17:08,576 - INFO - Container for django__django-15819 created: 464d8f241526ff7e65e9e9f15f7113fd0930c81afee17aca75516d8384164d33
+2026-10-10 13:17:09,261 - INFO - Container for django__django-15819 started: 464d8f241526ff7e65e9e9f15f7113fd0930c81afee17aca75516d8384164d33
+2026-10-10 13:17:09,262 - INFO - Intermediate patch for django__django-15819 written to logs/run_evaluation/rerun-2026-10__google__forced__rep3__full__final/rerun-2026-10__google__forced__rep3__full__final/django__django-15819/patch.diff, now applying to container...
+2026-10-10 13:17:09,461 - INFO - >>>>> Applied Patch:
+Checking patch django/core/management/commands/inspectdb.py...
+warning: django/core/management/commands/inspectdb.py has type 100755, expected 100644
+Applied patch django/core/management/commands/inspectdb.py cleanly.
+
+2026-10-10 13:17:10,374 - INFO - Git diff before:
+diff --git a/django/core/management/commands/inspectdb.py b/django/core/management/commands/inspectdb.py
+index f33bcbdccf..50da777647 100755
+--- a/django/core/management/commands/inspectdb.py
++++ b/django/core/management/commands/inspectdb.py
+@@ -186,6 +186,9 @@ class Command(BaseCommand):
+                             field_type = "%s(%s" % (rel_type, rel_to)
+                         else:
+                             field_type = "%s('%s'" % (rel_type, rel_to)
++                        # Add related_name for self-referential relations to avoid clashes.
++                        if ref_db_table == table_name:
++                            extra_params["related_name"] = att_name
+                     else:
+                         # Calling `get_field_type` to get the field type string and any
+                         # additional parameters and notes.
+2026-10-10 13:17:10,374 - INFO - Eval script for django__django-15819 written to logs/run_evaluation/rerun-2026-10__google__forced__rep3__full__final/rerun-2026-10__google__forced__rep3__full__final/django__django-15819/eval.sh; copying to container...
+2026-10-10 13:17:20,558 - INFO - Test runtime: 10.07 seconds
+2026-10-10 13:17:21,003 - INFO - Test output for django__django-15819 written to logs/run_evaluation/rerun-2026-10__google__forced__rep3__full__final/rerun-2026-10__google__forced__rep3__full__final/django__django-15819/test_output.txt
+2026-10-10 13:17:21,076 - INFO - Git diff after:
+diff --git a/django/core/management/commands/inspectdb.py b/django/core/management/commands/inspectdb.py
+index f33bcbdccf..50da777647 100755
+--- a/django/core/management/commands/inspectdb.py
++++ b/django/core/management/commands/inspectdb.py
+@@ -186,6 +186,9 @@ class Command(BaseCommand):
+                             field_type = "%s(%s" % (rel_type, rel_to)
+                         else:
+                             field_type = "%s('%s'" % (rel_type, rel_to)
++                        # Add related_name for self-referential relations to avoid clashes.
++                        if ref_db_table == table_name:
++                            extra_params["related_name"] = att_name
+                     else:
+                         # Calling `get_field_type` to get the field type string and any
+                         # additional parameters and notes.
+2026-10-10 13:17:21,076 - INFO - Grading answer for django__django-15819...
+2026-10-10 13:17:21,086 - INFO - report: {'django__django-15819': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_same_relations (inspectdb.tests.InspectDBTestCase)']}, 'PASS_TO_PASS': {'success': ['test_composite_primary_key (inspectdb.tests.InspectDBTransactionalTests)', 'inspectdb --include-views creates models for database views.', 'test_char_field_db_collation (inspectdb.tests.InspectDBTestCase)', 'Introspection of columns with a custom field (#21090)', 'Introspection of column names consist/start with digits (#16536/#17676)', 'Test introspection of various Django field types', 'test_foreign_key_to_field (inspectdb.tests.InspectDBTestCase)', 'Introspection errors should not crash the command, and the error should', 'test_json_field (inspectdb.tests.InspectDBTestCase)', 'By default the command generates models with `Meta.managed = False`.', 'Introspection of column names containing special characters,', 'test_stealth_table_name_filter_option (inspectdb.tests.InspectDBTestCase)', 'Introspection of table names containing special characters,', 'inspectdb can inspect a subset of tables by passing the table names as', 'test_table_with_func_unique_constraint (inspectdb.tests.InspectDBTestCase)', 'test_text_field_db_collation (inspectdb.tests.InspectDBTestCase)', 'test_unique_together_meta (inspectdb.tests.InspectDBTestCase)'], 'failure': ['test_attribute_name_not_python_keyword (inspectdb.tests.InspectDBTestCase)']}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-15819: resolved: False
+2026-10-10 13:17:21,087 - INFO - Attempting to stop container sweb.eval.django__django-15819.rerun-2026-10__google__forced__rep3__full__final...
+2026-10-10 13:17:40,908 - INFO - Attempting to remove container sweb.eval.django__django-15819.rerun-2026-10__google__forced__rep3__full__final...
+2026-10-10 13:17:41,484 - INFO - Container sweb.eval.django__django-15819.rerun-2026-10__google__forced__rep3__full__final removed.

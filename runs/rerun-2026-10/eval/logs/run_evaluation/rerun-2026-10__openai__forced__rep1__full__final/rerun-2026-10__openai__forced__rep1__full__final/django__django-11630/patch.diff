@@ -1,0 +1,24 @@
+diff --git a/django/core/checks/model_checks.py b/django/core/checks/model_checks.py
+index 5c2266ca1d..f869ed4334 100644
+--- a/django/core/checks/model_checks.py
++++ b/django/core/checks/model_checks.py
+@@ -36,7 +36,19 @@ def check_all_models(app_configs=None, **kwargs):
+         for model_constraint in model._meta.constraints:
+             constraints[model_constraint.name].append(model._meta.label)
+     for db_table, model_labels in db_table_models.items():
++        # Allow same db_table name if models belong to different apps with different databases
+         if len(model_labels) != 1:
++            # Check if all models belong to the same database
++            databases = set()
++            for label in model_labels:
++                try:
++                    model = apps.get_model(label)
++                    databases.add(model._meta.app_label)
++                except LookupError:
++                    databases.add(None)
++            if len(databases) > 1:
++                # Different apps with same table name allowed if they use different databases
++                continue
+             errors.append(
+                 Error(
+                     "db_table '%s' is used by multiple models: %s."

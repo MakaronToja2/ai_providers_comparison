@@ -1,0 +1,18 @@
+diff --git a/django/db/models/query.py b/django/db/models/query.py
+index e0eeccefa6..5902743f93 100644
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -1140,6 +1140,13 @@ class QuerySet:
+         """
+         assert not self.query.is_sliced, \
+             "Cannot create distinct fields once a slice has been taken."
++        # Raise if distinct is called on a union queryset, because distinct on union
++        # requires wrapping the union in a subquery, which is not currently done.
++        if self.query.combinator == 'union':
++            raise NotImplementedError(
++                "distinct() is not supported on a union() queryset. "
++                "You must wrap the union in a subquery to apply distinct."
++            )
+         obj = self._chain()
+         obj.query.add_distinct_fields(*field_names)
+         return obj

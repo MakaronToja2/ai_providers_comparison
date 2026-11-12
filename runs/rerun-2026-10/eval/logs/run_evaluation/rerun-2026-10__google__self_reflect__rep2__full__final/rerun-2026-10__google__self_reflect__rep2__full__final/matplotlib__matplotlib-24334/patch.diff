@@ -1,0 +1,19 @@
+diff --git a/lib/matplotlib/axis.py b/lib/matplotlib/axis.py
+index af0815d41d..96e216d6f6 100644
+--- a/lib/matplotlib/axis.py
++++ b/lib/matplotlib/axis.py
+@@ -2022,7 +2022,13 @@ class Axis(martist.Artist):
+         ticks.
+         """
+         result = self._set_tick_locations(ticks, minor=minor)
+-        if labels is not None:
++        if labels is None and kwargs:
++            # If labels is None but kwargs are provided, we still want to validate
++            # kwargs as Text properties. We do this by calling set_ticklabels
++            # with an empty list for labels, ensuring kwargs are processed.
++            self.set_ticklabels([], minor=minor, **kwargs)
++        else:
++            # Otherwise, use the provided labels (which could be None).
+             self.set_ticklabels(labels, minor=minor, **kwargs)
+         return result
+ 

@@ -1,0 +1,48 @@
+2026-10-10 13:00:25,403 - INFO - Creating container for django__django-14915...
+2026-10-10 13:00:25,578 - INFO - Container for django__django-14915 created: 3e81c1cff5e362963cdd8e9a6f4e18b19c5ac636b02588ff38afd7582fa236e3
+2026-10-10 13:00:25,881 - INFO - Container for django__django-14915 started: 3e81c1cff5e362963cdd8e9a6f4e18b19c5ac636b02588ff38afd7582fa236e3
+2026-10-10 13:00:25,882 - INFO - Intermediate patch for django__django-14915 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep2__full__final/rerun-2026-10__anthropic__baseline__rep2__full__final/django__django-14915/patch.diff, now applying to container...
+2026-10-10 13:00:26,148 - INFO - >>>>> Applied Patch:
+Checking patch django/forms/models.py...
+warning: django/forms/models.py has type 100755, expected 100644
+Applied patch django/forms/models.py cleanly.
+
+2026-10-10 13:00:27,290 - INFO - Git diff before:
+diff --git a/django/forms/models.py b/django/forms/models.py
+index 5dcf923c12..bc7e6959e7 100755
+--- a/django/forms/models.py
++++ b/django/forms/models.py
+@@ -1171,6 +1171,9 @@ class ModelChoiceIteratorValue:
+             other = other.value
+         return self.value == other
+ 
++    def __hash__(self):
++        return hash(self.value)
++
+ 
+ class ModelChoiceIterator:
+     def __init__(self, field):
+2026-10-10 13:00:27,291 - INFO - Eval script for django__django-14915 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep2__full__final/rerun-2026-10__anthropic__baseline__rep2__full__final/django__django-14915/eval.sh; copying to container...
+2026-10-10 13:00:39,114 - INFO - Test runtime: 11.67 seconds
+2026-10-10 13:00:39,115 - INFO - Test output for django__django-14915 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep2__full__final/rerun-2026-10__anthropic__baseline__rep2__full__final/django__django-14915/test_output.txt
+2026-10-10 13:00:39,173 - INFO - Git diff after:
+diff --git a/django/forms/models.py b/django/forms/models.py
+index 5dcf923c12..bc7e6959e7 100755
+--- a/django/forms/models.py
++++ b/django/forms/models.py
+@@ -1171,6 +1171,9 @@ class ModelChoiceIteratorValue:
+             other = other.value
+         return self.value == other
+ 
++    def __hash__(self):
++        return hash(self.value)
++
+ 
+ class ModelChoiceIterator:
+     def __init__(self, field):
+2026-10-10 13:00:39,174 - INFO - Grading answer for django__django-14915...
+2026-10-10 13:00:39,179 - INFO - report: {'django__django-14915': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_choice_value_hash (model_forms.test_modelchoicefield.ModelChoiceFieldTests)'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_basics (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_choice_iterator_passes_model_to_widget (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_choices (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_choices_bool (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_choices_bool_empty_label (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_choices_freshness (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_choices_not_fetched_when_not_rendering (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_choices_radio_blank (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_clean_model_instance (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_clean_to_field_name (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_custom_choice_iterator_passes_model_to_widget (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_deepcopies_widget (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_disabled_modelchoicefield (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_disabled_modelchoicefield_has_changed (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_disabled_modelchoicefield_initial_model_instance (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_disabled_modelmultiplechoicefield_has_changed (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_disabled_multiplemodelchoicefield (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', "ModelChoiceField with RadioSelect widget doesn't produce unnecessary", "Widgets that render multiple subwidgets shouldn't make more than one", 'Iterator defaults to ModelChoiceIterator and can be overridden with', 'test_queryset_manager (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_queryset_none (model_forms.test_modelchoicefield.ModelChoiceFieldTests)', 'test_result_cache_not_shared (model_forms.test_modelchoicefield.ModelChoiceFieldTests)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-14915: resolved: True
+2026-10-10 13:00:39,179 - INFO - Attempting to stop container sweb.eval.django__django-14915.rerun-2026-10__anthropic__baseline__rep2__full__final...
+2026-10-10 13:00:54,570 - INFO - Attempting to remove container sweb.eval.django__django-14915.rerun-2026-10__anthropic__baseline__rep2__full__final...
+2026-10-10 13:00:54,657 - INFO - Container sweb.eval.django__django-14915.rerun-2026-10__anthropic__baseline__rep2__full__final removed.

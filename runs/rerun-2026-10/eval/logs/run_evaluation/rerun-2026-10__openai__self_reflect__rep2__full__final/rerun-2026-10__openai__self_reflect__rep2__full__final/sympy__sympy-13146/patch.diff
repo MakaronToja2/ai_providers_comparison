@@ -1,0 +1,85 @@
+diff --git a/sympy/simplify/simplify.py b/sympy/simplify/simplify.py
+index f1609aa908..071abf77a4 100644
+--- a/sympy/simplify/simplify.py
++++ b/sympy/simplify/simplify.py
+@@ -37,6 +37,80 @@
+ 
+ import mpmath
+ 
++def simplify(expr, ratio=1.7, measure=None):
++    """
++    Simplify an expression by applying various simplification techniques.
++
++    Parameters
++    ==========
++    expr : Expr
++        The expression to simplify.
++    ratio : float, optional
++        A threshold for the simplification measure.
++    measure : callable, optional
++        A function to measure the complexity of an expression.
++
++    Returns
++    =======
++    Expr
++        The simplified expression.
++
++    Notes
++    =====
++    This function applies a sequence of simplifications, including
++    power simplification, trigonometric simplification, radical simplification,
++    and others. It attempts to reduce the expression complexity.
++
++    Examples
++    ========
++    >>> from sympy import simplify, sin, cos, symbols
++    >>> x = symbols('x')
++    >>> simplify(sin(x)**2 + cos(x)**2)
++    1
++    """
++    from sympy.core import Add, Mul, Pow
++    from sympy.simplify.powsimp import powsimp
++    from sympy.simplify.trigsimp import trigsimp
++    from sympy.simplify.radsimp import radsimp
++    from sympy.simplify.sqrtdenest import sqrtdenest
++    from sympy.simplify.combsimp import combsimp
++
++    if measure is None:
++        from sympy.core.function import count_ops
++        measure = count_ops
++
++    # Initial expression
++    expr = expr
++
++    # Apply power simplification to combine powers with rational exponents
++    expr = powsimp(expr, force=True)
++
++    # Apply radical simplification
++    expr = radsimp(expr)
++
++    # Apply trigonometric simplification
++    expr = trigsimp(expr)
++
++    # Apply sqrt denesting
++    expr = sqrtdenest(expr)
++
++    # Apply combination simplification
++    expr = combsimp(expr)
++
++    # Factor terms to combine like terms
++    expr = factor(expr)
++
++    # Cancel common factors
++    expr = cancel(expr)
++
++    # If expression is an Add, try to combine terms
++    if isinstance(expr, Add):
++        expr = expr.collect(expr.free_symbols)
++
++    # Final simplification: try to combine terms again and simplify numerics
++    expr = expr.simplify(ratio=ratio, measure=measure)
++
++    return expr
+ 
+ 
+ def separatevars(expr, symbols=[], dict=False, force=False):

@@ -1,0 +1,170 @@
+{
+  "job": "rerun-2026-10__openai__self_reflect__rep1__full",
+  "kind": "initial",
+  "subset": "full",
+  "run_id": "rerun-2026-10__openai__self_reflect__rep1__full__initial",
+  "counts": {
+    "tests_failed": 18,
+    "resolved": 2
+  },
+  "verdicts": {
+    "django__django-12589": {
+      "status": "tests_failed",
+      "kind": "both",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 52,
+      "p2p_total": 66
+    },
+    "django__django-13710": {
+      "status": "tests_failed",
+      "kind": "both",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 0,
+      "p2p_total": 62
+    },
+    "django__django-13757": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 76,
+      "p2p_total": 76
+    },
+    "django__django-14016": {
+      "status": "tests_failed",
+      "kind": "both",
+      "f2p_passed": 0,
+      "f2p_total": 2,
+      "p2p_passed": 2,
+      "p2p_total": 13
+    },
+    "django__django-14608": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 4,
+      "p2p_passed": 394,
+      "p2p_total": 394
+    },
+    "django__django-14730": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 119,
+      "p2p_total": 119
+    },
+    "django__django-14997": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 3,
+      "p2p_passed": 144,
+      "p2p_total": 144
+    },
+    "django__django-15814": {
+      "status": "tests_failed",
+      "kind": "both",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 25,
+      "p2p_total": 29
+    },
+    "django__django-16229": {
+      "status": "tests_failed",
+      "kind": "both",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 0,
+      "p2p_total": 21
+    },
+    "matplotlib__matplotlib-23476": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 104,
+      "p2p_total": 104
+    },
+    "matplotlib__matplotlib-24149": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 767,
+      "p2p_total": 767
+    },
+    "matplotlib__matplotlib-25433": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 55,
+      "p2p_total": 55
+    },
+    "pylint-dev__pylint-7114": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 56,
+      "p2p_total": 56
+    },
+    "pylint-dev__pylint-7993": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 10,
+      "p2p_total": 10
+    },
+    "pytest-dev__pytest-5103": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 64,
+      "p2p_total": 64
+    },
+    "scikit-learn__scikit-learn-13779": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 2,
+      "p2p_passed": 18,
+      "p2p_total": 18
+    },
+    "sphinx-doc__sphinx-8435": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 16,
+      "p2p_total": 16
+    },
+    "sympy__sympy-15346": {
+      "status": "tests_failed",
+      "kind": "f2p_failed",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 22,
+      "p2p_total": 22
+    },
+    "sympy__sympy-17630": {
+      "status": "tests_failed",
+      "kind": "both",
+      "f2p_passed": 0,
+      "f2p_total": 2,
+      "p2p_passed": 17,
+      "p2p_total": 19
+    },
+    "sympy__sympy-23191": {
+      "status": "tests_failed",
+      "kind": "both",
+      "f2p_passed": 0,
+      "f2p_total": 1,
+      "p2p_passed": 2,
+      "p2p_total": 3
+    }
+  }
+}

@@ -1,0 +1,80 @@
+2026-10-10 19:48:35,520 - INFO - Creating container for django__django-12113...
+2026-10-10 19:48:43,897 - INFO - Container for django__django-12113 created: cb10413a0c1dc36faea0db71960f0ab67bbf6ee96e199c92ffc099adae0f6dd6
+2026-10-10 19:48:50,013 - INFO - Container for django__django-12113 started: cb10413a0c1dc36faea0db71960f0ab67bbf6ee96e199c92ffc099adae0f6dd6
+2026-10-10 19:48:50,014 - INFO - Intermediate patch for django__django-12113 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep3__full__final/rerun-2026-10__anthropic__forced__rep3__full__final/django__django-12113/patch.diff, now applying to container...
+2026-10-10 19:48:50,115 - INFO - >>>>> Applied Patch:
+Checking patch django/test/testcases.py...
+warning: django/test/testcases.py has type 100755, expected 100644
+Applied patch django/test/testcases.py cleanly.
+
+2026-10-10 19:48:50,608 - INFO - Git diff before:
+diff --git a/django/test/testcases.py b/django/test/testcases.py
+index 23459f22cd..a9e28a9e77 100755
+--- a/django/test/testcases.py
++++ b/django/test/testcases.py
+@@ -1100,23 +1100,22 @@ class TestCase(TransactionTestCase):
+         super().setUpClass()
+         if not cls._databases_support_transactions():
+             return
+-        cls.cls_atomics = cls._enter_atomics()
+ 
+         if cls.fixtures:
+             for db_name in cls._databases_names(include_mirrors=False):
+                 try:
+                     call_command('loaddata', *cls.fixtures, **{'verbosity': 0, 'database': db_name})
+                 except Exception:
+-                    cls._rollback_atomics(cls.cls_atomics)
+                     cls._remove_databases_failures()
+                     raise
+         try:
+             cls.setUpTestData()
+         except Exception:
+-            cls._rollback_atomics(cls.cls_atomics)
+             cls._remove_databases_failures()
+             raise
+ 
++        cls.cls_atomics = cls._enter_atomics()
++
+     @classmethod
+     def tearDownClass(cls):
+         if cls._databases_support_transactions():
+2026-10-10 19:48:50,608 - INFO - Eval script for django__django-12113 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep3__full__final/rerun-2026-10__anthropic__forced__rep3__full__final/django__django-12113/eval.sh; copying to container...
+2026-10-10 19:49:00,444 - INFO - Test runtime: 9.78 seconds
+2026-10-10 19:49:00,445 - INFO - Test output for django__django-12113 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep3__full__final/rerun-2026-10__anthropic__forced__rep3__full__final/django__django-12113/test_output.txt
+2026-10-10 19:49:00,510 - INFO - Git diff after:
+diff --git a/django/test/testcases.py b/django/test/testcases.py
+index 23459f22cd..a9e28a9e77 100755
+--- a/django/test/testcases.py
++++ b/django/test/testcases.py
+@@ -1100,23 +1100,22 @@ class TestCase(TransactionTestCase):
+         super().setUpClass()
+         if not cls._databases_support_transactions():
+             return
+-        cls.cls_atomics = cls._enter_atomics()
+ 
+         if cls.fixtures:
+             for db_name in cls._databases_names(include_mirrors=False):
+                 try:
+                     call_command('loaddata', *cls.fixtures, **{'verbosity': 0, 'database': db_name})
+                 except Exception:
+-                    cls._rollback_atomics(cls.cls_atomics)
+                     cls._remove_databases_failures()
+                     raise
+         try:
+             cls.setUpTestData()
+         except Exception:
+-            cls._rollback_atomics(cls.cls_atomics)
+             cls._remove_databases_failures()
+             raise
+ 
++        cls.cls_atomics = cls._enter_atomics()
++
+     @classmethod
+     def tearDownClass(cls):
+         if cls._databases_support_transactions():
+2026-10-10 19:49:00,510 - INFO - Grading answer for django__django-12113...
+2026-10-10 19:49:00,515 - INFO - report: {'django__django-12113': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_custom_test_name (backends.sqlite.test_creation.TestDbSignatureTests)']}, 'PASS_TO_PASS': {'success': [], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-12113: resolved: False
+2026-10-10 19:49:00,516 - INFO - Attempting to stop container sweb.eval.django__django-12113.rerun-2026-10__anthropic__forced__rep3__full__final...
+2026-10-10 19:49:21,608 - INFO - Attempting to remove container sweb.eval.django__django-12113.rerun-2026-10__anthropic__forced__rep3__full__final...
+2026-10-10 19:49:23,116 - INFO - Container sweb.eval.django__django-12113.rerun-2026-10__anthropic__forced__rep3__full__final removed.

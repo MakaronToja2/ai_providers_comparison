@@ -1,0 +1,80 @@
+2026-10-10 12:46:23,932 - INFO - Creating container for django__django-13447...
+2026-10-10 12:46:24,213 - INFO - Container for django__django-13447 created: 5b0655b6ed8e617a631a81fbceb625c7ed329ab2d53219ebbd31c5d8833bc9cd
+2026-10-10 12:46:24,952 - INFO - Container for django__django-13447 started: 5b0655b6ed8e617a631a81fbceb625c7ed329ab2d53219ebbd31c5d8833bc9cd
+2026-10-10 12:46:24,953 - INFO - Intermediate patch for django__django-13447 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep2__full__final/rerun-2026-10__google__baseline__rep2__full__final/django__django-13447/patch.diff, now applying to container...
+2026-10-10 12:46:25,102 - INFO - >>>>> Applied Patch:
+Checking patch django/contrib/admin/sites.py...
+warning: django/contrib/admin/sites.py has type 100755, expected 100644
+Applied patch django/contrib/admin/sites.py cleanly.
+
+2026-10-10 12:46:25,734 - INFO - Git diff before:
+diff --git a/django/contrib/admin/sites.py b/django/contrib/admin/sites.py
+index 837dabfea8..2328ca9d47 100755
+--- a/django/contrib/admin/sites.py
++++ b/django/contrib/admin/sites.py
+@@ -430,7 +430,7 @@ class AdminSite:
+                     return HttpResponsePermanentRedirect(path)
+         raise Http404
+ 
+-    def _build_app_dict(self, request, label=None):
++    def build_app_dict(self, request, label=None):
+         """
+         Build the app dictionary. The optional `label` parameter filters models
+         of a specific app.
+@@ -466,6 +466,7 @@ class AdminSite:
+                 'perms': perms,
+                 'admin_url': None,
+                 'add_url': None,
++                'model_class': model,  # Add the model class here
+             }
+             if perms.get('change') or perms.get('view'):
+                 model_dict['view_only'] = not perms.get('change')
+@@ -503,7 +504,7 @@ class AdminSite:
+         Return a sorted list of all the installed apps that have been
+         registered in this site.
+         """
+-        app_dict = self._build_app_dict(request)
++        app_dict = self.build_app_dict(request)
+ 
+         # Sort the apps alphabetically.
+         app_list = sorted(app_dict.values(), key=lambda x: x['name'].lower())
+2026-10-10 12:46:25,734 - INFO - Eval script for django__django-13447 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep2__full__final/rerun-2026-10__google__baseline__rep2__full__final/django__django-13447/eval.sh; copying to container...
+2026-10-10 12:46:35,230 - INFO - Test runtime: 9.44 seconds
+2026-10-10 12:46:35,232 - INFO - Test output for django__django-13447 written to logs/run_evaluation/rerun-2026-10__google__baseline__rep2__full__final/rerun-2026-10__google__baseline__rep2__full__final/django__django-13447/test_output.txt
+2026-10-10 12:46:35,313 - INFO - Git diff after:
+diff --git a/django/contrib/admin/sites.py b/django/contrib/admin/sites.py
+index 837dabfea8..2328ca9d47 100755
+--- a/django/contrib/admin/sites.py
++++ b/django/contrib/admin/sites.py
+@@ -430,7 +430,7 @@ class AdminSite:
+                     return HttpResponsePermanentRedirect(path)
+         raise Http404
+ 
+-    def _build_app_dict(self, request, label=None):
++    def build_app_dict(self, request, label=None):
+         """
+         Build the app dictionary. The optional `label` parameter filters models
+         of a specific app.
+@@ -466,6 +466,7 @@ class AdminSite:
+                 'perms': perms,
+                 'admin_url': None,
+                 'add_url': None,
++                'model_class': model,  # Add the model class here
+             }
+             if perms.get('change') or perms.get('view'):
+                 model_dict['view_only'] = not perms.get('change')
+@@ -503,7 +504,7 @@ class AdminSite:
+         Return a sorted list of all the installed apps that have been
+         registered in this site.
+         """
+-        app_dict = self._build_app_dict(request)
++        app_dict = self.build_app_dict(request)
+ 
+         # Sort the apps alphabetically.
+         app_list = sorted(app_dict.values(), key=lambda x: x['name'].lower())
+2026-10-10 12:46:35,313 - INFO - Grading answer for django__django-13447...
+2026-10-10 12:46:35,320 - INFO - report: {'django__django-13447': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_available_apps (admin_views.test_adminsite.SiteEachContextTest)']}, 'PASS_TO_PASS': {'success': ['test_add_action (admin_views.test_adminsite.SiteActionsTests)', 'test_disable_action (admin_views.test_adminsite.SiteActionsTests)', "AdminSite.get_action() returns an action even if it's disabled.", 'test_each_context (admin_views.test_adminsite.SiteEachContextTest)', 'test_each_context_site_url_with_script_name (admin_views.test_adminsite.SiteEachContextTest)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-13447: resolved: False
+2026-10-10 12:46:35,320 - INFO - Attempting to stop container sweb.eval.django__django-13447.rerun-2026-10__google__baseline__rep2__full__final...
+2026-10-10 12:46:50,743 - INFO - Attempting to remove container sweb.eval.django__django-13447.rerun-2026-10__google__baseline__rep2__full__final...
+2026-10-10 12:46:50,825 - INFO - Container sweb.eval.django__django-13447.rerun-2026-10__google__baseline__rep2__full__final removed.

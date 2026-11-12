@@ -1,0 +1,20 @@
+diff --git a/lib/matplotlib/axes/_axes.py b/lib/matplotlib/axes/_axes.py
+index fdac0f3560..7a4e19d1a6 100644
+--- a/lib/matplotlib/axes/_axes.py
++++ b/lib/matplotlib/axes/_axes.py
+@@ -2369,8 +2369,13 @@ class Axes(_AxesBase):
+         # subtracted uniformly
+         if self.xaxis is not None:
+             x0 = x
+-            x = np.asarray(self.convert_xunits(x))
+-            width = self._convert_dx(width, x0, x, self.convert_xunits)
++            try:
++                x = np.asarray(self.convert_xunits(x))
++                width = self._convert_dx(width, x0, x, self.convert_xunits)
++            except StopIteration:
++                # This happens if all values in x0 are NaN or non-finite.
++                # In that case, convert x but leave width as is.
++                x = np.asarray(self.convert_xunits(x))
+             if xerr is not None:
+                 xerr = self._convert_dx(xerr, x0, x, self.convert_xunits)
+         if self.yaxis is not None:

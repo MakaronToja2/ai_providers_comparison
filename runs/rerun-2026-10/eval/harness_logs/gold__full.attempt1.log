@@ -1,0 +1,19 @@
+<frozen runpy>:128: RuntimeWarning: 'swebench.harness.run_evaluation' found in sys.modules after import of package 'swebench.harness', but prior to execution of 'swebench.harness.run_evaluation'; this may result in unpredictable behaviour
+Using gold predictions
+Found 10 existing instance images. Will reuse them.
+Running 10 instances...
+Evaluation:   0%|          | 0/10 [00:00<?, ?it/s, error=0, ✓=0, ✖=0]Evaluation:   0%|          | 0/10 [00:57<?, ?it/s, ✓=1, ✖=0, error=0]Evaluation:  10%|█         | 1/10 [00:57<08:38, 57.61s/it, ✓=1, ✖=0, error=0]Evaluation:  10%|█         | 1/10 [01:08<08:38, 57.61s/it, ✓=2, ✖=0, error=0]Evaluation:  20%|██        | 2/10 [01:08<04:02, 30.29s/it, ✓=2, ✖=0, error=0]Evaluation:  20%|██        | 2/10 [01:08<04:02, 30.29s/it, ✓=3, ✖=0, error=0]Evaluation:  30%|███       | 3/10 [01:19<03:32, 30.29s/it, ✓=4, ✖=0, error=0]Evaluation:  40%|████      | 4/10 [01:19<01:28, 14.68s/it, ✓=4, ✖=0, error=0]Evaluation:  40%|████      | 4/10 [01:40<01:28, 14.68s/it, ✓=5, ✖=0, error=0]Evaluation:  50%|█████     | 5/10 [01:40<01:22, 16.56s/it, ✓=5, ✖=0, error=0]Evaluation:  50%|█████     | 5/10 [01:53<01:22, 16.56s/it, ✓=6, ✖=0, error=0]Evaluation:  60%|██████    | 6/10 [01:53<01:02, 15.62s/it, ✓=6, ✖=0, error=0]Evaluation:  60%|██████    | 6/10 [02:08<01:02, 15.62s/it, ✓=7, ✖=0, error=0]Evaluation:  70%|███████   | 7/10 [02:08<00:45, 15.24s/it, ✓=7, ✖=0, error=0]Evaluation:  70%|███████   | 7/10 [02:08<00:45, 15.24s/it, ✓=8, ✖=0, error=0]Evaluation:  80%|████████  | 8/10 [02:08<00:21, 10.79s/it, ✓=8, ✖=0, error=0]Evaluation:  80%|████████  | 8/10 [02:09<00:21, 10.79s/it, ✓=9, ✖=0, error=0]Evaluation:  90%|█████████ | 9/10 [02:09<00:07,  7.86s/it, ✓=9, ✖=0, error=0]Evaluation:  90%|█████████ | 9/10 [02:28<00:07,  7.86s/it, ✓=10, ✖=0, error=0]Evaluation: 100%|██████████| 10/10 [02:28<00:00, 11.10s/it, ✓=10, ✖=0, error=0]Evaluation: 100%|██████████| 10/10 [02:28<00:00, 14.84s/it, ✓=10, ✖=0, error=0]
+All instances run.
+Cleaning cached images...
+Removed 0 images.
+Total instances: 10
+Instances submitted: 10
+Instances completed: 10
+Instances incomplete: 0
+Instances resolved: 10
+Instances unresolved: 0
+Instances with empty patches: 0
+Instances with errors: 0
+Unstopped containers: 0
+Unremoved images: 10
+Report written to gold.gold__full.json

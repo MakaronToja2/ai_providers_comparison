@@ -1,0 +1,45 @@
+diff --git a/django/core/exceptions.py b/django/core/exceptions.py
+index dc084b8692..ef4831eeac 100644
+--- a/django/core/exceptions.py
++++ b/django/core/exceptions.py
+@@ -182,6 +182,40 @@ class ValidationError(Exception):
+     def __repr__(self):
+         return 'ValidationError(%s)' % self
+ 
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++        if hasattr(self, 'error_dict') and hasattr(other, 'error_dict'):
++            # Compare error_dict, order-independent
++            if set(self.error_dict.keys()) != set(other.error_dict.keys()):
++                return False
++            for field in self.error_dict:
++                # Compare error lists for each field, order-independent
++                self_errors = sorted(self.error_dict[field], key=lambda e: (str(e.message), e.code, str(e.params)))
++                other_errors = sorted(other.error_dict[field], key=lambda e: (str(e.message), e.code, str(e.params)))
++                if len(self_errors) != len(other_errors):
++                    return False
++                for self_error, other_error in zip(self_errors, other_errors):
++                    if self_error != other_error:
++                        return False
++            return True
++        elif hasattr(self, 'error_dict') or hasattr(other, 'error_dict'):
++            # One has error_dict and the other doesn't
++            return False
++        else:
++            # Compare error_list, order-independent
++            if len(self.error_list) != len(other.error_list):
++                return False
++            # Sort by string representation for comparison
++            self_sorted = sorted(self.error_list, key=lambda e: (str(e.message), e.code, str(e.params)))
++            other_sorted = sorted(other.error_list, key=lambda e: (str(e.message), e.code, str(e.params)))
++            for self_error, other_error in zip(self_sorted, other_sorted):
++                if self_error != other_error:
++                    return False
++            return True
++
++    __hash__ = None
++
+ 
+ class EmptyResultSet(Exception):
+     """A database query predicate is impossible."""

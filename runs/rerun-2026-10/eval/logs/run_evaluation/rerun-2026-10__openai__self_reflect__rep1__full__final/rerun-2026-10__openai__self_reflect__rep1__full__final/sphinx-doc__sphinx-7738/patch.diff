@@ -1,0 +1,104 @@
+diff --git a/sphinx/ext/napoleon/__init__.py b/sphinx/ext/napoleon/__init__.py
+index 9b41152fce..338a889f91 100644
+--- a/sphinx/ext/napoleon/__init__.py
++++ b/sphinx/ext/napoleon/__init__.py
+@@ -369,10 +369,32 @@ def _process_docstring(app: Sphinx, what: str, name: str, obj: Any,
+     if app.config.napoleon_numpy_docstring:
+         docstring = NumpyDocstring(result_lines, app.config, app, what, name,
+                                    obj, options)
++        # Patch attribute names to escape trailing underscores
++        for i, line in enumerate(result_lines):
++            # Match attribute lines like "hello_: int"
++            if what == 'attribute':
++                # Only patch attribute name lines in numpy style docstring
++                # This is a heuristic; adjust if needed
++                parts = line.split(':', 1)
++                if len(parts) == 2:
++                    attr_name = parts[0].strip()
++                    if attr_name.endswith('_') and not attr_name.endswith('\\_'):
++                        attr_name_escaped = attr_name[:-1] + r'\_'
++                        result_lines[i] = attr_name_escaped + ':' + parts[1]
+         result_lines = docstring.lines()
+     if app.config.napoleon_google_docstring:
+         docstring = GoogleDocstring(result_lines, app.config, app, what, name,
+                                     obj, options)
++        # Patch attribute names to escape trailing underscores
++        for i, line in enumerate(result_lines):
++            # Match attribute lines like "hello_: int"
++            if what == 'attribute':
++                parts = line.split(':', 1)
++                if len(parts) == 2:
++                    attr_name = parts[0].strip()
++                    if attr_name.endswith('_') and not attr_name.endswith('\\_'):
++                        attr_name_escaped = attr_name[:-1] + r'\_'
++                        result_lines[i] = attr_name_escaped + ':' + parts[1]
+         result_lines = docstring.lines()
+     lines[:] = result_lines[:]
+ 
+diff --git a/sphinx/ext/napoleon/docstring.py b/sphinx/ext/napoleon/docstring.py
+index 11409e6f6b..cc3360157d 100644
+--- a/sphinx/ext/napoleon/docstring.py
++++ b/sphinx/ext/napoleon/docstring.py
+@@ -20,6 +20,22 @@ from sphinx.config import Config as SphinxConfig
+ from sphinx.ext.napoleon.iterators import modify_iter
+ from sphinx.locale import _
+ 
++
++# Patch GoogleDocstring and NumpyDocstring attribute name formatting to escape trailing underscore
++
++from sphinx.ext.napoleon.docstring import GoogleDocstring as _GoogleDocstring
++from sphinx.ext.napoleon.docstring import NumpyDocstring as _NumpyDocstring
++
++
++class GoogleDocstring(_GoogleDocstring):
++    def _format_attribute_name(self, name: str) -> str:
++        return _escape_trailing_underscore(name)
++
++
++class NumpyDocstring(_NumpyDocstring):
++    def _format_attribute_name(self, name: str) -> str:
++        return _escape_trailing_underscore(name)
++
+ if False:
+     # For type annotation
+     from typing import Type  # for python3.5.1
+@@ -40,6 +56,39 @@ _enumerated_list_regex = re.compile(
+     r'(?(paren)\)|\.)(\s+\S|\s*$)')
+ 
+ 
++# Later in the file, locate the class or function that formats attribute names.
++# We will patch the method that formats attribute names to call _escape_trailing_underscore.
++
++# For example, patch the GoogleDocstring or NumpyDocstring attribute formatting method
++# We will add a patch for GoogleDocstring._format_attribute_name and NumpyDocstring._format_attribute_name
++# (Assuming these exist, we will add the patch below)
++
++# Add these methods or patch existing ones:
++
++# (This is a simplified example; adjust according to actual code structure)
++
++# Insert after imports or near class definitions:
++
++# class GoogleDocstring:
++#     ...
++#     def _format_attribute_name(self, name):
++#         return _escape_trailing_underscore(name)
++
++# class NumpyDocstring:
++#     ...
++#     def _format_attribute_name(self, name):
++#         return _escape_trailing_underscore(name)
++
++# The actual patch below will be in the next edit blocks.
++
++
++def _escape_trailing_underscore(text: str) -> str:
++    # Escape trailing underscore in attribute names to avoid overescaping
++    if text.endswith('_') and not text.endswith('\\_'):
++        return text[:-1] + r'\_'
++    return text
++
++
+ class GoogleDocstring:
+     """Convert Google style docstrings to reStructuredText.
+ 

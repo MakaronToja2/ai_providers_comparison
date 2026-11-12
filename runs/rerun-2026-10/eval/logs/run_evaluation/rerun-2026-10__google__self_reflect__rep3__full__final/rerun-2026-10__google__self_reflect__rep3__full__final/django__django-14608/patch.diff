@@ -1,0 +1,14 @@
+diff --git a/django/forms/formsets.py b/django/forms/formsets.py
+index a89c35599f..a6066ce240 100644
+--- a/django/forms/formsets.py
++++ b/django/forms/formsets.py
+@@ -380,7 +380,8 @@ class BaseFormSet:
+             # Give self.clean() a chance to do cross-form validation.
+             self.clean()
+         except ValidationError as e:
+-            self._non_form_errors = self.error_class(e.error_list)
++            # Pass 'nonform' as the error_class to ErrorList to add the CSS class.
++            self._non_form_errors = self.error_class(error_class='nonform', initlist=e.error_list)
+ 
+     def clean(self):
+         """

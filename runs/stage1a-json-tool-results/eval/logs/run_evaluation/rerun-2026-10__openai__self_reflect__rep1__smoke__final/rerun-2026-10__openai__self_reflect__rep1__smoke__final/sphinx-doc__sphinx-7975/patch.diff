@@ -1,0 +1,29 @@
+--- a/sphinx/environment/collectors/indexentries.py
++++ b/sphinx/environment/collectors/indexentries.py
+@@ -153,7 +153,8 @@
+-        # Symbols and numbers are special cases: they are grouped together
+-        # under the heading 'Symbols' and 'Numbers' respectively.
+-        # This causes two 'Symbols' sections if there are symbols in both groups.
+-        if key == 'Symbols':
+-            key = 'Symbols'
+-        elif key == 'Numbers':
+-            key = 'Numbers'
++        # Symbols and numbers are special cases: they are grouped together
++        # under the heading 'Symbols' and 'Numbers' respectively.
++        # To avoid duplicate 'Symbols' sections, unify all symbol keys to 'Symbols'.
++        # The keys 'Symbols1' and 'Symbols2' appear due to different symbol groups.
++        if key.startswith('Symbols'):
++            key = 'Symbols'
++        elif key == 'Numbers':
++            key = 'Numbers'
+@@ -173,5 +180,8 @@
+-        if key == 'Symbols':
+-            key = 'Symbols'
++        # unify symbol keys to avoid duplicate 'Symbols' sections
++        if key.startswith('Symbols'):
++            key = 'Symbols'
++        elif key == 'Numbers':
++            key = 'Numbers'
+ 
+         # add the index entry
+         entries.setdefault(key, []).append((name, subtype, anchor, extra))

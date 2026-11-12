@@ -1,0 +1,80 @@
+2026-10-10 11:27:36,677 - INFO - Creating container for django__django-12113...
+2026-10-10 11:27:36,854 - INFO - Container for django__django-12113 created: 98041dd0f55078ea1dab86ce8ecae5ba0a61383071baa9fbe48a361877d06ad6
+2026-10-10 11:27:37,459 - INFO - Container for django__django-12113 started: 98041dd0f55078ea1dab86ce8ecae5ba0a61383071baa9fbe48a361877d06ad6
+2026-10-10 11:27:37,459 - INFO - Intermediate patch for django__django-12113 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep1__full__final/rerun-2026-10__openai__forced__rep1__full__final/django__django-12113/patch.diff, now applying to container...
+2026-10-10 11:27:37,615 - INFO - >>>>> Applied Patch:
+Checking patch django/db/backends/sqlite3/creation.py...
+warning: django/db/backends/sqlite3/creation.py has type 100755, expected 100644
+Applied patch django/db/backends/sqlite3/creation.py cleanly.
+
+2026-10-10 11:27:38,401 - INFO - Git diff before:
+diff --git a/django/db/backends/sqlite3/creation.py b/django/db/backends/sqlite3/creation.py
+index d97052f52d..7436beb635 100755
+--- a/django/db/backends/sqlite3/creation.py
++++ b/django/db/backends/sqlite3/creation.py
+@@ -24,6 +24,12 @@ class DatabaseCreation(BaseDatabaseCreation):
+         test_database_name = self._get_test_db_name()
+ 
+         if keepdb:
++            # When using keepdb, ensure the database is not locked by closing all connections
++            for conn in self.connection._connections.all():
++                try:
++                    conn.close()
++                except Exception:
++                    pass
+             return test_database_name
+         if not self.is_in_memory_db(test_database_name):
+             # Erase the old test database
+@@ -65,6 +71,12 @@ class DatabaseCreation(BaseDatabaseCreation):
+             # Erase the old test database
+             if os.access(target_database_name, os.F_OK):
+                 if keepdb:
++                    # When using keepdb, ensure the database is not locked by closing all connections
++                    for conn in self.connection._connections.all():
++                        try:
++                            conn.close()
++                        except Exception:
++                            pass
+                     return
+                 if verbosity >= 1:
+                     self.log('Destroying old test database for alias %s...' % (
+2026-10-10 11:27:38,401 - INFO - Eval script for django__django-12113 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep1__full__final/rerun-2026-10__openai__forced__rep1__full__final/django__django-12113/eval.sh; copying to container...
+2026-10-10 11:27:44,308 - INFO - Test runtime: 5.82 seconds
+2026-10-10 11:27:44,310 - INFO - Test output for django__django-12113 written to logs/run_evaluation/rerun-2026-10__openai__forced__rep1__full__final/rerun-2026-10__openai__forced__rep1__full__final/django__django-12113/test_output.txt
+2026-10-10 11:27:44,366 - INFO - Git diff after:
+diff --git a/django/db/backends/sqlite3/creation.py b/django/db/backends/sqlite3/creation.py
+index d97052f52d..7436beb635 100755
+--- a/django/db/backends/sqlite3/creation.py
++++ b/django/db/backends/sqlite3/creation.py
+@@ -24,6 +24,12 @@ class DatabaseCreation(BaseDatabaseCreation):
+         test_database_name = self._get_test_db_name()
+ 
+         if keepdb:
++            # When using keepdb, ensure the database is not locked by closing all connections
++            for conn in self.connection._connections.all():
++                try:
++                    conn.close()
++                except Exception:
++                    pass
+             return test_database_name
+         if not self.is_in_memory_db(test_database_name):
+             # Erase the old test database
+@@ -65,6 +71,12 @@ class DatabaseCreation(BaseDatabaseCreation):
+             # Erase the old test database
+             if os.access(target_database_name, os.F_OK):
+                 if keepdb:
++                    # When using keepdb, ensure the database is not locked by closing all connections
++                    for conn in self.connection._connections.all():
++                        try:
++                            conn.close()
++                        except Exception:
++                            pass
+                     return
+                 if verbosity >= 1:
+                     self.log('Destroying old test database for alias %s...' % (
+2026-10-10 11:27:44,366 - INFO - Grading answer for django__django-12113...
+2026-10-10 11:27:44,371 - INFO - report: {'django__django-12113': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['test_custom_test_name (backends.sqlite.test_creation.TestDbSignatureTests)']}, 'PASS_TO_PASS': {'success': [], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-12113: resolved: False
+2026-10-10 11:27:44,371 - INFO - Attempting to stop container sweb.eval.django__django-12113.rerun-2026-10__openai__forced__rep1__full__final...
+2026-10-10 11:27:59,644 - INFO - Attempting to remove container sweb.eval.django__django-12113.rerun-2026-10__openai__forced__rep1__full__final...
+2026-10-10 11:27:59,713 - INFO - Container sweb.eval.django__django-12113.rerun-2026-10__openai__forced__rep1__full__final removed.

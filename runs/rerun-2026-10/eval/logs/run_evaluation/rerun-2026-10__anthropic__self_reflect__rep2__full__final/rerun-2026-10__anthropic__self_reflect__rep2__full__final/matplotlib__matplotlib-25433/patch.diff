@@ -1,0 +1,21 @@
+diff --git a/lib/matplotlib/widgets.py b/lib/matplotlib/widgets.py
+index ebe5da43e2..baef3e60d8 100644
+--- a/lib/matplotlib/widgets.py
++++ b/lib/matplotlib/widgets.py
+@@ -880,7 +880,15 @@ class RangeSlider(SliderBase):
+             event.name == "button_press_event" and event.inaxes != self.ax
+         ):
+             self.drag_active = False
+-            event.canvas.release_mouse(self.ax)
++            # Only release mouse if the axis is still part of the figure
++            if self.ax.figure is not None and self.ax in self.ax.figure.axes:
++                event.canvas.release_mouse(self.ax)
++            self._active_handle = None
++            return
++
++        # If axis is no longer in the figure, stop processing events
++        if self.ax.figure is None or self.ax not in self.ax.figure.axes:
++            self.drag_active = False
+             self._active_handle = None
+             return
+ 

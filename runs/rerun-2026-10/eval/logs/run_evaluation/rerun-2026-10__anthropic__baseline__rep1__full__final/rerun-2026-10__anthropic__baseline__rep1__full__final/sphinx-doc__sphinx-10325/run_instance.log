@@ -1,0 +1,80 @@
+2026-10-10 18:02:51,608 - INFO - Creating container for sphinx-doc__sphinx-10325...
+2026-10-10 18:02:58,747 - INFO - Container for sphinx-doc__sphinx-10325 created: aa914eceb110385547008256f08ae8b7005661c711999e02e01fae0a8384a180
+2026-10-10 18:03:03,870 - INFO - Container for sphinx-doc__sphinx-10325 started: aa914eceb110385547008256f08ae8b7005661c711999e02e01fae0a8384a180
+2026-10-10 18:03:03,871 - INFO - Intermediate patch for sphinx-doc__sphinx-10325 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep1__full__final/rerun-2026-10__anthropic__baseline__rep1__full__final/sphinx-doc__sphinx-10325/patch.diff, now applying to container...
+2026-10-10 18:03:04,039 - INFO - >>>>> Applied Patch:
+Checking patch sphinx/ext/autodoc/__init__.py...
+warning: sphinx/ext/autodoc/__init__.py has type 100755, expected 100644
+Applied patch sphinx/ext/autodoc/__init__.py cleanly.
+
+2026-10-10 18:03:04,422 - INFO - Git diff before:
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 62631f7ff..1bac5e383 100755
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -110,11 +110,13 @@ def exclude_members_option(arg: Any) -> Union[object, Set[str]]:
+ 
+ 
+ def inherited_members_option(arg: Any) -> Union[object, Set[str]]:
+-    """Used to convert the :members: option to auto directives."""
++    """Used to convert the :inherited-members: option to auto directives."""
+     if arg in (None, True):
+-        return 'object'
++        return {'object'}
++    elif arg is False:
++        return set()
+     else:
+-        return arg
++        return {x.strip() for x in arg.split(',') if x.strip()}
+ 
+ 
+ def member_order_option(arg: Any) -> Optional[str]:
+@@ -682,7 +684,7 @@ class Documenter:
+         def is_filtered_inherited_member(name: str, obj: Any) -> bool:
+             if inspect.isclass(self.object):
+                 for cls in self.object.__mro__:
+-                    if cls.__name__ == self.options.inherited_members and cls != self.object:
++                    if cls.__name__ in self.options.inherited_members and cls != self.object:
+                         # given member is a member of specified *super class*
+                         return True
+                     elif name in cls.__dict__:
+2026-10-10 18:03:04,422 - INFO - Eval script for sphinx-doc__sphinx-10325 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep1__full__final/rerun-2026-10__anthropic__baseline__rep1__full__final/sphinx-doc__sphinx-10325/eval.sh; copying to container...
+2026-10-10 18:03:12,876 - INFO - Test runtime: 8.38 seconds
+2026-10-10 18:03:12,877 - INFO - Test output for sphinx-doc__sphinx-10325 written to logs/run_evaluation/rerun-2026-10__anthropic__baseline__rep1__full__final/rerun-2026-10__anthropic__baseline__rep1__full__final/sphinx-doc__sphinx-10325/test_output.txt
+2026-10-10 18:03:12,930 - INFO - Git diff after:
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 62631f7ff..1bac5e383 100755
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -110,11 +110,13 @@ def exclude_members_option(arg: Any) -> Union[object, Set[str]]:
+ 
+ 
+ def inherited_members_option(arg: Any) -> Union[object, Set[str]]:
+-    """Used to convert the :members: option to auto directives."""
++    """Used to convert the :inherited-members: option to auto directives."""
+     if arg in (None, True):
+-        return 'object'
++        return {'object'}
++    elif arg is False:
++        return set()
+     else:
+-        return arg
++        return {x.strip() for x in arg.split(',') if x.strip()}
+ 
+ 
+ def member_order_option(arg: Any) -> Optional[str]:
+@@ -682,7 +684,7 @@ class Documenter:
+         def is_filtered_inherited_member(name: str, obj: Any) -> bool:
+             if inspect.isclass(self.object):
+                 for cls in self.object.__mro__:
+-                    if cls.__name__ == self.options.inherited_members and cls != self.object:
++                    if cls.__name__ in self.options.inherited_members and cls != self.object:
+                         # given member is a member of specified *super class*
+                         return True
+                     elif name in cls.__dict__:
+2026-10-10 18:03:12,930 - INFO - Grading answer for sphinx-doc__sphinx-10325...
+2026-10-10 18:03:12,932 - INFO - report: {'sphinx-doc__sphinx-10325': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['tests/test_ext_autodoc_automodule.py::test_automodule_inherited_members'], 'failure': []}, 'PASS_TO_PASS': {'success': ['tests/test_ext_autodoc_automodule.py::test_empty_all', 'tests/test_ext_autodoc_automodule.py::test_automodule', 'tests/test_ext_autodoc_automodule.py::test_automodule_undoc_members', 'tests/test_ext_autodoc_automodule.py::test_automodule_special_members', 'tests/test_ext_autodoc_automodule.py::test_subclass_of_mocked_object'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sphinx-doc__sphinx-10325: resolved: True
+2026-10-10 18:03:12,932 - INFO - Attempting to stop container sweb.eval.sphinx-doc__sphinx-10325.rerun-2026-10__anthropic__baseline__rep1__full__final...
+2026-10-10 18:03:35,062 - INFO - Attempting to remove container sweb.eval.sphinx-doc__sphinx-10325.rerun-2026-10__anthropic__baseline__rep1__full__final...
+2026-10-10 18:03:36,972 - INFO - Container sweb.eval.sphinx-doc__sphinx-10325.rerun-2026-10__anthropic__baseline__rep1__full__final removed.

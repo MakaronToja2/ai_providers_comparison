@@ -1,0 +1,446 @@
+2026-10-10 17:34:16,897 - INFO - Creating container for pytest-dev__pytest-5103...
+2026-10-10 17:34:22,310 - INFO - Container for pytest-dev__pytest-5103 created: aab5c3b58b822da986e8d38c7fc710c66753add037f82619feb8c02d7bb2bd1d
+2026-10-10 17:34:32,196 - INFO - Container for pytest-dev__pytest-5103 started: aab5c3b58b822da986e8d38c7fc710c66753add037f82619feb8c02d7bb2bd1d
+2026-10-10 17:34:32,196 - INFO - Intermediate patch for pytest-dev__pytest-5103 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep2__full__final/rerun-2026-10__anthropic__forced__rep2__full__final/pytest-dev__pytest-5103/patch.diff, now applying to container...
+2026-10-10 17:34:32,320 - INFO - >>>>> Applied Patch:
+/tmp/patch.diff:14: trailing whitespace.
+        
+/tmp/patch.diff:38: trailing whitespace.
+        
+/tmp/patch.diff:45: trailing whitespace.
+            
+/tmp/patch.diff:49: trailing whitespace.
+            
+/tmp/patch.diff:58: trailing whitespace.
+            
+Checking patch src/_pytest/assertion/rewrite.py...
+warning: src/_pytest/assertion/rewrite.py has type 100755, expected 100644
+Applied patch src/_pytest/assertion/rewrite.py cleanly.
+warning: squelched 20 whitespace errors
+warning: 25 lines add whitespace errors.
+
+2026-10-10 17:34:32,390 - INFO - Git diff before:
+diff --git a/src/_pytest/assertion/rewrite.py b/src/_pytest/assertion/rewrite.py
+index 2903b899..5080457a 100755
+--- a/src/_pytest/assertion/rewrite.py
++++ b/src/_pytest/assertion/rewrite.py
+@@ -968,6 +968,12 @@ warn_explicit(
+         """
+         visit `ast.Call` nodes on Python3.5 and after
+         """
++        # Special handling for all() and any() with iterables
++        if self._is_all_or_any_call(call):
++            unrolled = self._unroll_all_any(call)
++            if unrolled is not None:
++                return unrolled, "all/any unrolled"
++        
+         new_func, func_expl = self.visit(call.func)
+         arg_expls = []
+         new_args = []
+@@ -991,6 +997,189 @@ warn_explicit(
+         outer_expl = "%s\n{%s = %s\n}" % (res_expl, res_expl, expl)
+         return res, outer_expl
+ 
++    def _is_all_or_any_call(self, call):
++        """Check if this is a call to all() or any() with a single iterable argument."""
++        if not isinstance(call.func, ast.Name):
++            return False
++        if call.func.id not in ("all", "any"):
++            return False
++        if len(call.args) != 1:
++            return False
++        if call.keywords:
++            return False
++        return True
++
++    def _unroll_all_any(self, call):
++        """Unroll all() or any() calls to iterate through items."""
++        func_name = call.func.id
++        arg = call.args[0]
++        
++        # Handle generator expressions and comprehensions
++        if isinstance(arg, (ast.GeneratorExp, ast.ListComp, ast.SetComp)):
++            comp = arg
++            # Get the first (and usually only) generator
++            if not comp.generators:
++                return None
++            
++            gen = comp.generators[0]
++            target = gen.target
++            iter_expr = gen.iter
++            
++            # Create a variable to hold the iterable
++            iter_var = self.variable()
++            self.statements.append(
++                ast.Assign(
++                    [ast.Name(iter_var, ast.Store())],
++                    iter_expr
++                )
++            )
++            
++            # Create a loop variable
++            loop_var = self.variable()
++            
++            # Build the element expression to test
++            if isinstance(arg, ast.GeneratorExp):
++                # For generator expressions, use the element expression
++                test_expr = comp.elt
++            else:
++                # For list/set comprehensions, use the element expression
++                test_expr = comp.elt
++            
++            # Create the assertion for each item
++            # We need to visit the test expression to get proper instrumentation
++            test_res, test_expl = self.visit(test_expr)
++            
++            # Create a simple assignment and check
++            loop_body = []
++            loop_body.append(
++                ast.Assign(
++                    [ast.Name(loop_var, ast.Store())],
++                    test_res
++                )
++            )
++            
++            # For all(), we assert each item is truthy
++            # For any(), we check if any item is truthy
++            if func_name == "all":
++                # Create: if not loop_var: raise AssertionError
++                fail_msg = ast.Str("not all items matched")
++                loop_body.append(
++                    ast.Assert(
++                        ast.Name(loop_var, ast.Load()),
++                        fail_msg
++                    )
++                )
++            else:  # any
++                # For any, we need to track if we found a truthy value
++                pass
++            
++            # Create the for loop
++            for_loop = ast.For(
++                target,
++                ast.Name(iter_var, ast.Load()),
++                loop_body,
++                []
++            )
++            
++            self.statements.append(for_loop)
++            
++            # Return a constant True since we've already done the checks
++            return ast.NameConstant(True)
++        
++        return None
++
++    def _is_all_or_any_call(self, call):
++        """Check if this is a call to all() or any() with a single iterable argument."""
++        if not isinstance(call.func, ast.Name):
++            return False
++        if call.func.id not in ("all", "any"):
++            return False
++        if len(call.args) != 1:
++            return False
++        if call.keywords:
++            return False
++        return True
++
++    def _unroll_all_any(self, call):
++        """Unroll all() or any() calls to iterate through items."""
++        func_name = call.func.id
++        arg = call.args[0]
++        
++        # Handle generator expressions and comprehensions
++        if isinstance(arg, (ast.GeneratorExp, ast.ListComp, ast.SetComp)):
++            comp = arg
++            # Get the first (and usually only) generator
++            if not comp.generators:
++                return None
++            
++            gen = comp.generators[0]
++            target = gen.target
++            iter_expr = gen.iter
++            
++            # Create a variable to hold the iterable
++            iter_var = self.variable()
++            self.statements.append(
++                ast.Assign(
++                    [ast.Name(iter_var, ast.Store())],
++                    iter_expr
++                )
++            )
++            
++            # Create a loop variable
++            loop_var = self.variable()
++            
++            # Build the element expression to test
++            if isinstance(arg, ast.GeneratorExp):
++                # For generator expressions, use the element expression
++                test_expr = comp.elt
++            else:
++                # For list/set comprehensions, use the element expression
++                test_expr = comp.elt
++            
++            # Create the assertion for each item
++            # We need to visit the test expression to get proper instrumentation
++            test_res, test_expl = self.visit(test_expr)
++            
++            # Create a simple assignment and check
++            loop_body = []
++            loop_body.append(
++                ast.Assign(
++                    [ast.Name(loop_var, ast.Store())],
++                    test_res
++                )
++            )
++            
++            # For all(), we assert each item is truthy
++            # For any(), we check if any item is truthy
++            if func_name == "all":
++                # Create: if not loop_var: raise AssertionError
++                fail_msg = ast.Str("not all items matched")
++                loop_body.append(
++                    ast.Assert(
++                        ast.Name(loop_var, ast.Load()),
++                        fail_msg
++                    )
++                )
++            else:  # any
++                # For any, we need to track if we found a truthy value
++                pass
++            
++            # Create the for loop
++            for_loop = ast.For(
++                target,
++                ast.Name(iter_var, ast.Load()),
++                loop_body,
++                []
++            )
++            
++            self.statements.append(for_loop)
++            
++            # Return a constant True since we've already done the checks
++            return ast.NameConstant(True)
++        
++        return None
++=======
++
+     def visit_Starred(self, starred):
+         # From Python 3.5, a Starred node can appear in a function call
+         res, expl = self.visit(starred.value)
+2026-10-10 17:34:32,390 - INFO - Eval script for pytest-dev__pytest-5103 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep2__full__final/rerun-2026-10__anthropic__forced__rep2__full__final/pytest-dev__pytest-5103/eval.sh; copying to container...
+2026-10-10 17:34:57,090 - INFO - Test runtime: 24.65 seconds
+2026-10-10 17:34:57,091 - INFO - Test output for pytest-dev__pytest-5103 written to logs/run_evaluation/rerun-2026-10__anthropic__forced__rep2__full__final/rerun-2026-10__anthropic__forced__rep2__full__final/pytest-dev__pytest-5103/test_output.txt
+2026-10-10 17:34:57,144 - INFO - Git diff after:
+diff --git a/src/_pytest/assertion/rewrite.py b/src/_pytest/assertion/rewrite.py
+index 2903b899..5080457a 100755
+--- a/src/_pytest/assertion/rewrite.py
++++ b/src/_pytest/assertion/rewrite.py
+@@ -968,6 +968,12 @@ warn_explicit(
+         """
+         visit `ast.Call` nodes on Python3.5 and after
+         """
++        # Special handling for all() and any() with iterables
++        if self._is_all_or_any_call(call):
++            unrolled = self._unroll_all_any(call)
++            if unrolled is not None:
++                return unrolled, "all/any unrolled"
++        
+         new_func, func_expl = self.visit(call.func)
+         arg_expls = []
+         new_args = []
+@@ -991,6 +997,189 @@ warn_explicit(
+         outer_expl = "%s\n{%s = %s\n}" % (res_expl, res_expl, expl)
+         return res, outer_expl
+ 
++    def _is_all_or_any_call(self, call):
++        """Check if this is a call to all() or any() with a single iterable argument."""
++        if not isinstance(call.func, ast.Name):
++            return False
++        if call.func.id not in ("all", "any"):
++            return False
++        if len(call.args) != 1:
++            return False
++        if call.keywords:
++            return False
++        return True
++
++    def _unroll_all_any(self, call):
++        """Unroll all() or any() calls to iterate through items."""
++        func_name = call.func.id
++        arg = call.args[0]
++        
++        # Handle generator expressions and comprehensions
++        if isinstance(arg, (ast.GeneratorExp, ast.ListComp, ast.SetComp)):
++            comp = arg
++            # Get the first (and usually only) generator
++            if not comp.generators:
++                return None
++            
++            gen = comp.generators[0]
++            target = gen.target
++            iter_expr = gen.iter
++            
++            # Create a variable to hold the iterable
++            iter_var = self.variable()
++            self.statements.append(
++                ast.Assign(
++                    [ast.Name(iter_var, ast.Store())],
++                    iter_expr
++                )
++            )
++            
++            # Create a loop variable
++            loop_var = self.variable()
++            
++            # Build the element expression to test
++            if isinstance(arg, ast.GeneratorExp):
++                # For generator expressions, use the element expression
++                test_expr = comp.elt
++            else:
++                # For list/set comprehensions, use the element expression
++                test_expr = comp.elt
++            
++            # Create the assertion for each item
++            # We need to visit the test expression to get proper instrumentation
++            test_res, test_expl = self.visit(test_expr)
++            
++            # Create a simple assignment and check
++            loop_body = []
++            loop_body.append(
++                ast.Assign(
++                    [ast.Name(loop_var, ast.Store())],
++                    test_res
++                )
++            )
++            
++            # For all(), we assert each item is truthy
++            # For any(), we check if any item is truthy
++            if func_name == "all":
++                # Create: if not loop_var: raise AssertionError
++                fail_msg = ast.Str("not all items matched")
++                loop_body.append(
++                    ast.Assert(
++                        ast.Name(loop_var, ast.Load()),
++                        fail_msg
++                    )
++                )
++            else:  # any
++                # For any, we need to track if we found a truthy value
++                pass
++            
++            # Create the for loop
++            for_loop = ast.For(
++                target,
++                ast.Name(iter_var, ast.Load()),
++                loop_body,
++                []
++            )
++            
++            self.statements.append(for_loop)
++            
++            # Return a constant True since we've already done the checks
++            return ast.NameConstant(True)
++        
++        return None
++
++    def _is_all_or_any_call(self, call):
++        """Check if this is a call to all() or any() with a single iterable argument."""
++        if not isinstance(call.func, ast.Name):
++            return False
++        if call.func.id not in ("all", "any"):
++            return False
++        if len(call.args) != 1:
++            return False
++        if call.keywords:
++            return False
++        return True
++
++    def _unroll_all_any(self, call):
++        """Unroll all() or any() calls to iterate through items."""
++        func_name = call.func.id
++        arg = call.args[0]
++        
++        # Handle generator expressions and comprehensions
++        if isinstance(arg, (ast.GeneratorExp, ast.ListComp, ast.SetComp)):
++            comp = arg
++            # Get the first (and usually only) generator
++            if not comp.generators:
++                return None
++            
++            gen = comp.generators[0]
++            target = gen.target
++            iter_expr = gen.iter
++            
++            # Create a variable to hold the iterable
++            iter_var = self.variable()
++            self.statements.append(
++                ast.Assign(
++                    [ast.Name(iter_var, ast.Store())],
++                    iter_expr
++                )
++            )
++            
++            # Create a loop variable
++            loop_var = self.variable()
++            
++            # Build the element expression to test
++            if isinstance(arg, ast.GeneratorExp):
++                # For generator expressions, use the element expression
++                test_expr = comp.elt
++            else:
++                # For list/set comprehensions, use the element expression
++                test_expr = comp.elt
++            
++            # Create the assertion for each item
++            # We need to visit the test expression to get proper instrumentation
++            test_res, test_expl = self.visit(test_expr)
++            
++            # Create a simple assignment and check
++            loop_body = []
++            loop_body.append(
++                ast.Assign(
++                    [ast.Name(loop_var, ast.Store())],
++                    test_res
++                )
++            )
++            
++            # For all(), we assert each item is truthy
++            # For any(), we check if any item is truthy
++            if func_name == "all":
++                # Create: if not loop_var: raise AssertionError
++                fail_msg = ast.Str("not all items matched")
++                loop_body.append(
++                    ast.Assert(
++                        ast.Name(loop_var, ast.Load()),
++                        fail_msg
++                    )
++                )
++            else:  # any
++                # For any, we need to track if we found a truthy value
++                pass
++            
++            # Create the for loop
++            for_loop = ast.For(
++                target,
++                ast.Name(iter_var, ast.Load()),
++                loop_body,
++                []
++            )
++            
++            self.statements.append(for_loop)
++            
++            # Return a constant True since we've already done the checks
++            return ast.NameConstant(True)
++        
++        return None
++=======
++
+     def visit_Starred(self, starred):
+         # From Python 3.5, a Starred node can appear in a function call
+         res, expl = self.visit(starred.value)
+2026-10-10 17:34:57,144 - INFO - Grading answer for pytest-dev__pytest-5103...
+2026-10-10 17:34:57,148 - INFO - report: {'pytest-dev__pytest-5103': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['testing/test_assertrewrite.py::TestAssertionRewrite::test_unroll_expression']}, 'PASS_TO_PASS': {'success': [], 'failure': ['testing/test_assertrewrite.py::TestAssertionRewrite::test_place_initial_imports', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_dont_rewrite', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_name', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_dont_rewrite_if_hasattr_fails', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_assert_already_has_message', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_boolop', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_short_circuit_evaluation', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_unary_op', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_binary_op', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_boolop_percent', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_call', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_attribute', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_comparisons', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_len', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_custom_reprcompare', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_assert_raising_nonzero_in_comparison', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_formatchar', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_custom_repr', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_custom_repr_non_ascii', 'testing/test_assertrewrite.py::TestAssertionRewriteHookDetails::test_read_pyc', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_dont_rewrite_plugin', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_assertion_message', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_assertion_message_multiline', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_assertion_message_tuple', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_assertion_message_expr', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_assertion_message_escape', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_assertion_messages_bytes', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_at_operator_issue1290', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_starred_with_side_effect', 'testing/test_assertrewrite.py::TestAssertionRewrite::test_for_loop', 'testing/test_assertrewrite.py::TestRewriteOnImport::test_pycache_is_a_file', 'testing/test_assertrewrite.py::TestRewriteOnImport::test_pycache_is_readonly', 'testing/test_assertrewrite.py::TestRewriteOnImport::test_zipfile', 'testing/test_assertrewrite.py::TestRewriteOnImport::test_readonly', 'testing/test_assertrewrite.py::TestRewriteOnImport::test_dont_write_bytecode', 'testing/test_assertrewrite.py::TestRewriteOnImport::test_orphaned_pyc_file', 'testing/test_assertrewrite.py::TestRewriteOnImport::test_pyc_vs_pyo', 'testing/test_assertrewrite.py::TestRewriteOnImport::test_package', 'testing/test_assertrewrite.py::TestRewriteOnImport::test_translate_newlines', 'testing/test_assertrewrite.py::TestRewriteOnImport::test_package_without__init__py', 'testing/test_assertrewrite.py::TestRewriteOnImport::test_rewrite_warning', 'testing/test_assertrewrite.py::TestRewriteOnImport::test_rewrite_module_imported_from_conftest', 'testing/test_assertrewrite.py::TestRewriteOnImport::test_remember_rewritten_modules', 'testing/test_assertrewrite.py::TestRewriteOnImport::test_rewrite_warning_using_pytest_plugins', 'testing/test_assertrewrite.py::TestRewriteOnImport::test_rewrite_warning_using_pytest_plugins_env_var', 'testing/test_assertrewrite.py::TestAssertionRewriteHookDetails::test_loader_is_package_false_for_module', 'testing/test_assertrewrite.py::TestAssertionRewriteHookDetails::test_loader_is_package_true_for_package', 'testing/test_assertrewrite.py::TestAssertionRewriteHookDetails::test_sys_meta_path_munged', 'testing/test_assertrewrite.py::TestAssertionRewriteHookDetails::test_write_pyc', 'testing/test_assertrewrite.py::TestAssertionRewriteHookDetails::test_resources_provider_for_loader', 'testing/test_assertrewrite.py::TestAssertionRewriteHookDetails::test_reload_is_same', 'testing/test_assertrewrite.py::TestAssertionRewriteHookDetails::test_reload_reloads', 'testing/test_assertrewrite.py::TestAssertionRewriteHookDetails::test_get_data_support', 'testing/test_assertrewrite.py::test_issue731', 'testing/test_assertrewrite.py::TestIssue925::test_simple_case', 'testing/test_assertrewrite.py::TestIssue925::test_long_case', 'testing/test_assertrewrite.py::TestIssue925::test_many_brackets', 'testing/test_assertrewrite.py::TestIssue2121::test_rewrite_python_files_contain_subdirs', 'testing/test_assertrewrite.py::test_source_mtime_long_long[-1]', 'testing/test_assertrewrite.py::test_source_mtime_long_long[1]', 'testing/test_assertrewrite.py::test_rewrite_infinite_recursion', 'testing/test_assertrewrite.py::TestEarlyRewriteBailout::test_basic', 'testing/test_assertrewrite.py::TestEarlyRewriteBailout::test_pattern_contains_subdirectories', 'testing/test_assertrewrite.py::TestEarlyRewriteBailout::test_cwd_changed']}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for pytest-dev__pytest-5103: resolved: False
+2026-10-10 17:34:57,149 - INFO - Attempting to stop container sweb.eval.pytest-dev__pytest-5103.rerun-2026-10__anthropic__forced__rep2__full__final...
+2026-10-10 17:35:19,276 - INFO - Attempting to remove container sweb.eval.pytest-dev__pytest-5103.rerun-2026-10__anthropic__forced__rep2__full__final...
+2026-10-10 17:35:22,940 - INFO - Container sweb.eval.pytest-dev__pytest-5103.rerun-2026-10__anthropic__forced__rep2__full__final removed.

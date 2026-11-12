@@ -1,0 +1,31 @@
+diff --git a/sympy/simplify/cse_main.py b/sympy/simplify/cse_main.py
+index d649dd02a9..5a3625adc2 100644
+--- a/sympy/simplify/cse_main.py
++++ b/sympy/simplify/cse_main.py
+@@ -672,8 +672,24 @@ def _rebuild(expr):
+                 raise ValueError("Symbols iterator ran out of symbols.")
+ 
+             if isinstance(orig_expr, MatrixExpr):
+-                sym = MatrixSymbol(sym.name, orig_expr.rows,
+-                    orig_expr.cols)
++                # Fix: If the original expression is a MatrixSymbol but is being indexed,
++                # we should not replace it with a MatrixSymbol but keep it as a Symbol.
++                # Check if the original expression is a MatrixSymbol and if the new_expr
++                # is an Indexed or similar expression, then keep sym as Symbol.
++                from sympy.matrices.expressions import MatrixSymbol as MS
++                from sympy.tensor.indexed import IndexedBase
++                if isinstance(orig_expr, MS):
++                    # If new_expr is indexing orig_expr, keep sym as Symbol
++                    # because indexing returns scalar expressions.
++                    if new_expr.func.__name__ == 'Indexed':
++                        # sym remains a Symbol, do not convert to MatrixSymbol
++                        pass
++                    else:
++                        sym = MatrixSymbol(sym.name, orig_expr.rows,
++                            orig_expr.cols)
++                else:
++                    sym = MatrixSymbol(sym.name, orig_expr.rows,
++                        orig_expr.cols)
+ 
+             subs[orig_expr] = sym
+             replacements.append((sym, new_expr))

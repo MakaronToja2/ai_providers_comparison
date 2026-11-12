@@ -1,0 +1,15 @@
+diff --git a/sklearn/utils/_pprint.py b/sklearn/utils/_pprint.py
+index b8686dba5b0..f49b5747192 100644
+--- a/sklearn/utils/_pprint.py
++++ b/sklearn/utils/_pprint.py
+@@ -337,6 +337,10 @@ def _safe_repr(object, context, maxlevels, level, changed_only=False):
+     if typ in pprint._builtin_scalars:
+         return repr(object), True, False
+ 
++    # Check for numpy arrays and convert them to lists for consistent representation
++    if hasattr(object, 'tolist') and isinstance(object, np.ndarray):
++        return _safe_repr(object.tolist(), context, maxlevels, level, changed_only=changed_only)
++
+     r = getattr(typ, "__repr__", None)
+     if issubclass(typ, dict) and r is dict.__repr__:
+         if not object:

@@ -1,0 +1,95 @@
+2026-10-10 11:40:01,850 - INFO - Creating container for django__django-13220...
+2026-10-10 11:40:01,971 - INFO - Container for django__django-13220 created: 07ab8eefec846f87ac0df65005462744a1eb529515512623232d2475846a3577
+2026-10-10 11:40:02,231 - INFO - Container for django__django-13220 started: 07ab8eefec846f87ac0df65005462744a1eb529515512623232d2475846a3577
+2026-10-10 11:40:02,231 - INFO - Intermediate patch for django__django-13220 written to logs/run_evaluation/gold__full/gold/django__django-13220/patch.diff, now applying to container...
+2026-10-10 11:40:02,351 - INFO - >>>>> Applied Patch:
+Checking patch django/core/exceptions.py...
+Applied patch django/core/exceptions.py cleanly.
+
+2026-10-10 11:40:02,945 - INFO - Git diff before:
+diff --git a/django/core/exceptions.py b/django/core/exceptions.py
+index dc084b8692..2b3e55fe49 100755
+--- a/django/core/exceptions.py
++++ b/django/core/exceptions.py
+@@ -1,6 +1,9 @@
+ """
+ Global Django exception and warning classes.
+ """
++import operator
++
++from django.utils.hashable import make_hashable
+ 
+ 
+ class FieldDoesNotExist(Exception):
+@@ -182,6 +185,23 @@ class ValidationError(Exception):
+     def __repr__(self):
+         return 'ValidationError(%s)' % self
+ 
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++        return hash(self) == hash(other)
++
++    def __hash__(self):
++        # Ignore params and messages ordering.
++        if hasattr(self, 'message'):
++            return hash((
++                self.message,
++                self.code,
++                tuple(sorted(make_hashable(self.params))) if self.params else None,
++            ))
++        if hasattr(self, 'error_dict'):
++            return hash(tuple(sorted(make_hashable(self.error_dict))))
++        return hash(tuple(sorted(self.error_list, key=operator.attrgetter('message'))))
++
+ 
+ class EmptyResultSet(Exception):
+     """A database query predicate is impossible."""
+2026-10-10 11:40:02,946 - INFO - Eval script for django__django-13220 written to logs/run_evaluation/gold__full/gold/django__django-13220/eval.sh; copying to container...
+2026-10-10 11:40:08,602 - INFO - Test runtime: 5.57 seconds
+2026-10-10 11:40:08,605 - INFO - Test output for django__django-13220 written to logs/run_evaluation/gold__full/gold/django__django-13220/test_output.txt
+2026-10-10 11:40:08,664 - INFO - Git diff after:
+diff --git a/django/core/exceptions.py b/django/core/exceptions.py
+index dc084b8692..2b3e55fe49 100755
+--- a/django/core/exceptions.py
++++ b/django/core/exceptions.py
+@@ -1,6 +1,9 @@
+ """
+ Global Django exception and warning classes.
+ """
++import operator
++
++from django.utils.hashable import make_hashable
+ 
+ 
+ class FieldDoesNotExist(Exception):
+@@ -182,6 +185,23 @@ class ValidationError(Exception):
+     def __repr__(self):
+         return 'ValidationError(%s)' % self
+ 
++    def __eq__(self, other):
++        if not isinstance(other, ValidationError):
++            return NotImplemented
++        return hash(self) == hash(other)
++
++    def __hash__(self):
++        # Ignore params and messages ordering.
++        if hasattr(self, 'message'):
++            return hash((
++                self.message,
++                self.code,
++                tuple(sorted(make_hashable(self.params))) if self.params else None,
++            ))
++        if hasattr(self, 'error_dict'):
++            return hash(tuple(sorted(make_hashable(self.error_dict))))
++        return hash(tuple(sorted(self.error_list, key=operator.attrgetter('message'))))
++
+ 
+ class EmptyResultSet(Exception):
+     """A database query predicate is impossible."""
+2026-10-10 11:40:08,664 - INFO - Grading answer for django__django-13220...
+2026-10-10 11:40:08,669 - INFO - report: {'django__django-13220': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_eq (test_exceptions.test_validation_error.TestValidationError)', 'test_eq_nested (test_exceptions.test_validation_error.TestValidationError)', 'test_hash (test_exceptions.test_validation_error.TestValidationError)', 'test_hash_nested (test_exceptions.test_validation_error.TestValidationError)'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_messages_concatenates_error_dict_values (test_exceptions.test_validation_error.TestValidationError)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-13220: resolved: True
+2026-10-10 11:40:08,669 - INFO - Attempting to stop container sweb.eval.django__django-13220.gold__full...
+2026-10-10 11:40:23,983 - INFO - Attempting to remove container sweb.eval.django__django-13220.gold__full...
+2026-10-10 11:40:24,665 - INFO - Container sweb.eval.django__django-13220.gold__full removed.

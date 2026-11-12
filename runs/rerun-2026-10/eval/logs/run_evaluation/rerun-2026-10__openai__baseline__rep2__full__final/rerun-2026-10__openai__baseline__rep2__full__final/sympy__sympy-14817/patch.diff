@@ -1,0 +1,26 @@
+diff --git a/sympy/printing/pretty/pretty.py b/sympy/printing/pretty/pretty.py
+index 0545797d5f..3849c57692 100644
+--- a/sympy/printing/pretty/pretty.py
++++ b/sympy/printing/pretty/pretty.py
+@@ -825,9 +825,19 @@ def _print_MatAdd(self, expr):
+             if s is None:
+                 s = pform     # First element
+             else:
+-                if S(item.args[0]).is_negative:
++                # Check if the item is negative without sympify on strings
++                # We only check if item is an Add or Mul and if the first argument is negative
++                # Otherwise, just add with a plus sign
++                from sympy import Add, Mul
++                is_negative = False
++                if isinstance(item, (Add, Mul)):
++                    first_arg = item.args[0]
++                    # Only check if first_arg has is_negative attribute and it's True
++                    if hasattr(first_arg, 'is_negative') and first_arg.is_negative:
++                        is_negative = True
++
++                if is_negative:
+                     s = prettyForm(*stringPict.next(s, ' '))
+-                    pform = self._print(item)
+                 else:
+                     s = prettyForm(*stringPict.next(s, ' + '))
+                 s = prettyForm(*stringPict.next(s, pform))

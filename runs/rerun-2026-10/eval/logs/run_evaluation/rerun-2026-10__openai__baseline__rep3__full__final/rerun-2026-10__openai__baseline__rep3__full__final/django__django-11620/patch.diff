@@ -1,0 +1,19 @@
+diff --git a/django/urls/resolvers.py b/django/urls/resolvers.py
+index 2154a46320..010f798e5f 100644
+--- a/django/urls/resolvers.py
++++ b/django/urls/resolvers.py
+@@ -537,6 +537,14 @@ class URLResolver:
+         match = self.pattern.match(path)
+         if match:
+             new_path, args, kwargs = match
++            # Wrap to_python calls to catch Http404 and convert to Resolver404
++            try:
++                for key, value in kwargs.items():
++                    converter = getattr(self.pattern.converters, key, None)
++                    if converter:
++                        kwargs[key] = converter.to_python(value)
++            except Http404:
++                raise Resolver404({'path': path})
+             for pattern in self.url_patterns:
+                 try:
+                     sub_match = pattern.resolve(new_path)

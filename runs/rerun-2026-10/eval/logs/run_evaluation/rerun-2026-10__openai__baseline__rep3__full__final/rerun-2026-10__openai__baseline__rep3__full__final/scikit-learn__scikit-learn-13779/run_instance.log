@@ -1,0 +1,62 @@
+2026-10-10 17:58:01,203 - INFO - Creating container for scikit-learn__scikit-learn-13779...
+2026-10-10 17:58:09,143 - INFO - Container for scikit-learn__scikit-learn-13779 created: 145978d25541007bb304e3dff3f1c31bacb26bc4dc5e8481ca58820d8a9b7e6f
+2026-10-10 17:58:17,360 - INFO - Container for scikit-learn__scikit-learn-13779 started: 145978d25541007bb304e3dff3f1c31bacb26bc4dc5e8481ca58820d8a9b7e6f
+2026-10-10 17:58:17,360 - INFO - Intermediate patch for scikit-learn__scikit-learn-13779 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep3__full__final/rerun-2026-10__openai__baseline__rep3__full__final/scikit-learn__scikit-learn-13779/patch.diff, now applying to container...
+2026-10-10 17:58:17,446 - INFO - >>>>> Applied Patch:
+Checking patch sklearn/ensemble/voting.py...
+warning: sklearn/ensemble/voting.py has type 100755, expected 100644
+Applied patch sklearn/ensemble/voting.py cleanly.
+
+2026-10-10 17:58:17,640 - INFO - Git diff before:
+diff --git a/sklearn/ensemble/voting.py b/sklearn/ensemble/voting.py
+index 7afa7180c..06a631007 100755
+--- a/sklearn/ensemble/voting.py
++++ b/sklearn/ensemble/voting.py
+@@ -270,6 +270,16 @@ class VotingClassifier(_BaseVoting, ClassifierMixin):
+         self.classes_ = self.le_.classes_
+         transformed_y = self.le_.transform(y)
+ 
++        # Filter out None estimators before fitting
++        self.estimators_ = [est for est in self.estimators if est is not None]
++
++        # If sample_weight is given, pass it to each estimator's fit if supported
++        if sample_weight is not None:
++            for est in self.estimators_:
++                fit_params = est.fit.__code__.co_varnames
++                if 'sample_weight' not in fit_params:
++                    raise ValueError(f"Underlying estimator {est} does not support sample_weight")
++
+         return super().fit(X, transformed_y, sample_weight)
+ 
+     def predict(self, X):
+2026-10-10 17:58:17,640 - INFO - Eval script for scikit-learn__scikit-learn-13779 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep3__full__final/rerun-2026-10__openai__baseline__rep3__full__final/scikit-learn__scikit-learn-13779/eval.sh; copying to container...
+2026-10-10 17:58:23,509 - INFO - Test runtime: 5.82 seconds
+2026-10-10 17:58:23,510 - INFO - Test output for scikit-learn__scikit-learn-13779 written to logs/run_evaluation/rerun-2026-10__openai__baseline__rep3__full__final/rerun-2026-10__openai__baseline__rep3__full__final/scikit-learn__scikit-learn-13779/test_output.txt
+2026-10-10 17:58:23,561 - INFO - Git diff after:
+diff --git a/sklearn/ensemble/voting.py b/sklearn/ensemble/voting.py
+index 7afa7180c..06a631007 100755
+--- a/sklearn/ensemble/voting.py
++++ b/sklearn/ensemble/voting.py
+@@ -270,6 +270,16 @@ class VotingClassifier(_BaseVoting, ClassifierMixin):
+         self.classes_ = self.le_.classes_
+         transformed_y = self.le_.transform(y)
+ 
++        # Filter out None estimators before fitting
++        self.estimators_ = [est for est in self.estimators if est is not None]
++
++        # If sample_weight is given, pass it to each estimator's fit if supported
++        if sample_weight is not None:
++            for est in self.estimators_:
++                fit_params = est.fit.__code__.co_varnames
++                if 'sample_weight' not in fit_params:
++                    raise ValueError(f"Underlying estimator {est} does not support sample_weight")
++
+         return super().fit(X, transformed_y, sample_weight)
+ 
+     def predict(self, X):
+2026-10-10 17:58:23,561 - INFO - Grading answer for scikit-learn__scikit-learn-13779...
+2026-10-10 17:58:23,564 - INFO - report: {'scikit-learn__scikit-learn-13779': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['sklearn/ensemble/tests/test_voting.py::test_none_estimator_with_weights[X0-y0-voter0]', 'sklearn/ensemble/tests/test_voting.py::test_none_estimator_with_weights[X1-y1-voter1]']}, 'PASS_TO_PASS': {'success': ['sklearn/ensemble/tests/test_voting.py::test_estimator_init', 'sklearn/ensemble/tests/test_voting.py::test_predictproba_hardvoting', 'sklearn/ensemble/tests/test_voting.py::test_notfitted', 'sklearn/ensemble/tests/test_voting.py::test_majority_label_iris', 'sklearn/ensemble/tests/test_voting.py::test_tie_situation', 'sklearn/ensemble/tests/test_voting.py::test_weights_iris', 'sklearn/ensemble/tests/test_voting.py::test_weights_regressor', 'sklearn/ensemble/tests/test_voting.py::test_predict_on_toy_problem', 'sklearn/ensemble/tests/test_voting.py::test_predict_proba_on_toy_problem', 'sklearn/ensemble/tests/test_voting.py::test_multilabel', 'sklearn/ensemble/tests/test_voting.py::test_gridsearch', 'sklearn/ensemble/tests/test_voting.py::test_parallel_fit', 'sklearn/ensemble/tests/test_voting.py::test_set_params', 'sklearn/ensemble/tests/test_voting.py::test_set_estimator_none', 'sklearn/ensemble/tests/test_voting.py::test_estimator_weights_format', 'sklearn/ensemble/tests/test_voting.py::test_transform'], 'failure': ['sklearn/ensemble/tests/test_voting.py::test_sample_weight', 'sklearn/ensemble/tests/test_voting.py::test_sample_weight_kwargs']}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for scikit-learn__scikit-learn-13779: resolved: False
+2026-10-10 17:58:23,564 - INFO - Attempting to stop container sweb.eval.scikit-learn__scikit-learn-13779.rerun-2026-10__openai__baseline__rep3__full__final...
+2026-10-10 17:58:41,675 - INFO - Attempting to remove container sweb.eval.scikit-learn__scikit-learn-13779.rerun-2026-10__openai__baseline__rep3__full__final...
+2026-10-10 17:58:42,673 - INFO - Container sweb.eval.scikit-learn__scikit-learn-13779.rerun-2026-10__openai__baseline__rep3__full__final removed.

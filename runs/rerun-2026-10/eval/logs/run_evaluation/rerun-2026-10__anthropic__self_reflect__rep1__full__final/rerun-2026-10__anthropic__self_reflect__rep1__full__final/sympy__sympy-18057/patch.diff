@@ -1,0 +1,20 @@
+diff --git a/sympy/parsing/sympy_parser.py b/sympy/parsing/sympy_parser.py
+index 2ab43d9b31..25a3c5dbf3 100644
+--- a/sympy/parsing/sympy_parser.py
++++ b/sympy/parsing/sympy_parser.py
+@@ -899,8 +899,13 @@ def eval_expr(code, local_dict, global_dict):
+ 
+     Generally, ``parse_expr`` should be used.
+     """
+-    expr = eval(
+-        code, global_dict, local_dict)  # take local objects in preference
++    try:
++        expr = eval(
++            code, global_dict, local_dict)  # take local objects in preference
++    except SyntaxError:
++        raise
++    except Exception as e:
++        raise SyntaxError("Error evaluating expression: %s" % str(e))
+ 
+     return expr
+ 

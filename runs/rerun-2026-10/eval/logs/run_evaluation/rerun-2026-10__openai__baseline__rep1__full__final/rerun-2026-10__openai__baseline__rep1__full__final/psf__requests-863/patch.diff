@@ -1,0 +1,21 @@
+diff --git a/requests/models.py b/requests/models.py
+index d8456375..52d00953 100644
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -128,6 +128,16 @@ class Request(object):
+         #: content and metadata of HTTP Response, once :attr:`sent <send>`.
+         self.response = Response()
+ 
++        # Initialize hooks dictionary, allowing lists of hooks per event
++        self.hooks = {}
++        if hooks is None:
++            hooks = {}
++        for event, hook in hooks.items():
++            if isinstance(hook, list):
++                self.hooks[event] = list(hook)
++            else:
++                self.hooks[event] = [hook]
++
+         #: Authentication tuple or object to attach to :class:`Request <Request>`.
+         self.auth = auth
+ 

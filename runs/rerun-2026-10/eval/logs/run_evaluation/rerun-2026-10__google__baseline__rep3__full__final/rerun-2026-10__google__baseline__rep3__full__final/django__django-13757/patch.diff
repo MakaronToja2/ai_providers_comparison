@@ -1,0 +1,24 @@
+diff --git a/django/db/models/fields/json.py b/django/db/models/fields/json.py
+index 29c6ff0926..a311e133e0 100644
+--- a/django/db/models/fields/json.py
++++ b/django/db/models/fields/json.py
+@@ -372,7 +372,18 @@ class KeyTransformIsNull(lookups.IsNull):
+ 
+     def as_sqlite(self, compiler, connection):
+         if not self.rhs:
+-            return HasKey(self.lhs.lhs, self.lhs.key_name).as_sqlite(compiler, connection)
++            # For SQLite, __isnull=True should match when the key does not exist.
++            # JSON_EXTRACT returns NULL if the key does not exist OR if the value is JSON null.
++            # JSON_TYPE returns 'NULL' for JSON null values.
++            # We want to match only when the key does not exist, which means JSON_EXTRACT returns NULL
++            # AND JSON_TYPE is NOT 'NULL'.
++            lhs, params, key_transforms = self.lhs.preprocess_lhs(compiler, connection)
++            json_path = compile_json_path(key_transforms)
++            # Check if JSON_EXTRACT returns NULL AND JSON_TYPE is not 'NULL'
++            return (
++                "JSON_EXTRACT(%s, %%s) IS NULL AND JSON_TYPE(%s, %%s) != 'NULL'"
++                % (lhs, lhs)
++            ), tuple(params) * 2 + (json_path, json_path)
+         return super().as_sql(compiler, connection)
+ 
+ 

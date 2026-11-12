@@ -1,0 +1,25 @@
+diff --git a/django/db/models/query.py b/django/db/models/query.py
+index 5ac2407ea3..0a31056075 100644
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -783,6 +783,20 @@ class QuerySet(AltersData):
+         self._prepare_for_bulk_create(objs)
+         with transaction.atomic(using=self.db, savepoint=False):
+             objs_with_pk, objs_without_pk = partition(lambda o: o.pk is None, objs)
++
++            # If update_conflicts is enabled, we want to ensure that the primary key
++            # is included in the fields that are returned by the database, so that
++            # the primary keys of updated/inserted objects can be set on the model instances.
++            # This assumes that opts.db_returning_fields is the list of fields that
++            # the database operations will attempt to return.
++            if update_conflicts and opts.pk and opts.pk not in opts.db_returning_fields:
++                # We need to ensure that the primary key field is considered for returning.
++                # The exact mechanism for populating db_returning_fields might be in
++                # the compiler or database operations, but this is a direct attempt
++                # to influence it based on the bug report.
++                # We append the primary key field to the list of fields to be returned.
++                opts.db_returning_fields.append(opts.pk)
++
+             if objs_with_pk:
+                 returned_columns = self._batched_insert(
+                     objs_with_pk,

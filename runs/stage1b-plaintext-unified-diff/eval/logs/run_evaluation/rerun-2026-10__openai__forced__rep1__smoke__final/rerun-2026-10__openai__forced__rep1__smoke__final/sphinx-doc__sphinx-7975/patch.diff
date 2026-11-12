@@ -1,0 +1,53 @@
+--- a/sphinx/writers/html.py
++++ b/sphinx/writers/html.py
+@@ -1200,9 +1200,16 @@
+-        # Group entries by their first letter or symbol
+-        sections = {}
+-        for key, entries in content:
+-            first_char = key[0]
+-            if first_char.isalpha():
+-                section_key = first_char.upper()
+-            else:
+-                section_key = 'Symbols'
+-            sections.setdefault(section_key, []).append((key, entries))
++        # Group entries by their first letter or symbol, but unify all symbol keys into one 'Symbols' section
++        sections = {}
++        def is_symbol_char(c):
++            # Define what counts as a symbol for the index grouping
++            # This includes any non-alphanumeric character
++            return not c.isalnum()
++
++        for key, entries in content:
++            first_char = key[0]
++            if first_char.isalpha():
++                section_key = first_char.upper()
++            elif is_symbol_char(first_char):
++                section_key = 'Symbols'
++            else:
++                section_key = first_char
++            sections.setdefault(section_key, []).append((key, entries))
+@@ -1215,11 +1225,13 @@
+-        # Write out the sections
+-        for section, entries in sorted(sections.items()):
+-            self.body.append(self.starttag({}, 'h2', '', ids=[section]))
+-            for key, subentries in entries:
+-                self.body.append(self.starttag({}, 'dt'))
+-                self.body.append(key)
+-                self.body.append('</dt>')
+-                for subentry in subentries:
+-                    self.body.append(self.starttag({}, 'dd'))
+-                    self.body.append(subentry)
+-                    self.body.append('</dd>')
++        # Write out the sections
++        for section, entries in sorted(sections.items()):
++            # Use a fixed id for the Symbols section to avoid duplicate anchors
++            section_id = section if section != 'Symbols' else 'symbols'
++            self.body.append(self.starttag({}, 'h2', '', ids=[section_id]))
++            for key, subentries in entries:
++                self.body.append(self.starttag({}, 'dt'))
++                self.body.append(key)
++                self.body.append('</dt>')
++                for subentry in subentries:
++                    self.body.append(self.starttag({}, 'dd'))
++                    self.body.append(subentry)
++                    self.body.append('</dd>')

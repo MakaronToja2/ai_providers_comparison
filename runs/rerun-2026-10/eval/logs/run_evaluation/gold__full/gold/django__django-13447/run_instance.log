@@ -1,0 +1,43 @@
+2026-10-10 11:40:01,932 - INFO - Creating container for django__django-13447...
+2026-10-10 11:40:02,042 - INFO - Container for django__django-13447 created: 3d815ddef1a9759dd00ed3660738f11d921f85cc3a572e465dbf9a076fddcc6a
+2026-10-10 11:40:02,264 - INFO - Container for django__django-13447 started: 3d815ddef1a9759dd00ed3660738f11d921f85cc3a572e465dbf9a076fddcc6a
+2026-10-10 11:40:02,264 - INFO - Intermediate patch for django__django-13447 written to logs/run_evaluation/gold__full/gold/django__django-13447/patch.diff, now applying to container...
+2026-10-10 11:40:02,386 - INFO - >>>>> Applied Patch:
+Checking patch django/contrib/admin/sites.py...
+Applied patch django/contrib/admin/sites.py cleanly.
+
+2026-10-10 11:40:02,953 - INFO - Git diff before:
+diff --git a/django/contrib/admin/sites.py b/django/contrib/admin/sites.py
+index 837dabfea8..59a4a0364d 100755
+--- a/django/contrib/admin/sites.py
++++ b/django/contrib/admin/sites.py
+@@ -461,6 +461,7 @@ class AdminSite:
+ 
+             info = (app_label, model._meta.model_name)
+             model_dict = {
++                'model': model,
+                 'name': capfirst(model._meta.verbose_name_plural),
+                 'object_name': model._meta.object_name,
+                 'perms': perms,
+2026-10-10 11:40:02,953 - INFO - Eval script for django__django-13447 written to logs/run_evaluation/gold__full/gold/django__django-13447/eval.sh; copying to container...
+2026-10-10 11:40:09,044 - INFO - Test runtime: 6.01 seconds
+2026-10-10 11:40:09,046 - INFO - Test output for django__django-13447 written to logs/run_evaluation/gold__full/gold/django__django-13447/test_output.txt
+2026-10-10 11:40:09,105 - INFO - Git diff after:
+diff --git a/django/contrib/admin/sites.py b/django/contrib/admin/sites.py
+index 837dabfea8..59a4a0364d 100755
+--- a/django/contrib/admin/sites.py
++++ b/django/contrib/admin/sites.py
+@@ -461,6 +461,7 @@ class AdminSite:
+ 
+             info = (app_label, model._meta.model_name)
+             model_dict = {
++                'model': model,
+                 'name': capfirst(model._meta.verbose_name_plural),
+                 'object_name': model._meta.object_name,
+                 'perms': perms,
+2026-10-10 11:40:09,105 - INFO - Grading answer for django__django-13447...
+2026-10-10 11:40:09,111 - INFO - report: {'django__django-13447': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_available_apps (admin_views.test_adminsite.SiteEachContextTest)'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_add_action (admin_views.test_adminsite.SiteActionsTests)', 'test_disable_action (admin_views.test_adminsite.SiteActionsTests)', "AdminSite.get_action() returns an action even if it's disabled.", 'test_each_context (admin_views.test_adminsite.SiteEachContextTest)', 'test_each_context_site_url_with_script_name (admin_views.test_adminsite.SiteEachContextTest)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-13447: resolved: True
+2026-10-10 11:40:09,113 - INFO - Attempting to stop container sweb.eval.django__django-13447.gold__full...
+2026-10-10 11:40:26,634 - INFO - Attempting to remove container sweb.eval.django__django-13447.gold__full...
+2026-10-10 11:40:26,676 - INFO - Container sweb.eval.django__django-13447.gold__full removed.

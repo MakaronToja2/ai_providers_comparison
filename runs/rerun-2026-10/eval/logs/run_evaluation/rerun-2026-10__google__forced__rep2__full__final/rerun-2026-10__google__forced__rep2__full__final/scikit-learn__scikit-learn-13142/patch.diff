@@ -1,0 +1,15 @@
+diff --git a/sklearn/mixture/base.py b/sklearn/mixture/base.py
+index bd34333c063..b450ae3d6a4 100644
+--- a/sklearn/mixture/base.py
++++ b/sklearn/mixture/base.py
+@@ -371,7 +371,9 @@ class BaseMixture(DensityMixin, BaseEstimator, metaclass=ABCMeta):
+         """
+         self._check_is_fitted()
+         X = _check_X(X, None, self.means_.shape[1])
+-        return self._estimate_weighted_log_prob(X).argmax(axis=1)
++        # Use _e_step to get responsibilities, consistent with fit_predict
++        _, log_resp = self._e_step(X)
++        return log_resp.argmax(axis=1)
+ 
+     def predict_proba(self, X):
+         """Predict posterior probability of each component given the data.

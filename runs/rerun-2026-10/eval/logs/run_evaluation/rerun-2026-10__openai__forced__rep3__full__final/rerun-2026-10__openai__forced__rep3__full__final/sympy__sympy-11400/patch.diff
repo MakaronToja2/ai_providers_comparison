@@ -1,0 +1,57 @@
+diff --git a/sympy/printing/ccode.py b/sympy/printing/ccode.py
+index 30a07a7b59..c3950080dd 100644
+--- a/sympy/printing/ccode.py
++++ b/sympy/printing/ccode.py
+@@ -43,6 +43,7 @@
+     "atanh": "atanh",
+     "floor": "floor",
+     "ceiling": "ceil",
++    "sinc": None,  # no direct C function, handle specially
+ }
+ 
+ # These are the core reserved words in the C language. Taken from:
+@@ -399,3 +400,44 @@ def ccode(expr, assign_to=None, **settings):
+ def print_ccode(expr, **settings):
+     """Prints C representation of the given expression."""
+     print(ccode(expr, **settings))
++
++
++class CCodePrinter(CodePrinter):
++    """Printer to convert symbolic expressions to C code."""
++
++    _default_settings = {
++        "precision": 15,
++        "user_functions": {},
++        "dereference": [],
++        "human": True,
++        "contract": True,
++    }
++
++    def __init__(self, settings=None):
++        super().__init__(settings)
++        self.known_functions = known_functions.copy()
++        self.known_functions.update(self._settings.get("user_functions", {}))
++
++    def _print_Function(self, expr):
++        func_name = expr.func.__name__
++        if func_name == "sinc":
++            # sinc(x) = sin(x)/x with special case at x=0
++            arg = expr.args[0]
++            return "(%s == 0 ? 1 : sin(%s)/%s)" % (
++                self._print(arg),
++                self._print(arg),
++                self._print(arg),
++            )
++        if func_name in self.known_functions:
++            cfunc = self.known_functions[func_name]
++            if cfunc is None:
++                # no direct C function, fallback to default printing
++                return "%s(%s)" % (func_name, ", ".join(self._print(arg) for arg in expr.args))
++            if isinstance(cfunc, str):
++                return "%s(%s)" % (cfunc, ", ".join(self._print(arg) for arg in expr.args))
++            if isinstance(cfunc, (list, tuple)):
++                for cond, cfunc_str in cfunc:
++                    if cond(expr.args[0]):
++                        return "%s(%s)" % (cfunc_str, ", ".join(self._print(arg) for arg in expr.args))
++        # fallback
++        return super()._print_Function(expr)

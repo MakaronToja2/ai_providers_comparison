@@ -1,0 +1,122 @@
+2026-10-10 19:30:49,769 - INFO - Creating container for sympy__sympy-21055...
+2026-10-10 19:31:01,341 - INFO - Container for sympy__sympy-21055 created: 1b83868b80e3c6cbf62d446031732a1b7b57758aeba723c3e2f3935d7b5a886f
+2026-10-10 19:31:09,096 - INFO - Container for sympy__sympy-21055 started: 1b83868b80e3c6cbf62d446031732a1b7b57758aeba723c3e2f3935d7b5a886f
+2026-10-10 19:31:09,096 - INFO - Intermediate patch for sympy__sympy-21055 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep3__full__final/rerun-2026-10__anthropic__self_reflect__rep3__full__final/sympy__sympy-21055/patch.diff, now applying to container...
+2026-10-10 19:31:09,195 - INFO - >>>>> Applied Patch:
+Checking patch sympy/assumptions/refine.py...
+warning: sympy/assumptions/refine.py has type 100755, expected 100644
+Checking patch sympy/assumptions/tests/test_refine.py...
+warning: sympy/assumptions/tests/test_refine.py has type 100755, expected 100644
+Applied patch sympy/assumptions/refine.py cleanly.
+Applied patch sympy/assumptions/tests/test_refine.py cleanly.
+
+2026-10-10 19:31:09,496 - INFO - Git diff before:
+diff --git a/sympy/assumptions/refine.py b/sympy/assumptions/refine.py
+index e1f97190c0..c50c0c3677 100755
+--- a/sympy/assumptions/refine.py
++++ b/sympy/assumptions/refine.py
+@@ -373,6 +373,30 @@ def refine_matrixelement(expr, assumptions):
+             return expr
+         return MatrixElement(matrix, j, i)
+ 
++
++def refine_arg(expr, assumptions):
++    """
++    Handler for the argument (phase) of a complex number.
++
++    Examples
++    ========
++
++    >>> from sympy import Q, arg, pi
++    >>> from sympy.assumptions.refine import refine_arg
++    >>> from sympy.abc import x
++    >>> refine_arg(arg(x), Q.positive(x))
++    0
++    >>> refine_arg(arg(x), Q.negative(x))
++    pi
++    """
++    arg_expr = expr.args[0]
++    if ask(Q.positive(arg_expr), assumptions):
++        return S.Zero
++    if ask(Q.negative(arg_expr), assumptions):
++        return S.Pi
++    return expr
++
++
+ handlers_dict = {
+     'Abs': refine_abs,
+     'Pow': refine_Pow,
+@@ -380,5 +404,6 @@ def refine_matrixelement(expr, assumptions):
+     're': refine_re,
+     'im': refine_im,
+     'sign': refine_sign,
++    'arg': refine_arg,
+     'MatrixElement': refine_matrixelement
+ }  # type: Dict[str, Callable[[Expr, Boolean], Expr]]
+diff --git a/sympy/assumptions/tests/test_refine.py b/sympy/assumptions/tests/test_refine.py
+index 505cd609e8..2d6e5310b4 100755
+--- a/sympy/assumptions/tests/test_refine.py
++++ b/sympy/assumptions/tests/test_refine.py
+@@ -208,3 +208,9 @@ def test_matrixelement():
+     assert refine(x[1, 0], Q.symmetric(x)) == x[0, 1]
+     assert refine(x[i, j], Q.symmetric(x)) == x[j, i]
+     assert refine(x[j, i], Q.symmetric(x)) == x[j, i]
++
++
++def test_arg():
++    from sympy import arg, pi
++    assert refine(arg(x), Q.positive(x)) == 0
++    assert refine(arg(x), Q.negative(x)) == pi
+2026-10-10 19:31:09,496 - INFO - Eval script for sympy__sympy-21055 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep3__full__final/rerun-2026-10__anthropic__self_reflect__rep3__full__final/sympy__sympy-21055/eval.sh; copying to container...
+2026-10-10 19:31:18,957 - INFO - Test runtime: 9.41 seconds
+2026-10-10 19:31:18,957 - INFO - Test output for sympy__sympy-21055 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep3__full__final/rerun-2026-10__anthropic__self_reflect__rep3__full__final/sympy__sympy-21055/test_output.txt
+2026-10-10 19:31:19,005 - INFO - Git diff after:
+diff --git a/sympy/assumptions/refine.py b/sympy/assumptions/refine.py
+index e1f97190c0..c50c0c3677 100755
+--- a/sympy/assumptions/refine.py
++++ b/sympy/assumptions/refine.py
+@@ -373,6 +373,30 @@ def refine_matrixelement(expr, assumptions):
+             return expr
+         return MatrixElement(matrix, j, i)
+ 
++
++def refine_arg(expr, assumptions):
++    """
++    Handler for the argument (phase) of a complex number.
++
++    Examples
++    ========
++
++    >>> from sympy import Q, arg, pi
++    >>> from sympy.assumptions.refine import refine_arg
++    >>> from sympy.abc import x
++    >>> refine_arg(arg(x), Q.positive(x))
++    0
++    >>> refine_arg(arg(x), Q.negative(x))
++    pi
++    """
++    arg_expr = expr.args[0]
++    if ask(Q.positive(arg_expr), assumptions):
++        return S.Zero
++    if ask(Q.negative(arg_expr), assumptions):
++        return S.Pi
++    return expr
++
++
+ handlers_dict = {
+     'Abs': refine_abs,
+     'Pow': refine_Pow,
+@@ -380,5 +404,6 @@ def refine_matrixelement(expr, assumptions):
+     're': refine_re,
+     'im': refine_im,
+     'sign': refine_sign,
++    'arg': refine_arg,
+     'MatrixElement': refine_matrixelement
+ }  # type: Dict[str, Callable[[Expr, Boolean], Expr]]
+2026-10-10 19:31:19,005 - INFO - Git diff changed after running eval script
+2026-10-10 19:31:19,005 - INFO - Grading answer for sympy__sympy-21055...
+2026-10-10 19:31:19,007 - INFO - report: {'sympy__sympy-21055': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_arg'], 'failure': []}, 'PASS_TO_PASS': {'success': ['test_Abs', 'test_pow1', 'test_pow2', 'test_exp', 'test_Piecewise', 'test_atan2', 'test_re', 'test_im', 'test_complex', 'test_sign', 'test_func_args', 'test_eval_refine', 'test_refine_issue_12724'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for sympy__sympy-21055: resolved: True
+2026-10-10 19:31:19,007 - INFO - Attempting to stop container sweb.eval.sympy__sympy-21055.rerun-2026-10__anthropic__self_reflect__rep3__full__final...
+2026-10-10 19:31:39,610 - INFO - Attempting to remove container sweb.eval.sympy__sympy-21055.rerun-2026-10__anthropic__self_reflect__rep3__full__final...
+2026-10-10 19:31:43,012 - INFO - Container sweb.eval.sympy__sympy-21055.rerun-2026-10__anthropic__self_reflect__rep3__full__final removed.

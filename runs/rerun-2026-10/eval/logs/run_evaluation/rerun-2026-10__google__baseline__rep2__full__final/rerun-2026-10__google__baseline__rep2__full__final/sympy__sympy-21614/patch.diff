@@ -1,0 +1,12 @@
+diff --git a/sympy/core/function.py b/sympy/core/function.py
+index 69df976b8b..16650c0701 100644
+--- a/sympy/core/function.py
++++ b/sympy/core/function.py
+@@ -44,6 +44,7 @@
+ from .rules import Transform
+ from .singleton import S
+ from .sympify import sympify
++from sympy.matrices.matrices import MatrixKind
+ 
+ from sympy.core.containers import Tuple, Dict
+ from sympy.core.parameters import global_parameters

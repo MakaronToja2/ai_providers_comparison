@@ -1,0 +1,13 @@
+diff --git a/django/test/testcases.py b/django/test/testcases.py
+index 23459f22cd..dd4b1ad974 100644
+--- a/django/test/testcases.py
++++ b/django/test/testcases.py
+@@ -1059,7 +1059,7 @@ def connections_support_transactions(aliases=None):
+     transactions.
+     """
+     conns = connections.all() if aliases is None else (connections[alias] for alias in aliases)
+-    return all(conn.features.supports_transactions for conn in conns)
++    return all(conn.features.supports_transactions and conn.features.atomic_transactions for conn in conns)
+ 
+ 
+ class TestCase(TransactionTestCase):

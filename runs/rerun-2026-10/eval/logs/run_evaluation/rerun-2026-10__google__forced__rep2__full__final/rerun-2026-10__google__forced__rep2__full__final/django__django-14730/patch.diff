@@ -1,0 +1,16 @@
+diff --git a/django/db/models/fields/reverse_related.py b/django/db/models/fields/reverse_related.py
+index 65950590e2..efb468d4b5 100644
+--- a/django/db/models/fields/reverse_related.py
++++ b/django/db/models/fields/reverse_related.py
+@@ -295,6 +295,11 @@ class ManyToManyRel(ForeignObjectRel):
+             limit_choices_to=limit_choices_to,
+         )
+ 
++        if symmetrical and related_name:
++            raise ValueError(
++                "Cannot define related_name on a symmetrical ManyToManyField."
++            )
++
+         if through and not db_constraint:
+             raise ValueError("Can't supply a through model and db_constraint=False")
+         self.through = through

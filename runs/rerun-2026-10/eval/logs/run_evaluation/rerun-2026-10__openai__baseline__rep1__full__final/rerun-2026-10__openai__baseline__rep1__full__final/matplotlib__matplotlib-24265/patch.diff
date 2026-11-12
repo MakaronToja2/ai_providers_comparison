@@ -1,0 +1,12 @@
+diff --git a/lib/matplotlib/style/core.py b/lib/matplotlib/style/core.py
+index fb0a5426e6..d719f9f560 100644
+--- a/lib/matplotlib/style/core.py
++++ b/lib/matplotlib/style/core.py
+@@ -257,5 +257,7 @@ def reload_library():
+     library = update_user_library(_base_library)
+     available[:] = sorted(library.keys())
+ 
++# Initialize the library and available styles on import
++reload_library()
+ 
+ reload_library()

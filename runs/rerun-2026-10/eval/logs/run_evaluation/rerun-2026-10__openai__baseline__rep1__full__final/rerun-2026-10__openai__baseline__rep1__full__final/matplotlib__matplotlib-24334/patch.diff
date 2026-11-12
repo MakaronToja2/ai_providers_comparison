@@ -1,0 +1,23 @@
+diff --git a/lib/matplotlib/axis.py b/lib/matplotlib/axis.py
+index af0815d41d..b80dba7d71 100644
+--- a/lib/matplotlib/axis.py
++++ b/lib/matplotlib/axis.py
+@@ -2021,9 +2021,18 @@ class Axis(martist.Artist):
+         other limits, you should set the limits explicitly after setting the
+         ticks.
+         """
++        import matplotlib.text as mtext
++
+         result = self._set_tick_locations(ticks, minor=minor)
+         if labels is not None:
+             self.set_ticklabels(labels, minor=minor, **kwargs)
++        elif kwargs:
++            # Validate kwargs even if labels is None
++            # We create a dummy Text object to validate kwargs
++            dummy_text = mtext.Text()
++            for key in kwargs:
++                if not hasattr(dummy_text, key):
++                    raise TypeError(f"Unknown property '{key}' for Text")
+         return result
+ 
+     def _get_tick_boxes_siblings(self, renderer):

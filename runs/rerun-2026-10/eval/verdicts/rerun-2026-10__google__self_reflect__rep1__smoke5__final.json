@@ -1,0 +1,25 @@
+{
+  "job": "rerun-2026-10__google__self_reflect__rep1__smoke5",
+  "kind": "final",
+  "subset": "smoke5",
+  "run_id": "rerun-2026-10__google__self_reflect__rep1__smoke5__final",
+  "counts": {
+    "resolved": 2
+  },
+  "verdicts": {
+    "django__django-15347": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 29,
+      "p2p_total": 29
+    },
+    "scikit-learn__scikit-learn-13439": {
+      "status": "resolved",
+      "f2p_passed": 1,
+      "f2p_total": 1,
+      "p2p_passed": 40,
+      "p2p_total": 40
+    }
+  }
+}

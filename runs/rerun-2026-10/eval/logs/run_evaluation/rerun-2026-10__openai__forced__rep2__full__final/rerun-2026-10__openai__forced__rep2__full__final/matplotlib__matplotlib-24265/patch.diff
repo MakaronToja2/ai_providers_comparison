@@ -1,0 +1,13 @@
+diff --git a/lib/matplotlib/style/core.py b/lib/matplotlib/style/core.py
+index fb0a5426e6..d7882939e3 100644
+--- a/lib/matplotlib/style/core.py
++++ b/lib/matplotlib/style/core.py
+@@ -113,6 +113,8 @@ def use(style):
+     def fix_style(s):
+         if isinstance(s, str):
+             s = style_alias.get(s, s)
++            # The seaborn styles shipped by Matplotlib 3.6+ are renamed
++            # to 'seaborn-v0_8-<style>' to avoid confusion with actual seaborn styles.
+             if s in [
+                 "seaborn",
+                 "seaborn-bright",

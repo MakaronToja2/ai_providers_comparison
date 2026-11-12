@@ -1,0 +1,14 @@
+diff --git a/sympy/simplify/simplify.py b/sympy/simplify/simplify.py
+index f1609aa908..5235a58664 100644
+--- a/sympy/simplify/simplify.py
++++ b/sympy/simplify/simplify.py
+@@ -542,7 +542,8 @@ def shorter(*choices):
+         return min(choices, key=measure)
+ 
+     expr = bottom_up(expr, lambda w: w.normal())
+-    expr = Mul(*powsimp(expr).as_content_primitive())
++    # Use powsimp with combine='exp' to combine exponents like 2.5 and 5/2 properly
++    expr = Mul(*powsimp(expr, combine='exp').as_content_primitive())
+     _e = cancel(expr)
+     expr1 = shorter(_e, _mexpand(_e).cancel())  # issue 6829
+     expr2 = shorter(together(expr, deep=True), together(expr1, deep=True))

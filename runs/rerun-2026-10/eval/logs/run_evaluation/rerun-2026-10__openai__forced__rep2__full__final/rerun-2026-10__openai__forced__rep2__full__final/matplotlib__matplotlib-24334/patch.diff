@@ -1,0 +1,17 @@
+diff --git a/lib/matplotlib/axis.py b/lib/matplotlib/axis.py
+index af0815d41d..abef36ee79 100644
+--- a/lib/matplotlib/axis.py
++++ b/lib/matplotlib/axis.py
+@@ -2024,6 +2024,12 @@ class Axis(martist.Artist):
+         result = self._set_tick_locations(ticks, minor=minor)
+         if labels is not None:
+             self.set_ticklabels(labels, minor=minor, **kwargs)
++        elif kwargs:
++            # Validate kwargs even if labels is None by creating a dummy Text
++            # and checking for invalid kwargs.
++            from matplotlib.text import Text
++            # This will raise if any kwarg is invalid for Text
++            _ = Text(**kwargs)
+         return result
+ 
+     def _get_tick_boxes_siblings(self, renderer):

@@ -1,0 +1,91 @@
+<frozen runpy>:128: RuntimeWarning: 'swebench.harness.run_evaluation' found in sys.modules after import of package 'swebench.harness', but prior to execution of 'swebench.harness.run_evaluation'; this may result in unpredictable behaviour
+Traceback (most recent call last):
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/urllib3/connection.py", line 239, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/urllib3/util/connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/socket.py", line 963, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno -3] Temporary failure in name resolution
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/urllib3/connectionpool.py", line 793, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/urllib3/connectionpool.py", line 494, in _make_request
+    raise new_e
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/urllib3/connectionpool.py", line 470, in _make_request
+    self._validate_conn(conn)
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/urllib3/connectionpool.py", line 1125, in _validate_conn
+    conn.connect()
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/urllib3/connection.py", line 827, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/urllib3/connection.py", line 246, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: HTTPSConnection(host='raw.githubusercontent.com', port=443): Failed to resolve 'raw.githubusercontent.com' ([Errno -3] Temporary failure in name resolution)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/requests/adapters.py", line 696, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/urllib3/connectionpool.py", line 847, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/urllib3/util/retry.py", line 555, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='raw.githubusercontent.com', port=443): Max retries exceeded with url: /matplotlib/matplotlib/73909bcb408886a22e2b84581d6b9e6d9907c813/environment.yml (Caused by NameResolutionError("HTTPSConnection(host='raw.githubusercontent.com', port=443): Failed to resolve 'raw.githubusercontent.com' ([Errno -3] Temporary failure in name resolution)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/swebench/harness/run_evaluation.py", line 677, in <module>
+    main(**vars(args))
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/swebench/harness/run_evaluation.py", line 552, in main
+    run_instances(
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/swebench/harness/run_evaluation.py", line 304, in run_instances
+    test_specs = list(
+                 ^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/swebench/harness/run_evaluation.py", line 306, in <lambda>
+    lambda instance: make_test_spec(
+                     ^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/swebench/harness/test_spec/test_spec.py", line 215, in make_test_spec
+    env_script_list = make_env_script_list(instance, specs, env_name)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/swebench/harness/test_spec/create_scripts.py", line 38, in make_env_script_list
+    return func(instance, specs, env_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/swebench/harness/test_spec/python.py", line 365, in make_env_script_list_py
+    reqs = get_environment_yml(instance, env_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/swebench/harness/test_spec/python.py", line 132, in get_environment_yml
+    yml_text = get_environment_yml_by_commit(instance["repo"], commit, env_name)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/swebench/harness/test_spec/python.py", line 35, in get_environment_yml_by_commit
+    reqs = requests.get(reqs_url, headers=HEADERS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/requests/api.py", line 87, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/requests/api.py", line 71, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/requests/sessions.py", line 651, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/requests/sessions.py", line 784, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/makarontoja/recovered/studies/ai_providers_comparison/.venv-eval/lib/python3.12/site-packages/requests/adapters.py", line 729, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='raw.githubusercontent.com', port=443): Max retries exceeded with url: /matplotlib/matplotlib/73909bcb408886a22e2b84581d6b9e6d9907c813/environment.yml (Caused by NameResolutionError("HTTPSConnection(host='raw.githubusercontent.com', port=443): Failed to resolve 'raw.githubusercontent.com' ([Errno -3] Temporary failure in name resolution)"))

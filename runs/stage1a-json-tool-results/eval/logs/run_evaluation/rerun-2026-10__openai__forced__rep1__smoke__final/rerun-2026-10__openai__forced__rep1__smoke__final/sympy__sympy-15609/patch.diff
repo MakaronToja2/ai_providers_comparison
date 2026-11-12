@@ -1,0 +1,20 @@
+--- a/sympy/printing/latex.py
++++ b/sympy/printing/latex.py
+@@ -1438,3 +1438,14 @@
+-    def _print_MatrixElement(self, expr):
+-        return self.parenthesize(expr.parent, PRECEDENCE[\"Atom\"], strict=True) \\
+-            + '_{%s, %s}' % (expr.i, expr.j)
++    def _print_MatrixElement(self, expr):
++        # Print the parent matrix symbol without indices
++        parent_str = self._print(expr.parent)
++        # Print the indices with proper formatting, avoiding double underscores
++        def format_index(idx):
++            # If idx is a Symbol, print it as is, else print normally
++            if hasattr(idx, 'name'):
++                return self._print(idx)
++            else:
++                return self._print(idx)
++
++        i_str = format_index(expr.i)
++        j_str = format_index(expr.j)
++        return self.parenthesize(expr.parent, PRECEDENCE["Atom"], strict=True) + '_{' + i_str + ', ' + j_str + '}'

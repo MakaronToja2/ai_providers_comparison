@@ -1,0 +1,17 @@
+diff --git a/sympy/functions/elementary/complexes.py b/sympy/functions/elementary/complexes.py
+index 7fda45982b..0b19070cc7 100644
+--- a/sympy/functions/elementary/complexes.py
++++ b/sympy/functions/elementary/complexes.py
+@@ -288,9 +288,9 @@ class sign(Function):
+     _singularities = True
+ 
+     def doit(self, **hints):
+-        if self.args[0].is_zero is False:
+-            return self.args[0] / Abs(self.args[0])
+-        return self
++        if self.args[0].is_zero:
++            return S.NaN
++        return self.args[0] / Abs(self.args[0])
+ 
+     @classmethod
+     def eval(cls, arg):

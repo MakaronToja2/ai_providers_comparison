@@ -1,0 +1,15 @@
+diff --git a/django/contrib/auth/forms.py b/django/contrib/auth/forms.py
+index 20d8922799..7f41ab9329 100644
+--- a/django/contrib/auth/forms.py
++++ b/django/contrib/auth/forms.py
+@@ -35,6 +35,10 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
+     read_only = True
+ 
+     def get_context(self, name, value, attrs):
++        # Remove 'id' attribute from attrs to avoid label 'for' attribute pointing to non-labelable element
++        if attrs and 'id' in attrs:
++            attrs = attrs.copy()
++            attrs.pop('id')
+         context = super().get_context(name, value, attrs)
+         summary = []
+         if not value or value.startswith(UNUSABLE_PASSWORD_PREFIX):

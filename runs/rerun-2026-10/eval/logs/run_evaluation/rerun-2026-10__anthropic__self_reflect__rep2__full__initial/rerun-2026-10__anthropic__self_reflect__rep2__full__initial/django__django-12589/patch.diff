@@ -1,0 +1,16 @@
+diff --git a/django/db/models/expressions.py b/django/db/models/expressions.py
+index 84960d77e1..b3498490a5 100644
+--- a/django/db/models/expressions.py
++++ b/django/db/models/expressions.py
+@@ -1050,6 +1050,11 @@ class Subquery(Expression):
+         return sql, sql_params
+ 
+     def get_group_by_cols(self, alias=None):
++        # If this subquery contains aggregates, we need to group by the
++        # subquery itself, not just its alias, to avoid ambiguity errors
++        # in databases like PostgreSQL when multiple tables are involved.
++        if self.query.has_aggregates:
++            return [self]
+         if alias:
+             return [Ref(alias, self)]
+         external_cols = self.query.get_external_cols()

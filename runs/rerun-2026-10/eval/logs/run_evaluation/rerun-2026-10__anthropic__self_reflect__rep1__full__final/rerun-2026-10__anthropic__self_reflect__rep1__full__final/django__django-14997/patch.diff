@@ -1,0 +1,54 @@
+diff --git a/django/db/backends/sqlite3/schema.py b/django/db/backends/sqlite3/schema.py
+index f0c81c123b..44785be5fc 100644
+--- a/django/db/backends/sqlite3/schema.py
++++ b/django/db/backends/sqlite3/schema.py
+@@ -237,6 +237,20 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+             ]
+ 
+         constraints = list(model._meta.constraints)
++        # Separate constraints that need to be deferred (those with expressions)
++        constraints_to_defer = [
++            constraint for constraint in constraints
++            if isinstance(constraint, UniqueConstraint) and (
++                constraint.condition or
++                constraint.contains_expressions or
++                constraint.include or
++                constraint.deferrable
++            )
++        ]
++        constraints_for_table = [
++            constraint for constraint in constraints
++            if constraint not in constraints_to_defer
++        ]
+ 
+         # Provide isolated instances of the fields to the new model body so
+         # that the existing model's internals aren't interfered with when
+@@ -254,7 +268,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+             'unique_together': unique_together,
+             'index_together': index_together,
+             'indexes': indexes,
+-            'constraints': constraints,
++            'constraints': constraints_for_table,
+             'apps': apps,
+         }
+         meta = type("Meta", (), meta_contents)
+@@ -270,7 +284,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+             'unique_together': unique_together,
+             'index_together': index_together,
+             'indexes': indexes,
+-            'constraints': constraints,
++            'constraints': constraints_for_table,
+             'apps': apps,
+         }
+         meta = type("Meta", (), meta_contents)
+@@ -302,6 +316,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         for sql in self.deferred_sql:
+             self.execute(sql)
+         self.deferred_sql = []
++        
++        # Add constraints with expressions after table is renamed
++        for constraint in constraints_to_defer:
++            self.add_constraint(model, constraint)
+         # Fix any PK-removed field
+         if restore_pk_field:
+             restore_pk_field.primary_key = True

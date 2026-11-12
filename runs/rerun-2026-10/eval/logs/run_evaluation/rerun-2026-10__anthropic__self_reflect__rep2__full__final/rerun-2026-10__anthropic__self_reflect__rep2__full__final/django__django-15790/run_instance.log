@@ -1,0 +1,62 @@
+2026-10-10 15:33:37,991 - INFO - Creating container for django__django-15790...
+2026-10-10 15:33:59,342 - INFO - Container for django__django-15790 created: f9a45967bbc1d5771d0e50fcf79f0119738e44264e1cc7e539d5421bf1f893fc
+2026-10-10 15:34:09,194 - INFO - Container for django__django-15790 started: f9a45967bbc1d5771d0e50fcf79f0119738e44264e1cc7e539d5421bf1f893fc
+2026-10-10 15:34:09,194 - INFO - Intermediate patch for django__django-15790 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep2__full__final/rerun-2026-10__anthropic__self_reflect__rep2__full__final/django__django-15790/patch.diff, now applying to container...
+2026-10-10 15:34:09,594 - INFO - >>>>> Applied Patch:
+Checking patch django/core/checks/templates.py...
+warning: django/core/checks/templates.py has type 100755, expected 100644
+Applied patch django/core/checks/templates.py cleanly.
+
+2026-10-10 15:34:10,769 - INFO - Git diff before:
+diff --git a/django/core/checks/templates.py b/django/core/checks/templates.py
+index 5214276987..d6dabae5dd 100755
+--- a/django/core/checks/templates.py
++++ b/django/core/checks/templates.py
+@@ -61,12 +61,14 @@ def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
+         libraries[module_name].append(module_path)
+ 
+     for library_name, items in libraries.items():
+-        if len(items) > 1:
++        # Deduplicate items to avoid reporting the same library path multiple times
++        unique_items = list(set(items))
++        if len(unique_items) > 1:
+             errors.append(
+                 Error(
+                     E003.msg.format(
+                         repr(library_name),
+-                        ", ".join(repr(item) for item in items),
++                        ", ".join(repr(item) for item in sorted(unique_items)),
+                     ),
+                     id=E003.id,
+                 )
+2026-10-10 15:34:10,769 - INFO - Eval script for django__django-15790 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep2__full__final/rerun-2026-10__anthropic__self_reflect__rep2__full__final/django__django-15790/eval.sh; copying to container...
+2026-10-10 15:34:31,908 - INFO - Test runtime: 21.02 seconds
+2026-10-10 15:34:31,912 - INFO - Test output for django__django-15790 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep2__full__final/rerun-2026-10__anthropic__self_reflect__rep2__full__final/django__django-15790/test_output.txt
+2026-10-10 15:34:32,037 - INFO - Git diff after:
+diff --git a/django/core/checks/templates.py b/django/core/checks/templates.py
+index 5214276987..d6dabae5dd 100755
+--- a/django/core/checks/templates.py
++++ b/django/core/checks/templates.py
+@@ -61,12 +61,14 @@ def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
+         libraries[module_name].append(module_path)
+ 
+     for library_name, items in libraries.items():
+-        if len(items) > 1:
++        # Deduplicate items to avoid reporting the same library path multiple times
++        unique_items = list(set(items))
++        if len(unique_items) > 1:
+             errors.append(
+                 Error(
+                     E003.msg.format(
+                         repr(library_name),
+-                        ", ".join(repr(item) for item in items),
++                        ", ".join(repr(item) for item in sorted(unique_items)),
+                     ),
+                     id=E003.id,
+                 )
+2026-10-10 15:34:32,037 - INFO - Grading answer for django__django-15790...
+2026-10-10 15:34:32,044 - INFO - report: {'django__django-15790': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_template_tags_same_library_in_installed_apps_libraries (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)'], 'failure': []}, 'PASS_TO_PASS': {'success': ['Error if template loaders are specified and APP_DIRS is True.', 'test_app_dirs_removed (check_framework.test_templates.CheckTemplateSettingsAppDirsTest)', 'test_loaders_removed (check_framework.test_templates.CheckTemplateSettingsAppDirsTest)', 'test_string_if_invalid_both_are_strings (check_framework.test_templates.CheckTemplateStringIfInvalidTest)', 'test_string_if_invalid_first_is_string (check_framework.test_templates.CheckTemplateStringIfInvalidTest)', 'test_string_if_invalid_not_specified (check_framework.test_templates.CheckTemplateStringIfInvalidTest)', 'test_string_if_invalid_not_string (check_framework.test_templates.CheckTemplateStringIfInvalidTest)', 'test_template_tags_with_different_library_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)', 'test_template_tags_with_different_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)', 'test_template_tags_with_same_library_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)', 'test_template_tags_with_same_library_name_and_module_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)', 'test_template_tags_with_same_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-15790: resolved: True
+2026-10-10 15:34:32,046 - INFO - Attempting to stop container sweb.eval.django__django-15790.rerun-2026-10__anthropic__self_reflect__rep2__full__final...
+2026-10-10 15:34:51,944 - INFO - Attempting to remove container sweb.eval.django__django-15790.rerun-2026-10__anthropic__self_reflect__rep2__full__final...
+2026-10-10 15:34:54,838 - INFO - Container sweb.eval.django__django-15790.rerun-2026-10__anthropic__self_reflect__rep2__full__final removed.

@@ -1,0 +1,20 @@
+diff --git a/sklearn/ensemble/voting.py b/sklearn/ensemble/voting.py
+index 7afa7180cc5..23f3e5e1d7e 100644
+--- a/sklearn/ensemble/voting.py
++++ b/sklearn/ensemble/voting.py
+@@ -29,10 +29,11 @@ from ..utils import Bunch
+ 
+ def _parallel_fit_estimator(estimator, X, y, sample_weight=None):
+     """Private function used to fit an estimator within a job."""
+-    if sample_weight is not None:
+-        estimator.fit(X, y, sample_weight=sample_weight)
+-    else:
+-        estimator.fit(X, y)
++    if estimator is not None:
++        if sample_weight is not None:
++            estimator.fit(X, y, sample_weight=sample_weight)
++        else:
++            estimator.fit(X, y)
+     return estimator
+ 
+ 

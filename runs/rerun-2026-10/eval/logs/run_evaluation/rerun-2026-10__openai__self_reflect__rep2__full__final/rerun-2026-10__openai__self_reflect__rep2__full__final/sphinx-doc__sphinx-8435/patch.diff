@@ -1,0 +1,22 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 171a3e7b0d..36c6806fdf 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -812,6 +812,17 @@ class Documenter:
+             full_mname = self.modname + '::' + \
+                 '.'.join(self.objpath + [mname])
+             documenter = classes[-1](self.directive, full_mname, self.indent)
++            # Patch: apply autodoc_type_aliases to attribute and variable types
++            # Only apply if the documenter has an 'annotation' attribute and it is a string
++            if hasattr(documenter, 'annotation') and isinstance(documenter.annotation, str):
++                # Replace type aliases in the annotation string
++                for alias, replacement in self.config.autodoc_type_aliases.items():
++                    # Replace exact matches or occurrences within the annotation string
++                    if documenter.annotation == alias:
++                        documenter.annotation = replacement
++                    else:
++                        # Replace alias occurrences inside annotation string if present
++                        documenter.annotation = documenter.annotation.replace(alias, replacement)
+             memberdocumenters.append((documenter, isattr))
+ 
+         member_order = self.options.member_order or self.config.autodoc_member_order

@@ -1,0 +1,96 @@
+diff --git a/src/_pytest/assertion/rewrite.py b/src/_pytest/assertion/rewrite.py
+index 2903b8995..38ab0c5cc 100644
+--- a/src/_pytest/assertion/rewrite.py
++++ b/src/_pytest/assertion/rewrite.py
+@@ -490,6 +490,91 @@ def _saferepr(obj):
+     return r.replace(u"\n", u"\\n")
+ 
+ 
++def _unroll_all_any(node):
++    """
++    Unroll all(...) or any(...) calls in an assert expression into a series of individual assertions.
++    This improves assertion reporting by showing which element failed.
++    """
++    import ast
++
++    if not isinstance(node, ast.Call):
++        return None
++    if not isinstance(node.func, ast.Name):
++        return None
++    if node.func.id not in ("all", "any"):
++        return None
++    if len(node.args) != 1:
++        return None
++
++    gen = node.args[0]
++    # We only handle generator expressions or list comprehensions
++    if not isinstance(gen, (ast.GeneratorExp, ast.ListComp)):
++        return None
++
++    # Extract the element expression and the iterator(s)
++    elt = gen.elt
++    generators = gen.generators
++
++    # We only handle a single generator for now
++    if len(generators) != 1:
++        return None
++    genexp = generators[0]
++
++    # Build a list of individual assert statements for each item in the iterable
++    # We cannot evaluate the iterable at rewrite time, so we rewrite the assert to a for loop with asserts inside
++    # But since this is a rewrite of assert, we convert the assert expression into multiple asserts
++
++    # We build a new AST node representing a for loop with asserts inside
++    # However, the assertion rewriting framework expects an expression, so we transform the call into a tuple of asserts
++
++    # Instead, we transform all(...) or any(...) into a tuple of asserts joined by 'and' or 'or'
++
++    # For that, we need to unroll the iterable at runtime, so we replace the call with a tuple of asserts
++
++    # But since we cannot unroll at rewrite time, we rewrite the call into a call to a helper function that does the unrolling
++
++    # So we replace all(...) or any(...) with a call to _pytest._assertion.unroll_all_any_helper
++
++    # We create a new call node:
++    # _pytest._assertion.unroll_all_any_helper(func_name, elt, target, iter)
++
++    # Build the new call node
++    new_call = ast.Call(
++        func=ast.Attribute(
++            value=ast.Attribute(
++                value=ast.Name(id="_pytest", ctx=ast.Load()),
++                attr="_assertion",
++                ctx=ast.Load(),
++            ),
++            attr="unroll_all_any_helper",
++            ctx=ast.Load(),
++        ),
++        args=[
++            ast.Str(s=node.func.id),
++            elt,
++            genexp.target,
++            genexp.iter,
++        ],
++        keywords=[],
++    )
++    return new_call
++
++
++class AssertionRewriter:
++    # existing code ...
++
++    def _rewrite_assert_expr(self, node):
++        # existing code ...
++
++        # Insert unroll for all/any calls
++        new_node = _unroll_all_any(node)
++        if new_node is not None:
++            return new_node
++
++        # existing code ...
++        return node
++
++
+ def _format_assertmsg(obj):
+     """Format the custom assertion message given.
+ 

@@ -1,0 +1,31 @@
+diff --git a/sympy/series/sequences.py b/sympy/series/sequences.py
+index 08f36df061..2929d911c6 100644
+--- a/sympy/series/sequences.py
++++ b/sympy/series/sequences.py
+@@ -710,6 +710,26 @@ def coeff_mul(self, coeff):
+         formula = self.formula * coeff
+         return SeqFormula(formula, self.args[1])
+ 
++    def _repr_latex_(self):
++        # Custom LaTeX representation for Jupyter notebook display
++        # Render the sequence as a list without backslash-escaping square brackets
++        try:
++            from sympy.printing.latex import latex
++            x, start, stop = self.variables[0], self.limits[1], self.limits[2]
++            # Generate the list of terms for a finite sequence
++            if stop.is_finite:
++                terms = [self._eval_coeff(i) for i in range(int(start), int(stop) + 1)]
++                terms_latex = ", ".join(latex(term) for term in terms)
++                return r"$\left[{} \right]$".format(terms_latex)
++            else:
++                # Infinite sequence: show first few terms and ellipsis
++                terms = [self._eval_coeff(i) for i in range(int(start), int(start) + 4)]
++                terms_latex = ", ".join(latex(term) for term in terms)
++                return r"$\left[{} , \ldots \right]$".format(terms_latex)
++        except Exception:
++            # fallback to default string representation
++            return str(self)
++
+ 
+ def sequence(seq, limits=None):
+     """Returns appropriate sequence object.

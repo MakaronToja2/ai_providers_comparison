@@ -1,0 +1,42 @@
+<frozen runpy>:128: RuntimeWarning: 'swebench.harness.run_evaluation' found in sys.modules after import of package 'swebench.harness', but prior to execution of 'swebench.harness.run_evaluation'; this may result in unpredictable behaviour
+Found 8 existing instance images. Will reuse them.
+Running 8 instances...
+Evaluation:   0%|          | 0/8 [00:00<?, ?it/s, error=0, ✓=0, ✖=0]Evaluation:   0%|          | 0/8 [00:23<?, ?it/s, ✓=0, ✖=0, error=1]Evaluation:  12%|█▎        | 1/8 [00:23<02:41, 23.13s/it, ✓=0, ✖=0, error=1]Evaluation:  12%|█▎        | 1/8 [00:23<02:41, 23.13s/it, ✓=0, ✖=0, error=2]Evaluation:  25%|██▌       | 2/8 [00:23<00:57,  9.66s/it, ✓=0, ✖=0, error=2]Evaluation:  25%|██▌       | 2/8 [00:25<00:57,  9.66s/it, ✓=1, ✖=0, error=2]Evaluation:  38%|███▊      | 3/8 [00:25<00:30,  6.05s/it, ✓=1, ✖=0, error=2]Evaluation:  38%|███▊      | 3/8 [00:40<00:30,  6.05s/it, ✓=1, ✖=0, error=3]Evaluation:  50%|█████     | 4/8 [00:40<00:39,  9.90s/it, ✓=1, ✖=0, error=3]Evaluation:  50%|█████     | 4/8 [00:42<00:39,  9.90s/it, ✓=1, ✖=0, error=4]Evaluation:  62%|██████▎   | 5/8 [00:42<00:20,  6.87s/it, ✓=1, ✖=0, error=4]Evaluation:  62%|██████▎   | 5/8 [00:45<00:20,  6.87s/it, ✓=2, ✖=0, error=4]Evaluation:  75%|███████▌  | 6/8 [00:45<00:11,  5.54s/it, ✓=2, ✖=0, error=4]Evaluation:  75%|███████▌  | 6/8 [01:03<00:11,  5.54s/it, ✓=2, ✖=1, error=4]Evaluation:  88%|████████▊ | 7/8 [01:03<00:09,  9.67s/it, ✓=2, ✖=1, error=4]Evaluation:  88%|████████▊ | 7/8 [01:10<00:09,  9.67s/it, ✓=2, ✖=2, error=4]Evaluation: 100%|██████████| 8/8 [01:10<00:00,  8.76s/it, ✓=2, ✖=2, error=4]Evaluation: 100%|██████████| 8/8 [01:10<00:00,  8.80s/it, ✓=2, ✖=2, error=4]
+pytest-dev__pytest-5692: >>>>> Patch Apply Failed:
+patching file src/_pytest/junitxml.py
+Hunk #1 FAILED at 655.
+1 out of 1 hunk FAILED -- saving rejects to file src/_pytest/junitxml.py.rej
+
+Check (logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__smoke__final/rerun-2026-10__openai__baseline__rep1__smoke__final/pytest-dev__pytest-5692/run_instance.log) for more information.
+django__django-13448: >>>>> Patch Apply Failed:
+patching file django/db/backends/base/creation.py
+Hunk #1 FAILED at 39.
+1 out of 1 hunk FAILED -- saving rejects to file django/db/backends/base/creation.py.rej
+
+Check (logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__smoke__final/rerun-2026-10__openai__baseline__rep1__smoke__final/django__django-13448/run_instance.log) for more information.
+sphinx-doc__sphinx-7975: >>>>> Patch Apply Failed:
+patching file sphinx/environment/adapters/indexentries.py
+Hunk #1 FAILED at 162.
+1 out of 2 hunks FAILED -- saving rejects to file sphinx/environment/adapters/indexentries.py.rej
+
+Check (logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__smoke__final/rerun-2026-10__openai__baseline__rep1__smoke__final/sphinx-doc__sphinx-7975/run_instance.log) for more information.
+sympy__sympy-15609: >>>>> Patch Apply Failed:
+patching file sympy/printing/latex.py
+Hunk #1 FAILED at 1438.
+1 out of 1 hunk FAILED -- saving rejects to file sympy/printing/latex.py.rej
+
+Check (logs/run_evaluation/rerun-2026-10__openai__baseline__rep1__smoke__final/rerun-2026-10__openai__baseline__rep1__smoke__final/sympy__sympy-15609/run_instance.log) for more information.
+All instances run.
+Cleaning cached images...
+Removed 0 images.
+Total instances: 8
+Instances submitted: 8
+Instances completed: 4
+Instances incomplete: 0
+Instances resolved: 2
+Instances unresolved: 2
+Instances with empty patches: 0
+Instances with errors: 4
+Unstopped containers: 0
+Unremoved images: 8
+Report written to rerun-2026-10__openai__baseline__rep1__smoke__final.rerun-2026-10__openai__baseline__rep1__smoke__final.json

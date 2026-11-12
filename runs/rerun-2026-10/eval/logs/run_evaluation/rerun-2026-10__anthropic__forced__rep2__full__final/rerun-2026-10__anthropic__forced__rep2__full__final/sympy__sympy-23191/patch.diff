@@ -1,0 +1,28 @@
+diff --git a/sympy/printing/pretty/pretty.py b/sympy/printing/pretty/pretty.py
+index 66461181d0..25422f18eb 100644
+--- a/sympy/printing/pretty/pretty.py
++++ b/sympy/printing/pretty/pretty.py
+@@ -1144,6 +1144,8 @@ def _print_BasisDependent(self, expr):
+             if '\n' in partstr:
+                 tempstr = partstr
+                 tempstr = tempstr.replace(vectstrs[i], '')
++                # Split by newlines to work with the last line
++                lines = tempstr.split('\n')
+                 if '\N{right parenthesis extension}' in tempstr:   # If scalar is a fraction
+                     for paren in range(len(tempstr)):
+                         flag[i] = 1
+@@ -1157,9 +1159,11 @@ def _print_BasisDependent(self, expr):
+                                         '\N{RIGHT PARENTHESIS LOWER HOOK}'
+                                         + ' ' + vectstrs[i])
+                 else:
+-                    tempstr = tempstr.replace('\N{RIGHT PARENTHESIS UPPER HOOK}',
+-                                        '\N{RIGHT PARENTHESIS UPPER HOOK}'
+-                                        + ' ' + vectstrs[i])
++                    # Append basis vector to the last line instead of replacing
++                    lines = tempstr.split('\n')
++                    if lines:
++                        lines[-1] = lines[-1] + ' ' + vectstrs[i]
++                    tempstr = '\n'.join(lines)
+                 o1[i] = tempstr
+ 
+         o1 = [x.split('\n') for x in o1]

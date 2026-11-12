@@ -1,0 +1,84 @@
+2026-10-10 13:09:02,658 - INFO - Creating container for django__django-15790...
+2026-10-10 13:09:02,811 - INFO - Container for django__django-15790 created: 578f6aee653e0701a4150141012c1bb960ea507980a5b91778665a56656d96ec
+2026-10-10 13:09:03,065 - INFO - Container for django__django-15790 started: 578f6aee653e0701a4150141012c1bb960ea507980a5b91778665a56656d96ec
+2026-10-10 13:09:03,066 - INFO - Intermediate patch for django__django-15790 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep2__full__final/rerun-2026-10__openai__self_reflect__rep2__full__final/django__django-15790/patch.diff, now applying to container...
+2026-10-10 13:09:03,197 - INFO - >>>>> Applied Patch:
+Checking patch django/core/checks/templates.py...
+warning: django/core/checks/templates.py has type 100755, expected 100644
+Applied patch django/core/checks/templates.py cleanly.
+
+2026-10-10 13:09:03,879 - INFO - Git diff before:
+diff --git a/django/core/checks/templates.py b/django/core/checks/templates.py
+index 5214276987..692ec98203 100755
+--- a/django/core/checks/templates.py
++++ b/django/core/checks/templates.py
+@@ -50,15 +50,15 @@ def check_string_if_invalid_is_string(app_configs, **kwargs):
+ @register(Tags.templates)
+ def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
+     errors = []
+-    libraries = defaultdict(list)
++    libraries = defaultdict(set)
+ 
+     for conf in settings.TEMPLATES:
+         custom_libraries = conf.get("OPTIONS", {}).get("libraries", {})
+         for module_name, module_path in custom_libraries.items():
+-            libraries[module_name].append(module_path)
++            libraries[module_name].add(module_path)
+ 
+     for module_name, module_path in get_template_tag_modules():
+-        libraries[module_name].append(module_path)
++        libraries[module_name].add(module_path)
+ 
+     for library_name, items in libraries.items():
+         if len(items) > 1:
+@@ -66,7 +66,7 @@ def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
+                 Error(
+                     E003.msg.format(
+                         repr(library_name),
+-                        ", ".join(repr(item) for item in items),
++                        ", ".join(repr(item) for item in sorted(items)),
+                     ),
+                     id=E003.id,
+                 )
+2026-10-10 13:09:03,879 - INFO - Eval script for django__django-15790 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep2__full__final/rerun-2026-10__openai__self_reflect__rep2__full__final/django__django-15790/eval.sh; copying to container...
+2026-10-10 13:09:09,482 - INFO - Test runtime: 5.54 seconds
+2026-10-10 13:09:09,484 - INFO - Test output for django__django-15790 written to logs/run_evaluation/rerun-2026-10__openai__self_reflect__rep2__full__final/rerun-2026-10__openai__self_reflect__rep2__full__final/django__django-15790/test_output.txt
+2026-10-10 13:09:09,554 - INFO - Git diff after:
+diff --git a/django/core/checks/templates.py b/django/core/checks/templates.py
+index 5214276987..692ec98203 100755
+--- a/django/core/checks/templates.py
++++ b/django/core/checks/templates.py
+@@ -50,15 +50,15 @@ def check_string_if_invalid_is_string(app_configs, **kwargs):
+ @register(Tags.templates)
+ def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
+     errors = []
+-    libraries = defaultdict(list)
++    libraries = defaultdict(set)
+ 
+     for conf in settings.TEMPLATES:
+         custom_libraries = conf.get("OPTIONS", {}).get("libraries", {})
+         for module_name, module_path in custom_libraries.items():
+-            libraries[module_name].append(module_path)
++            libraries[module_name].add(module_path)
+ 
+     for module_name, module_path in get_template_tag_modules():
+-        libraries[module_name].append(module_path)
++        libraries[module_name].add(module_path)
+ 
+     for library_name, items in libraries.items():
+         if len(items) > 1:
+@@ -66,7 +66,7 @@ def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
+                 Error(
+                     E003.msg.format(
+                         repr(library_name),
+-                        ", ".join(repr(item) for item in items),
++                        ", ".join(repr(item) for item in sorted(items)),
+                     ),
+                     id=E003.id,
+                 )
+2026-10-10 13:09:09,555 - INFO - Grading answer for django__django-15790...
+2026-10-10 13:09:09,561 - INFO - report: {'django__django-15790': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['test_template_tags_same_library_in_installed_apps_libraries (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)'], 'failure': []}, 'PASS_TO_PASS': {'success': ['Error if template loaders are specified and APP_DIRS is True.', 'test_app_dirs_removed (check_framework.test_templates.CheckTemplateSettingsAppDirsTest)', 'test_loaders_removed (check_framework.test_templates.CheckTemplateSettingsAppDirsTest)', 'test_string_if_invalid_both_are_strings (check_framework.test_templates.CheckTemplateStringIfInvalidTest)', 'test_string_if_invalid_first_is_string (check_framework.test_templates.CheckTemplateStringIfInvalidTest)', 'test_string_if_invalid_not_specified (check_framework.test_templates.CheckTemplateStringIfInvalidTest)', 'test_string_if_invalid_not_string (check_framework.test_templates.CheckTemplateStringIfInvalidTest)', 'test_template_tags_with_different_library_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)', 'test_template_tags_with_different_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)', 'test_template_tags_with_same_library_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)', 'test_template_tags_with_same_library_name_and_module_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)', 'test_template_tags_with_same_name (check_framework.test_templates.CheckTemplateTagLibrariesWithSameName)'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for django__django-15790: resolved: True
+2026-10-10 13:09:09,563 - INFO - Attempting to stop container sweb.eval.django__django-15790.rerun-2026-10__openai__self_reflect__rep2__full__final...
+2026-10-10 13:09:33,191 - INFO - Attempting to remove container sweb.eval.django__django-15790.rerun-2026-10__openai__self_reflect__rep2__full__final...
+2026-10-10 13:09:33,235 - INFO - Container sweb.eval.django__django-15790.rerun-2026-10__openai__self_reflect__rep2__full__final removed.

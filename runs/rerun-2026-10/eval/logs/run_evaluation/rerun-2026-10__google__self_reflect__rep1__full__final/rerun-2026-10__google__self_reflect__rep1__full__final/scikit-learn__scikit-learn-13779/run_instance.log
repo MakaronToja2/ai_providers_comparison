@@ -1,0 +1,56 @@
+2026-10-10 18:11:41,537 - INFO - Creating container for scikit-learn__scikit-learn-13779...
+2026-10-10 18:11:47,297 - INFO - Container for scikit-learn__scikit-learn-13779 created: b86c41624af5d2f9af5f5af19a05ae44ef06263ecb03e6c2b5d798c63b1e6036
+2026-10-10 18:11:53,395 - INFO - Container for scikit-learn__scikit-learn-13779 started: b86c41624af5d2f9af5f5af19a05ae44ef06263ecb03e6c2b5d798c63b1e6036
+2026-10-10 18:11:53,396 - INFO - Intermediate patch for scikit-learn__scikit-learn-13779 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep1__full__final/rerun-2026-10__google__self_reflect__rep1__full__final/scikit-learn__scikit-learn-13779/patch.diff, now applying to container...
+2026-10-10 18:11:53,502 - INFO - >>>>> Applied Patch:
+Checking patch sklearn/ensemble/voting.py...
+warning: sklearn/ensemble/voting.py has type 100755, expected 100644
+Applied patch sklearn/ensemble/voting.py cleanly.
+
+2026-10-10 18:11:53,676 - INFO - Git diff before:
+diff --git a/sklearn/ensemble/voting.py b/sklearn/ensemble/voting.py
+index 7afa7180c..23f3e5e1d 100755
+--- a/sklearn/ensemble/voting.py
++++ b/sklearn/ensemble/voting.py
+@@ -29,10 +29,11 @@ from ..utils import Bunch
+ 
+ def _parallel_fit_estimator(estimator, X, y, sample_weight=None):
+     """Private function used to fit an estimator within a job."""
+-    if sample_weight is not None:
+-        estimator.fit(X, y, sample_weight=sample_weight)
+-    else:
+-        estimator.fit(X, y)
++    if estimator is not None:
++        if sample_weight is not None:
++            estimator.fit(X, y, sample_weight=sample_weight)
++        else:
++            estimator.fit(X, y)
+     return estimator
+2026-10-10 18:11:53,676 - INFO - Eval script for scikit-learn__scikit-learn-13779 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep1__full__final/rerun-2026-10__google__self_reflect__rep1__full__final/scikit-learn__scikit-learn-13779/eval.sh; copying to container...
+2026-10-10 18:11:58,970 - INFO - Test runtime: 5.24 seconds
+2026-10-10 18:11:58,971 - INFO - Test output for scikit-learn__scikit-learn-13779 written to logs/run_evaluation/rerun-2026-10__google__self_reflect__rep1__full__final/rerun-2026-10__google__self_reflect__rep1__full__final/scikit-learn__scikit-learn-13779/test_output.txt
+2026-10-10 18:11:59,023 - INFO - Git diff after:
+diff --git a/sklearn/ensemble/voting.py b/sklearn/ensemble/voting.py
+index 7afa7180c..23f3e5e1d 100755
+--- a/sklearn/ensemble/voting.py
++++ b/sklearn/ensemble/voting.py
+@@ -29,10 +29,11 @@ from ..utils import Bunch
+ 
+ def _parallel_fit_estimator(estimator, X, y, sample_weight=None):
+     """Private function used to fit an estimator within a job."""
+-    if sample_weight is not None:
+-        estimator.fit(X, y, sample_weight=sample_weight)
+-    else:
+-        estimator.fit(X, y)
++    if estimator is not None:
++        if sample_weight is not None:
++            estimator.fit(X, y, sample_weight=sample_weight)
++        else:
++            estimator.fit(X, y)
+     return estimator
+2026-10-10 18:11:59,023 - INFO - Grading answer for scikit-learn__scikit-learn-13779...
+2026-10-10 18:11:59,025 - INFO - report: {'scikit-learn__scikit-learn-13779': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['sklearn/ensemble/tests/test_voting.py::test_none_estimator_with_weights[X0-y0-voter0]', 'sklearn/ensemble/tests/test_voting.py::test_none_estimator_with_weights[X1-y1-voter1]']}, 'PASS_TO_PASS': {'success': ['sklearn/ensemble/tests/test_voting.py::test_estimator_init', 'sklearn/ensemble/tests/test_voting.py::test_predictproba_hardvoting', 'sklearn/ensemble/tests/test_voting.py::test_notfitted', 'sklearn/ensemble/tests/test_voting.py::test_majority_label_iris', 'sklearn/ensemble/tests/test_voting.py::test_tie_situation', 'sklearn/ensemble/tests/test_voting.py::test_weights_iris', 'sklearn/ensemble/tests/test_voting.py::test_weights_regressor', 'sklearn/ensemble/tests/test_voting.py::test_predict_on_toy_problem', 'sklearn/ensemble/tests/test_voting.py::test_predict_proba_on_toy_problem', 'sklearn/ensemble/tests/test_voting.py::test_multilabel', 'sklearn/ensemble/tests/test_voting.py::test_gridsearch', 'sklearn/ensemble/tests/test_voting.py::test_parallel_fit', 'sklearn/ensemble/tests/test_voting.py::test_sample_weight', 'sklearn/ensemble/tests/test_voting.py::test_sample_weight_kwargs', 'sklearn/ensemble/tests/test_voting.py::test_set_params', 'sklearn/ensemble/tests/test_voting.py::test_set_estimator_none', 'sklearn/ensemble/tests/test_voting.py::test_estimator_weights_format', 'sklearn/ensemble/tests/test_voting.py::test_transform'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for scikit-learn__scikit-learn-13779: resolved: False
+2026-10-10 18:11:59,025 - INFO - Attempting to stop container sweb.eval.scikit-learn__scikit-learn-13779.rerun-2026-10__google__self_reflect__rep1__full__final...
+2026-10-10 18:12:19,813 - INFO - Attempting to remove container sweb.eval.scikit-learn__scikit-learn-13779.rerun-2026-10__google__self_reflect__rep1__full__final...
+2026-10-10 18:12:27,612 - INFO - Container sweb.eval.scikit-learn__scikit-learn-13779.rerun-2026-10__google__self_reflect__rep1__full__final removed.

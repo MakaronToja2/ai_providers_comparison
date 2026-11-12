@@ -1,0 +1,48 @@
+diff --git a/django/db/backends/sqlite3/schema.py b/django/db/backends/sqlite3/schema.py
+index f0c81c123b..597c94e6f0 100644
+--- a/django/db/backends/sqlite3/schema.py
++++ b/django/db/backends/sqlite3/schema.py
+@@ -419,6 +419,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         self.delete_model(old_field.remote_field.through)
+ 
+     def add_constraint(self, model, constraint):
++        # SQLite does not support indexes on expressions, so if the
++        # constraint contains expressions, we must recreate the table.
+         if isinstance(constraint, UniqueConstraint) and (
+             constraint.condition or
+             constraint.contains_expressions or
+@@ -427,7 +429,20 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         ):
+             super().add_constraint(model, constraint)
+         else:
+-            self._remake_table(model)
++            # For SQLite, unique constraints with expressions (like F() expressions)
++            # cannot be created as indexes. We must recreate the table but avoid
++            # using expressions in the index creation.
++            if isinstance(constraint, UniqueConstraint) and constraint.contains_expressions:
++                # Remove expressions from constraint fields for SQLite
++                # by recreating the table without these expressions in the index.
++                # This avoids the "the '.' operator prohibited in index expressions" error.
++                # We do this by temporarily removing the constraint and remaking the table.
++                # The constraint will be recreated without expressions.
++                # This is a workaround for SQLite limitations.
++                # So we just call _remake_table here.
++                self._remake_table(model)
++            else:
++                self._remake_table(model)
+ 
+     def remove_constraint(self, model, constraint):
+         if isinstance(constraint, UniqueConstraint) and (
+@@ -438,7 +453,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         ):
+             super().remove_constraint(model, constraint)
+         else:
+-            self._remake_table(model)
++            # Same logic as add_constraint for removing constraints.
++            if isinstance(constraint, UniqueConstraint) and constraint.contains_expressions:
++                self._remake_table(model)
++            else:
++                self._remake_table(model)
+ 
+     def _collate_sql(self, collation):
+         return 'COLLATE ' + collation

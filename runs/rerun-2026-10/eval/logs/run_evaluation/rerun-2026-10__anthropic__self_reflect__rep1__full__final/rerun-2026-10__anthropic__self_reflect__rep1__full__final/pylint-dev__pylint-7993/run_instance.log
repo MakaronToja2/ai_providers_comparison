@@ -1,0 +1,96 @@
+2026-10-10 17:35:26,513 - INFO - Creating container for pylint-dev__pylint-7993...
+2026-10-10 17:35:33,346 - INFO - Container for pylint-dev__pylint-7993 created: 9c0b4ee5b9245c0c6d62d2844697dd9ef61b5058da80c5b16c271f2c31bbea60
+2026-10-10 17:35:40,920 - INFO - Container for pylint-dev__pylint-7993 started: 9c0b4ee5b9245c0c6d62d2844697dd9ef61b5058da80c5b16c271f2c31bbea60
+2026-10-10 17:35:40,921 - INFO - Intermediate patch for pylint-dev__pylint-7993 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep1__full__final/rerun-2026-10__anthropic__self_reflect__rep1__full__final/pylint-dev__pylint-7993/patch.diff, now applying to container...
+2026-10-10 17:35:41,019 - INFO - >>>>> Applied Patch:
+Checking patch pylint/reporters/text.py...
+warning: pylint/reporters/text.py has type 100755, expected 100644
+Applied patch pylint/reporters/text.py cleanly.
+
+2026-10-10 17:35:41,167 - INFO - Git diff before:
+diff --git a/pylint/reporters/text.py b/pylint/reporters/text.py
+index 29bd46798..29076e09f 100755
+--- a/pylint/reporters/text.py
++++ b/pylint/reporters/text.py
+@@ -174,16 +174,30 @@ class TextReporter(BaseReporter):
+         # Set template to the currently selected template
+         self._template = template
+ 
++        # Temporarily replace escaped braces with placeholders to avoid matching them
++        # in the regex pattern. This allows templates like {{ "key": "{value}" }} to work.
++        escaped_open_brace = "\x00ESCAPED_OPEN_BRACE\x00"
++        escaped_close_brace = "\x00ESCAPED_CLOSE_BRACE\x00"
++        template_with_placeholders = template.replace("{{", escaped_open_brace).replace(
++            "}}", escaped_close_brace
++        )
++
+         # Check to see if all parameters in the template are attributes of the Message
+-        arguments = re.findall(r"\{(.+?)(:.*)?\}", template)
++        arguments = re.findall(r"\{(.+?)(:.*)?\}", template_with_placeholders)
+         for argument in arguments:
+             if argument[0] not in MESSAGE_FIELDS:
+                 warnings.warn(
+                     f"Don't recognize the argument '{argument[0]}' in the --msg-template. "
+                     "Are you sure it is supported on the current version of pylint?"
+                 )
+-                template = re.sub(r"\{" + argument[0] + r"(:.*?)?\}", "", template)
+-        self._fixed_template = template
++                template_with_placeholders = re.sub(
++                    r"\{" + argument[0] + r"(:.*?)?\}", "", template_with_placeholders
++                )
++
++        # Restore escaped braces in the template
++        self._fixed_template = template_with_placeholders.replace(
++            escaped_open_brace, "{{"
++        ).replace(escaped_close_brace, "}}")
+ 
+     def write_message(self, msg: Message) -> None:
+         """Convenience method to write a formatted message with class default
+2026-10-10 17:35:41,168 - INFO - Eval script for pylint-dev__pylint-7993 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep1__full__final/rerun-2026-10__anthropic__self_reflect__rep1__full__final/pylint-dev__pylint-7993/eval.sh; copying to container...
+2026-10-10 17:35:54,837 - INFO - Test runtime: 13.62 seconds
+2026-10-10 17:35:54,838 - INFO - Test output for pylint-dev__pylint-7993 written to logs/run_evaluation/rerun-2026-10__anthropic__self_reflect__rep1__full__final/rerun-2026-10__anthropic__self_reflect__rep1__full__final/pylint-dev__pylint-7993/test_output.txt
+2026-10-10 17:35:54,882 - INFO - Git diff after:
+diff --git a/pylint/reporters/text.py b/pylint/reporters/text.py
+index 29bd46798..29076e09f 100755
+--- a/pylint/reporters/text.py
++++ b/pylint/reporters/text.py
+@@ -174,16 +174,30 @@ class TextReporter(BaseReporter):
+         # Set template to the currently selected template
+         self._template = template
+ 
++        # Temporarily replace escaped braces with placeholders to avoid matching them
++        # in the regex pattern. This allows templates like {{ "key": "{value}" }} to work.
++        escaped_open_brace = "\x00ESCAPED_OPEN_BRACE\x00"
++        escaped_close_brace = "\x00ESCAPED_CLOSE_BRACE\x00"
++        template_with_placeholders = template.replace("{{", escaped_open_brace).replace(
++            "}}", escaped_close_brace
++        )
++
+         # Check to see if all parameters in the template are attributes of the Message
+-        arguments = re.findall(r"\{(.+?)(:.*)?\}", template)
++        arguments = re.findall(r"\{(.+?)(:.*)?\}", template_with_placeholders)
+         for argument in arguments:
+             if argument[0] not in MESSAGE_FIELDS:
+                 warnings.warn(
+                     f"Don't recognize the argument '{argument[0]}' in the --msg-template. "
+                     "Are you sure it is supported on the current version of pylint?"
+                 )
+-                template = re.sub(r"\{" + argument[0] + r"(:.*?)?\}", "", template)
+-        self._fixed_template = template
++                template_with_placeholders = re.sub(
++                    r"\{" + argument[0] + r"(:.*?)?\}", "", template_with_placeholders
++                )
++
++        # Restore escaped braces in the template
++        self._fixed_template = template_with_placeholders.replace(
++            escaped_open_brace, "{{"
++        ).replace(escaped_close_brace, "}}")
+ 
+     def write_message(self, msg: Message) -> None:
+         """Convenience method to write a formatted message with class default
+2026-10-10 17:35:54,882 - INFO - Grading answer for pylint-dev__pylint-7993...
+2026-10-10 17:35:54,885 - INFO - report: {'pylint-dev__pylint-7993': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['tests/reporters/unittest_reporting.py::test_template_option_with_header'], 'failure': []}, 'PASS_TO_PASS': {'success': ['tests/reporters/unittest_reporting.py::test_template_option', 'tests/reporters/unittest_reporting.py::test_template_option_default', 'tests/reporters/unittest_reporting.py::test_template_option_end_line', 'tests/reporters/unittest_reporting.py::test_template_option_non_existing', 'tests/reporters/unittest_reporting.py::test_deprecation_set_output', 'tests/reporters/unittest_reporting.py::test_parseable_output_deprecated', 'tests/reporters/unittest_reporting.py::test_parseable_output_regression', 'tests/reporters/unittest_reporting.py::test_multi_format_output', 'tests/reporters/unittest_reporting.py::test_multi_reporter_independant_messages', 'tests/reporters/unittest_reporting.py::test_display_results_is_renamed'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for pylint-dev__pylint-7993: resolved: True
+2026-10-10 17:35:54,885 - INFO - Attempting to stop container sweb.eval.pylint-dev__pylint-7993.rerun-2026-10__anthropic__self_reflect__rep1__full__final...
+2026-10-10 17:36:17,299 - INFO - Attempting to remove container sweb.eval.pylint-dev__pylint-7993.rerun-2026-10__anthropic__self_reflect__rep1__full__final...
+2026-10-10 17:36:19,654 - INFO - Container sweb.eval.pylint-dev__pylint-7993.rerun-2026-10__anthropic__self_reflect__rep1__full__final removed.

@@ -1,0 +1,34 @@
+diff --git a/django/db/backends/sqlite3/schema.py b/django/db/backends/sqlite3/schema.py
+index f0c81c123b..672ba2ed62 100644
+--- a/django/db/backends/sqlite3/schema.py
++++ b/django/db/backends/sqlite3/schema.py
+@@ -237,6 +237,17 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+             ]
+ 
+         constraints = list(model._meta.constraints)
++        # Filter out constraints with expressions as SQLite doesn't support
++        # the dot notation in index expressions. They will be recreated after
++        # the table is renamed.
++        constraints_with_expressions = [
++            constraint for constraint in constraints
++            if isinstance(constraint, UniqueConstraint) and constraint.contains_expressions
++        ]
++        constraints = [
++            constraint for constraint in constraints
++            if not (isinstance(constraint, UniqueConstraint) and constraint.contains_expressions)
++        ]
+ 
+         # Provide isolated instances of the fields to the new model body so
+         # that the existing model's internals aren't interfered with when
+@@ -302,6 +313,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
+         for sql in self.deferred_sql:
+             self.execute(sql)
+         self.deferred_sql = []
++        
++        # Recreate constraints with expressions after the table is renamed
++        for constraint in constraints_with_expressions:
++            self.add_constraint(model, constraint)
++        
+         # Fix any PK-removed field
+         if restore_pk_field:
+             restore_pk_field.primary_key = True

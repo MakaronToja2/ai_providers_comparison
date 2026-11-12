@@ -1,0 +1,38 @@
+diff --git a/pylint/reporters/text.py b/pylint/reporters/text.py
+index 29bd46798..29076e09f 100644
+--- a/pylint/reporters/text.py
++++ b/pylint/reporters/text.py
+@@ -174,16 +174,30 @@ class TextReporter(BaseReporter):
+         # Set template to the currently selected template
+         self._template = template
+ 
++        # Temporarily replace escaped braces with placeholders to avoid matching them
++        # in the regex pattern. This allows templates like {{ "key": "{value}" }} to work.
++        escaped_open_brace = "\x00ESCAPED_OPEN_BRACE\x00"
++        escaped_close_brace = "\x00ESCAPED_CLOSE_BRACE\x00"
++        template_with_placeholders = template.replace("{{", escaped_open_brace).replace(
++            "}}", escaped_close_brace
++        )
++
+         # Check to see if all parameters in the template are attributes of the Message
+-        arguments = re.findall(r"\{(.+?)(:.*)?\}", template)
++        arguments = re.findall(r"\{(.+?)(:.*)?\}", template_with_placeholders)
+         for argument in arguments:
+             if argument[0] not in MESSAGE_FIELDS:
+                 warnings.warn(
+                     f"Don't recognize the argument '{argument[0]}' in the --msg-template. "
+                     "Are you sure it is supported on the current version of pylint?"
+                 )
+-                template = re.sub(r"\{" + argument[0] + r"(:.*?)?\}", "", template)
+-        self._fixed_template = template
++                template_with_placeholders = re.sub(
++                    r"\{" + argument[0] + r"(:.*?)?\}", "", template_with_placeholders
++                )
++
++        # Restore escaped braces in the template
++        self._fixed_template = template_with_placeholders.replace(
++            escaped_open_brace, "{{"
++        ).replace(escaped_close_brace, "}}")
+ 
+     def write_message(self, msg: Message) -> None:
+         """Convenience method to write a formatted message with class default

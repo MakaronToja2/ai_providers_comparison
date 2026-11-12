@@ -1,0 +1,28 @@
+diff --git a/django/db/models/query.py b/django/db/models/query.py
+index 5ac2407ea3..eea1e60bcd 100644
+--- a/django/db/models/query.py
++++ b/django/db/models/query.py
+@@ -1836,14 +1836,22 @@ class QuerySet(AltersData):
+         batch_size = min(batch_size, max_batch_size) if batch_size else max_batch_size
+         inserted_rows = []
+         bulk_return = connection.features.can_return_rows_from_bulk_insert
++        # Adjust condition to allow returning fields when update_conflicts is True
++        if on_conflict == OnConflict.UPDATE:
++            can_return = bulk_return
++        else:
++            can_return = bulk_return and on_conflict is None
+         for item in [objs[i : i + batch_size] for i in range(0, len(objs), batch_size)]:
+-            if bulk_return and on_conflict is None:
++            if can_return:
+                 inserted_rows.extend(
+                     self._insert(
+                         item,
+                         fields=fields,
+                         using=self.db,
+                         returning_fields=self.model._meta.db_returning_fields,
++                        on_conflict=on_conflict,
++                        update_fields=update_fields,
++                        unique_fields=unique_fields,
+                     )
+                 )
+             else:

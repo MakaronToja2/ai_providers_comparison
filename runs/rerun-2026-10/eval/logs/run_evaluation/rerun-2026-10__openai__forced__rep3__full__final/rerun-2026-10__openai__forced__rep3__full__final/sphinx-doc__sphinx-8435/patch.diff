@@ -1,0 +1,51 @@
+diff --git a/sphinx/ext/autodoc/__init__.py b/sphinx/ext/autodoc/__init__.py
+index 171a3e7b0d..27ec48fa7b 100644
+--- a/sphinx/ext/autodoc/__init__.py
++++ b/sphinx/ext/autodoc/__init__.py
+@@ -1273,7 +1273,45 @@ class FunctionDocumenter(DocstringSignatureMixin, ModuleLevelDocumenter):  # typ
+         return args
+ 
+     def document_members(self, all_members: bool = False) -> None:
+-        pass
++        # Override to apply autodoc_type_aliases to variables and attributes
++        from sphinx.util.inspect import stringify_annotation
++
++        def format_annotation(annotation):
++            # Apply type aliases if configured
++            if annotation is None:
++                return None
++            if self.config.autodoc_type_aliases:
++                # Replace annotation string by alias if matched
++                annotation_str = stringify_annotation(annotation)
++                for alias, target in self.config.autodoc_type_aliases.items():
++                    if annotation_str == alias:
++                        return target
++            return stringify_annotation(annotation)
++
++        # Document variables and attributes with type alias applied
++        members = self.get_object_members(all_members)
++        for name, member in members:
++            # Only document variables and attributes (not methods/functions)
++            if not (inspect.isroutine(member) or inspect.isclass(member)):
++                annotation = getattr(self.object, '__annotations__', {}).get(name)
++                if annotation:
++                    annotation_str = format_annotation(annotation)
++                    # Add line for variable with type alias applied
++                    self.add_line(f".. attribute:: {name}", self.get_sourcename())
++                    if annotation_str:
++                        self.add_line(f"   :type: {annotation_str}", self.get_sourcename())
++                    doc = getattr(self.object, name).__doc__ if hasattr(getattr(self.object, name), '__doc__') else None
++                    if doc:
++                        for line in doc.splitlines():
++                            self.add_line(f"   {line}", self.get_sourcename())
++                    else:
++                        # fallback to attribute docstring or comment
++                        attr_doc = self.get_attr_doc(name)
++                        if attr_doc:
++                            for line in attr_doc.splitlines():
++                                self.add_line(f"   {line}", self.get_sourcename())
++        # Call super to document other members normally
++        super().document_members(all_members)
+ 
+     def add_directive_header(self, sig: str) -> None:
+         sourcename = self.get_sourcename()

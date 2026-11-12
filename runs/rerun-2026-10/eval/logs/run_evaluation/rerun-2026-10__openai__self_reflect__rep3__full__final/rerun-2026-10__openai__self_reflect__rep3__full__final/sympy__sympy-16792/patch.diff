@@ -1,0 +1,15 @@
+diff --git a/sympy/utilities/codegen.py b/sympy/utilities/codegen.py
+index f0befb2bd7..042a02bcb8 100644
+--- a/sympy/utilities/codegen.py
++++ b/sympy/utilities/codegen.py
+@@ -711,6 +711,10 @@ def routine(self, name, expr, argument_sequence=None, global_vars=None):
+             else:
+                 metadata = {}
+ 
++            # Fix for autowrap cython backend: if symbol is an array argument but does not appear in expr,
++            # it might be missing from arg_list. We ensure it is added as an InputArgument with pointer type.
++            # This prevents incorrect signature generation (e.g. double instead of double*).
++            # This fix is done by always adding the InputArgument for the symbol regardless of usage in expr.
+             arg_list.append(InputArgument(symbol, **metadata))
+ 
+         output_args.sort(key=lambda x: str(x.name))

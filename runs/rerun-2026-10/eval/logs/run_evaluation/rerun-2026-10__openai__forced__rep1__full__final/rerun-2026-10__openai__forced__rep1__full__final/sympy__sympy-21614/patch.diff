@@ -1,0 +1,18 @@
+diff --git a/sympy/core/function.py b/sympy/core/function.py
+index 69df976b8b..54afebd3b1 100644
+--- a/sympy/core/function.py
++++ b/sympy/core/function.py
+@@ -1276,6 +1276,13 @@ def __new__(cls, expr, *variables, **kwargs):
+         symbols_or_none = getattr(expr, "free_symbols", None)
+         has_symbol_set = isinstance(symbols_or_none, set)
+ 
++        # Fix for kind attribute for Derivative of MatrixExpr:
++        # If expr is a MatrixExpr, propagate its kind to the Derivative
++        if isinstance(expr, MatrixExpr):
++            obj = Expr.__new__(cls, expr, *variables)
++            obj._kind = expr.kind
++            return obj
++
+         if not has_symbol_set:
+             raise ValueError(filldedent('''
+                 Since there are no variables in the expression %s,

@@ -1,0 +1,32 @@
+diff --git a/django/contrib/admin/helpers.py b/django/contrib/admin/helpers.py
+index 6f0be6b148..6397276ca0 100644
+--- a/django/contrib/admin/helpers.py
++++ b/django/contrib/admin/helpers.py
+@@ -184,11 +184,22 @@ class AdminReadonlyField:
+         self.empty_value_display = model_admin.get_empty_value_display()
+ 
+     def label_tag(self):
+-        attrs = {}
+-        if not self.is_first:
+-            attrs["class"] = "inline"
+-        label = self.field['label']
+-        return format_html('<label{}>{}{}</label>', flatatt(attrs), capfirst(label), self.form.label_suffix)
++        # For read-only widgets like ReadOnlyPasswordHashWidget, do not add a 'for' attribute
++        # because there is no labelable element.
++        widget = getattr(self.form.fields.get(self.field['field'], None), 'widget', None)
++        if widget and getattr(widget, 'read_only', False):
++            attrs = {}
++            if not self.is_first:
++                attrs["class"] = "inline"
++            label = self.field['label']
++            # Render label without 'for' attribute
++            return format_html('<label{}>{}{}</label>', flatatt(attrs), capfirst(label), self.form.label_suffix)
++        else:
++            attrs = {}
++            if not self.is_first:
++                attrs["class"] = "inline"
++            label = self.field['label']
++            return format_html('<label for="{}"{}>{}{}</label>', self.id_for_label, flatatt(attrs), capfirst(label), self.form.label_suffix)
+ 
+     def get_admin_url(self, remote_field, remote_obj):
+         url_name = 'admin:%s_%s_change' % (

@@ -99,6 +99,47 @@ class PatchExtractor:
 
         return None
 
+    FENCED_BLOCK_PATTERN = re.compile(r'```\w*[ \t]*\n(.*?)```', re.DOTALL)
+
+    def extract_final(self, content: str) -> Tuple[Optional[str], int]:
+        """
+        Extract the patch from a final answer message.
+
+        Returns (patch, number of valid diff blocks found). When the answer holds several
+        diff blocks: blocks that touch different files are parts of one multi-file patch
+        and are joined in order; otherwise later blocks supersede earlier ones and the
+        last block is taken.
+        """
+        if not content:
+            return None, 0
+
+        blocks = [
+            self._normalize_patch(match)
+            for match in self.FENCED_BLOCK_PATTERN.findall(content)
+            if self._is_valid_patch(match)
+        ]
+
+        if not blocks:
+            # No fenced diff: fall back to the inline scan of extract()
+            patch = self.extract(content)
+            return patch, (1 if patch else 0)
+
+        if len(blocks) == 1:
+            return blocks[0], 1
+
+        file_sets = [set(self.extract_files_changed(block)) for block in blocks]
+        seen: set = set()
+        disjoint = True
+        for files in file_sets:
+            if not files or files & seen:
+                disjoint = False
+                break
+            seen |= files
+
+        if disjoint:
+            return ''.join(blocks), len(blocks)
+        return blocks[-1], len(blocks)
+
     def _is_valid_patch(self, text: str) -> bool:
         """Check if text looks like a valid unified diff patch."""
         text = text.strip()
